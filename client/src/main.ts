@@ -7,6 +7,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { CreateGameComponent } from '@app/pages/create-game/create-game.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
+import { AdministrationGameComponent } from '@app/pages/administration-game/administration-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { environment } from './environments/environment';
@@ -21,6 +22,7 @@ const routes: Routes = [
     { path: 'game', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
     { path: 'join-game', component: JoinGameComponent },
+    { path: 'administration-game', component: AdministrationGameComponent },
     { path: 'create-game', component: CreateGameComponent },
     { path: '**', redirectTo: '/home' },
 ];
