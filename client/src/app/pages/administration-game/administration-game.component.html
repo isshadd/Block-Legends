@@ -1,1 +1,38 @@
-<p>administration-game works!</p>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="admin_page">
+            <h1 id="title">Liste des jeux:</h1>
+            <ul class="game_list">
+                <li *ngFor="let game of games">
+                    <img [src]="game.imgSrc" [ngStyle]="getImageStyles(game)" (mouseover)="onMouseOver(game)" (mouseout)="onMouseOut(game)" />
+                    <div class="game_info" [ngStyle]="getGameStyle(game)">
+                        <h3>{{ game.name }}</h3>
+                        <div class="info_preamble">
+                            <p>Taille: {{ game.size }} tuiles</p>
+                            <p>Mode: {{ game.mode }}</p>
+                            <p>Dernière modification: {{ game.lastModif | date: 'shortDate' }}</p>
+                        </div>
+                        <div class="action_icons">
+                            <span class="material-icons" (click)="deleteGame(game)" title="Supprimer">delete</span>
+                            <span class="material-icons" href="/" title="Éditer">edit</span>
+                            <span class="material-icons" (click)="exportGame(game)" title="Exporter">file_download</span>
+                            <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
+                                {{ game.isVisible ? 'visibility' : 'visibility_off' }}
+                            </span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div class="button_container">
+                <a href="/client/src/app/pages/main-page"><button id="btnImport">Importer</button></a>
+                <a href="/client/src/app/pages/create-game"><button id="btnCreat">Créer un jeu</button></a>
+            </div>
+        </div>
+    </body>
+</html>
