@@ -2,9 +2,9 @@
     <div id="side-menu"></div>
 
     <div id="map-container">
-        <div id="map">
+        <div id="map" [style.--grid-size]="grid.length" [style.--tile-size]="100 / grid.length + '%'">
             @for(row of grid; track row; let i = $index){ @for(column of row; track column; let j = $index){
-            <div [class]="column.type" (click)="onTileClick(i, j)">{{ j }}, {{ i }}</div>
+            <div [class]="column" class="tile" (click)="onTileClick(i, j)">{{ j }}, {{ i }}</div>
             } }
         </div>
     </div>

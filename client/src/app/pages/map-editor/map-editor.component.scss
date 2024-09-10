@@ -18,9 +18,18 @@
 
         #map {
             aspect-ratio: 1/1;
+            max-height: 100vh;
             display: grid;
-            grid-template-columns: repeat(5, 20%);
+            grid-template-columns: repeat(var(--grid-size), var(--tile-size));
             background-color: rgb(57, 57, 125);
+
+            .tile {
+                border: 1px solid black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 50%;
+            }
 
             .stone {
                 background-color: gray;

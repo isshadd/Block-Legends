@@ -8,13 +8,22 @@ import { Component } from '@angular/core';
     styleUrl: './map-editor.component.scss',
 })
 export class MapEditorComponent {
-    grid = [
-        [{ type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }, { type: 'water' }],
-        [{ type: 'grass' }, { type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }],
-        [{ type: 'water' }, { type: 'grass' }, { type: 'stone' }, { type: 'water' }, { type: 'grass' }],
-        [{ type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }, { type: 'water' }],
-        [{ type: 'grass' }, { type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }],
-    ];
+    gridType: Array<string> = ['stone', 'water', 'grass'];
+
+    grid: Array<Array<string>> = [];
+
+    gridCreator(tileNumber: number) {
+        for (let i = 0; i < tileNumber; i++) {
+            this.grid.push([]);
+            for (let j = 0; j < tileNumber; j++) {
+                this.grid[i].push(this.gridType[Math.floor(Math.random() * this.gridType.length)]);
+            }
+        }
+    }
+
+    constructor() {
+        this.gridCreator(20);
+    }
 
     onTileClick(i: number, j: number) {
         alert(`Tile ${j}, ${i} clicked`);
