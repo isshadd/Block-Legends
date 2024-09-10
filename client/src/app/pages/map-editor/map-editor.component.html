@@ -2,6 +2,10 @@
     <div id="side-menu"></div>
 
     <div id="map-container">
-        <div id="map"></div>
+        <div id="map">
+            @for(row of grid; track row){ @for(column of row; track column){
+            <div [class]="column.type"></div>
+            } }
+        </div>
     </div>
 </div>
