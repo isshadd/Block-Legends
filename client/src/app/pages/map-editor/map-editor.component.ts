@@ -15,4 +15,8 @@ export class MapEditorComponent {
         [{ type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }, { type: 'water' }],
         [{ type: 'grass' }, { type: 'stone' }, { type: 'water' }, { type: 'grass' }, { type: 'stone' }],
     ];
+
+    onTileClick(i: number, j: number) {
+        alert(`Tile ${j}, ${i} clicked`);
+    }
 }
