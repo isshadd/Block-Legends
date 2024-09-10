@@ -1,18 +1,24 @@
 #page-container {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
     height: 100vh;
     width: 100vw;
 
-    #first-rectangle {
-        min-width: 400px;
+    #side-menu {
+        min-width: 25%;
+        max-width: 30%;
         height: auto;
         background-color: red;
     }
-    #second-rectangle {
-        aspect-ratio: 1/1;
-        background-color: blue;
+
+    #map-container {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+
+        #map {
+            aspect-ratio: 1/1;
+            background-color: blue;
+        }
     }
 }
-
