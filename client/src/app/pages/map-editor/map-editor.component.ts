@@ -22,7 +22,7 @@ export class MapEditorComponent {
     }
 
     constructor() {
-        this.gridCreator(20);
+        this.gridCreator(10);
     }
 
     onTileClick(i: number, j: number) {
