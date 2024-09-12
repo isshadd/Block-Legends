@@ -8,7 +8,7 @@ import { MapCoordinateService } from '@app/services/map-coordinate.service';
 export class BaseTile implements PlaceableEntity {
     nom: String = 'BaseTile';
     description: String = 'BaseTile';
-    imageUrl: String = 'BaseTile';
+    imageUrl: String = '@assets/images/tiles/grass.png';
     coordinates: MapCoordinateService = new MapCoordinateService();
     constructor() {}
 }
