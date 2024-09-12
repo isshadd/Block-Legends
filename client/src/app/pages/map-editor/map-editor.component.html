@@ -1,5 +1,14 @@
 <div id="page-container">
-    <div id="side-menu"></div>
+    <div id="side-menu">
+        <p id="title">Tiles</p>
+        <div id="tiles-list-container">
+            @for (tile of gridType; track tile){
+            <div class="tile" [style.background-image]="'url(' + tile.imageUrl + ')'">
+                <p>{{ tile.name }}</p>
+            </div>
+            }
+        </div>
+    </div>
 
     <div id="map-container">
         <div id="map" [style.--grid-size]="grid.length" [style.--tile-size]="100 / grid.length + '%'">
