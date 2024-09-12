@@ -6,8 +6,8 @@ import { BaseTile } from './base-tile';
     providedIn: 'root',
 })
 export class WaterTile extends BaseTile {
-    nom: String = 'WaterTile';
+    name: String = 'WaterTile';
     description: String = 'WaterTile';
-    imageUrl: String = '@assets/images/tiles/water.jpg';
+    imageUrl: String = 'assets/images/tiles/water.jpg';
     coordinates: MapCoordinateService = new MapCoordinateService();
 }

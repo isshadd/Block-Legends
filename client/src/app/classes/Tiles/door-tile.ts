@@ -8,6 +8,6 @@ import { BaseTile } from './base-tile';
 export class DoorTile extends BaseTile {
     name: String = 'DoorTile';
     description: String = 'DoorTile';
-    imageUrl: String = '@assets/images/tiles/door.jpg';
+    imageUrl: String = 'assets/images/tiles/door.jpg';
     coordinates: MapCoordinateService = new MapCoordinateService();
 }

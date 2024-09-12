@@ -1,4 +1,9 @@
 import { Component } from '@angular/core';
+import { BaseTile } from '@app/classes/Tiles/base-tile';
+import { DoorTile } from '@app/classes/Tiles/door-tile';
+import { IceTile } from '@app/classes/Tiles/ice-tile';
+import { WallTile } from '@app/classes/Tiles/wall-tile';
+import { WaterTile } from '@app/classes/Tiles/water-tile';
 
 @Component({
     selector: 'app-map-editor',
@@ -8,9 +13,9 @@ import { Component } from '@angular/core';
     styleUrl: './map-editor.component.scss',
 })
 export class MapEditorComponent {
-    gridType: Array<string> = ['stone', 'water', 'grass'];
+    gridType: Array<BaseTile> = [new WaterTile(), new DoorTile(), new IceTile(), new WallTile(), new BaseTile()];
 
-    grid: Array<Array<string>> = [];
+    grid: Array<Array<BaseTile>> = [];
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
@@ -25,7 +30,7 @@ export class MapEditorComponent {
         this.gridCreator(10);
     }
 
-    onTileClick(i: number, j: number) {
-        alert(`Tile ${j}, ${i} clicked`);
+    onTileClick(i: number, j: number, tile: BaseTile) {
+        alert(`${tile.name} ${j}, ${i} clicked`);
     }
 }
