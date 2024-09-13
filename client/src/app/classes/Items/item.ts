@@ -6,6 +6,6 @@ import { Injectable } from '@angular/core';
 export class Item {
     name: String = 'Item';
     description: String = 'Item';
-    imageUrl: String = 'assets/images/items/Sword.png';
+    imageUrl: String = 'assets/images/item/baseItem.png'; //minecraftWiki
     constructor() {}
 }

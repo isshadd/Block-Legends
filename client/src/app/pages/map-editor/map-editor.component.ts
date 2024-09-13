@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Item } from '@app/classes/Items/item';
 import { BaseTile } from '@app/classes/Tiles/base-tile';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
@@ -14,7 +15,6 @@ import { WaterTile } from '@app/classes/Tiles/water-tile';
 })
 export class MapEditorComponent {
     gridType: Array<BaseTile> = [new WaterTile(), new DoorTile(), new IceTile(), new WallTile(), new BaseTile()];
-
     grid: Array<Array<BaseTile>> = [];
 
     gridCreator(tileNumber: number) {
@@ -25,6 +25,8 @@ export class MapEditorComponent {
             }
         }
     }
+
+    itemTypes: Array<Item> = [new Item(), new Item(), new Item(), new Item(), new Item(), new Item()];
 
     constructor() {
         this.gridCreator(20);

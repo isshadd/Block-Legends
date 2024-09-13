@@ -1,10 +1,18 @@
 <div id="page-container">
     <div id="side-menu">
         <p id="title">Tiles</p>
-        <div id="tiles-list-container">
+        <div class="list-container">
             @for (tile of gridType; track tile){
             <div class="tile" [style.background-image]="'url(' + tile.imageUrl + ')'">
                 <p>{{ tile.name }}</p>
+            </div>
+            }
+        </div>
+        <p id="title">Items</p>
+        <div class="list-container">
+            @for (item of itemTypes; track item){
+            <div class="tile" [style.background-image]="'url(' + item.imageUrl + ')'">
+                <p>{{ item.name }}</p>
             </div>
             }
         </div>
