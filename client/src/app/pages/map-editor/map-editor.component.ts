@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Item } from '@app/classes/Items/item';
 import { BaseTile } from '@app/classes/Tiles/base-tile';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
@@ -9,7 +10,7 @@ import { WaterTile } from '@app/classes/Tiles/water-tile';
 @Component({
     selector: 'app-map-editor',
     standalone: true,
-    imports: [],
+    imports: [RouterLink],
     templateUrl: './map-editor.component.html',
     styleUrl: './map-editor.component.scss',
 })
