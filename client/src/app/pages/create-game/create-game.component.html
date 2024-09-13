@@ -6,6 +6,19 @@
         <link rel="stylesheet" href="create-game.component.scss" />
     </head>
     <body>
+        <nav class="navbar">
+            <div class="navbar-title">Créer une nouvelle partie - League of Versions</div>
+            <div class="navbar-modes">
+                <div class="mode-option">
+                    <img src="https://www.clipartmax.com/png/middle/326-3260345_minecraft-swords-crossed-png-minecraft-diamond-sword-crossed.png" alt="Combat Classique">
+                    <button (click)="selectMode('combat')" [ngClass]="{'active': selectedMode === 'combat'}">Combat Classique</button>
+                </div>
+                <div class="mode-option">
+                    <img src="https://files.oaiusercontent.com/file-2ACuf6yZTHbJkatDbxNciFvv?se=2024-09-13T16%3A06%3A13Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D2e2f7a55-af24-4135-9713-cdc2247f49cc.webp&sig=yL83MGJ/zi2N9hgrcSxRv19zpYq94A580ddC1I/oev0%3D" alt="Capture de Drapeau">
+                    <button (click)="selectMode('capture')" [ngClass]="{'active': selectedMode === 'capture'}">Capture de Drapeau</button>
+                </div>
+            </div>
+        </nav>
         <h1>Créer une nouvelle partie - League of Versions</h1>
         <ul>
             <li *ngFor="let game of games">
