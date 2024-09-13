@@ -14,6 +14,7 @@ export class CreateGameComponent {
 
     selectedGame: any;
     gameStatus: string | null;
+    selectedMode: string | null;
 
     constructor(private router: Router) {}
 
@@ -26,5 +27,10 @@ export class CreateGameComponent {
             this.gameStatus = null;
             this.router.navigate(['/create-character']);
         }
+    }
+    
+    selectMode(mode: string): void {
+        this.selectedMode = mode;
+        console.log('Selected mode:', mode);
     }
 }
