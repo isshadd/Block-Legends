@@ -43,13 +43,12 @@ export class CreateCharacterComponent {
     }
 
     assignBonus() {
-        if (!this.isLifeOrSpeedBonusAssigned) {
-            if (this.bonusAttribute === 'life') {
-                this.character.life += 2;
-            } else if (this.bonusAttribute === 'speed') {
-                this.character.speed += 2;
-            }
-            this.isLifeOrSpeedBonusAssigned = true;
+        if (this.bonusAttribute === 'life') {
+            this.character.life = 6;
+            this.character.speed = 4;
+        } else if (this.bonusAttribute === 'speed') {
+            this.character.speed = 6;
+            this.character.life = 4;
         }
     }
 
