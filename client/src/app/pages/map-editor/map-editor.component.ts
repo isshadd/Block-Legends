@@ -27,7 +27,7 @@ export class MapEditorComponent {
     }
 
     constructor() {
-        this.gridCreator(10);
+        this.gridCreator(20);
     }
 
     onTileClick(i: number, j: number, tile: BaseTile) {
