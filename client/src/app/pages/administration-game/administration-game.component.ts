@@ -44,13 +44,16 @@ export class AdministrationGameComponent {
             isVisible: true,
         },
     ];
+
     onMouseOver(game: any): void {
         // pour le moment, le type de game est any
         game.isHovered = true;
     }
+
     onMouseOut(game: any): void {
         game.isHovered = false;
     }
+
     getImageStyles(game: any): any {
         return {
             transform: game.isHovered ? 'scale(1.4)' : 'scale(1)',
@@ -63,14 +66,12 @@ export class AdministrationGameComponent {
         this.games = this.games.filter((elem) => elem !== game);
     }
 
-    exportGame(game: any) {}
-
     toggleVisibility(game: any): void {
         game.isVisible = !game.isVisible;
     }
+
     getGameStyle(game: any): any {
         return {
-            color: game.isVisible ? 'black' : 'gray',
             opacity: game.isVisible ? '1' : '0.5',
         };
     }

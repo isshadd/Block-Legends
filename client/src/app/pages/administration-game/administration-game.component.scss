@@ -1,13 +1,14 @@
+@import 'src/_variables.scss';
+
 .admin_page {
-    background-color: #b7daf8;
-    background-image: linear-gradient(to top, #b7daf8 0%, #e5eef7 100%);
+    background-color: $background;
     background-size: 100%;
     padding: 20px;
 }
 
 .game_list {
     font-size: 2rem;
-    color: aliceblue;
+    color: $primary-light;
     list-style-type: none;
     padding: 0;
 }
@@ -15,7 +16,8 @@
 .game_list li {
     display: flex;
     align-items: center;
-    background-color: #6c96a1;
+    background-color: $primary-dark;
+    color: black;
     padding: 20px;
     margin-bottom: 10px;
     margin-right: 20px;
@@ -62,11 +64,11 @@
         visibility 0.3s ease;
     font-size: 1rem;
     padding: 5px;
-    background-color: #1d4e63b3;
-    color: white;
+    background-color: $secondary;
+    color: black;
     padding: 5px 10px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px #00000080; /* Optional shadow */
+    box-shadow: 0 4px 8px black; /* Optional shadow */
 }
 
 .game_list img:hover ~ .game_info .info_preamble {
@@ -78,8 +80,8 @@
 #title {
     margin: 0;
     font-size: 3rem;
-    background-color: #07374f;
-    background-image: linear-gradient(to top, #07374f 0%, #0f648e 100%);
+    background-color: $primary-dark;
+    // background-image: linear-gradient(to top, $primary-dark 0%, $primary 100%);
     background-size: 100%;
     -webkit-background-clip: text;
     -moz-background-clip: text;
@@ -96,7 +98,7 @@
 
 .action_icons .material-icons {
     font-size: 24px;
-    color: #244b4e; /* Set the icon color */
+    color: $primary; /* Set the icon color */
     cursor: pointer;
     transition:
         color 0.3s ease,
@@ -104,7 +106,7 @@
 }
 
 .action_icons .material-icons:hover {
-    color: #ffffff; /* Change color on hover */
+    color: white; /* Change color on hover */
     transform: scale(1.2); /* Enlarge slightly on hover */
 }
 
@@ -118,10 +120,10 @@
     padding: 10px 30px;
     margin-right: 20px;
     font-size: medium;
-    background-color: #84aeb7;
+    background-color: $primary-dark;
 }
 
 .button_container button:hover {
     background-color: #244b4e;
-    color: #f8f8f8;
+    color: $primary-light;
 }
