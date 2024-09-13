@@ -1,0 +1,68 @@
+@import 'src/_variables.scss';
+
+body {
+    background-color: $background;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.attributes {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    background-color: #94c5cc;
+    border-radius: 5px;
+    padding: 10px;
+}
+button {
+    background-color: #b4d2e7;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+.attribute {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #e0a458;
+    border-radius: 5px;
+}
+button:hover {
+    background-color: #4f5d75;
+}
+
+button[disabled] {
+    background-color: #94c5cc;
+    cursor: not-allowed;
+}
+
+.attribute input {
+    width: 70px; /* Pour que les champs ne prennent pas trop de place */
+    text-align: center;
+}
+
+#life,
+#speed {
+    height: 55px;
+    width: 100px;
+}
+
+.info-char input {
+    width: 100px; /* Pour que les champs ne prennent pas trop de place */
+    text-align: center;
+}

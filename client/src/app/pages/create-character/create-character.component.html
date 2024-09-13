@@ -8,32 +8,32 @@
     <body>
         <h1>Création de personnage - League of Versions</h1>
         <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
-            <div>
+            <div class="info-char">
                 <label for="name">Nom :</label>
                 <input id="name" [(ngModel)]="character.name" name="name" required />
             </div>
-            <div>
+            <div class="info-char">
                 <label for="avatar">Avatar :</label>
                 <select id="avatar" [(ngModel)]="character.avatar" name="avatar" required>
                     <option *ngFor="let avatar of avatars" [value]="avatar">{{ avatar }}</option>
                 </select>
             </div>
-            <div>
+            <div class="attributes">
                 <h3>Attributs :</h3>
-                <div>
+                <div class="attribute" id="life">
                     <label>Vie :</label>
                     <input name="life" [(ngModel)]="character.life" type="number" min="4" required readonly />
                 </div>
-                <div>
+                <div class="attribute" id="speed">
                     <label>Rapidité :</label>
                     <input name="speed" [(ngModel)]="character.speed" type="number" min="4" required readonly />
                 </div>
-                <div>
+                <div class="attribute" id="attack">
                     <label>Attaque :</label>
                     <input name="attack" [(ngModel)]="character.attack" type="number" min="4" required readonly />
                     <button type="button" (click)="diceAttribution('attack')" [disabled]="isAttackDiceAssigned">Assigner un dé</button>
                 </div>
-                <div>
+                <div class="attribute" id="defense">
                     <label>Défense :</label>
                     <input name="defense" [(ngModel)]="character.defense" type="number" min="4" required readonly />
                     <button type="button" (click)="diceAttribution('defense')" [disabled]="isDefenseDiceAssigned">Assigner un dé</button>
@@ -41,7 +41,7 @@
             </div>
             <div>
                 <label for="bonus">Attribuer un bonus de +2 à la vie ou à la rapidité</label>
-                <select id="bonus" [(ngModel)]="bonusAttribute" name="bonus" (change)="assignBonus()">
+                <select id="bonus" [(ngModel)]="bonusAttribute" name="bonus" [disabled]="isLifeOrSpeedBonusAssigned" (change)="assignBonus()">
                     <option value="life">Vie</option>
                     <option value="speed">Rapidité</option>
                 </select>
