@@ -7,11 +7,12 @@ import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { MapComponent } from '@app/components/map/map.component';
+import { TileComponent } from '@app/components/placeable-entity/tile.component';
 
 @Component({
     selector: 'app-map-editor',
     standalone: true,
-    imports: [RouterLink, MapComponent],
+    imports: [RouterLink, MapComponent, TileComponent],
     templateUrl: './map-editor.component.html',
     styleUrl: './map-editor.component.scss',
 })

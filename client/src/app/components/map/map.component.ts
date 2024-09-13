@@ -4,12 +4,12 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { PlaceableEntityComponent } from '../placeable-entity/placeable-entity.component';
+import { TileComponent } from '../placeable-entity/tile.component';
 
 @Component({
     selector: 'app-map',
     standalone: true,
-    imports: [PlaceableEntityComponent],
+    imports: [TileComponent],
     templateUrl: './map.component.html',
     styleUrl: './map.component.scss',
 })
