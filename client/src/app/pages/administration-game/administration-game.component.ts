@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-administration-game',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './administration-game.component.html',
     styleUrl: './administration-game.component.scss',
 })
@@ -63,6 +64,10 @@ export class AdministrationGameComponent {
     }
 
     exportGame(game: any) {}
+
+    editGame(game : any) {
+        return
+    }
 
     toggleVisibility(game: any): void {
         game.isVisible = !game.isVisible;

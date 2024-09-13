@@ -20,7 +20,7 @@
                         </div>
                         <div class="action_icons">
                             <span class="material-icons" (click)="deleteGame(game)" title="Supprimer">delete</span>
-                            <span class="material-icons" href="/" title="Éditer">edit</span>
+                            <span class="material-icons" routerLink="/main-page" title="Éditer">edit</span>
                             <span class="material-icons" (click)="exportGame(game)" title="Exporter">file_download</span>
                             <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
                                 {{ game.isVisible ? 'visibility' : 'visibility_off' }}
@@ -30,8 +30,8 @@
                 </li>
             </ul>
             <div class="button_container">
-                <a href="/client/src/app/pages/main-page"><button id="btnImport">Importer</button></a>
-                <a href="/client/src/app/pages/create-game"><button id="btnCreat">Créer un jeu</button></a>
+                <a routerLink="/main-page"><button id="btnImport">Importer</button></a>
+                <a routerLink="/create-game"><button id="btnCreat">Créer un jeu</button></a>
             </div>
         </div>
     </body>
