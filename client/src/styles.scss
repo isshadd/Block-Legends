@@ -3,6 +3,7 @@
 @use '@angular/material' as mat;
 @use './app/pages/material-page/material-page.component.theme' as material-page;
 // Plus imports for other components in your app.
+@import 'src/_variables.scss';
 
 // Include the common styles for Angular Material. We include this here so that you only
 // have to load a single css file for Angular Material in your app.
@@ -68,6 +69,14 @@ $indigo-pink-theme: mat.m2-define-light-theme(
     @include material-page.theme($purple-green-theme);
 }
 
+@font-face {
+    font-family: 'Minercraftory';
+    // source: https://www.dafont.com/minercraftory.font
+    src: url('/assets/fonts/Minercraftory.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* You can add global styles to this file, and also import other style files */
 
 html,
@@ -76,5 +85,8 @@ body {
 }
 body {
     margin: 0;
-    font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+* {
+    font-family: 'Minercraftory', sans-serif;
 }
