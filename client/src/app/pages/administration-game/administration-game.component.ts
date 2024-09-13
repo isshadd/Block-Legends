@@ -60,14 +60,10 @@ export class AdministrationGameComponent {
     }
 
     deleteGame(game: any) {
-        this.games = this.games.filter((elem) => elem != game);
+        this.games = this.games.filter((elem) => elem !== game);
     }
 
     exportGame(game: any) {}
-
-    editGame(game : any) {
-        return
-    }
 
     toggleVisibility(game: any): void {
         game.isVisible = !game.isVisible;
