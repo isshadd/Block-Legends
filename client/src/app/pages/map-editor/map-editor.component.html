@@ -19,13 +19,5 @@
         </div>
     </div>
 
-    <div id="map-container">
-        <div id="map" [style.--grid-size]="grid.length" [style.--tile-size]="100 / grid.length + '%'">
-            @for(row of grid; track row; let i = $index){ @for(column of row; track column; let j = $index){
-            <div [class]="column" class="tile" (click)="onTileClick(i, j, column)" [style.background-image]="'url(' + column.imageUrl + ')'">
-                {{ j }}, {{ i }}
-            </div>
-            } }
-        </div>
-    </div>
+    <app-map id="map-container"></app-map>
 </div>
