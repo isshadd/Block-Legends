@@ -6,9 +6,9 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { ItemComponent } from '@app/components/item/item.component';
-import { MapComponent } from '@app/components/map/map.component';
-import { TileComponent } from '@app/components/tile/tile.component';
+import { ItemComponent } from '@app/components/game-board-components/item/item.component';
+import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { TileComponent } from '@app/components/game-board-components/tile/tile.component';
 
 @Component({
     selector: 'app-map-editor',
