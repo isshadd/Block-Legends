@@ -4,15 +4,13 @@
         <p id="title">Tiles</p>
         <div class="list-container">
             @for (tile of gridType; track tile){
-            <app-tile-component [tile]="tile"></app-tile-component>
+            <app-tile [tile]="tile"></app-tile>
             }
         </div>
         <p id="title">Items</p>
         <div class="list-container">
             @for (item of itemTypes; track item){
-            <div class="tile" [style.background-image]="'url(' + item.imageUrl + ')'">
-                <p>{{ item.name }}</p>
-            </div>
+            <app-item [item]="item"></app-item>
             }
         </div>
     </div>

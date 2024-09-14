@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { BaseTile } from '@app/classes/Tiles/base-tile';
 
 @Component({
-    selector: 'app-tile-component',
+    selector: 'app-tile',
     standalone: true,
     imports: [],
     templateUrl: './tile.component.html',

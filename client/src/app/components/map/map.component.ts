@@ -4,7 +4,7 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { TileComponent } from '../placeable-entity/tile.component';
+import { TileComponent } from '../tile/tile.component';
 
 @Component({
     selector: 'app-map',
