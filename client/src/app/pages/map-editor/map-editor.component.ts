@@ -7,12 +7,12 @@ import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
-import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 
 @Component({
     selector: 'app-map-editor',
     standalone: true,
-    imports: [RouterLink, MapComponent, PlaceableEntityComponent],
+    imports: [RouterLink, MapComponent, PlaceableEntityContainerComponent],
     templateUrl: './map-editor.component.html',
     styleUrl: './map-editor.component.scss',
 })

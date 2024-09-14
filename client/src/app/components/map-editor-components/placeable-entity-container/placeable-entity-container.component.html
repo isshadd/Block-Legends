@@ -1,1 +1,6 @@
-<p>placeable-entity-container works!</p>
+<p id="title">{{ containerTitle }}</p>
+<div class="list-container">
+    @for (item of containerItems; track item){
+    <app-placeable-entity [placeableEntity]="item"></app-placeable-entity>
+    }
+</div>

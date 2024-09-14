@@ -1,18 +1,8 @@
 <div id="page-container">
     <div id="side-menu">
         <button id="go-back-button" routerLink="/home">Back</button>
-        <p id="title">Tiles</p>
-        <div class="list-container">
-            @for (tile of gridType; track tile){
-            <app-placeable-entity [placeableEntity]="tile"></app-placeable-entity>
-            }
-        </div>
-        <p id="title">Items</p>
-        <div class="list-container">
-            @for (item of itemTypes; track item){
-            <app-placeable-entity [placeableEntity]="item"></app-placeable-entity>
-            }
-        </div>
+        <app-placeable-entity-container containerTitle="Tiles" [containerItems]="gridType"></app-placeable-entity-container>
+        <app-placeable-entity-container containerTitle="Items" [containerItems]="itemTypes"></app-placeable-entity-container>
     </div>
 
     <app-map id="map-container"></app-map>

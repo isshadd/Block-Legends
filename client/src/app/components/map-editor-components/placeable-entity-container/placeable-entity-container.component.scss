@@ -1,0 +1,21 @@
+#title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 200%;
+    color: white;
+    height: 10%;
+}
+
+.list-container {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fill, 100px);
+    grid-auto-rows: 100px;
+    row-gap: 5px;
+    column-gap: 5px;
+    background-color: rgb(59, 62, 73);
+    padding: 5px;
+    margin: 10px;
+    box-shadow: inset 0px 0px 5px 5px rgba(0, 0, 0, 0.285);
+}
