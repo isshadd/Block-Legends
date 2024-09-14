@@ -4,9 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 export const BONUS_LIFE = 6;
-export const BASE_LIFE = 4;
 export const BONUS_SPEED = 6;
-export const BASE_SPEED = 4;
 export const DICE_6 = 6;
 export const DICE_4 = 4;
 export const BASE_STATS = 4;
@@ -53,10 +51,10 @@ export class CreateCharacterComponent {
     assignBonus() {
         if (this.bonusAttribute === 'life') {
             this.character.life = BONUS_LIFE;
-            this.character.speed = BASE_SPEED;
+            this.character.speed = BASE_STATS;
         } else if (this.bonusAttribute === 'speed') {
             this.character.speed = BONUS_SPEED;
-            this.character.life = BASE_LIFE;
+            this.character.life = BASE_STATS;
         }
         this.isLifeOrSpeedBonusAssigned = true;
     }

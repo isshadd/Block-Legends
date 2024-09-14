@@ -40,14 +40,14 @@ describe('CreateCharacterComponent', () => {
         component.bonusAttribute = 'life';
         component.assignBonus();
         expect(component.character.life).toBe(BONUS_LIFE);
-        expect(component.character.speed).toBe(BONUS_SPEED);
+        expect(component.character.speed).toBe(BASE_STATS);
     });
 
     it('should assign bonus to speed', () => {
         component.bonusAttribute = 'speed';
         component.assignBonus();
         expect(component.character.speed).toBe(BONUS_SPEED);
-        expect(component.character.life).toBe(BONUS_LIFE);
+        expect(component.character.life).toBe(BASE_STATS);
     });
 
     it('should not allow submission if the form is incomplete', () => {
