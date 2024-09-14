@@ -6,9 +6,8 @@ import { Vec2 } from '@app/interfaces/vec2';
     providedIn: 'root',
 })
 export class Item implements PlaceableEntity {
-    name: String = 'Item';
-    description: String = 'Item';
-    imageUrl: String = 'assets/images/item/baseItem.png'; //minecraftWiki
+    name: string = 'Item';
+    description: string = 'Item';
+    imageUrl: string = 'assets/images/item/baseItem.png'; // minecraftWiki
     coordinates: Vec2 = { x: -1, y: -1 };
-    constructor() {}
 }

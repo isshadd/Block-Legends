@@ -5,7 +5,7 @@ import { BaseTile } from '@app/classes/Tiles/base-tile';
     providedIn: 'root',
 })
 export class MapEditorManagerService {
-    readonly grid: Array<Array<BaseTile>> = [];
+    readonly grid: BaseTile[][] = [];
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
@@ -17,6 +17,7 @@ export class MapEditorManagerService {
             }
         }
     }
+
     setMapSize(size: number) {
         this.gridCreator(size);
     }

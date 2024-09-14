@@ -11,5 +11,5 @@ import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 })
 export class PlaceableEntityContainerComponent {
     @Input() containerTitle: string;
-    @Input() containerItems: Array<PlaceableEntity>;
+    @Input() containerItems: PlaceableEntity[];
 }

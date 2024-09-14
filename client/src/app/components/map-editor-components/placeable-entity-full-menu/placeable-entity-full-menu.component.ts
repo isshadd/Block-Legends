@@ -5,8 +5,9 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
+// eslint-disable-next-line max-len
+import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
-import { PlaceableEntityContainerComponent } from '../placeable-entity-container/placeable-entity-container.component';
 
 @Component({
     selector: 'app-placeable-entity-full-menu',
@@ -16,7 +17,7 @@ import { PlaceableEntityContainerComponent } from '../placeable-entity-container
     styleUrl: './placeable-entity-full-menu.component.scss',
 })
 export class PlaceableEntityFullMenuComponent {
-    placeableEntitiesSections: Array<PlaceableEntitySection> = [
+    placeableEntitiesSections: PlaceableEntitySection[] = [
         {
             title: 'Tiles',
             entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile(), new BaseTile()],
@@ -29,5 +30,5 @@ export class PlaceableEntityFullMenuComponent {
 }
 class PlaceableEntitySection {
     title: string;
-    entities: Array<PlaceableEntity>;
+    entities: PlaceableEntity[];
 }

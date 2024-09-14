@@ -6,8 +6,8 @@ import { BaseTile } from './base-tile';
     providedIn: 'root',
 })
 export class DoorTile extends BaseTile {
-    name: String = 'DoorTile';
-    description: String = 'DoorTile';
-    imageUrl: String = 'assets/images/tiles/door.jpg';
+    name: string = 'DoorTile';
+    description: string = 'DoorTile';
+    imageUrl: string = 'assets/images/tiles/door.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
 }

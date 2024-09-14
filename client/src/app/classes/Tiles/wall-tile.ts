@@ -6,8 +6,8 @@ import { BaseTile } from './base-tile';
     providedIn: 'root',
 })
 export class WallTile extends BaseTile {
-    name: String = 'WallTile';
-    description: String = 'WallTile';
-    imageUrl: String = 'assets/images/tiles/brickwall.jpg';
+    name: string = 'WallTile';
+    description: string = 'WallTile';
+    imageUrl: string = 'assets/images/tiles/brickwall.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
 }

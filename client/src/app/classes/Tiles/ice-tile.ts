@@ -6,8 +6,8 @@ import { BaseTile } from './base-tile';
     providedIn: 'root',
 })
 export class IceTile extends BaseTile {
-    name: String = 'IceTile';
-    description: String = 'IceTile';
-    imageUrl: String = 'assets/images/tiles/ice.jpg';
+    name: string = 'IceTile';
+    description: string = 'IceTile';
+    imageUrl: string = 'assets/images/tiles/ice.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
 }

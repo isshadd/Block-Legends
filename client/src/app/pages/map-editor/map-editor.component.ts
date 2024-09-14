@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+// eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
 
 @Component({
