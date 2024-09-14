@@ -34,7 +34,7 @@
         </div>
         <div id="select">
             <label id="label" for="bonus">Attribuer un bonus de +2 à la vie ou à la rapidité :</label>
-            <select id="bonus" [(ngModel)]="bonusAttribute" name="bonus" [disabled]="isLifeOrSpeedBonusAssigned" (change)="assignBonus()">
+            <select id="bonus" [(ngModel)]="bonusAttribute" name="bonus" (change)="assignBonus()">
                 <option value="life">Vie</option>
                 <option value="speed">Rapidité</option>
             </select>
