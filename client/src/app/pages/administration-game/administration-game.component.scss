@@ -16,7 +16,7 @@
 .game_list li {
     display: flex;
     align-items: center;
-    background-color: $primary-dark;
+    background-color: $primary;
     color: black;
     padding: 20px;
     margin-bottom: 10px;
@@ -64,8 +64,8 @@
         visibility 0.3s ease;
     font-size: 1rem;
     padding: 5px;
-    background-color: $secondary;
-    color: black;
+    background-color: $primary-dark;
+    color: $primary-light;
     padding: 5px 10px;
     border-radius: 8px;
     box-shadow: 0 4px 8px black; /* Optional shadow */
@@ -98,7 +98,7 @@
 
 .action_icons .material-icons {
     font-size: 24px;
-    color: $primary; /* Set the icon color */
+    color: $primary-dark; /* Set the icon color */
     cursor: pointer;
     transition:
         color 0.3s ease,
@@ -106,7 +106,7 @@
 }
 
 .action_icons .material-icons:hover {
-    color: white; /* Change color on hover */
+    color: $secondary; /* Change color on hover */
     transform: scale(1.2); /* Enlarge slightly on hover */
 }
 
@@ -121,9 +121,10 @@
     margin-right: 20px;
     font-size: medium;
     background-color: $primary-dark;
+    color: $primary-light;
 }
 
 .button_container button:hover {
-    background-color: #244b4e;
-    color: $primary-light;
+    background-color: $secondary;
+    color: $primary-dark;
 }
