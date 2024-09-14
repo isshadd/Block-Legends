@@ -4,13 +4,13 @@
         <p id="title">Tiles</p>
         <div class="list-container">
             @for (tile of gridType; track tile){
-            <app-tile [tile]="tile"></app-tile>
+            <app-placeable-entity [placeableEntity]="tile"></app-placeable-entity>
             }
         </div>
         <p id="title">Items</p>
         <div class="list-container">
             @for (item of itemTypes; track item){
-            <app-item [item]="item"></app-item>
+            <app-placeable-entity [placeableEntity]="item"></app-placeable-entity>
             }
         </div>
     </div>

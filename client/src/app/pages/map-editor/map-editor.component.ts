@@ -6,14 +6,13 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { ItemComponent } from '@app/components/game-board-components/item/item.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
-import { TileComponent } from '@app/components/game-board-components/tile/tile.component';
+import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 
 @Component({
     selector: 'app-map-editor',
     standalone: true,
-    imports: [RouterLink, MapComponent, TileComponent, ItemComponent],
+    imports: [RouterLink, MapComponent, PlaceableEntityComponent],
     templateUrl: './map-editor.component.html',
     styleUrl: './map-editor.component.scss',
 })

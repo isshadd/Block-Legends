@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TileComponent } from './tile.component';
+import { PlaceableEntityComponent } from './placeable-entity.component';
 
 describe('PlaceableEntityComponent', () => {
-    let component: TileComponent;
-    let fixture: ComponentFixture<TileComponent>;
+    let component: PlaceableEntityComponent;
+    let fixture: ComponentFixture<PlaceableEntityComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [TileComponent],
+            imports: [PlaceableEntityComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(TileComponent);
+        fixture = TestBed.createComponent(PlaceableEntityComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
