@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MapCoordinateService } from '@app/services/map-coordinate.service';
+import { Vec2 } from '@app/interfaces/vec2';
 import { BaseTile } from './base-tile';
 
 @Injectable({
@@ -9,5 +9,5 @@ export class WaterTile extends BaseTile {
     name: String = 'WaterTile';
     description: String = 'WaterTile';
     imageUrl: String = 'assets/images/tiles/water.jpg';
-    coordinates: MapCoordinateService = new MapCoordinateService();
+    coordinates: Vec2 = { x: -1, y: -1 };
 }

@@ -1,8 +1,8 @@
-import { MapCoordinateService } from '@app/services/map-coordinate.service';
+import { Vec2 } from './vec2';
 
 export interface PlaceableEntity {
     name: String;
     description: String;
     imageUrl: String;
-    coordinates: MapCoordinateService;
+    coordinates: Vec2;
 }

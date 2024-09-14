@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
-import { MapCoordinateService } from '@app/services/map-coordinate.service';
+import { Vec2 } from '@app/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
@@ -9,6 +9,6 @@ export class BaseTile implements PlaceableEntity {
     name: String = 'BaseTile';
     description: String = 'BaseTile';
     imageUrl: String = 'assets/images/tiles/grass.png';
-    coordinates: MapCoordinateService = new MapCoordinateService();
+    coordinates: Vec2 = { x: -1, y: -1 };
     constructor() {}
 }
