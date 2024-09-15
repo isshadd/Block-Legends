@@ -14,7 +14,7 @@ export class CreateGameComponent {
 
     selectedGame: any;
     gameStatus: string | null;
-    selectedMode: string | null;
+    selectedMode: string | null = 'Combat classique';
 
     constructor(private router: Router) {}
 
@@ -29,6 +29,10 @@ export class CreateGameComponent {
         }
     }
     
+    homeButton(): void {
+        this.router.navigate(['/home']);
+    }
+
     selectMode(mode: string): void {
         this.selectedMode = mode;
         console.log('Selected mode:', mode);
