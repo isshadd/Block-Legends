@@ -1,0 +1,43 @@
+@import 'src/_variables.scss';
+#page-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+
+    #side-menu {
+        display: flex;
+        flex-direction: column;
+        min-width: 23%;
+        max-width: 26%;
+        height: auto;
+        background-color: $primary-dark;
+        overflow: scroll;
+        scrollbar-width: thin;
+        scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
+
+        #go-back-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            height: 50px;
+            background-color: darken($primary-dark, 10%);
+            color: $primary-light;
+            font-size: 150%;
+            cursor: pointer;
+            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.285);
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+    }
+
+    #map-container {
+        display: flex;
+        flex-grow: 1;
+        justify-content: center;
+        //devinart.com Al-Proto
+        background-image: url(https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ce539041-b1c9-46cf-b883-ea5b26701d21/d8sp8p9-cc8cadcc-773f-471a-aa59-44b980414bbe.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2NlNTM5MDQxLWIxYzktNDZjZi1iODgzLWVhNWIyNjcwMWQyMVwvZDhzcDhwOS1jYzhjYWRjYy03NzNmLTQ3MWEtYWE1OS00NGI5ODA0MTRiYmUuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.XFRjfUtIVOLOyyDlVf11fvh-ITFB792wPc5_ExdUpzs);
+        background-size: cover;
+    }
+}
