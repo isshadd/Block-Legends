@@ -10,6 +10,7 @@ import { CreateGameComponent } from '@app/pages/create-game/create-game.componen
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { WaitingViewComponent } from '@app/pages/waiting-view/waiting-view.component';
 import { environment } from './environments/environment';
@@ -28,6 +29,7 @@ const routes: Routes = [
     { path: 'create-game', component: CreateGameComponent },
     { path: 'create-character', component: CreateCharacterComponent },
     { path: 'waiting-view', component: WaitingViewComponent },
+    { path: 'map-editor', component: MapEditorComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
