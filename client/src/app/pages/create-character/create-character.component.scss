@@ -1,11 +1,18 @@
 @import 'src/_variables.scss';
 
-body {
-    background-color: $background;
+* {
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
     text-align: center;
+}
+
+.glob {
+    background-color: $background;
+    height: 100%;
+    gap: 20px;
 }
 
 form {
@@ -28,12 +35,12 @@ button {
     background-color: #b4d2e7;
     color: black;
     padding: 10px 20px;
-    border: none;
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
     margin-top: 10px;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
 }
 .attribute {
     display: flex;
@@ -41,18 +48,21 @@ button {
     align-items: center;
     background-color: #e0a458;
     border-radius: 5px;
+    padding: 10px;
+    justify-content: space-around;
 }
 button:hover {
-    background-color: #4f5d75;
+    border-color: black;
 }
 
 button[disabled] {
-    background-color: #94c5cc;
+    background-color: #e0a458;
     cursor: not-allowed;
+    border: 2px solid #e0a458;
 }
 
 .attribute input {
-    width: 70px; /* Pour que les champs ne prennent pas trop de place */
+    width: 70px;
     text-align: center;
 }
 
@@ -62,7 +72,46 @@ button[disabled] {
     width: 100px;
 }
 
+#create {
+    background-color: $primary;
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+#create:hover {
+    border-color: black;
+}
+
 .info-char input {
-    width: 100px; /* Pour que les champs ne prennent pas trop de place */
+    width: 100px;
     text-align: center;
+}
+
+.info-char {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+    background-color: #94c5cc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#message {
+    color: rgb(182, 16, 16);
+}
+
+#label {
+    background-color: #94c5cc;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#select {
+    padding: 5px;
+}
+
+#bonus {
+    background-color: whitesmoke;
+    border-radius: 5px;
+    padding: 10px;
 }

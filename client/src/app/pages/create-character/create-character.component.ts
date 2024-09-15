@@ -3,6 +3,12 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
+export const BONUS_LIFE = 6;
+export const BONUS_SPEED = 6;
+export const DICE_6 = 6;
+export const DICE_4 = 4;
+export const BASE_STATS = 4;
+
 @Component({
     selector: 'app-create-character',
     standalone: true,
@@ -32,11 +38,11 @@ export class CreateCharacterComponent {
 
     diceAttribution(attribute: string) {
         if (attribute === 'attack' && !this.isAttackDiceAssigned && !this.isAttackDiceAssigned) {
-            this.character.attack += Math.floor(Math.random() * 6) + 1;
-            this.character.defense += Math.floor(Math.random() * 4) + 1;
+            this.character.attack += Math.floor(Math.random() * DICE_6) + 1;
+            this.character.defense += Math.floor(Math.random() * DICE_4) + 1;
         } else if (attribute === 'defense' && !this.isDefenseDiceAssigned && !this.isAttackDiceAssigned) {
-            this.character.defense += Math.floor(Math.random() * 6) + 1;
-            this.character.attack += Math.floor(Math.random() * 4) + 1;
+            this.character.defense += Math.floor(Math.random() * DICE_6) + 1;
+            this.character.attack += Math.floor(Math.random() * DICE_4) + 1;
         }
         this.isAttackDiceAssigned = true;
         this.isDefenseDiceAssigned = true;
@@ -44,18 +50,19 @@ export class CreateCharacterComponent {
 
     assignBonus() {
         if (this.bonusAttribute === 'life') {
-            this.character.life = 6;
-            this.character.speed = 4;
+            this.character.life = BONUS_LIFE;
+            this.character.speed = BASE_STATS;
         } else if (this.bonusAttribute === 'speed') {
-            this.character.speed = 6;
-            this.character.life = 4;
+            this.character.speed = BONUS_SPEED;
+            this.character.life = BASE_STATS;
         }
+        this.isLifeOrSpeedBonusAssigned = true;
     }
 
     createCharacter() {
         if (
             !this.character.name ||
-            !this.character.avatar ||
+            !this.character.avatar || // A CHANGER PLUS TARD
             !this.isAttackDiceAssigned ||
             !this.isAttackDiceAssigned ||
             !this.isLifeOrSpeedBonusAssigned

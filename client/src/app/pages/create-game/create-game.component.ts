@@ -12,13 +12,13 @@ import { Router } from '@angular/router';
 export class CreateGameComponent {
     games = [{ id: 1, name: 'Jeu 1', description: "C'est le jeu 1", visible: true }];
 
-    selectedGame: any;
+    selectedGame: unknown;
     gameStatus: string | null;
     selectedMode: string | null = 'Combat classique';
 
     constructor(private router: Router) {}
 
-    selectGame(game: any /*A CHANGER UNE FOIS LE TYPE DE {game} DEFINI*/) {
+    selectGame(game: any /* A CHANGER UNE FOIS LE TYPE DE {game} DEFINI*/) {
         if (!game.visible) {
             this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
             this.selectedGame = null;
@@ -35,6 +35,5 @@ export class CreateGameComponent {
 
     selectMode(mode: string): void {
         this.selectedMode = mode;
-        console.log('Selected mode:', mode);
     }
 }
