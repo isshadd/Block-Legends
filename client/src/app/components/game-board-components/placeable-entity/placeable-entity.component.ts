@@ -11,4 +11,3 @@ import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 export class PlaceableEntityComponent {
     @Input() placeableEntity: PlaceableEntity;
 }
-5

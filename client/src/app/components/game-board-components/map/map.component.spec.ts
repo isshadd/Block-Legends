@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BaseTile } from '@app/classes/Tiles/base-tile';
+import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-import { PlaceableEntityComponent } from '../placeable-entity/placeable-entity.component';
 import { MapComponent } from './map.component';
 import SpyObj = jasmine.SpyObj;
 

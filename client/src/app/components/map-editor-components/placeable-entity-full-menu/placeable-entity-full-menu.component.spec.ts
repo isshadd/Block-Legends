@@ -1,9 +1,10 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Component, Input } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+// eslint-disable-next-line max-len
+import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
-import { PlaceableEntityContainerComponent } from '../placeable-entity-container/placeable-entity-container.component';
 import { PlaceableEntityFullMenuComponent } from './placeable-entity-full-menu.component';
+
 @Component({
     selector: 'app-placeable-entity-container',
     standalone: true,

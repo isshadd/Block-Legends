@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, MetadataOverride, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+// eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
 import { MapEditorComponent } from './map-editor.component';
 @Component({
