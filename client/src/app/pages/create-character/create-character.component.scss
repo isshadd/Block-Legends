@@ -1,12 +1,18 @@
 @import 'src/_variables.scss';
 
+* {
+    margin: 0;
+    padding: 0;
+}
+
 h1 {
     text-align: center;
 }
 
-#glob {
+.glob {
     background-color: $background;
     height: 100%;
+    gap: 20px;
 }
 
 form {
