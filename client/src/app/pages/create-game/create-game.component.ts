@@ -29,7 +29,7 @@ export class CreateGameComponent {
         }
     }
     
-    homeButton(): void {
+    homeButton() {
         this.router.navigate(['/home']);
     }
 
