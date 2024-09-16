@@ -40,6 +40,21 @@
             </select>
         </div>
         <div id="message" *ngIf="characterStatus">{{ characterStatus }}</div>
-        <button id="create" type="submit">Créer le personnage</button>
+        <div class="button-create-character">
+            <button id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
+            <button id="create" type="submit">Créer le personnage</button>
+        </div>
+        
+        <div id="confirmationModal" class="modal" *ngIf="isModalOpen">
+            <div class="modal-content">
+                <span class="close" (click)="closeModal()">&times;</span>
+                <p>Êtes-vous sûr de vouloir retourner à la sélection de jeu ?</p>
+                <small>(la création de votre avatar sera perdu)</small>
+                <div class="modal-buttons">
+                    <button (click)="confirmBack()">Oui</button>
+                    <button (click)="closeModal()">Non</button>
+                </div>
+            </div>
+        </div>
     </form>
 </div>
