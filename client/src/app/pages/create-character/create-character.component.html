@@ -7,9 +7,21 @@
         </div>
         <div class="info-char">
             <label for="avatar">Avatar : </label>
-            <select id="avatar" [(ngModel)]="character.avatar" name="avatar" required>
-                <option *ngFor="let avatar of avatars" [value]="avatar">{{ avatar }}</option>
-            </select>
+            <div class="avatar-selection">
+                <div class="avatar-grid">
+                    <div *ngFor="let avatar of avatars" class="avatar-item" (click)="selectAvatar(avatar.imgSrc1)">
+                        <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1">
+                        <small>{{ avatar.name }}</small>
+                    </div>
+                </div>
+                <div class="selected-avatar">
+                    <img *ngIf="character.avatar; else noAvatarSelected" [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name">
+                    <p>{{ getSelectedAvatar()?.name }}</p>
+                    <ng-template #noAvatarSelected>
+                        <p>Choisissez votre avatar</p>
+                    </ng-template>
+                </div>
+            </div>
         </div>
         <div class="attributes">
             <h3>Attributs :</h3>
