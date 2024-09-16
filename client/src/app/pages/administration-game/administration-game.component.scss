@@ -37,6 +37,10 @@
     transform-origin: center;
 }
 
+.game_list img:hover {
+    transform: scale(1.4);
+}
+
 .game_info {
     display: flex;
     flex-grow: 1;
@@ -75,6 +79,14 @@
     opacity: 1; /* Make it visible */
     visibility: visible; /* Make it visible */
     transform: translateX(0);
+}
+
+.invisible {
+    opacity: 0.6;
+}
+
+.visible {
+    opacity: 1;
 }
 
 #title {
