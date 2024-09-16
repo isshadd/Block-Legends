@@ -27,7 +27,8 @@ form {
     display: flex;
     justify-content: space-between;
     gap: 50px;
-    background-color: #94c5cc;
+    color: $primary-light;
+    background-color: $primary-dark;
     border-radius: 5px;
     padding: 10px;
 }
@@ -46,7 +47,8 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #e0a458;
+    color: black;
+    background-color: $secondary;
     border-radius: 5px;
     padding: 10px;
     justify-content: space-around;
@@ -56,9 +58,9 @@ button:hover {
 }
 
 button[disabled] {
-    background-color: #e0a458;
+    background-color: $secondary;
     cursor: not-allowed;
-    border: 2px solid #e0a458;
+    border: 2px solid $secondary;
 }
 
 .attribute input {
@@ -91,7 +93,8 @@ button[disabled] {
     display: flex;
     justify-content: space-between;
     gap: 50px;
-    background-color: #94c5cc;
+    color: $primary-light;
+    background-color: $primary-dark;
     border-radius: 5px;
     padding: 10px;
 }
@@ -101,7 +104,8 @@ button[disabled] {
 }
 
 #label {
-    background-color: #94c5cc;
+    color: $primary-light;
+    background-color: $primary-dark;
     border-radius: 5px;
     padding: 10px;
 }
