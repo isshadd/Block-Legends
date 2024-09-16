@@ -19,19 +19,31 @@
                 </div>
             </div>
         </nav>
-
-        <div class="header-container">
-            <button (click)="homeButton()" class="home-button" routerLink="/home">🏠</button>
-            <h1>Liste des jeux : {{this.selectedMode}}</h1>
+        <div class="container">
+            <div class="header-container">
+                <button (click)="homeButton()" class="home-button" routerLink="/home">🏠</button>
+                <h1>Liste des jeux : {{this.selectedMode}}</h1>
+            </div>
+            <div>
+                <ul class="game-list" *ngIf="getFilteredGames().length > 0; else noGames">
+                    <li *ngFor="let game of getFilteredGames()" class="game-item">
+                        <div class="game-box">
+                            <img [src]="game.imgSrc" alt="{{ game.name }}" class="game-image">
+                            <div class="game-details">
+                                <h2>{{ game.name }}</h2>
+                                <p>Taille de la carte: {{ game.size }}</p>
+                            </div>
+                            <button (click)="selectGame(game)" routerLink="/game-page">
+                                Créer une partie de :<br>{{ game.name }}
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                <ng-template #noGames>
+                    <p>Aucun jeu disponible pour le mode sélectionné.</p>
+                </ng-template>
+            </div>
+            <div *ngIf="gameStatus" class="alert alert-warning">{{ gameStatus }}</div>
         </div>
-
-        <ul>
-            <li *ngFor="let game of games">
-                <h2>{{ game.name }}</h2>
-                <p>{{ game.description }}</p>
-                <button (click)="selectGame(game)" routerLink="/game-page">Créer une partie de {{ game.name }}</button>
-            </li>
-        </ul>
-        <div *ngIf="gameStatus" class="alert alert-warning">{{ gameStatus }}</div>
     </body>
 </html>

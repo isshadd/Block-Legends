@@ -77,4 +77,11 @@ export class CreateGameComponent {
     selectMode(mode: string): void {
         this.selectedMode = mode;
     }
+    
+    getFilteredGames() {
+        if (!this.selectedMode) {
+            return this.games;
+        }
+        return this.games.filter(game => game.visible && (game.mode === this.selectedMode));
+    }
 }
