@@ -69,7 +69,7 @@ export class CreateGameComponent {
             this.router.navigate(['/create-character']);
         }
     }
-    
+
     homeButton() {
         this.router.navigate(['/home']);
     }
@@ -77,11 +77,11 @@ export class CreateGameComponent {
     selectMode(mode: string): void {
         this.selectedMode = mode;
     }
-    
+
     getFilteredGames() {
         if (!this.selectedMode) {
             return this.games;
         }
-        return this.games.filter(game => game.visible && (game.mode === this.selectedMode));
+        return this.games.filter((game) => game.visible && game.mode === this.selectedMode);
     }
 }

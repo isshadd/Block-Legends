@@ -36,7 +36,6 @@ export class WaitingViewComponent implements OnInit {
 
         if (this.isOrganizer) {
             this.players.push(this.organizerCharacter);
-            console.log(this.organizerCharacter);
         }
     }
 
