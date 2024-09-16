@@ -11,7 +11,6 @@ h1 {
 
 .glob {
     background-color: $background;
-    height: 100%;
     gap: 20px;
 }
 
@@ -92,7 +91,7 @@ button[disabled] {
 .info-char {
     display: flex;
     justify-content: space-between;
-    gap: 50px;
+    gap: 20px;
     color: $primary-light;
     background-color: $primary-dark;
     border-radius: 5px;
@@ -169,4 +168,51 @@ button[disabled] {
 .modal-buttons{
     display: flex;
     justify-content: space-evenly;
+}
+
+.avatar-selection {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 10px;
+    font-size: 0.5rem;
+}
+
+.avatar-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 5px;
+    transition: border-color 0.3s;
+    text-align: center;
+    justify-content: center;
+}
+
+.avatar-item:hover{
+    border-color: #007bff;
+}
+
+
+.avatar-item img {
+    width: 70px;
+    height: auto;
+    display: block;
+}
+
+.selected-avatar img {
+    width: 200px; /* Adjust the width as needed */
+    height: 300px; /* Adjust the height as needed */
+    object-fit: contain; /* Ensures the image fits within the area without being cut */
+    border-radius: 10px;
+}
+.selected-avatar {
+    cursor: pointer;
+    padding: 5px;
+    text-align: center; /* Center the text */
+    justify-content: center;
 }
