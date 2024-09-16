@@ -27,6 +27,8 @@ export class CreateCharacterComponent {
         defense: 4,
     };
 
+    isModalOpen = false;
+
     bonusAttribute: string;
     characterStatus: string | null;
 
@@ -71,5 +73,18 @@ export class CreateCharacterComponent {
         } else {
             this.router.navigate(['/waiting-view']);
         }
+    }
+    
+    openModal() {
+        this.isModalOpen = true;
+    }
+
+    closeModal() {
+        this.isModalOpen = false;
+    }
+
+    confirmBack() {
+        this.closeModal();
+        this.router.navigate(['/create-game']);
     }
 }
