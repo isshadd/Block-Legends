@@ -34,8 +34,8 @@ export class GameService {
                 avatar: '',
                 life: BASE_STATS, // LES 4 LIGNES SUIVANTES DEVRONT ETRE MODIFIEES PLUS TARD
                 speed: BASE_STATS,
-                attack: BASE_STATS + Math.floor(Math.random() * (DICE_6 || DICE_4)) + 1,
-                defense: Math.floor(Math.random() * (DICE_6 || DICE_4)) + 1,
+                attack: BASE_STATS + Math.floor(Math.random() * DICE_6) + 1,
+                defense: BASE_STATS + Math.floor(Math.random() * DICE_4) + 1,
             };
             characters.push(character);
         }

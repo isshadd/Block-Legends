@@ -77,4 +77,12 @@ describe('CreateCharacterComponent', () => {
         expect(component.isAttackDiceAssigned).toBeTrue();
         expect(component.isDefenseDiceAssigned).toBeTrue();
     });
+
+    it('should assign dice to attack and defense and not allow another try', () => {
+        component.diceAttribution('defense');
+        expect(component.character.attack).toBeGreaterThan(BASE_STATS);
+        expect(component.character.defense).toBeGreaterThan(BASE_STATS);
+        expect(component.isAttackDiceAssigned).toBeTrue();
+        expect(component.isDefenseDiceAssigned).toBeTrue();
+    });
 });
