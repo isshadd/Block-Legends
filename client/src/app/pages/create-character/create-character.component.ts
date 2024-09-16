@@ -74,7 +74,7 @@ export class CreateCharacterComponent {
             this.router.navigate(['/waiting-view']);
         }
     }
-    
+
     openModal() {
         this.isModalOpen = true;
     }
