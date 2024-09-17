@@ -33,8 +33,22 @@ export class ExampleService {
                 };
             });
     }
+    async getGames(): Promise<any[]> {
+        const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+        const client = new MongoClient(uri);
 
-
+        try {
+            await client.connect();
+            const database = client.db('LOG2990_104_Nicolas');
+            const collection = database.collection('Games');
+            return await collection.find({}).toArray();
+        } catch (error) {
+            throw new Error('Failed to get games: ' + (error as string));
+        } finally {
+            await client.close();
+        }
+    }
+    
     async populateDatabase(): Promise<void> {
         const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
         const client = new MongoClient(uri);

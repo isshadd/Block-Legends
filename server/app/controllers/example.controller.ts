@@ -149,6 +149,28 @@ export class ExampleController {
         /**
          * @swagger
          *
+         * /api/example/games:
+         *   get:
+         *     description: Return the list of games in the database
+         *     tags:
+         *       - Example
+         *     produces:
+         *       - application/json
+         *     responses:
+         *       200:
+         *         description: List of games
+         *         schema:
+         *           type: array
+         *           items:
+         *             type: string
+         */
+        this.router.get('/games', async (req: Request, res: Response) => {
+            const games = await this.exampleService.getGames();
+            res.json(games);
+        });
+        /**
+         * @swagger
+         *
          * /api/example/send:
          *   post:
          *     description: Send a message

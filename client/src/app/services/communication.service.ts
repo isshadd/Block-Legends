@@ -45,6 +45,14 @@ export class CommunicationService {
         );
     }
 
+    getGames(): Observable<Message[]> {
+        return this.http.get<Message[]>(`${this.baseUrl}/example/games`).pipe(
+            tap((games) => {
+                console.log('Fetched games:', games);
+            }),
+            catchError(this.handleError<Message[]>('getGames', []))
+        );
+    }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
         return () => of(result as T);
