@@ -7,7 +7,7 @@ const HTTP_STATUS_CREATED = 201;
 
 @Service()
 export class ExampleController {
-    router: Router;
+    router: Router = Router();
 
     constructor(private readonly exampleService: ExampleService) {
         this.configureRouter();
@@ -58,7 +58,73 @@ export class ExampleController {
             const time: Message = await this.exampleService.helloWorld();
             res.json(time);
         });
-
+        /**
+         * @swagger
+         *
+         * /api/example/populate:
+         *   post:
+         *     description: Populate the database with initial data
+         *     tags:
+         *       - Example
+         *     produces:
+         *       - application/json
+         *     responses:
+         *       201:
+         *         description: Database populated
+         */
+        this.router.post('/populate', async (req: Request, res: Response) => {
+            const message: Message = req.body;
+            this.exampleService.storeMessage(message);
+            await this.exampleService.populateDatabase();
+            res.sendStatus(HTTP_STATUS_CREATED);
+        });
+        /**
+         * @swagger
+         *
+         * /api/example/empty:
+         *   delete:
+         *     description: Empty the database
+         *     tags:
+         *       - Example
+         *     responses:
+         *       200:
+         *         description: Database emptied
+         */
+        this.router.delete('/empty', async (req: Request, res: Response) => {
+            const message: Message = req.body;
+            this.exampleService.storeMessage(message);
+            await this.exampleService.emptyDatabase();
+            res.sendStatus(200);
+        });
+    
+        /**
+         * @swagger
+         *
+         * /api/example/deleteGame:
+         *   delete:
+         *     description: Delete only one game from the database
+         *     tags:
+         *       - Example
+         *     parameters:
+         *       - name: name
+         *         in: query
+         *         required: true
+         *         type: string
+         *     responses:
+         *       200:
+         *         description: Game deleted
+         *       500:
+         *         description: Failed to delete game
+         */
+        this.router.delete('/deleteGame', async (req: Request, res: Response) => {
+            const gameName: string = req.query.name as string;
+            try {
+            await this.exampleService.deleteGame(gameName);
+            res.sendStatus(200);
+            } catch (error) {
+            res.status(500).send('Failed to delete game');
+            }
+        });
         /**
          * @swagger
          *

@@ -1,6 +1,10 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { CommunicationService } from '@app/services/communication.service';
+import { Message } from '@common/message';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-administration-game',
@@ -10,6 +14,55 @@ import { RouterLink } from '@angular/router';
     styleUrl: './administration-game.component.scss',
 })
 export class AdministrationGameComponent {
+    constructor(private readonly communicationService: CommunicationService) {}
+    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    emptyDB(): void {
+        this.communicationService.dataDelete().subscribe({
+            next: (response: any) => {
+                const responseString = `Le serveur a reçu la requête et a retourné un code ${response.status} : ${response.statusText}`;
+                this.message.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Le serveur ne répond pas et a retourné : ${err.message}`;
+                this.message.next(responseString);
+            },
+        });
+    }
+    sendDatatoDB(): void {
+
+        const newMessage: Message = {
+            title: 'The DB has been populated',
+            body: 'Success !',
+        };
+
+        this.communicationService.dataPost(newMessage).subscribe({
+            next: (response) => {
+                const responseString = `Le serveur a reçu la requête et a retourné un code ${response.status} : ${response.statusText}`;
+                this.message.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Le serveur ne répond pas et a retourné : ${err.message}`;
+                this.message.next(responseString);
+            },
+        });
+    }
+    deleteGame(game: any) {
+        this.games = this.games.filter((elem) => elem !== game);
+    }
+
+    deleteUniqueGame(game:any): void {
+        this.deleteGame(game);
+        this.communicationService.deleteOneGame(game.name).subscribe({
+            next: (response) => {
+                const responseString = `Le serveur a reçu la requête et a retourné un code ${response.status} : ${response.statusText}`;
+                this.message.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Le serveur ne répond pas et a retourné : ${err.message}`;
+                this.message.next(responseString);
+            },
+        });
+    }
     games: { name: string; size: number; mode: string; imgSrc: string; lastModif: Date; isVisible: boolean }[] = [
         {
             name: 'League Of Legends',
@@ -62,9 +115,6 @@ export class AdministrationGameComponent {
         };
     }
 
-    deleteGame(game: any) {
-        this.games = this.games.filter((elem) => elem !== game);
-    }
 
     toggleVisibility(game: any): void {
         game.isVisible = !game.isVisible;
