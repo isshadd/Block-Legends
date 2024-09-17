@@ -1,1 +1,13 @@
-<p>join-game works!</p>
+<div class="container">
+    <div class="join-game">
+        <h1>Rejoindre une Partie</h1>
+
+        <div class="form-group">
+            <label for="accessCode">Entrez le code d'accès</label>
+            <input name="accesCode" [(ngModel)]="accessCode" id="accessCode" type="number" placeholder="Entrez le code" />
+        </div>
+
+        <button *ngIf="this.accessCode" (click)="joinGame()">Rejoindre la Partie</button>
+    </div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+</div>
