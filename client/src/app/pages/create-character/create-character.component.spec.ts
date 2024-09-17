@@ -53,6 +53,7 @@ describe('CreateCharacterComponent', () => {
     it('should not allow submission if the form is incomplete', () => {
         component.isAttackDiceAssigned = false;
         component.isDefenseDiceAssigned = false;
+        component.isLifeOrSpeedBonusAssigned = false;
         component.createCharacter();
         expect(component.characterStatus).toBe("Le formulaire de création de personnage n'est pas valide !");
         expect(mockRouter.navigate).not.toHaveBeenCalled();
@@ -60,13 +61,13 @@ describe('CreateCharacterComponent', () => {
 
     it('should allow submission if the form is complete', () => {
         // rate dans tous les cas car les avatars ne sont pas encore définis
-        component.character.name = 'Test';
-        component.character.avatar = 'Test'; // à changer plus tard
+        component.character.name = "Kha'Zix";
+        component.character.avatar = component.avatars[0].imgSrc1;
         component.isAttackDiceAssigned = true;
         component.isDefenseDiceAssigned = true;
         component.isLifeOrSpeedBonusAssigned = true;
         component.createCharacter();
-        expect(component.characterStatus).toBeNull();
+        expect(component.characterStatus).toBeUndefined();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/waiting-view']);
     });
 
@@ -84,5 +85,31 @@ describe('CreateCharacterComponent', () => {
         expect(component.character.defense).toBeGreaterThan(BASE_STATS);
         expect(component.isAttackDiceAssigned).toBeTrue();
         expect(component.isDefenseDiceAssigned).toBeTrue();
+    });
+
+    it('should open the modal', () => {
+        component.openModal();
+        expect(component.isModalOpen).toBeTrue();
+    });
+
+    it('should close the modal', () => {
+        component.closeModal();
+        expect(component.isModalOpen).toBeFalse();
+    });
+
+    it('should confirm back', () => {
+        component.confirmBack();
+        expect(component.isModalOpen).toBeFalse();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-game']);
+    });
+
+    it('should select an avatar', () => {
+        component.selectAvatar(component.avatars[0].imgSrc1);
+        expect(component.character.avatar).toBe(component.avatars[0].imgSrc1);
+    });
+
+    it('should get the selected avatar', () => {
+        component.character.avatar = component.avatars[0].imgSrc1;
+        expect(component.getSelectedAvatar()).toBe(component.avatars[0]);
     });
 });

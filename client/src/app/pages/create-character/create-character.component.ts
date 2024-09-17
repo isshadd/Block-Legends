@@ -77,7 +77,7 @@ export class CreateCharacterComponent {
     createCharacter() {
         if (
             !this.character.name ||
-            !this.character.avatar || // A CHANGER PLUS TARD
+            !this.character.avatar ||
             !this.isAttackDiceAssigned ||
             !this.isAttackDiceAssigned ||
             !this.isLifeOrSpeedBonusAssigned
@@ -104,8 +104,8 @@ export class CreateCharacterComponent {
     selectAvatar(avatar: string) {
         this.character.avatar = avatar;
     }
-    
+
     getSelectedAvatar() {
-        return this.avatars.find(avatar => avatar.imgSrc1 === this.character.avatar);
+        return this.avatars.find((avatar) => avatar.imgSrc1 === this.character.avatar);
     }
 }
