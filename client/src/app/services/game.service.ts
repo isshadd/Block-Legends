@@ -9,13 +9,14 @@ const VP_NUMBER = 100;
     providedIn: 'root',
 })
 export class GameService {
-    private accessCode: string = '';
+    private accessCode: number;
+    characters: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }[] = [];
 
     generateAccessCode(): void {
-        this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000).toString();
+        this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);
     }
 
-    getAccessCode(): string {
+    getAccessCode(): number {
         return this.accessCode;
     }
 
@@ -27,7 +28,6 @@ export class GameService {
         attack: number;
         defense: number;
     }[] {
-        const characters = [];
         for (let i = 0; i < VP_NUMBER; i++) {
             const character = {
                 name: 'Virtual_Player ' + (i + 1),
@@ -37,8 +37,12 @@ export class GameService {
                 attack: BASE_STATS + Math.floor(Math.random() * DICE_6) + 1,
                 defense: BASE_STATS + Math.floor(Math.random() * DICE_4) + 1,
             };
-            characters.push(character);
+            this.characters.push(character);
         }
-        return characters;
+        return this.characters;
+    }
+
+    addPlayer(character: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }): void {
+        this.characters.push(character);
     }
 }

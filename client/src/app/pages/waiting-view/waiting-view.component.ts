@@ -12,7 +12,7 @@ import { GameService } from '@app/services/game.service';
     providers: [GameService],
 })
 export class WaitingViewComponent implements OnInit {
-    accessCode: string = '';
+    accessCode: number;
     players: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }[] = [];
     isOrganizer: boolean = true;
     organizerCharacter: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number } = {
@@ -37,6 +37,9 @@ export class WaitingViewComponent implements OnInit {
         if (this.isOrganizer) {
             this.players.push(this.organizerCharacter);
         }
+        this.gameService.characters.forEach((character) => {
+            this.players.push(character);
+        });
     }
 
     addVirtualPlayers(): void {
