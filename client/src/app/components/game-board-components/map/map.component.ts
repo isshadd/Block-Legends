@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BaseTile } from '@app/classes/Tiles/base-tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { Tile } from '@app/interfaces/tile';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 
 const MAPSIZE = 20;
@@ -17,7 +17,7 @@ export class MapComponent {
         mapEditorManagerService.setMapSize(MAPSIZE);
     }
 
-    onTileClick(tile: BaseTile) {
+    onTileClick(tile: Tile) {
         alert(`${tile.name} ${tile.coordinates.x}, ${tile.coordinates.y} clicked`);
     }
 }

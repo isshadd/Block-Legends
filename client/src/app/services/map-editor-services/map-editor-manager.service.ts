@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { BaseTile } from '@app/classes/Tiles/base-tile';
+import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { Tile } from '@app/interfaces/tile';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapEditorManagerService {
-    grid: BaseTile[][] = [];
+    grid: Tile[][] = [];
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
             this.grid.push([]);
             for (let j = 0; j < tileNumber; j++) {
-                const newTile = new BaseTile();
+                const newTile = new GrassTile();
                 this.grid[i].push(newTile);
                 newTile.coordinates = { x: j, y: i };
             }

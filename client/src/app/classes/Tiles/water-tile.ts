@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
+import { TerrainTile } from '@app/interfaces/terrain-tile';
 import { Vec2 } from '@app/interfaces/vec2';
-import { BaseTile } from './base-tile';
+import { Item } from '../Items/item';
 
 @Injectable({
     providedIn: 'root',
 })
-export class WaterTile extends BaseTile {
+export class WaterTile implements TerrainTile {
     name: string = 'WaterTile';
     description: string = 'WaterTile';
     imageUrl: string = 'assets/images/tiles/water.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
+    item: Item;
 }

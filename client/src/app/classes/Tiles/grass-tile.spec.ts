@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { Vec2 } from '@app/interfaces/vec2';
-import { BaseTile } from './base-tile';
+import { GrassTile } from './grass-tile';
 
 describe('BaseTile', () => {
-    let baseTile: BaseTile;
+    let baseTile: GrassTile;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        baseTile = TestBed.inject(BaseTile);
+        baseTile = TestBed.inject(GrassTile);
     });
 
     it('should be created', () => {

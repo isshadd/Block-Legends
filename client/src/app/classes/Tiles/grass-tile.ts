@@ -6,10 +6,10 @@ import { Item } from '../Items/item';
 @Injectable({
     providedIn: 'root',
 })
-export class IceTile implements TerrainTile {
-    name: string = 'IceTile';
-    description: string = 'IceTile';
-    imageUrl: string = 'assets/images/tiles/ice.jpg';
+export class GrassTile implements TerrainTile {
+    name: string = 'GrassTile';
+    description: string = 'GrassTile';
+    imageUrl: string = 'assets/images/tiles/grass.png';
     coordinates: Vec2 = { x: -1, y: -1 };
     item: Item;
 }

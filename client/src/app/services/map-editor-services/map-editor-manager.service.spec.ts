@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
-import { BaseTile } from '@app/classes/Tiles/base-tile';
+import { GrassTile } from '@app/classes/Tiles/base-tile';
 import { MapEditorManagerService } from './map-editor-manager.service';
 
 describe('MapEditorManagerService', () => {
     let service: MapEditorManagerService;
-    let grid: BaseTile[][];
+    let grid: GrassTile[][];
 
     beforeEach(() => {
         TestBed.configureTestingModule({ providers: [MapEditorManagerService] });
@@ -23,8 +23,8 @@ describe('MapEditorManagerService', () => {
         service.gridCreator(MAP_SIZE);
 
         grid = [
-            [new BaseTile(), new BaseTile()],
-            [new BaseTile(), new BaseTile()],
+            [new GrassTile(), new GrassTile()],
+            [new GrassTile(), new GrassTile()],
         ];
         grid[0][0].coordinates = { x: 0, y: 0 };
         grid[0][1].coordinates = { x: 1, y: 0 };

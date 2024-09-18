@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BaseTile } from '@app/classes/Tiles/base-tile';
+import { GrassTile } from '@app/classes/Tiles/base-tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
@@ -45,7 +45,7 @@ describe('MapComponent', () => {
     it('should alert correct tile information on tile click', () => {
         spyOn(window, 'alert');
 
-        const mockTile: BaseTile = new BaseTile();
+        const mockTile: GrassTile = new GrassTile();
         mockTile.coordinates = { x: 10, y: 15 };
 
         component.onTileClick(mockTile);
