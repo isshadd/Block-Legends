@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { Game } from 'src/app/classes/Games-create-game/game-interface';
 import { CreateGameComponent } from './create-game.component';
 
 describe('CreateGameComponent', () => {
@@ -24,7 +25,7 @@ describe('CreateGameComponent', () => {
     });
 
     it('should select a game', () => {
-        const game = { id: 1, name: 'Jeu 1', description: "C'est le jeu 1", visible: true };
+        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), true);
         component.selectGame(game);
         expect(component.selectedGame).toEqual(game);
     });
@@ -35,13 +36,13 @@ describe('CreateGameComponent', () => {
     });
 
     it('should navigate to the create-character page', () => {
-        const game = { id: 1, name: 'Jeu 1', description: "C'est le jeu 1", visible: true };
+        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), true);
         component.selectGame(game);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should hide the game if it is not visible', () => {
-        const game = { id: 1, name: 'Jeu 1', description: "C'est le jeu 1", visible: false };
+        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), false);
         component.selectGame(game);
         expect(component.selectedGame).toBeNull();
         expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
