@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Item } from '@app/classes/Items/item';
-import { BaseTile } from '@app/classes/Tiles/base-tile';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
@@ -20,7 +19,7 @@ export class PlaceableEntityFullMenuComponent {
     placeableEntitiesSections: PlaceableEntitySection[] = [
         {
             title: 'Tiles',
-            entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile(), new BaseTile()],
+            entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
         },
         {
             title: 'Items',
