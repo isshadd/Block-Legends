@@ -37,9 +37,6 @@ export class WaitingViewComponent implements OnInit {
         if (this.isOrganizer) {
             this.players.push(this.organizerCharacter);
         }
-        this.gameService.characters.forEach((character) => {
-            this.players.push(character);
-        });
     }
 
     addVirtualPlayers(): void {

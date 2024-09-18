@@ -41,8 +41,4 @@ export class GameService {
         }
         return this.characters;
     }
-
-    addPlayer(character: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }): void {
-        this.characters.push(character);
-    }
 }

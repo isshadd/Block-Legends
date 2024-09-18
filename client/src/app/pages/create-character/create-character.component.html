@@ -10,12 +10,12 @@
             <div class="avatar-selection">
                 <div class="avatar-grid">
                     <div *ngFor="let avatar of avatars" class="avatar-item" (click)="selectAvatar(avatar.imgSrc1)">
-                        <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1">
+                        <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1" />
                         <small>{{ avatar.name }}</small>
                     </div>
                 </div>
                 <div class="selected-avatar">
-                    <img *ngIf="character.avatar; else noAvatarSelected" [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name">
+                    <img *ngIf="character.avatar; else noAvatarSelected" [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name" />
                     <p>{{ getSelectedAvatar()?.name }}</p>
                     <ng-template #noAvatarSelected>
                         <p>Choisissez votre avatar</p>
@@ -56,7 +56,7 @@
             <button id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
             <button id="create" type="submit">Créer le personnage</button>
         </div>
-        
+
         <div id="confirmationModal" class="modal" *ngIf="isModalOpen">
             <div class="modal-content">
                 <span class="close" (click)="closeModal()">&times;</span>

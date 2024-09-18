@@ -52,4 +52,20 @@ describe('CreateGameComponent', () => {
         component.selectMode(mode);
         expect(component.selectedMode).toEqual(mode);
     });
+
+    it('should filter games by mode', () => {
+        const games = [
+            {
+                name: 'League Of Legends',
+                size: 30,
+                mode: 'Combat classique',
+                imgSrc: 'string',
+                lastModif: new Date('2024-10-23'),
+                visible: true,
+            },
+        ];
+        component.games = games;
+        component.selectedMode = null;
+        expect(component.getFilteredGames()).toEqual([games[0]]);
+    });
 });
