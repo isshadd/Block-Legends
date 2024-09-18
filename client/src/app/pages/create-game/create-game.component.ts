@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Game } from 'src/app/classes/Games-create-game/game-interface';
 
 @Component({
     selector: 'app-create-game',
@@ -59,7 +60,7 @@ export class CreateGameComponent {
 
     constructor(private router: Router) {}
 
-    selectGame(game: any /* A CHANGER UNE FOIS LE TYPE DE {game} DEFINI*/) {
+    selectGame(game: Game /* A CHANGER UNE FOIS LE TYPE DE {game} DEFINI*/) {
         if (!game.visible) {
             this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
             this.selectedGame = null;
