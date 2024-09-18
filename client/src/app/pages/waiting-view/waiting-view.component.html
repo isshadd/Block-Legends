@@ -1,28 +1,38 @@
-<div class="waiting-room">
-    <h1>Attente de partie - League of Versions</h1>
-    <h2>Code d'accès : {{ accessCode }}</h2>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="waiting-view.component.scss" />
+    </head>
+    <body>
+        <div class="waiting-room">
+            <h1>Attente de partie - League of Versions</h1>
+            <h2>Code d'accès : {{ accessCode }}</h2>
 
-    <div class="players-list">
-        <h3>Joueurs :</h3>
-        <ul>
-            <li *ngFor="let player of players" [ngClass]="{ organizer: player === organizerCharacter }">
-                <span>{{ player.name }}<img src="avatar.png" /></span>
-                <!-- avatar.png EST SEULEMENT UN PLACEHOLDER ICI, DONC A CHANGER PLUS TARD-->
-            </li>
-        </ul>
-    </div>
+            <div class="players-list">
+                <h3>Joueurs :</h3>
+                <ul>
+                    <li *ngFor="let player of players" [ngClass]="{ organizer: player === organizerCharacter }">
+                        <span>{{ player.name }}<img src="avatar.png" /></span>
+                        <!-- avatar.png EST SEULEMENT UN PLACEHOLDER ICI, DONC A CHANGER PLUS TARD-->
+                    </li>
+                </ul>
+            </div>
 
-    <div *ngIf="isOrganizer">
-        <button (click)="addVirtualPlayers()">Ajouter un joueur virtuel</button>
-        <!-- A CHANGER PLUS TARD, RAJOUTER UN  disabled="!isOrganizer", MAIS CE DERNIER EST TOUJOURS TRUE ICI-->
-    </div>
+            <div *ngIf="isOrganizer">
+                <button (click)="addVirtualPlayers()">Ajouter un joueur virtuel</button>
+                <!-- A CHANGER PLUS TARD, RAJOUTER UN  disabled="!isOrganizer", MAIS CE DERNIER EST TOUJOURS TRUE ICI-->
+            </div>
 
-    <div>
-        <button (click)="playerLeave()">Quitter la partie</button>
-    </div>
+            <div>
+                <button (click)="playerLeave()">Quitter la partie</button>
+            </div>
 
-    <div class="chat">
-        <h3>Clavardage</h3>
-        <textarea placeholder="Entrez votre message ici..."></textarea>
-    </div>
-</div>
+            <div class="chat">
+                <h3>Clavardage</h3>
+                <textarea placeholder="Entrez votre message ici..."></textarea>
+            </div>
+        </div>
+    </body>
+</html>
