@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { TerrainTile } from '@app/interfaces/terrain-tile';
 import { Tile } from '@app/interfaces/tile';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 
@@ -19,5 +20,9 @@ export class MapComponent {
 
     onTileClick(tile: Tile) {
         alert(`${tile.name} ${tile.coordinates.x}, ${tile.coordinates.y} clicked`);
+    }
+
+    isTerrainTile(tile: Tile): tile is TerrainTile {
+        return (tile as TerrainTile).item !== undefined;
     }
 }
