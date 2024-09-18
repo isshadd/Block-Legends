@@ -9,8 +9,8 @@ const VP_NUMBER = 100;
     providedIn: 'root',
 })
 export class GameService {
-    private accessCode: number;
     characters: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }[] = [];
+    private accessCode: number;
 
     generateAccessCode(): void {
         this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);

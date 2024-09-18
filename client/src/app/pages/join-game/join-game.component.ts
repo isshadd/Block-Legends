@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-//import { Router } from '@angular/router';
-/*import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
+// import { Router } from '@angular/router';
+/* import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
 import { GameService } from '@app/services/game.service';
 
 @Component({
@@ -16,8 +16,9 @@ export class JoinGameComponent {
     accessCode: number | null;
     errorMessage: string | null;
 
-    constructor(private gameService: GameService) //private router: Router,
-    {}
+    constructor(
+        private gameService: GameService, // private router: Router,
+    ) {}
 
     joinGame(): void {
         /*
