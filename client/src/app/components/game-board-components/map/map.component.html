@@ -1,0 +1,5 @@
+<div id="map" [style.--grid-size]="mapEditorManagerService.grid.length" [style.--tile-size]="100 / mapEditorManagerService.grid.length + '%'">
+    @for(row of mapEditorManagerService.grid; track row; let i = $index){ @for(column of row; track column; let j = $index){
+    <app-placeable-entity [placeableEntity]="column" (click)="onTileClick(column)"></app-placeable-entity>
+    } }
+</div>

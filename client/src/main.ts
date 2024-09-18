@@ -3,12 +3,13 @@ import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { Routes, provideRouter } from '@angular/router';
+import { AdministrationGameComponent } from '@app/pages/administration-game/administration-game.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreateGameComponent } from '@app/pages/create-game/create-game.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
-import { AdministrationGameComponent } from '@app/pages/administration-game/administration-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { environment } from './environments/environment';
 
@@ -24,6 +25,7 @@ const routes: Routes = [
     { path: 'join-game', component: JoinGameComponent },
     { path: 'administration-game', component: AdministrationGameComponent },
     { path: 'create-game', component: CreateGameComponent },
+    { path: 'map-editor', component: MapEditorComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
