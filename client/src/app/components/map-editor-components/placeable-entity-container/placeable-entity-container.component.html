@@ -1,6 +1,9 @@
 <p id="title">{{ containerTitle }}</p>
 <div class="list-container">
     @for (item of containerItems; track item){
-    <app-placeable-entity [placeableEntity]="item" [matTooltip]="item.description"></app-placeable-entity>
+    <div class="entity-container">
+        <app-placeable-entity class="layer-1" [placeableEntity]="item" [matTooltip]="item.description"></app-placeable-entity>
+        <app-visible-state class="layer-2"></app-visible-state>
+    </div>
     }
 </div>

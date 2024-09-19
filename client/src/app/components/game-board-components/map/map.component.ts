@@ -3,12 +3,13 @@ import { PlaceableEntityComponent } from '@app/components/game-board-components/
 import { TerrainTile } from '@app/interfaces/terrain-tile';
 import { Tile } from '@app/interfaces/tile';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { VisibleStateComponent } from '../entity-container/visible-state.component';
 
 const MAPSIZE = 20;
 @Component({
     selector: 'app-map',
     standalone: true,
-    imports: [PlaceableEntityComponent],
+    imports: [PlaceableEntityComponent, VisibleStateComponent],
     templateUrl: './map.component.html',
     styleUrl: './map.component.scss',
 })
