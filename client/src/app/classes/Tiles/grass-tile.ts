@@ -11,5 +11,5 @@ export class GrassTile implements TerrainTile {
     description: string = 'GrassTile';
     imageUrl: string = 'assets/images/tiles/grass.png';
     coordinates: Vec2 = { x: -1, y: -1 };
-    item: Item = new Item();
+    item: Item;
 }
