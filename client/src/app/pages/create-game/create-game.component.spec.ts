@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { Game } from 'src/app/classes/Games-create-game/game-interface';
 import { CreateGameComponent } from './create-game.component';
 
+const GAME_SIZE = 30;
+
 describe('CreateGameComponent', () => {
     let component: CreateGameComponent;
     let fixture: ComponentFixture<CreateGameComponent>;
@@ -25,7 +27,7 @@ describe('CreateGameComponent', () => {
     });
 
     it('should select a game', () => {
-        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), true);
+        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
         component.selectGame(game);
         expect(component.selectedGame).toEqual(game);
     });
@@ -36,13 +38,13 @@ describe('CreateGameComponent', () => {
     });
 
     it('should navigate to the create-character page', () => {
-        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), true);
+        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
         component.selectGame(game);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should hide the game if it is not visible', () => {
-        const game = new Game('jeu1', 30, 'Combat classique', 'img', new Date(), false);
+        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', false);
         component.selectGame(game);
         expect(component.selectedGame).toBeNull();
         expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
@@ -58,10 +60,9 @@ describe('CreateGameComponent', () => {
         const games = [
             {
                 name: 'League Of Legends',
-                size: 30,
+                size: GAME_SIZE,
                 mode: 'Combat classique',
                 imgSrc: 'string',
-                lastModif: new Date('2024-10-23'),
                 visible: true,
             },
         ];

@@ -4,7 +4,6 @@ export class Game {
         public size: number,
         public mode: string,
         public imgSrc: string,
-        public lastModif: Date,
-        public visible: boolean
+        public visible: boolean,
     ) {}
 }
