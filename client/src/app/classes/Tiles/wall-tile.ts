@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
-import { Tile } from '@app/interfaces/tile';
 import { Vec2 } from '@app/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
-export class WallTile implements Tile {
+export class WallTile extends Tile {
     name: string = 'WallTile';
     description: string = 'Mur';
     imageUrl: string = 'assets/images/tiles/brickwall.jpg';

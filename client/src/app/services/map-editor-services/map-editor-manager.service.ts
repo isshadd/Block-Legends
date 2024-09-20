@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Item } from '@app/classes/Items/item';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
-import { TerrainTile } from '@app/interfaces/terrain-tile';
-import { Tile } from '@app/interfaces/tile';
 
 @Injectable({
     providedIn: 'root',
@@ -68,8 +68,10 @@ export class MapEditorManagerService {
                 this.sideMenuSelectedEntity = null;
             } else if (!this.isItem(this.sideMenuSelectedEntity)) {
                 console.log('Not an item');
-                this.grid[entity.coordinates.y][entity.coordinates.x] = this.sideMenuSelectedEntity as Tile;
-                entity.visibleState = VisibleState.notSelected;
+                let tileCopy = new Tile(this.sideMenuSelectedEntity as Tile);
+                this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
+                tileCopy.visibleState = VisibleState.notSelected;
+                console.log(tileCopy);
             }
         }
     }
