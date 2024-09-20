@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { TerrainTile } from '@app/interfaces/terrain-tile';
 import { Tile } from '@app/interfaces/tile';
 
 @Injectable({
@@ -22,5 +24,21 @@ export class MapEditorManagerService {
     setMapSize(size: number) {
         this.grid = [];
         this.gridCreator(size);
+    }
+
+    isTerrainTile(tile: Tile): tile is TerrainTile {
+        return (tile as TerrainTile).item !== undefined;
+    }
+
+    onMouseEnter(entity: PlaceableEntity) {
+        entity.visibleState = VisibleState.hovered;
+    }
+
+    onMouseLeave(entity: PlaceableEntity) {
+        entity.visibleState = VisibleState.notSelected;
+    }
+
+    onMouseDown(entity: PlaceableEntity) {
+        entity.visibleState = VisibleState.selected;
     }
 }

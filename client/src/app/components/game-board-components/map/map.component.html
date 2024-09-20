@@ -1,8 +1,14 @@
 <div id="map" [style.--grid-size]="mapEditorManagerService.grid.length" [style.--tile-size]="100 / mapEditorManagerService.grid.length + '%'">
     @for(row of mapEditorManagerService.grid; track row; let i = $index){ @for(tile of row; track tile; let j = $index){
     <div class="tile-container">
-        <app-placeable-entity [placeableEntity]="tile" class="layer-1" (click)="onTileClick(tile)"></app-placeable-entity>
-        @if (isTerrainTile(tile)) {
+        <app-placeable-entity
+            [placeableEntity]="tile"
+            class="layer-1"
+            (mouseenter)="mapEditorManagerService.onMouseEnter(tile)"
+            (mouseleave)="mapEditorManagerService.onMouseLeave(tile)"
+            (click)="mapEditorManagerService.onMouseDown(tile)"
+        ></app-placeable-entity>
+        @if (mapEditorManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
         }
         <app-visible-state [placeableEntity]="tile" class="layer-3"></app-visible-state>
