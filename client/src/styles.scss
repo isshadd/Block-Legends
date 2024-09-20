@@ -82,9 +82,26 @@ $indigo-pink-theme: mat.m2-define-light-theme(
 html,
 body {
     height: 100%;
-}
-body {
     margin: 0;
+    background-color: $background;
+}
+
+.dark-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: darken($primary-dark, 10%);
+    color: $primary-light;
+    box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.285);
+
+    cursor: pointer;
+
+    padding: 5px;
+}
+
+.dark-button:hover {
+    background-color: darken($primary-dark, 20%);
 }
 
 * {
