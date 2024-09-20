@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Game } from 'src/app/classes/Games-create-game/game-interface';
 import { CreateGameComponent } from './create-game.component';
+import { Game } from '/Users/issamhaddadi/Desktop/Projet 2/LOG2990-104/common/game.interface';
 
 const GAME_SIZE = 30;
 
@@ -27,7 +27,15 @@ describe('CreateGameComponent', () => {
     });
 
     it('should select a game', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
+        const game: Game = {
+            id: 0,
+            name: 'JeuTest',
+            size: 30,
+            mode: 'Combat classique',
+            imageUrl: '',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: true,
+        };
         component.selectGame(game);
         expect(component.selectedGame).toEqual(game);
     });
@@ -38,13 +46,29 @@ describe('CreateGameComponent', () => {
     });
 
     it('should navigate to the create-character page', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
+        const game: Game = {
+            id: 0,
+            name: 'JeuTest',
+            size: 30,
+            mode: 'Combat classique',
+            imageUrl: '',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: true,
+        };
         component.selectGame(game);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should hide the game if it is not visible', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', false);
+        const game: Game = {
+            id: 0,
+            name: 'JeuTest',
+            size: 30,
+            mode: 'Combat classique',
+            imageUrl: '',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: false,
+        };
         component.selectGame(game);
         expect(component.selectedGame).toBeNull();
         expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
@@ -57,13 +81,15 @@ describe('CreateGameComponent', () => {
     });
 
     it('should filter games by mode', () => {
-        const games = [
+        const games: Game[] = [
             {
-                name: 'League Of Legends',
+                id: 0,
+                name: 'JeuTest',
                 size: GAME_SIZE,
                 mode: 'Combat classique',
-                imgSrc: 'string',
-                visible: true,
+                imageUrl: '',
+                lastModificationDate: new Date('2024-10-23'),
+                isVisible: true,
             },
         ];
         component.games = games;

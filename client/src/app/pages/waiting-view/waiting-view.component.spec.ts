@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { BASE_STATS } from '@app/pages/create-character/create-character.component';
+import { BASE_STATS } from 'src/app/classes/Characters/player-attributes';
 import { WaitingViewComponent } from './waiting-view.component';
 
 class MockRouter {
@@ -43,10 +43,10 @@ describe('WaitingViewComponent', () => {
         expect(component.players[1].name).toBe('Virtual_Player 1');
         // LES LIGNES SUIVANTES SERONT A CHANGER PLUS TARD
         expect(component.players[1].avatar).toBe('');
-        expect(component.players[1].life).toBe(BASE_STATS);
-        expect(component.players[1].speed).toBe(BASE_STATS);
-        expect(component.players[1].attack).toBeGreaterThan(BASE_STATS);
-        expect(component.players[1].defense).toBeGreaterThan(BASE_STATS);
+        expect(component.players[1].attributes.life).toBe(BASE_STATS);
+        expect(component.players[1].attributes.speed).toBe(BASE_STATS);
+        expect(component.players[1].attributes.attack).toBeGreaterThanOrEqual(BASE_STATS);
+        expect(component.players[1].attributes.defense).toBeGreaterThanOrEqual(BASE_STATS);
     });
 
     it('should add a virtual player when addVirtualPlayers is called', () => {

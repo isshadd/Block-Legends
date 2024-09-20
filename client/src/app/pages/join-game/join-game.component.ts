@@ -14,7 +14,7 @@ import { GameService } from '@app/services/game.service';
 })
 export class JoinGameComponent {
     accessCode: number | null;
-    errorMessage: string | null = '';
+    errorMessage: string | null;
 
     constructor(
         private gameService: GameService, // private router: Router,

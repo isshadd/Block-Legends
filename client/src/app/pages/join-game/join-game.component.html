@@ -20,6 +20,6 @@
 
             <button class="dark-button" [@ngIf]="this.accessCode" (click)="joinGame()">Rejoindre la Partie</button>
         </div>
-        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+        <div [@ngIf]="errorMessage" class="error">{{ errorMessage }}</div>
     </div>
 </body>

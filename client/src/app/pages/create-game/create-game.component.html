@@ -10,32 +10,37 @@
             <div class="navbar-title">Créer une nouvelle partie - League of Versions</div>
             <div class="navbar-modes">
                 <div class="mode-option">
-                    <img src="https://www.clipartmax.com/png/middle/326-3260345_minecraft-swords-crossed-png-minecraft-diamond-sword-crossed.png" alt="Combat Classique">
-                    <button (click)="selectMode('Combat classique')" [ngClass]="{'active': selectedMode === 'Combat classique'}">Combat Classique</button>
+                    <img
+                        src="https://www.clipartmax.com/png/middle/326-3260345_minecraft-swords-crossed-png-minecraft-diamond-sword-crossed.png"
+                        alt="Combat Classique"
+                    />
+                    <button (click)="selectMode('Combat classique')" [ngClass]="{ active: selectedMode === 'Combat classique' }">
+                        Combat Classique
+                    </button>
                 </div>
                 <div class="mode-option">
-                    <img src="https://lasertag.com.au/upload/modules/Badge-Capture-the-Flag-Game.jpg" alt="Capture de Drapeau">
-                    <button (click)="selectMode('Capture de drapeau')" [ngClass]="{'active': selectedMode === 'Capture de drapeau'}">Capture de Drapeau</button>
+                    <img src="https://lasertag.com.au/upload/modules/Badge-Capture-the-Flag-Game.jpg" alt="Capture de Drapeau" />
+                    <button (click)="selectMode('Capture de drapeau')" [ngClass]="{ active: selectedMode === 'Capture de drapeau' }">
+                        Capture de Drapeau
+                    </button>
                 </div>
             </div>
         </nav>
         <div class="container">
             <div class="header-container">
                 <button (click)="homeButton()" class="home-button" routerLink="/home">🏠</button>
-                <h1>Liste des jeux : {{this.selectedMode}}</h1>
+                <h1>Liste des jeux : {{ this.selectedMode }}</h1>
             </div>
             <div>
                 <ul class="game-list" *ngIf="getFilteredGames().length > 0; else noGames">
                     <li *ngFor="let game of getFilteredGames()" class="game-item">
                         <div class="game-box">
-                            <img [src]="game.imgSrc" alt="{{ game.name }}" class="game-image">
+                            <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
                             <div class="game-details">
                                 <h2>{{ game.name }}</h2>
                                 <p>Taille de la carte: {{ game.size }}</p>
                             </div>
-                            <button (click)="selectGame(game)" routerLink="/game-page">
-                                Créer une partie de :<br>{{ game.name }}
-                            </button>
+                            <button (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
                         </div>
                     </li>
                 </ul>

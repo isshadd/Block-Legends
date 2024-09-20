@@ -23,9 +23,10 @@ describe('JoinGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should join game', () => {
+    it('should not join a game if code is incorrect', () => {
         component.accessCode = 1111;
         component.joinGame();
+        expect(component.errorMessage).toBe("Le code d'accès est invalide !");
     });
 
     /*

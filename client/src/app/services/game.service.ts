@@ -4,7 +4,7 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 const MATH_1000 = 1000;
 const MATH_9000 = 9000;
-const VP_NUMBER = 100;
+const VP_NUMBER = 6;
 
 @Injectable({
     providedIn: 'root',
@@ -23,7 +23,7 @@ export class GameService {
 
     generateVirtualCharacters(): PlayerCharacter[] {
         for (let i = 0; i < VP_NUMBER; i++) {
-            const character = new PlayerCharacter('Virtual_Player ' + (i + 1), '', new PlayerAttributes());
+            const character = new PlayerCharacter('Joueur virtuel ' + (i + 1), '', new PlayerAttributes());
             this.characters.push(character);
         }
         return this.characters;

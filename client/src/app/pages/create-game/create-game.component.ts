@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Game } from 'src/app/classes/Games-create-game/game-interface';
+import { Game } from '/Users/issamhaddadi/Desktop/Projet 2/LOG2990-104/common/game.interface';
 
 @Component({
     selector: 'app-create-game',
@@ -11,41 +11,42 @@ import { Game } from 'src/app/classes/Games-create-game/game-interface';
     styleUrl: './create-game.component.scss',
 })
 export class CreateGameComponent {
-    games: { name: string; size: number; mode: string; imgSrc: string; visible: boolean }[] = [
+    games: Game[] = [
         {
+            id: 0,
             name: 'League Of Legends',
             size: 30,
             mode: 'Capture de drapeau',
-            imgSrc: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
-            visible: true,
+            imageUrl: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: true,
         },
         {
+            id: 1,
             name: 'Minecraft',
             size: 38,
             mode: 'Combat classique',
-            imgSrc: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            visible: true,
+            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
+            lastModificationDate: new Date('2020-01-03'),
+            isVisible: true,
         },
         {
+            id: 2,
             name: 'Penguin Diner',
             size: 25,
             mode: 'Combat classique',
-            imgSrc: 'https://tcf.admeen.org/game/4500/4373/400x246/penguin-diner.jpg',
-            visible: true,
+            imageUrl: 'https://tcf.admeen.org/game/4500/4373/400x246/penguin-diner.jpg',
+            lastModificationDate: new Date('2005-12-12'),
+            isVisible: true,
         },
         {
+            id: 3,
             name: 'Super Mario',
             size: 36,
             mode: 'Capture de drapeau',
-            imgSrc: 'https://image.uniqlo.com/UQ/ST3/eu/imagesother/2020/ut/gaming/pc-ut-hero-mario-35.jpg',
-            visible: true,
-        },
-        {
-            name: 'Call of Duty',
-            size: 35,
-            mode: 'Capture de drapeau',
-            imgSrc: 'https://image.uniqlo.com/UQ/ST3/eu/imagesother/2020/ut/gaming/pc-ut-hero-mario-35.jpg',
-            visible: false,
+            imageUrl: 'https://image.uniqlo.com/UQ/ST3/eu/imagesother/2020/ut/gaming/pc-ut-hero-mario-35.jpg',
+            lastModificationDate: new Date('2010-06-01'),
+            isVisible: true,
         },
     ];
 
@@ -56,7 +57,7 @@ export class CreateGameComponent {
     constructor(private router: Router) {}
 
     selectGame(game: Game) {
-        if (!game.visible) {
+        if (!game.isVisible) {
             this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
             this.selectedGame = null;
         } else {
@@ -78,6 +79,6 @@ export class CreateGameComponent {
         if (!this.selectedMode) {
             return this.games;
         }
-        return this.games.filter((game) => game.visible && game.mode === this.selectedMode);
+        return this.games.filter((game) => game.isVisible && game.mode === this.selectedMode);
     }
 }
