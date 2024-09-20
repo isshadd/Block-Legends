@@ -14,25 +14,26 @@ import { GameService } from '@app/services/game.service';
 })
 export class JoinGameComponent {
     accessCode: number | null;
-    errorMessage: string | null;
+    errorMessage: string | null = '';
 
     constructor(
         private gameService: GameService, // private router: Router,
     ) {}
 
     joinGame(): void {
-        /*
-        const playerCharacter = {
-            name: 'Player 1',
-            avatar: 'avatar_url',
-            life: BASE_STATS, // LES 4 LIGNES SUIVANTES DEVRONT ETRE MODIFIEES PLUS TARD
-            speed: BASE_STATS,
-            attack: BASE_STATS + Math.floor(Math.random() * DICE_6) + 1,
-            defense: BASE_STATS + Math.floor(Math.random() * DICE_4) + 1,
-        };
-        */
         if (!this.accessCode || this.accessCode !== this.gameService.getAccessCode()) {
             this.errorMessage = "Le code d'accès est invalide !";
         }
+    }
+
+    validateAccessCode(event: any): void {
+        const input = event.target.value;
+        const sanitizedInput = input.replace(/\D/g, '');
+        if (sanitizedInput > 9999) {
+            this.accessCode = 9999;
+        } else {
+            this.accessCode = sanitizedInput;
+        }
+        event.target.value = this.accessCode;
     }
 }

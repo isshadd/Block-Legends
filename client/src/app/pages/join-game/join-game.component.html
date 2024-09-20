@@ -1,23 +1,25 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="join-game.component.scss" />
-    </head>
-    <body>
-        <div class="container">
-            <div class="join-game">
-                <h1>Rejoindre une Partie</h1>
+<body>
+    <div class="container">
+        <div class="join-game">
+            <h1>Rejoindre une Partie</h1>
 
-                <div class="form-group">
-                    <label for="accessCode">Entrez le code d'accès</label>
-                    <input name="accesCode" [(ngModel)]="accessCode" id="accessCode" type="number" placeholder="Entrez le code" />
-                </div>
-
-                <button *ngIf="this.accessCode" (click)="joinGame()">Rejoindre la Partie</button>
+            <div class="form-group">
+                <label for="accessCode">Entrez le code d'accès</label>
+                <input
+                    name="accessCode"
+                    [(ngModel)]="accessCode"
+                    id="accessCode"
+                    type="text"
+                    placeholder="Entrez le code"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    maxlength="4"
+                    (input)="validateAccessCode($event)"
+                />
             </div>
-            <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+            <button class="dark-button" [@ngIf]="this.accessCode" (click)="joinGame()">Rejoindre la Partie</button>
         </div>
-    </body>
-</html>
+        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+    </div>
+</body>
