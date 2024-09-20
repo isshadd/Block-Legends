@@ -1,0 +1,24 @@
+@import 'src/_variables.scss';
+#title {
+    display: flex;
+    margin-left: 10px;
+    font-size: 150%;
+    color: $primary-light;
+    border-bottom: 3px solid $primary-light;
+    padding-bottom: 5px;
+}
+
+.list-container {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fill, 100px);
+    grid-auto-rows: 100px;
+    row-gap: 10px;
+    column-gap: 5px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    background-color: darken($primary-dark, 10%);
+    margin-left: 10px;
+    margin-right: 10px;
+    box-shadow: inset 0px 0px 5px 5px rgba(0, 0, 0, 0.285);
+}
