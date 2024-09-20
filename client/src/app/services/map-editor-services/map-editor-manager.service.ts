@@ -9,6 +9,7 @@ import { Tile } from '@app/interfaces/tile';
 })
 export class MapEditorManagerService {
     grid: Tile[][] = [];
+    selectedEntity: PlaceableEntity | null;
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
@@ -31,14 +32,24 @@ export class MapEditorManagerService {
     }
 
     onMouseEnter(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.hovered;
+        if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.hovered;
     }
 
     onMouseLeave(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.notSelected;
+        if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.notSelected;
     }
 
     onMouseDown(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.selected;
+        if (entity.visibleState === VisibleState.selected) {
+            entity.visibleState = VisibleState.notSelected;
+            this.selectedEntity = null;
+        } else if (this.selectedEntity && this.selectedEntity !== entity) {
+            this.selectedEntity.visibleState = VisibleState.notSelected;
+            entity.visibleState = VisibleState.selected;
+            this.selectedEntity = entity;
+        } else {
+            entity.visibleState = VisibleState.selected;
+            this.selectedEntity = entity;
+        }
     }
 }
