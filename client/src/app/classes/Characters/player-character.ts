@@ -1,44 +1,46 @@
 import { PlayerAttributes } from './player-attributes';
 
-export const BONUS_LIFE = 6;
-export const BONUS_SPEED = 6;
-export const DICE_6 = 6;
-export const DICE_4 = 4;
+export const BONUS = 6;
 export const BASE_STATS = 4;
 
 export class PlayerCharacter {
-    isAttackDiceAssigned: boolean = false;
-    isDefenseDiceAssigned: boolean = false;
-    isLifeOrSpeedBonusAssigned: boolean = false;
-    bonusAttribute: string;
+    isLifeBonusAssigned: boolean = false;
+    isSpeedBonusAssigned: boolean = false;
+    isAttackBonusAssigned: boolean = false;
+    isDefenseBonusAssigned: boolean = false;
     isOrganizer: boolean = false;
+    dice: string;
     constructor(
         public name: string,
         public avatar: string,
         public attributes = new PlayerAttributes(),
     ) {}
 
-    diceAttribution(attribute: string) {
-        if (attribute === 'attack' && !this.isAttackDiceAssigned && !this.isAttackDiceAssigned) {
-            this.attributes.attack += Math.floor(Math.random() * DICE_6) + 1;
-            this.attributes.defense += Math.floor(Math.random() * DICE_4) + 1;
-        } else if (attribute === 'defense' && !this.isDefenseDiceAssigned && !this.isAttackDiceAssigned) {
-            this.attributes.defense += Math.floor(Math.random() * DICE_6) + 1;
-            this.attributes.attack += Math.floor(Math.random() * DICE_4) + 1;
-        }
-        this.isAttackDiceAssigned = true;
-        this.isDefenseDiceAssigned = true;
+    assignAttackDice() {
+        this.dice = 'attack';
+        this.isAttackBonusAssigned = true;
+        this.isDefenseBonusAssigned = true;
     }
 
-    assignBonus() {
-        if (this.bonusAttribute === 'life') {
-            this.attributes.life = BONUS_LIFE;
-            this.attributes.speed = BASE_STATS;
-        } else if (this.bonusAttribute === 'speed') {
-            this.attributes.speed = BONUS_SPEED;
-            this.attributes.life = BASE_STATS;
-        }
-        this.isLifeOrSpeedBonusAssigned = true;
+    assignDefenseDice() {
+        this.dice = 'defense';
+        this.isDefenseBonusAssigned = true;
+        this.isAttackBonusAssigned = true;
+    }
+
+    assignLifeBonus() {
+        this.attributes.life = BONUS;
+        this.attributes.speed = BASE_STATS;
+        this.isLifeBonusAssigned = true;
+        this.isSpeedBonusAssigned = true;
+        console.log('isLifeBonusAssigned:', this.isLifeBonusAssigned);
+    }
+
+    assignSpeedBonus() {
+        this.attributes.speed = BONUS;
+        this.attributes.life = BASE_STATS;
+        this.isSpeedBonusAssigned = true;
+        this.isLifeBonusAssigned = true;
     }
 
     setOrganizer() {

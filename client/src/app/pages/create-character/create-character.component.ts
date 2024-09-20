@@ -29,11 +29,13 @@ export class CreateCharacterComponent {
         if (
             !this.character.name ||
             !this.character.avatar ||
-            !this.character.isAttackDiceAssigned ||
-            !this.character.isAttackDiceAssigned ||
-            !this.character.isLifeOrSpeedBonusAssigned
+            !this.character.isAttackBonusAssigned ||
+            !this.character.isDefenseBonusAssigned ||
+            !this.character.isLifeBonusAssigned ||
+            !this.character.isSpeedBonusAssigned
         ) {
             this.characterStatus = "Le formulaire de création de personnage n'est pas valide !";
+            console.log(this.character);
         } else {
             this.character.setOrganizer();
             this.router.navigate(['/waiting-view']);

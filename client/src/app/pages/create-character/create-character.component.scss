@@ -1,6 +1,6 @@
 @import 'src/_variables.scss';
 
-.glob{
+.glob {
     background-color: $background;
 }
 
@@ -85,7 +85,7 @@ button:hover {
 }
 
 .button-create-character {
-    width:50%;
+    width: 50%;
     display: flex;
     justify-content: space-between;
 }

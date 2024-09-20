@@ -2,31 +2,22 @@
     <h3>Attributs :</h3>
     <div class="attribute" id="life">
         <label>Vie :</label>
-        <input name="life" [(ngModel)]="character.attributes.life" type="number" min="4" required readonly />
+        <div name="life">{{ character.attributes.life }}</div>
+        <button type="button" (click)="character.assignLifeBonus()">Assigner un +2 à la vie</button>
     </div>
     <div class="attribute" id="speed">
         <label>Rapidité :</label>
-        <input name="speed" [(ngModel)]="character.attributes.speed" type="number" min="4" required readonly />
+        <div name="speed">{{ character.attributes.speed }}</div>
+        <button type="button" (click)="character.assignSpeedBonus()">Assigner un +2 à la rapidité</button>
     </div>
     <div class="attribute" id="attack">
         <label>Attaque :</label>
-        <input name="attack" [(ngModel)]="character.attributes.attack" type="number" min="4" required readonly />
-        <button type="button" (click)="character.diceAttribution('attack')" [disabled]="character.isAttackDiceAssigned">
-            Assigner un dé
-        </button>
+        <div name="attack">{{ character.attributes.attack }}</div>
+        <button type="button" (click)="character.assignAttackDice()">Assigner un dé à l'attaque</button>
     </div>
     <div class="attribute" id="defense">
         <label>Défense :</label>
-        <input name="defense" [(ngModel)]="character.attributes.defense" type="number" min="4" required readonly />
-        <button type="button" (click)="character.diceAttribution('defense')" [disabled]="character.isDefenseDiceAssigned">
-            Assigner un dé
-        </button>
+        <div name="defense">{{ character.attributes.defense }}</div>
+        <button type="button" (click)="character.assignDefenseDice()">Assigner un dé à la défense</button>
     </div>
-</div>
-<div id="select">
-    <label id="label" for="bonus">Attribuer un bonus de +2 à la vie ou à la rapidité :</label>
-    <select id="bonus" [(ngModel)]="character.bonusAttribute" name="bonus" (change)="character.assignBonus()">
-        <option value="life">Vie</option>
-        <option value="speed">Rapidité</option>
-    </select>
 </div>
