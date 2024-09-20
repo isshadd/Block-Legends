@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="create-character.component.scss" />
+    </head>
+    <body>
+        <div class="glob">
+            <h1>Création de personnage - League of Versions</h1>
+            <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
+                <div class="info-char">
+                    <label for="name">Nom :</label>
+                    <input id="name" [(ngModel)]="character.name" name="name" required />
+                </div>
+                <div class="info-char">
+                    <label for="avatar">Avatar : </label>
+                    <div class="avatar-selection">
+                        <div class="avatar-grid">
+                            <div *ngFor="let avatar of avatars" class="avatar-item" (click)="selectAvatar(avatar.imgSrc1)">
+                                <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1">
+                                <small>{{ avatar.name }}</small>
+                            </div>
+                        </div>
+                        <div class="selected-avatar">
+                            <img *ngIf="character.avatar; else noAvatarSelected" [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name">
+                            <p>{{ getSelectedAvatar()?.name }}</p>
+                            <ng-template #noAvatarSelected>
+                                <p>Choisissez votre avatar</p>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+                <div class="attributes">
+                    <h3>Attributs :</h3>
+                    <div class="attribute" id="life">
+                        <label>Vie :</label>
+                        <input name="life" [(ngModel)]="character.life" type="number" min="4" required readonly />
+                    </div>
+                    <div class="attribute" id="speed">
+                        <label>Rapidité :</label>
+                        <input name="speed" [(ngModel)]="character.speed" type="number" min="4" required readonly />
+                    </div>
+                    <div class="attribute" id="attack">
+                        <label>Attaque :</label>
+                        <input name="attack" [(ngModel)]="character.attack" type="number" min="4" required readonly />
+                        <button type="button" (click)="diceAttribution('attack')" [disabled]="isAttackDiceAssigned">Assigner un dé</button>
+                    </div>
+                    <div class="attribute" id="defense">
+                        <label>Défense :</label>
+                        <input name="defense" [(ngModel)]="character.defense" type="number" min="4" required readonly />
+                        <button type="button" (click)="diceAttribution('defense')" [disabled]="isDefenseDiceAssigned">Assigner un dé</button>
+                    </div>
+                </div>
+                <div id="select">
+                    <label id="label" for="bonus">Attribuer un bonus de +2 à la vie ou à la rapidité :</label>
+                    <select id="bonus" [(ngModel)]="bonusAttribute" name="bonus" (change)="assignBonus()">
+                        <option value="life">Vie</option>
+                        <option value="speed">Rapidité</option>
+                    </select>
+                </div>
+                <div id="message" *ngIf="characterStatus">{{ characterStatus }}</div>
+                <div class="button-create-character">
+                    <button id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
+                    <button id="create" type="submit">Créer le personnage</button>
+                </div>
+                
+                <div id="confirmationModal" class="modal" *ngIf="isModalOpen">
+                    <div class="modal-content">
+                        <span class="close" (click)="closeModal()">&times;</span>
+                        <p>Êtes-vous sûr de vouloir retourner à la sélection de jeu ?</p>
+                        <small>(la création de votre avatar sera perdu)</small>
+                        <div class="modal-buttons">
+                            <button (click)="confirmBack()">Oui</button>
+                            <button (click)="closeModal()">Non</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
