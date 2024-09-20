@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService } from '@app/services/game.service';
+import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
+import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-waiting-view',
@@ -13,16 +15,8 @@ import { GameService } from '@app/services/game.service';
 })
 export class WaitingViewComponent implements OnInit {
     accessCode: number;
-    players: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }[] = [];
-    isOrganizer: boolean = true;
-    organizerCharacter: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number } = {
-        name: 'Organizer', // A CHANGER PLUS TARD, CECI EST SEULEMENT POUR LE TEST DE LA PAGE
-        avatar: '',
-        life: 4,
-        speed: 4,
-        attack: 4,
-        defense: 4,
-    };
+    players: PlayerCharacter[] = [];
+    organizerCharacter = new PlayerCharacter('Organizer', '', new PlayerAttributes());
     virtualPlayersCounter = 0;
 
     constructor(
@@ -33,8 +27,9 @@ export class WaitingViewComponent implements OnInit {
     ngOnInit(): void {
         this.gameService.generateAccessCode();
         this.accessCode = this.gameService.getAccessCode();
+        this.organizerCharacter.setOrganizer();
 
-        if (this.isOrganizer) {
+        if (this.organizerCharacter.isOrganizer) {
             this.players.push(this.organizerCharacter);
         }
     }

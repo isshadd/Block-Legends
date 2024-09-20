@@ -55,7 +55,7 @@ export class CreateGameComponent {
 
     constructor(private router: Router) {}
 
-    selectGame(game: Game /* A CHANGER UNE FOIS LE TYPE DE {game} DEFINI*/) {
+    selectGame(game: Game) {
         if (!game.visible) {
             this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
             this.selectedGame = null;

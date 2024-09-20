@@ -7,10 +7,11 @@ export const DICE_4 = 4;
 export const BASE_STATS = 4;
 
 export class PlayerCharacter {
-    isAttackDiceAssigned: boolean = false;
-    isDefenseDiceAssigned: boolean = false;
-    isLifeOrSpeedBonusAssigned: boolean = false;
-    bonusAttribute: string;
+    public isAttackDiceAssigned: boolean = false;
+    public isDefenseDiceAssigned: boolean = false;
+    public isLifeOrSpeedBonusAssigned: boolean = false;
+    public bonusAttribute: string;
+    public isOrganizer: boolean = false;
     constructor(
         public name: string,
         public avatar: string,
@@ -38,5 +39,9 @@ export class PlayerCharacter {
             this.attributes.life = BASE_STATS;
         }
         this.isLifeOrSpeedBonusAssigned = true;
+    }
+
+    setOrganizer() {
+        this.isOrganizer = true;
     }
 }
