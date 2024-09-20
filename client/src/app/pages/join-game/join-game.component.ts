@@ -25,15 +25,4 @@ export class JoinGameComponent {
             this.errorMessage = "Le code d'accès est invalide !";
         }
     }
-
-    validateAccessCode(event: any): void {
-        const input = event.target.value;
-        const sanitizedInput = input.replace(/\D/g, '');
-        if (sanitizedInput > 9999) {
-            this.accessCode = 9999;
-        } else {
-            this.accessCode = sanitizedInput;
-        }
-        event.target.value = this.accessCode;
-    }
 }

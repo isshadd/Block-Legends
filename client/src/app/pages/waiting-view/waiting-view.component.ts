@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/game.service';
+import { GameService, VP_NUMBER } from '@app/services/game.service';
 import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
@@ -32,17 +32,17 @@ export class WaitingViewComponent implements OnInit {
         this.accessCode = this.gameService.getAccessCode();
         this.organizerCharacter.setOrganizer();
 
-        if (this.organizerCharacter.isOrganizer == true) {
+        if (this.organizerCharacter.isOrganizer === true) {
             this.players.push(this.organizerCharacter);
             this.cdr.detectChanges();
         }
     }
 
     addVirtualPlayers(): void {
-        if (this.playersCounter < 6) {
+        if (this.playersCounter < VP_NUMBER) {
             this.players.push(this.gameService.generateVirtualCharacters()[this.playersCounter]);
             this.playersCounter += 1;
-        } else if (this.playersCounter >= 6) {
+        } else if (this.playersCounter >= VP_NUMBER) {
             this.maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
             this.isMaxPlayer = true;
         }

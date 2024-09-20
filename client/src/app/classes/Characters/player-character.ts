@@ -7,11 +7,11 @@ export const DICE_4 = 4;
 export const BASE_STATS = 4;
 
 export class PlayerCharacter {
-    public isAttackDiceAssigned: boolean = false;
-    public isDefenseDiceAssigned: boolean = false;
-    public isLifeOrSpeedBonusAssigned: boolean = false;
-    public bonusAttribute: string;
-    public isOrganizer: boolean = false;
+    isAttackDiceAssigned: boolean = false;
+    isDefenseDiceAssigned: boolean = false;
+    isLifeOrSpeedBonusAssigned: boolean = false;
+    bonusAttribute: string;
+    isOrganizer: boolean = false;
     constructor(
         public name: string,
         public avatar: string,

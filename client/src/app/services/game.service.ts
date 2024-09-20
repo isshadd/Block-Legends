@@ -4,7 +4,7 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 const MATH_1000 = 1000;
 const MATH_9000 = 9000;
-const VP_NUMBER = 6;
+export const VP_NUMBER = 6;
 
 @Injectable({
     providedIn: 'root',
