@@ -1,0 +1,32 @@
+<div class="attributes">
+    <h3>Attributs :</h3>
+    <div class="attribute" id="life">
+        <label>Vie :</label>
+        <input name="life" [(ngModel)]="character.attributes.life" type="number" min="4" required readonly />
+    </div>
+    <div class="attribute" id="speed">
+        <label>Rapidité :</label>
+        <input name="speed" [(ngModel)]="character.attributes.speed" type="number" min="4" required readonly />
+    </div>
+    <div class="attribute" id="attack">
+        <label>Attaque :</label>
+        <input name="attack" [(ngModel)]="character.attributes.attack" type="number" min="4" required readonly />
+        <button type="button" (click)="character.diceAttribution('attack')" [disabled]="character.isAttackDiceAssigned">
+            Assigner un dé
+        </button>
+    </div>
+    <div class="attribute" id="defense">
+        <label>Défense :</label>
+        <input name="defense" [(ngModel)]="character.attributes.defense" type="number" min="4" required readonly />
+        <button type="button" (click)="character.diceAttribution('defense')" [disabled]="character.isDefenseDiceAssigned">
+            Assigner un dé
+        </button>
+    </div>
+</div>
+<div id="select">
+    <label id="label" for="bonus">Attribuer un bonus de +2 à la vie ou à la rapidité :</label>
+    <select id="bonus" [(ngModel)]="character.bonusAttribute" name="bonus" (change)="character.assignBonus()">
+        <option value="life">Vie</option>
+        <option value="speed">Rapidité</option>
+    </select>
+</div>
