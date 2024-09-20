@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { VisibleStateComponent } from '@app/components/game-board-components/entity-container/visible-state.component';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 
 @Component({
