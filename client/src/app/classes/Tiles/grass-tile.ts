@@ -12,6 +12,6 @@ export class GrassTile implements TerrainTile {
     description: string = 'Gazon';
     imageUrl: string = 'assets/images/tiles/grass.png';
     coordinates: Vec2 = { x: -1, y: -1 };
-    item: Item;
+    item: Item | null = null;
     visibleState: VisibleState = VisibleState.notSelected;
 }

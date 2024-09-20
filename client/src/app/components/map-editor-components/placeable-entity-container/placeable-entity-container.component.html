@@ -8,7 +8,7 @@
             [matTooltip]="item.description"
             (mouseenter)="mapEditorManagerService.onMouseEnter(item)"
             (mouseleave)="mapEditorManagerService.onMouseLeave(item)"
-            (click)="mapEditorManagerService.onMouseDown(item)"
+            (click)="mapEditorManagerService.onMouseDownSideMenu(item)"
         ></app-placeable-entity>
         <app-visible-state [placeableEntity]="item" class="layer-2"></app-visible-state>
     </div>

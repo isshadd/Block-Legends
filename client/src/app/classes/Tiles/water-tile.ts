@@ -12,6 +12,6 @@ export class WaterTile implements TerrainTile {
     description: string = 'Eau';
     imageUrl: string = 'assets/images/tiles/water.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
-    item: Item;
+    item: Item | null = null;
     visibleState: VisibleState = VisibleState.notSelected;
 }

@@ -9,5 +9,5 @@ import { PlaceableEntity } from '@app/interfaces/placeable-entity';
     styleUrl: './placeable-entity.component.scss',
 })
 export class PlaceableEntityComponent {
-    @Input() placeableEntity: PlaceableEntity;
+    @Input() placeableEntity: PlaceableEntity | null;
 }

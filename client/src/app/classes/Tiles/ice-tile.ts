@@ -12,6 +12,6 @@ export class IceTile implements TerrainTile {
     description: string = 'Glace';
     imageUrl: string = 'assets/images/tiles/ice.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
-    item: Item;
+    item: Item | null = null;
     visibleState: VisibleState = VisibleState.notSelected;
 }

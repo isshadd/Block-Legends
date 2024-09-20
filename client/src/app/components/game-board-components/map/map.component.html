@@ -6,7 +6,7 @@
             class="layer-1"
             (mouseenter)="mapEditorManagerService.onMouseEnter(tile)"
             (mouseleave)="mapEditorManagerService.onMouseLeave(tile)"
-            (click)="mapEditorManagerService.onMouseDown(tile)"
+            (click)="mapEditorManagerService.onMouseDownMapTile(tile)"
         ></app-placeable-entity>
         @if (mapEditorManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
