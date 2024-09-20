@@ -129,27 +129,10 @@ export class AdministrationGameComponent {
     }
 
 
-
-
-    onMouseOver(game: Game): void {
-        // pour le moment, le type de game est any
-        game.isHovered = true;
-    }
-
     toggleVisibility(game: Game): void {
         game.isVisible = !game.isVisible;
     }
-    onMouseOut(game: Game): void {
-        game.isHovered = false;
-    }
-
-    getImageStyles(game: Game): any {
-        return {
-            transform: game.isHovered ? 'scale(1.4)' : 'scale(1)',
-            opacity: game.isVisible ? '1' : '0.5',
-            transition: 'transform 0.3s ease, opacity 0.3s ease',
-        };
-    }
+    
 
 
 }
