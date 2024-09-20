@@ -8,7 +8,7 @@ import { Vec2 } from '@app/interfaces/vec2';
 })
 export class WallTile implements Tile {
     name: string = 'WallTile';
-    description: string = 'WallTile';
+    description: string = 'Mur';
     imageUrl: string = 'assets/images/tiles/brickwall.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
     visibleState: VisibleState = VisibleState.notSelected;

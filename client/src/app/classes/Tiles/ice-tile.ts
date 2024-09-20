@@ -9,7 +9,7 @@ import { Item } from '../Items/item';
 })
 export class IceTile implements TerrainTile {
     name: string = 'IceTile';
-    description: string = 'IceTile';
+    description: string = 'Glace';
     imageUrl: string = 'assets/images/tiles/ice.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
     item: Item;

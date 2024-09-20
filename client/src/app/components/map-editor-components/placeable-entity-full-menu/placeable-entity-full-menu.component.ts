@@ -18,11 +18,11 @@ import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 export class PlaceableEntityFullMenuComponent {
     placeableEntitiesSections: PlaceableEntitySection[] = [
         {
-            title: 'Tiles',
+            title: 'Tuiles',
             entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
         },
         {
-            title: 'Items',
+            title: 'Objets',
             entities: [new Item(), new Item(), new Item(), new Item(), new Item(), new Item()],
         },
     ];
