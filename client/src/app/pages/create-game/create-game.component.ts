@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Game } from '/Users/issamhaddadi/Desktop/Projet 2/LOG2990-104/common/game.interface';
+import { Game } from '@common/game.interface';
 
 @Component({
     selector: 'app-create-game',
