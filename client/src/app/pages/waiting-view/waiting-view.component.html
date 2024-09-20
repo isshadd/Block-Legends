@@ -13,14 +13,14 @@
             <div class="players-list">
                 <h3>Joueurs :</h3>
                 <ul>
-                    <li *ngFor="let player of players" [ngClass]="{ organizer: player === organizerCharacter }">
+                    <li *ngFor="let player of players" [ngClass]="{ organizer: player === this.organizerCharacter }">
                         <span>{{ player.name }}<img src="avatar.png" /></span>
                         <!-- avatar.png EST SEULEMENT UN PLACEHOLDER ICI, DONC A CHANGER PLUS TARD-->
                     </li>
                 </ul>
             </div>
 
-            <div *ngIf="isOrganizer">
+            <div *ngIf="this.organizerCharacter.isOrganizer">
                 <button (click)="addVirtualPlayers()">Ajouter un joueur virtuel</button>
                 <!-- A CHANGER PLUS TARD, RAJOUTER UN  disabled="!isOrganizer", MAIS CE DERNIER EST TOUJOURS TRUE ICI-->
             </div>
