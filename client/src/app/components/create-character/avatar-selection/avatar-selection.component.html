@@ -1,0 +1,22 @@
+<div class="info-char">
+    <label for="avatar">Avatar : </label>
+    <div class="avatar-selection">
+        <div class="avatar-grid">
+            <div *ngFor="let avatar of avatars" class="avatar-item" (click)="selectAvatar(avatar.imgSrc1)">
+                <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1" />
+                <small>{{ avatar.name }}</small>
+            </div>
+        </div>
+        <div class="selected-avatar">
+            <img
+                *ngIf="character.avatar; else noAvatarSelected"
+                [src]="getSelectedAvatar()?.imgSrc2"
+                [alt]="getSelectedAvatar()?.name"
+            />
+            <p>{{ getSelectedAvatar()?.name }}</p>
+            <ng-template #noAvatarSelected>
+                <p>Choisissez<br>votre avatar</p>
+            </ng-template>
+        </div>
+    </div>
+</div>
