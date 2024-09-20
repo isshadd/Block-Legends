@@ -4,6 +4,7 @@ import { Message } from '@common/message';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { Game} from '@common/game.interface';
 
 @Injectable({
     providedIn: 'root',

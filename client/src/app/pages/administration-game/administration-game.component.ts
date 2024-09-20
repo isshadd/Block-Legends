@@ -15,6 +15,8 @@ import { BehaviorSubject } from 'rxjs';
     styleUrl: './administration-game.component.scss',
 })
 export class AdministrationGameComponent {
+    constructor(private readonly communicationService: CommunicationService) {}
+    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     games: Game[] = [
         {
             id: 0,
@@ -52,48 +54,17 @@ export class AdministrationGameComponent {
             lastModificationDate: new Date('2010-06-01'),
             isVisible: true,
         },
-    constructor(private readonly communicationService: CommunicationService) {}
-    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    games: { name: string; size: number; mode: string; imgSrc: string; lastModif: Date; isVisible: boolean }[] = [
-        // {
-        //     name: 'League Of Legends',
-        //     size: 30,
-        //     mode: 'CTF',
-        //     imgSrc: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
-        //     lastModif: new Date('2024-10-23'),
-        //     isVisible: true,
-        // },
-        // {
-        //     name: 'Minecraft',
-        //     size: 38,
-        //     mode: 'Normal',
-        //     imgSrc: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-        //     lastModif: new Date('2020-01-03'),
-        //     isVisible: true,
-        // },
-        // {
-        //     name: 'Penguin Diner',
-        //     size: 25,
-        //     mode: 'Normal',
-        //     imgSrc: 'https://tcf.admeen.org/game/4500/4373/400x246/penguin-diner.jpg',
-        //     lastModif: new Date('2005-12-12'),
-        //     isVisible: true,
-        // },
-        // {
-        //     name: 'Super Mario',
-        //     size: 36,
-        //     mode: 'CTF',
-        //     imgSrc: 'https://image.uniqlo.com/UQ/ST3/eu/imagesother/2020/ut/gaming/pc-ut-hero-mario-35.jpg',
-        //     lastModif: new Date('2010-06-01'),
-        //     isVisible: true,
-        // },
+    
     ];
+    
     ngOnInit(): void {
         this.updateGamesList();
     }
 
     deleteGame(game: Game): void {
         this.games = this.games.filter((elem) => elem.id !== game.id);
+    }
+
     emptyDB(): void {
         this.communicationService.dataDelete().subscribe({
             next: (response: any) => {
@@ -124,11 +95,8 @@ export class AdministrationGameComponent {
             },
         });
     }
-    deleteGame(game: any) {
-        this.games = this.games.filter((elem) => elem !== game);
-    }
 
-    deleteUniqueGame(game:any): void {
+    deleteUniqueGame(game:Game): void {
         this.deleteGame(game);
         this.communicationService.deleteOneGame(game.name).subscribe({
             next: (response) => {
@@ -144,12 +112,12 @@ export class AdministrationGameComponent {
     updateGamesList(): void {
         this.communicationService.getGames().subscribe({
             next: (response: any) => {
-                this.games = response.map((game: any) => ({
+                this.games = response.map((game: Game) => ({
                     name: game.name,
                     size: game.size,
                     mode: game.mode,
-                    imgSrc: game.imgSrc,
-                    lastModif: new Date(game.lastModif),
+                    imageUrl: game.imageUrl,
+                    lastModificationDate: new Date(game.lastModificationDate),
                     isVisible: game.isVisible,
                 }));
             },
@@ -163,17 +131,19 @@ export class AdministrationGameComponent {
 
 
 
-    onMouseOver(game: any): void {
+    onMouseOver(game: Game): void {
         // pour le moment, le type de game est any
         game.isHovered = true;
     }
 
     toggleVisibility(game: Game): void {
-    onMouseOut(game: any): void {
+        game.isVisible = !game.isVisible;
+    }
+    onMouseOut(game: Game): void {
         game.isHovered = false;
     }
 
-    getImageStyles(game: any): any {
+    getImageStyles(game: Game): any {
         return {
             transform: game.isHovered ? 'scale(1.4)' : 'scale(1)',
             opacity: game.isVisible ? '1' : '0.5',
@@ -182,7 +152,4 @@ export class AdministrationGameComponent {
     }
 
 
-    toggleVisibility(game: any): void {
-        game.isVisible = !game.isVisible;
-    }
 }
