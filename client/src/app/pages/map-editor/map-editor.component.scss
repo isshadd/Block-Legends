@@ -17,26 +17,8 @@
         scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
         padding: 10px;
 
-        #go-back-button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            background-color: darken($primary-dark, 10%);
-            color: $primary-light;
-            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.285);
-
-            cursor: pointer;
-
-            padding: 5px;
-        }
-
-        #go-back-button {
+        .dark-button {
             font-size: 150%;
-        }
-
-        #go-back-button:hover {
-            background-color: darken($primary-dark, 20%);
         }
     }
 
