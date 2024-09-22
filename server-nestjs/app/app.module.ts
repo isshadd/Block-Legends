@@ -14,7 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MongooseModule.forRootAsync({
-            imports: [ConfigModule, MongooseModule.forRoot('mongodb+srv://nihaltaih:nihal010203@cluster0.rrbzp.mongodb.net/LOG2990_104_Nihal?retryWrites=true&w=majority&appName=Cluster0')],
+            imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
