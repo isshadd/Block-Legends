@@ -46,6 +46,10 @@ export class AdministrationPageManagerService {
 
     constructor() {}
 
+    getGames(): Game[] {
+        return this.games;
+    }
+
     deleteGame(game: Game): void {
         this.games = this.games.filter((elem) => elem.id !== game.id);
     }

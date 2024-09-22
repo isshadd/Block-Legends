@@ -7,7 +7,6 @@ import { Game } from '@common/game.interface';
     templateUrl: './listGame.component.html',
     styleUrls: ['./listGame.component.scss'],
     standalone: true,
-    providers: [AdministrationPageManagerService],
 })
 export class ListGameComponent {
     constructor(private administrationService: AdministrationPageManagerService) {}
@@ -20,7 +19,7 @@ export class ListGameComponent {
         this.administrationService.deleteGame(game);
     }
 
-    ToggleVisibity(game: Game): void {
+    ToggleVisibility(game: Game): void {
         this.administrationService.toggleVisibility(game);
     }
 }
