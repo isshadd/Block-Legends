@@ -1,4 +1,10 @@
 <div class="info-char">
-    <label for="name">Nom :</label>
-    <input id="name" [(ngModel)]="character.name" name="name" required />
+    <div class="name-creation">
+        <label for="name">Nom :</label>
+        <input id="name" [(ngModel)]="character.name" name="name" required maxlength="15" />
+        <button class="dark-button" type="button" (click)="saveName()">Enregistrer le nom</button>    
+    </div>
+    <div *ngIf="savedName" class="saved-name">
+        <p>Nom enregistré : {{ savedName }}</p>
+    </div>
 </div>

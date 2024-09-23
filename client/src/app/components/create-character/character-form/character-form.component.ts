@@ -18,4 +18,13 @@ export class CharacterFormComponent {
     characterStatus: string | null;
 
     isModalOpen = false;
+
+    maxNameLength: number = 15;
+
+    savedName: string | null = null;
+
+    saveName() {
+        this.savedName = this.character.name; // Update savedName property
+        console.log('Nom enregistré:', this.character.name);
+    }
 }
