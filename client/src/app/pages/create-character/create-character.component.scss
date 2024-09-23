@@ -1,9 +1,5 @@
 @import 'src/_variables.scss';
 
-.glob {
-    background-color: $background;
-}
-
 h1 {
     text-align: center;
 }
@@ -16,41 +12,10 @@ form {
     gap: 10px;
 }
 
-button {
-    background-color: $primary;
-    color: black;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
-}
-
-button:hover {
-    border-color: black;
-}
-
 #life,
 #speed {
     height: 55px;
     width: 100px;
-}
-
-#create {
-    background-color: $primary;
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
-}
-
-#create:hover {
-    border-color: black;
-}
-
-.info-char input {
-    width: 100px;
-    text-align: center;
 }
 
 .info-char {
