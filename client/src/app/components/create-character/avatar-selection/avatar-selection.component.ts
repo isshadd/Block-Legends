@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
+import { Component, Input } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -26,7 +25,7 @@ export class AvatarSelectionComponent {
         { name: 'Azir', imgSrc1: 'assets/images/avatar/Azir.webp', imgSrc2: 'assets/images/avatar/Azir2.webp' },
     ];
 
-    character = new PlayerCharacter('', '', new PlayerAttributes());
+    @Input() character : PlayerCharacter;
 
     selectAvatar(avatar: string) {
         this.character.avatar = avatar;

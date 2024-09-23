@@ -1,9 +1,9 @@
 <div class="glob">
     <h1>Création de personnage - League of Versions</h1>
     <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
-        <app-character-form></app-character-form>
-        <app-avatar-selection></app-avatar-selection>
-        <app-attributes></app-attributes>
+        <app-character-form [character]="character"></app-character-form>
+        <app-avatar-selection [character]="character"></app-avatar-selection>
+        <app-attributes [character]="character"></app-attributes>
         @if(characterStatus) {
         <div id="message">{{ characterStatus }}</div>
         }
