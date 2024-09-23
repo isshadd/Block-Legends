@@ -4,6 +4,8 @@
     display: flex;
     gap: 20px;
     align-items: center;
+    background-color: $primary-dark;
+    border: 5px solid #000;
 }
 
 .avatar-grid {
@@ -23,10 +25,9 @@
     justify-content: center;
 }
 
-.avatar-item:hover{
+.avatar-item:hover {
     border-color: #007bff;
 }
-
 
 .avatar-item img {
     width: 50px;
@@ -44,7 +45,6 @@
     display: flex;
     flex-direction: column;
     padding: 5px;
-    text-align: center; 
+    text-align: center;
     justify-content: center;
-
 }

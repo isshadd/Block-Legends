@@ -6,8 +6,8 @@
     gap: 50px;
     color: $primary-light;
     background-color: $primary-dark;
-    border-radius: 5px;
     padding: 10px;
+    border: 5px solid #000;
 }
 .attribute input {
     width: 70px;
@@ -19,7 +19,6 @@
     align-items: center;
     color: black;
     background-color: $secondary;
-    border-radius: 5px;
     padding: 10px;
     justify-content: space-around;
 }
