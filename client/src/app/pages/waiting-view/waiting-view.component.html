@@ -18,16 +18,16 @@
                     </li>
                 </ul>
             </div>
-
-            <div *ngIf="this.organizerCharacter.isOrganizer">
-                <button (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
+            @if(this.organizerCharacter.isOrganizer) {
+            <div>
+                <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
                 <!-- A CHANGER PLUS TARD, RAJOUTER UN  disabled="!isOrganizer", MAIS CE DERNIER EST TOUJOURS TRUE ICI-->
             </div>
-            @if (isMaxPlayer) {
+            } @if (isMaxPlayer) {
             <div class="error">{{ maxPlayerMessage }}</div>
             }
             <div>
-                <button (click)="playerLeave()">Quitter la partie</button>
+                <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
             </div>
 
             <div class="chat">

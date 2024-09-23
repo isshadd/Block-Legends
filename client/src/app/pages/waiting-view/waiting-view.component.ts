@@ -16,7 +16,7 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 export class WaitingViewComponent implements OnInit {
     accessCode: number;
     players: PlayerCharacter[] = [];
-    organizerCharacter = new PlayerCharacter('Organisateur', '', new PlayerAttributes());
+    organizerCharacter = new PlayerCharacter('Organisateur ♛', '', new PlayerAttributes());
     playersCounter = 0;
     maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
     isMaxPlayer: boolean;
