@@ -32,6 +32,7 @@ div {
     max-width: 400px;
     margin: 0 auto;
     height: fit-content;
+    border: 5px solid #000;
 }
 
 h1 {
@@ -53,6 +54,8 @@ h1 {
         margin-bottom: 5px;
         color: black;
         background-color: #e0a458;
+        padding: 5px;
+        border: 5px solid #000;
     }
 
     input {

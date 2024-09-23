@@ -14,11 +14,15 @@
                     inputmode="numeric"
                     pattern="[0-9]*"
                     maxlength="4"
+                    (keypress)="allowOnlyNumbers($event)"
                 />
             </div>
-
-            <button class="dark-button" [@ngIf]="this.accessCode" (click)="joinGame()">Rejoindre la Partie</button>
+            @if(this.accessCode){
+            <button class="dark-button" (click)="joinGame()">Rejoindre la Partie</button>
+            }
         </div>
-        <div [@ngIf]="errorMessage" class="error">{{ errorMessage }}</div>
+        @if(this.errorMessage) {
+        <div class="error">{{ errorMessage }}</div>
+        }
     </div>
 </body>

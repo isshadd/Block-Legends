@@ -25,4 +25,12 @@ export class JoinGameComponent {
             this.errorMessage = "Le code d'accès est invalide !";
         }
     }
+
+    allowOnlyNumbers(event: KeyboardEvent) {
+        const charCode = event.keyCode ? event.keyCode : event.which;
+        if (charCode < 48 || charCode > 57) {
+            // Seuls les codes ASCII des chiffres sont autorisés
+            event.preventDefault();
+        }
+    }
 }

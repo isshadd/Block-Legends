@@ -4,20 +4,22 @@
         <app-character-form></app-character-form>
         <app-avatar-selection></app-avatar-selection>
         <app-attributes></app-attributes>
-        <div id="message" *ngIf="characterStatus">{{ characterStatus }}</div>
+        @if(characterStatus) {
+        <div id="message">{{ characterStatus }}</div>
+        }
         <div class="button-create-character">
             <button id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
             <button id="create" type="submit">Créer le personnage</button>
         </div>
-    </form>    
+    </form>
+    @if(isModalOpen) {
     <app-modal
-    *ngIf="isModalOpen"
-    [title]="'Êtes-vous sûr de vouloir retourner à la sélection de jeu ?'"
-    [message]="'(la création de votre avatar sera perdu)'"
-    [confirmText]="'Oui'"
-    [cancelText]="'Non'"
-    (confirm)="confirmBack()"
-    (cancel)="closeModal()"
+        [title]="'Êtes-vous sûr de vouloir retourner à la sélection de jeu ?'"
+        [message]="'(la création de votre avatar sera perdu)'"
+        [confirmText]="'Oui'"
+        [cancelText]="'Non'"
+        (confirm)="confirmBack()"
+        (cancel)="closeModal()"
     ></app-modal>
-
+    }
 </div>
