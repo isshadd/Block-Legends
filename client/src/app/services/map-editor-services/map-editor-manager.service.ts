@@ -86,19 +86,26 @@ export class MapEditorManagerService {
         if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.notSelected;
     }
 
-    onMouseDownMapTile(entity: Tile) {
-        if (this.sideMenuSelectedEntity) {
-            console.log('Side menu entity selected');
-            if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
-                entity.item = this.sideMenuSelectedEntity;
-                this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-                this.sideMenuSelectedEntity = null;
-            } else if (!this.isItem(this.sideMenuSelectedEntity)) {
-                this.isDragging = true;
-                let tileCopy = this.createATileCopy(this.sideMenuSelectedEntity, entity);
-                this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
-                tileCopy.visibleState = VisibleState.notSelected;
-                console.log(tileCopy);
+    onMouseDownMapTile(event: MouseEvent, entity: Tile) {
+        if (event.button === 0) {
+            if (this.sideMenuSelectedEntity) {
+                console.log('Side menu entity selected');
+                if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
+                    entity.item = this.sideMenuSelectedEntity;
+                    this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
+                    this.sideMenuSelectedEntity = null;
+                } else if (!this.isItem(this.sideMenuSelectedEntity)) {
+                    this.isDragging = true;
+                    let tileCopy = this.createATileCopy(this.sideMenuSelectedEntity, entity);
+                    this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
+                    tileCopy.visibleState = VisibleState.notSelected;
+                    console.log(tileCopy);
+                }
+            }
+        } else if (event.button === 2) {
+            if (!this.isItem(entity)) {
+                event.preventDefault();
+                this.grid[entity.coordinates.y][entity.coordinates.x] = new GrassTile();
             }
         }
     }
@@ -133,5 +140,9 @@ export class MapEditorManagerService {
             this.sideMenuSelectedEntity = entity;
             this.cancelSelectionMap();
         }
+    }
+
+    onRightClick(event: MouseEvent) {
+        event.preventDefault();
     }
 }
