@@ -4,7 +4,7 @@
         <app-placeable-entity
             [placeableEntity]="tile"
             class="layer-1"
-            (click)="mapEditorManagerService.onMouseDownMapTile(tile)"
+            (mousedown)="mapEditorManagerService.onMouseDownMapTile(tile)"
             (mouseenter)="mapEditorManagerService.onMouseEnter(tile)"
             (mousemove)="mapEditorManagerService.onMouseMoveMapTile(tile)"
             (mouseup)="mapEditorManagerService.onMouseUpMapTile()"
