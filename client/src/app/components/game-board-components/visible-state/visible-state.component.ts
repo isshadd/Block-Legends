@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PlaceableEntity, VisibleState } from '@common/placeable-entity';
+import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 
 const HOVERED_COLOR = 'rgba(255, 255, 255, 0.3)';
 const SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)';

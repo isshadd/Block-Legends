@@ -1,4 +1,3 @@
-import { PlaceableEntity } from '@common/placeable-entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsString, MaxLength } from 'class-validator';
 import { MAP_CONSTANTS } from './map.dto.constants';

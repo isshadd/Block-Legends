@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { VisibleState } from '@common/placeable-entity';
+import { VisibleState } from '@app/interfaces/placeable-entity';
 import { Vec2 } from '@common/vec2';
 import { Item } from '../Items/item';
 

@@ -20,7 +20,7 @@ export class Map {
 
     @ApiProperty({})
     @Prop({ required: true })
-    tiles: Tile[][];
+    tiles: PlaceableEntity[][];
 }
 
 export const MapSchema = SchemaFactory.createForClass(Map);
