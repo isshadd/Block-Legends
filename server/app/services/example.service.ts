@@ -22,7 +22,7 @@ export class ExampleService {
             .currentTime()
             .then((timeMessage: Message) => {
                 return {
-                    title: 'YOOOOOOOO',
+                    title: 'Hello world',
                     body: 'Time is ' + timeMessage.body,
                 };
             })
