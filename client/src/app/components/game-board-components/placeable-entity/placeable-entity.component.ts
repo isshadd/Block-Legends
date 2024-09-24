@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { PlaceableEntity } from '@common/placeable-entity';
 
 @Component({
     selector: 'app-placeable-entity',

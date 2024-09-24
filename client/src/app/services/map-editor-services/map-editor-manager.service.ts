@@ -7,7 +7,7 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { PlaceableEntity, VisibleState } from '@common/placeable-entity';
 
 @Injectable({
     providedIn: 'root',

@@ -6,7 +6,7 @@ import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 // eslint-disable-next-line max-len
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { PlaceableEntity } from '@common/placeable-entity';
 
 @Component({
     selector: 'app-placeable-entity-full-menu',

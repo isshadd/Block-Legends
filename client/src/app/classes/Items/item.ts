@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
-import { Vec2 } from '@app/interfaces/vec2';
+import { PlaceableEntity, VisibleState } from '@common/placeable-entity';
+import { Vec2 } from '@common/vec2';
 
 @Injectable({
     providedIn: 'root',
