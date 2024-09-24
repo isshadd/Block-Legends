@@ -4,9 +4,11 @@
         <app-placeable-entity
             [placeableEntity]="tile"
             class="layer-1"
-            (mouseenter)="mapEditorManagerService.onMouseEnter(tile)"
-            (mouseleave)="mapEditorManagerService.onMouseLeave(tile)"
             (click)="mapEditorManagerService.onMouseDownMapTile(tile)"
+            (mouseenter)="mapEditorManagerService.onMouseEnter(tile)"
+            (mousemove)="mapEditorManagerService.onMouseMoveMapTile(tile)"
+            (mouseup)="mapEditorManagerService.onMouseUpMapTile()"
+            (mouseleave)="mapEditorManagerService.onMouseLeave(tile)"
         ></app-placeable-entity>
         @if (mapEditorManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
