@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
+export enum VisibleStateColor {
+    HOVERED_COLOR = 'rgba(255, 255, 255, 0.3)',
+    SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)',
+    VALID_COLOR = 'rgba(50, 255, 50, 0.3)',
+    INVALID_COLOR = 'rgba(255, 50, 50, 0.3)',
+    NOT_SELECTED_COLOR = 'rgba(255, 255, 255, 0)',
+    DISABLED_COLOR = 'rgba(0, 0, 0, 0.5)',
+}
 import { PlaceableEntity, VisibleState } from '@common/placeable-entity';
-
-const HOVERED_COLOR = 'rgba(255, 255, 255, 0.3)';
-const SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)';
-const VALID_COLOR = 'rgba(50, 255, 50, 0.3)';
-const INVALID_COLOR = 'rgba(255, 50, 50, 0.3)';
-const NOT_SELECTED_COLOR = 'rgba(255, 255, 255, 0)';
-const DISABLED_COLOR = 'rgba(0, 0, 0, 0.5)';
-
 @Component({
     selector: 'app-visible-state',
     standalone: true,
@@ -21,17 +21,17 @@ export class VisibleStateComponent {
     colorSelector() {
         switch (this.placeableEntity.visibleState) {
             case VisibleState.selected:
-                return SELECTED_COLOR;
+                return VisibleStateColor.SELECTED_COLOR;
             case VisibleState.hovered:
-                return HOVERED_COLOR;
+                return VisibleStateColor.HOVERED_COLOR;
             case VisibleState.valid:
-                return VALID_COLOR;
+                return VisibleStateColor.VALID_COLOR;
             case VisibleState.invalid:
-                return INVALID_COLOR;
+                return VisibleStateColor.INVALID_COLOR;
             case VisibleState.disabled:
-                return DISABLED_COLOR;
+                return VisibleStateColor.DISABLED_COLOR;
             default:
-                return NOT_SELECTED_COLOR;
+                return VisibleStateColor.NOT_SELECTED_COLOR;
         }
     }
 }
