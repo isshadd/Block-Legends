@@ -6,6 +6,7 @@ export enum VisibleState {
     hovered,
     valid,
     invalid,
+    disabled,
 }
 export interface PlaceableEntity {
     name: string;

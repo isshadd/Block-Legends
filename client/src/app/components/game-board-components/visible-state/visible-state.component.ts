@@ -6,6 +6,7 @@ const SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)';
 const VALID_COLOR = 'rgba(50, 255, 50, 0.3)';
 const INVALID_COLOR = 'rgba(255, 50, 50, 0.3)';
 const NOT_SELECTED_COLOR = 'rgba(255, 255, 255, 0)';
+const DISABLED_COLOR = 'rgba(0, 0, 0, 0.5)';
 
 @Component({
     selector: 'app-visible-state',
@@ -27,6 +28,8 @@ export class VisibleStateComponent {
                 return VALID_COLOR;
             case VisibleState.invalid:
                 return INVALID_COLOR;
+            case VisibleState.disabled:
+                return DISABLED_COLOR;
             default:
                 return NOT_SELECTED_COLOR;
         }
