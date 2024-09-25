@@ -11,7 +11,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     styleUrl: './attributes.component.scss',
 })
 export class AttributesComponent {
-    @Input() character : PlayerCharacter;
+    @Input() character: PlayerCharacter;
 
     characterStatus: string | null;
 }

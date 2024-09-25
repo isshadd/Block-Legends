@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { VP_NUMBER } from '@app/services/game.service';
 import { BASE_STATS } from 'src/app/classes/Characters/player-attributes';
 import { WaitingViewComponent } from './waiting-view.component';
 
@@ -35,12 +36,12 @@ describe('WaitingViewComponent', () => {
 
     it('should add organizer to the players list if user is organizer', () => {
         expect(component.players.length).toBe(1);
-        expect(component.players[0].name).toBe('Organizer');
+        expect(component.players[0].name).toBe('Organisateur ♛');
     });
 
     it('sould create a valid virtual player', () => {
         component.addVirtualPlayers();
-        expect(component.players[1].name).toBe('Virtual_Player 1');
+        expect(component.players[1].name).toBe('Joueur virtuel 1');
         // LES LIGNES SUIVANTES SERONT A CHANGER PLUS TARD
         expect(component.players[1].avatar).toBe('');
         expect(component.players[1].attributes.life).toBe(BASE_STATS);
@@ -53,16 +54,27 @@ describe('WaitingViewComponent', () => {
         const expectedPlayer1 = 2;
         component.addVirtualPlayers();
         expect(component.players.length).toBe(expectedPlayer1);
-        expect(component.players[1].name).toBe('Virtual_Player 1');
+        expect(component.players[1].name).toBe('Joueur virtuel 1');
 
         const expectedPlayer2 = 3;
         component.addVirtualPlayers();
         expect(component.players.length).toBe(expectedPlayer2);
-        expect(component.players[2].name).toBe('Virtual_Player 2');
+        expect(component.players[2].name).toBe('Joueur virtuel 2');
     });
 
     it('should navigate to the home page when playerLeave is called', () => {
         component.playerLeave();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
+    });
+
+    it('should not allow another player to join if the game is full', () => {
+        component.addVirtualPlayers();
+        component.addVirtualPlayers();
+        component.addVirtualPlayers();
+        component.addVirtualPlayers();
+        component.addVirtualPlayers();
+        component.addVirtualPlayers();
+        expect(component.players.length).toBe(VP_NUMBER + 1);
+        expect(component.maxPlayerMessage).toBe('Le nombre maximum de joueurs est atteint !');
     });
 });

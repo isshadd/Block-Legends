@@ -19,4 +19,16 @@ describe('ModalComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should emit confirm when confirm button is clicked', () => {
+        spyOn(component.confirm, 'emit');
+        component.onConfirm();
+        expect(component.confirm.emit).toHaveBeenCalled();
+    });
+
+    it('should emit cancel when cancel button is clicked', () => {
+        spyOn(component.cancel, 'emit');
+        component.onCancel();
+        expect(component.cancel.emit).toHaveBeenCalled();
+    });
 });

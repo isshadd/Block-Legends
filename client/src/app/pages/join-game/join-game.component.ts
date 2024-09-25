@@ -5,6 +5,9 @@ import { FormsModule } from '@angular/forms';
 /* import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
 import { GameService } from '@app/services/game.service';
 
+export const MIN_CHAR = 48;
+export const MAX_CHAR = 57;
+
 @Component({
     selector: 'app-join-game',
     standalone: true,
@@ -28,7 +31,7 @@ export class JoinGameComponent {
 
     allowOnlyNumbers(event: KeyboardEvent) {
         const charCode = event.keyCode ? event.keyCode : event.which;
-        if (charCode < 48 || charCode > 57) {
+        if (charCode < MIN_CHAR || charCode > MAX_CHAR) {
             // Seuls les codes ASCII des chiffres sont autorisés
             event.preventDefault();
         }

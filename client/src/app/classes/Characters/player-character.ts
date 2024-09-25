@@ -33,7 +33,6 @@ export class PlayerCharacter {
         this.attributes.speed = BASE_STATS;
         this.isLifeBonusAssigned = true;
         this.isSpeedBonusAssigned = true;
-        console.log('isLifeBonusAssigned:', this.isLifeBonusAssigned);
     }
 
     assignSpeedBonus() {

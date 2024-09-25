@@ -35,7 +35,6 @@ export class CreateCharacterComponent {
             !this.character.isSpeedBonusAssigned
         ) {
             this.characterStatus = "Le formulaire de création de personnage n'est pas valide !";
-            console.log(this.character);
         } else {
             this.character.setOrganizer();
             this.router.navigate(['/waiting-view']);

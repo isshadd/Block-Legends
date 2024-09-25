@@ -10,6 +10,8 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     styleUrl: './avatar-selection.component.scss',
 })
 export class AvatarSelectionComponent {
+    @Input() character: PlayerCharacter;
+
     avatars = [
         { name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' },
         { name: 'Yasuo', imgSrc1: 'assets/images/avatar/Yasuo.webp', imgSrc2: 'assets/images/avatar/Yasuo2.webp' },
@@ -24,8 +26,6 @@ export class AvatarSelectionComponent {
         { name: 'Corki', imgSrc1: 'assets/images/avatar/Corki.webp', imgSrc2: 'assets/images/avatar/Corki2.webp' },
         { name: 'Azir', imgSrc1: 'assets/images/avatar/Azir.webp', imgSrc2: 'assets/images/avatar/Azir2.webp' },
     ];
-
-    @Input() character : PlayerCharacter;
 
     selectAvatar(avatar: string) {
         this.character.avatar = avatar;
