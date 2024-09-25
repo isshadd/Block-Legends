@@ -26,15 +26,30 @@ export class CreateCharacterComponent {
     constructor(private router: Router) {}
 
     createCharacter() {
-        if (
-            !this.character.name ||
-            !this.character.avatar ||
-            !this.character.isAttackBonusAssigned ||
-            !this.character.isDefenseBonusAssigned ||
-            !this.character.isLifeBonusAssigned ||
-            !this.character.isSpeedBonusAssigned
-        ) {
-            this.characterStatus = "Le formulaire de création de personnage n'est pas valide !";
+        const missingFields: string[] = [];
+        const fieldsToCheck = [
+            { field: this.character.name, label: 'Nom' },
+            { field: this.character.avatar, label: 'Avatar' },
+            { field: this.character.isAttackBonusAssigned, label: "Bonus d'attaque" },
+            { field: this.character.isDefenseBonusAssigned, label: 'Bonus de défense' },
+            { field: this.character.isLifeBonusAssigned, label: 'Bonus de vie' },
+            { field: this.character.isSpeedBonusAssigned, label: 'Bonus de vitesse' },
+        ];
+
+        fieldsToCheck.forEach((item) => {
+            switch (item.field) {
+                case '':
+                case false:
+                    missingFields.push(item.label);
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // If there are any missing fields, display the error message
+        if (missingFields.length > 0) {
+            this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
         } else {
             this.character.setOrganizer();
             this.router.navigate(['/waiting-view']);
