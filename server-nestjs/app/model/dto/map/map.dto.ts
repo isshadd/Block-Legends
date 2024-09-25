@@ -1,3 +1,4 @@
+import { Tile } from '@app/model/schema/tile.schema';
 import { ApiProperty } from '@nestjs/swagger';
 import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsString, MaxLength } from 'class-validator';
 import { MAP_CONSTANTS } from './map.dto.constants';
@@ -21,5 +22,5 @@ export class CreateMapDto {
     @ApiProperty({})
     @IsArray()
     @ArrayNotEmpty()
-    tiles: PlaceableEntity[][];
+    tiles: Tile[][];
 }

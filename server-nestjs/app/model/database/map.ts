@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
+import { Tile } from '../schema/tile.schema';
 
 export type MapDocument = Map & Document;
 
@@ -20,7 +21,7 @@ export class Map {
 
     @ApiProperty({})
     @Prop({ required: true })
-    tiles: PlaceableEntity[][];
+    tiles: Tile[][];
 }
 
 export const MapSchema = SchemaFactory.createForClass(Map);
