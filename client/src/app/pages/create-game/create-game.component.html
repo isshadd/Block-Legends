@@ -32,7 +32,8 @@
                 <h1>Liste des jeux : {{ this.selectedMode }}</h1>
             </div>
             <div>
-                <ul class="game-list" *ngIf="getFilteredGames().length > 0; else noGames">
+                @if(getFilteredGames().length > 0){
+                <ul class="game-list">
                     <li *ngFor="let game of getFilteredGames()" class="game-item">
                         <div class="game-box">
                             <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
@@ -44,11 +45,13 @@
                         </div>
                     </li>
                 </ul>
-                <ng-template #noGames>
-                    <p>Aucun jeu disponible pour le mode sélectionné.</p>
-                </ng-template>
+                } @else {
+                <p>Aucun jeu disponible pour le mode sélectionné.</p>
+                }
             </div>
-            <div *ngIf="gameStatus" class="alert alert-warning">{{ gameStatus }}</div>
+            @if(gameStatus){
+            <div class="alert alert-warning">{{ gameStatus }}</div>
+            }
         </div>
     </body>
 </html>

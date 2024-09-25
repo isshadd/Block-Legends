@@ -8,15 +8,12 @@
             </div>
         </div>
         <div class="selected-avatar">
-            <img
-                *ngIf="character.avatar; else noAvatarSelected"
-                [src]="getSelectedAvatar()?.imgSrc2"
-                [alt]="getSelectedAvatar()?.name"
-            />
+            @if(character.avatar){
+            <img [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name" />
+            } @else{
+            <p>Choisissez<br />votre avatar</p>
+            }x
             <p>{{ getSelectedAvatar()?.name }}</p>
-            <ng-template #noAvatarSelected>
-                <p>Choisissez<br>votre avatar</p>
-            </ng-template>
         </div>
     </div>
 </div>

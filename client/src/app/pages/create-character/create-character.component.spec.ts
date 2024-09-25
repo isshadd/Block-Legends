@@ -35,7 +35,10 @@ describe('CreateCharacterComponent', () => {
     it('should not create a character if the character is not valid', () => {
         component.character = new PlayerCharacter('', '', new PlayerAttributes());
         component.createCharacter();
-        expect(component.characterStatus).toBe("Le formulaire de création de personnage n'est pas valide !");
+        expect(component.characterStatus).toBe(
+            "Le formulaire de création de personnage n'est pas valide !" +
+                " Manquants: Nom, Avatar, Bonus d'attaque, Bonus de défense, Bonus de vie, Bonus de vitesse.",
+        );
     });
 
     it('should set the character to organizer and navigate to the waiting view if valid', () => {
