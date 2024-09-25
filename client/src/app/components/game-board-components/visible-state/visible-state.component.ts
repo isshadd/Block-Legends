@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 export enum VisibleStateColor {
     HOVERED_COLOR = 'rgba(255, 255, 255, 0.3)',
     SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)',
@@ -7,7 +8,6 @@ export enum VisibleStateColor {
     NOT_SELECTED_COLOR = 'rgba(255, 255, 255, 0)',
     DISABLED_COLOR = 'rgba(0, 0, 0, 0.5)',
 }
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 @Component({
     selector: 'app-visible-state',
     standalone: true,
