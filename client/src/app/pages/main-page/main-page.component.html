@@ -11,8 +11,8 @@
             <button class="button" routerLink="/create-game">Créer une partie</button>
             <button class="button" routerLink="/administration-game">Administrer les jeux</button>
             <!-- TODO: Delete this line later -->
-            <button class="button" routerLink="/map-editor">Edition de la carte (Nouvelle carte) (A enlever)</button>
-            <button class="button" routerLink="/map-editor">Edition de la carte (Carte existante) (A enlever)</button>
+            <button class="button" (click)="mapEditorNewMap()" routerLink="/map-editor">Edition de la carte (Nouvelle carte) (A enlever)</button>
+            <button class="button" (click)="mapEditorLoadMap()" routerLink="/map-editor">Edition de la carte (Carte existante) (A enlever)</button>
         </div>
     </section>
 

@@ -3,12 +3,14 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from '../Items/item';
+import { TileType } from './enums/tile-type';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WaterTile extends TerrainTile {
     name: string = 'WaterTile';
+    type: TileType = TileType.Water;
     description: string = 'Eau';
     imageUrl: string = 'assets/images/tiles/water.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };

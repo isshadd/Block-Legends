@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
+import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { Message } from '@common/message';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -17,7 +18,10 @@ export class MainPageComponent {
     readonly title: string = 'LOG2990';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(
+        private readonly communicationService: CommunicationService,
+        public mapEditorManagerService: MapEditorManagerService,
+    ) {}
 
     sendTimeToServer(): void {
         const newTimeMessage: Message = {
@@ -49,7 +53,43 @@ export class MainPageComponent {
             .subscribe(this.message);
     }
 
-    mapEditorNewMap(): void {}
+    //**************Temp */
+    mapEditorNewMap(): void {
+        this.mapEditorManagerService.newMap();
+    }
 
-    mapEditorLoadMap(): void {}
+    mapEditorLoadMap(): void {
+        this.mapEditorManagerService.loadMap({
+            name: '',
+            description: '',
+            size: 2,
+            tiles: [
+                [
+                    {
+                        name: 'GrassTile',
+                        item: {
+                            name: 'Magic Wand',
+                        },
+                    },
+                    {
+                        name: 'GrassTile',
+                        item: null,
+                    },
+                ],
+                [
+                    {
+                        name: 'GrassTile',
+                        item: {
+                            name: 'Item',
+                        },
+                    },
+                    {
+                        name: 'WaterTile',
+                        item: null,
+                    },
+                ],
+            ],
+        });
+    }
+    //**************Temp */
 }

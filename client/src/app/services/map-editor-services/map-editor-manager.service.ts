@@ -8,16 +8,37 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { MapShared } from '@common/interfaces/map-shared';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapEditorManagerService {
+    map: MapShared = {
+        name: '',
+        description: '',
+        size: 10,
+        tiles: [],
+    };
+
     grid: Tile[][] = [];
     selectedEntity: PlaceableEntity | null;
     sideMenuSelectedEntity: null | PlaceableEntity;
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
+
+    newMap() {
+        this.map = {
+            name: '',
+            description: '',
+            size: 10,
+            tiles: [],
+        };
+    }
+
+    loadMap(map: MapShared) {
+        this.map = map;
+    }
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
