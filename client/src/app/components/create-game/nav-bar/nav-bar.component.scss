@@ -1,0 +1,56 @@
+@import 'src/_variables.scss';
+
+.navbar-title {
+    background-color: #333;
+    font-size: 1.5em;
+    text-align: center;
+    padding-bottom: 10px;
+    color: $primary-light;
+}
+
+.navbar-modes {
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.mode-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.mode-option img {
+    width: 100px; 
+    height: 100px;
+    margin-bottom: 5px;
+}
+
+.navbar-modes button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.navbar-modes button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.navbar-modes button:hover {
+    background-color: #555;
+}
+
+.navbar-modes button.active {
+    background-color: #007bff;
+    color: white;
+}
