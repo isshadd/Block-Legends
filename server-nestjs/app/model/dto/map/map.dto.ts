@@ -22,17 +22,17 @@ class CreateTileDto {
 }
 
 export class CreateMapDto {
-    @ApiProperty({})
+    @ApiProperty({ maxLength: MAP_CONSTANTS.NAME_MAX_LENGTH })
     @IsString()
     @MaxLength(MAP_CONSTANTS.NAME_MAX_LENGTH)
     name: string;
 
-    @ApiProperty({})
+    @ApiProperty({ maxLength: MAP_CONSTANTS.DESCRIPTION_MAX_LENGTH })
     @IsString()
     @MaxLength(MAP_CONSTANTS.DESCRIPTION_MAX_LENGTH)
     description: string;
 
-    @ApiProperty({})
+    @ApiProperty({ enum: MAP_CONSTANTS.ALLOWED_SIZES })
     @IsInt()
     @IsIn(MAP_CONSTANTS.ALLOWED_SIZES)
     size: number;

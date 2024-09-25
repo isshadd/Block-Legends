@@ -9,7 +9,9 @@ import { ExampleService } from '@app/services/example/example.service';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MapController } from './controllers/map/map.controller';
 import { Map, MapSchema } from './model/database/map';
+import { MapService } from './services/map/map.service';
 
 @Module({
     imports: [
@@ -24,7 +26,7 @@ import { Map, MapSchema } from './model/database/map';
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
         MongooseModule.forFeature([{ name: Map.name, schema: MapSchema }]),
     ],
-    controllers: [CourseController, DateController, ExampleController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger],
+    controllers: [CourseController, DateController, ExampleController, MapController],
+    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, MapService],
 })
 export class AppModule {}
