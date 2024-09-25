@@ -48,4 +48,8 @@ export class MainPageComponent {
             )
             .subscribe(this.message);
     }
+
+    mapEditorNewMap(): void {}
+
+    mapEditorLoadMap(): void {}
 }

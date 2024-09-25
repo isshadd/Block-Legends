@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
-import { Vec2 } from '@common/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Item } from '../Items/item';
 
 @Injectable({

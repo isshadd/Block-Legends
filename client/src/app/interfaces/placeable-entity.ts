@@ -1,4 +1,4 @@
-import { Vec2 } from '@common/vec2';
+import { Vec2 } from '@common/interfaces/vec2';
 
 export enum VisibleState {
     notSelected,
