@@ -1,7 +1,25 @@
-import { Tile } from '@app/model/schema/tile.schema';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsString, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { MAP_CONSTANTS } from './map.dto.constants';
+
+class CreateItemDto {
+    @ApiProperty({})
+    @IsString()
+    name: string;
+}
+
+class CreateTileDto {
+    @ApiProperty({})
+    @IsString()
+    name: string;
+
+    @ApiProperty({})
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => CreateItemDto)
+    item?: CreateItemDto;
+}
 
 export class CreateMapDto {
     @ApiProperty({})
@@ -21,6 +39,8 @@ export class CreateMapDto {
 
     @ApiProperty({})
     @IsArray()
+    @ValidateNested({ each: true })
     @ArrayNotEmpty()
-    tiles: Tile[][];
+    @Type(() => CreateTileDto)
+    tiles: CreateTileDto[][];
 }
