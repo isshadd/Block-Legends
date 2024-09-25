@@ -1,10 +1,10 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Game } from '@common/game.interface';
 import { Message } from '@common/message';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-
 
 @Injectable({
     providedIn: 'root',
@@ -21,11 +21,11 @@ export class CommunicationService {
     basicPost(message: Message): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
     }
-    dataPost(message: Message): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.baseUrl}/example/populate`, message, { observe: 'response', responseType: 'text' });
-    }
+    // dataPost(message: Message): Observable<HttpResponse<string>> {
+    //     return this.http.post(`${this.baseUrl}/example/populate`, message, { observe: 'response', responseType: 'text' });
+    // }
     dataDelete(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/example/empty`, { observe: 'response', responseType: 'text' }).pipe(
+        return this.http.delete(`${this.baseUrl}/game-admin/`, { observe: 'response', responseType: 'text' }).pipe(
             tap((response) => {
                 if (response.status === 200) {
                     // Send a message to the server
@@ -36,7 +36,7 @@ export class CommunicationService {
     }
     
     deleteOneGame(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/example/deleteGame?name=${gameName}`, { observe: 'response', responseType: 'text' }).pipe(
+        return this.http.delete(`${this.baseUrl}/game-admin/${gameName}`, { observe: 'response', responseType: 'text' }).pipe(
             tap((response) => {
                 if (response.status === 200) {
                     // Send a message to the server
@@ -46,12 +46,12 @@ export class CommunicationService {
         );
     }
 
-    getGames(): Observable<Message[]> {
-        return this.http.get<Message[]>(`${this.baseUrl}/example/games`).pipe(
+    getGames(): Observable<Game[]> {
+        return this.http.get<Game[]>(`${this.baseUrl}/game-admin/`).pipe(
             tap((games) => {
                 console.log('Fetched games:', games);
             }),
-            catchError(this.handleError<Message[]>('getGames', []))
+            catchError(this.handleError<Game[]>('getGames', []))
         );
     }
 

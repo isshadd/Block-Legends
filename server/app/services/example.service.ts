@@ -34,13 +34,13 @@ export class ExampleService {
             });
     }
     async getGames(): Promise<any[]> {
-        const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+        const uri = 'mongodb+srv://nicolasbilodeau:Nicolas123@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
         const client = new MongoClient(uri);
 
         try {
             await client.connect();
             const database = client.db('LOG2990_104_Nicolas');
-            const collection = database.collection('Games');
+            const collection = database.collection('games');
             return await collection.find({}).toArray();
         } catch (error) {
             throw new Error('Failed to get games: ' + (error as string));
@@ -50,7 +50,7 @@ export class ExampleService {
     }
     
     async populateDatabase(): Promise<void> {
-        const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+        const uri = 'mongodb+srv://nicolasbilodeau:Nicolas123@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
         const client = new MongoClient(uri);
 
         const games = [
@@ -92,7 +92,7 @@ export class ExampleService {
         try {
             await client.connect();
             const database = client.db('LOG2990_104_Nicolas');
-            const collection = database.collection('Games');
+            const collection = database.collection('games');
             await collection.insertMany(games);
         } catch (error) {
             throw new Error('Failed to populate database: ' + (error as string));
@@ -101,13 +101,13 @@ export class ExampleService {
         }
     }
     async emptyDatabase(): Promise<void> {
-        const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+        const uri = 'mongodb+srv://nicolasbilodeau:Nicolas123@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
         const client = new MongoClient(uri);
 
         try {
             await client.connect();
             const database = client.db('LOG2990_104_Nicolas');
-            const collection = database.collection('Games');
+            const collection = database.collection('games');
             await collection.deleteMany({});
         } catch (error) {
             throw new Error('Failed to empty database: ' + (error as string));
@@ -117,13 +117,13 @@ export class ExampleService {
     }
     
     async deleteGame(gameName: string): Promise<void> {
-        const uri = 'mongodb+srv://nicolasbilodeau:MphdHKkRMAlolEyp@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+        const uri = 'mongodb+srv://nicolasbilodeau:Nicolas123@cluster0.rrbzp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
         const client = new MongoClient(uri);
     
         try {
             await client.connect();
             const database = client.db('LOG2990_104_Nicolas');
-            const collection = database.collection('Games');
+            const collection = database.collection('games');
             await collection.deleteOne({name: gameName});
         } catch (error) {
             throw new Error('Failed to delete game: ' + (error as string));
