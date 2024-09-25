@@ -16,7 +16,8 @@ export class MapEditorManagerService {
     grid: Tile[][] = [];
     selectedEntity: PlaceableEntity | null;
     sideMenuSelectedEntity: null | PlaceableEntity;
-    isDragging: boolean = false;
+    isDraggingLeft: boolean = false;
+    isDraggingRight: boolean = false;
 
     gridCreator(tileNumber: number) {
         for (let i = 0; i < tileNumber; i++) {
@@ -95,7 +96,7 @@ export class MapEditorManagerService {
                     this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
                     this.sideMenuSelectedEntity = null;
                 } else if (!this.isItem(this.sideMenuSelectedEntity)) {
-                    this.isDragging = true;
+                    this.isDraggingLeft = true;
                     let tileCopy = this.createATileCopy(this.sideMenuSelectedEntity, entity);
                     this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
                     tileCopy.visibleState = VisibleState.notSelected;
@@ -104,22 +105,36 @@ export class MapEditorManagerService {
             }
         } else if (event.button === 2) {
             if (!this.isItem(entity) && !(entity instanceof GrassTile)) {
+                this.isDraggingRight = true;
                 event.preventDefault();
-                this.grid[entity.coordinates.y][entity.coordinates.x] = new GrassTile();
+                let newTile = new GrassTile();
+                this.grid[entity.coordinates.y][entity.coordinates.x] = newTile;
+                newTile.coordinates = { x: entity.coordinates.x, y: entity.coordinates.y };
             }
         }
     }
     onMouseMoveMapTile(entity: Tile) {
-        if (this.sideMenuSelectedEntity && this.isDragging) {
-            console.log('Dragging');
-            let tileCopy = this.createATileCopy(this.sideMenuSelectedEntity, entity);
-            this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
-            tileCopy.visibleState = VisibleState.notSelected;
+        if (this.isDraggingLeft) {
+            if (this.sideMenuSelectedEntity && this.isDraggingLeft) {
+                console.log('left click');
+                let tileCopy = this.createATileCopy(this.sideMenuSelectedEntity, entity);
+                tileCopy.coordinates = { x: entity.coordinates.x, y: entity.coordinates.y };
+                this.grid[entity.coordinates.y][entity.coordinates.x] = tileCopy;
+                tileCopy.visibleState = VisibleState.notSelected;
+            }
+        } else if (this.isDraggingRight) {
+            console.log('Right click');
+            if (this.isDraggingRight && !(entity instanceof GrassTile)) {
+                let newTile = new GrassTile();
+                this.grid[entity.coordinates.y][entity.coordinates.x] = newTile;
+                newTile.coordinates = { x: entity.coordinates.x, y: entity.coordinates.y };
+            }
         }
     }
 
     onMouseUpMapTile() {
-        this.isDragging = false;
+        this.isDraggingLeft = false;
+        this.isDraggingRight = false;
         console.log('Dragging ended');
     }
 
