@@ -43,6 +43,7 @@ export class AdministrationPageManagerService {
             isVisible: true,
         },
     ];
+    //rien de spécial
 
     getGames(): Game[] {
         return this.games;
