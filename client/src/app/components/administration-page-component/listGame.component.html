@@ -1,4 +1,4 @@
-@for(game of GetGames(); track game.name){
+@for(game of getGames(); track game.name){
 <li [class]="game.isVisible ? 'visible' : 'invisible'">
     <img [src]="game.imageUrl" />
     <div class="game_info">
@@ -9,10 +9,10 @@
             <p>Dernière modification: {{ game.lastModificationDate }}</p>
         </div>
         <div class="action_icons">
-            <span class="material-icons" (click)="DeleteGame(game)" title="Supprimer">delete</span>
+            <span class="material-icons" (click)="deleteGame(game)" title="Supprimer">delete</span>
             <span class="material-icons" routerLink="/main-page" title="Éditer">edit</span>
             <span class="material-icons" title="Exporter">file_download</span>
-            <span class="material-icons" (click)="ToggleVisibility(game)" title="Changer visibilité">
+            <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
                 {{ game.isVisible ? 'visibility' : 'visibility_off' }}
             </span>
         </div>

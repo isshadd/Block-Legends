@@ -44,8 +44,6 @@ export class AdministrationPageManagerService {
         },
     ];
 
-    constructor() {}
-
     getGames(): Game[] {
         return this.games;
     }

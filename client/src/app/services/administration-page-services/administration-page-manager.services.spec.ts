@@ -15,7 +15,8 @@ describe('AdministrationPageManagerService', () => {
     });
 
     it('should have a list of games', () => {
-        expect(service.games.length).toBe(4);
+        const GAMESLENGTH = 4;
+        expect(service.games.length).toBe(GAMESLENGTH);
     });
 
     it('should return the correct games when getGames is called', () => {

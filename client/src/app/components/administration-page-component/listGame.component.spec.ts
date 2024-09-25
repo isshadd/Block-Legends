@@ -36,7 +36,7 @@ describe('ListGameComponent', () => {
             isVisible: true,
         };
 
-        component.DeleteGame(mockGame);
+        component.deleteGame(mockGame);
         expect(administrationService.deleteGame).toHaveBeenCalled();
         expect(administrationService.deleteGame).toHaveBeenCalledWith(mockGame);
     });
@@ -52,7 +52,7 @@ describe('ListGameComponent', () => {
             lastModificationDate: new Date(),
         };
 
-        component.ToggleVisibility(mockGame);
+        component.toggleVisibility(mockGame);
         expect(administrationService.toggleVisibility).toHaveBeenCalledWith(mockGame);
     });
 });
