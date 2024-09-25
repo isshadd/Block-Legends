@@ -103,7 +103,7 @@ export class MapEditorManagerService {
                 }
             }
         } else if (event.button === 2) {
-            if (!this.isItem(entity)) {
+            if (!this.isItem(entity) && !(entity instanceof GrassTile)) {
                 event.preventDefault();
                 this.grid[entity.coordinates.y][entity.coordinates.x] = new GrassTile();
             }
