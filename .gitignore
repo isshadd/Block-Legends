@@ -10,4 +10,3 @@ coverage/
 
 #Node Modules
 /node_modules
-server-nestjs/.env
