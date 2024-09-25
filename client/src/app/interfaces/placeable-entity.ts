@@ -9,7 +9,6 @@ export enum VisibleState {
     disabled,
 }
 export interface PlaceableEntity {
-    name: string;
     description: string;
     imageUrl: string;
     coordinates: Vec2;

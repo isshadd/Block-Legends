@@ -1,21 +1,23 @@
+import { ItemType } from '@common/enums/item-type';
+import { TileType } from '@common/enums/tile-type';
 import { CreateItemSharedDto } from '@common/interfaces/dto/item-shared.dto';
 import { CreateMapSharedDto } from '@common/interfaces/dto/map-shared.dto';
 import { CreateTileSharedDto } from '@common/interfaces/dto/tile-shared.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsEnum, IsIn, IsInt, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { MAP_CONSTANTS } from './map.dto.constants';
 
 class CreateItemDto implements CreateItemSharedDto {
     @ApiProperty({})
-    @IsString()
-    name: string;
+    @IsEnum(ItemType)
+    type: ItemType;
 }
 
 class CreateTileDto implements CreateTileSharedDto {
     @ApiProperty({})
-    @IsString()
-    name: string;
+    @IsEnum(TileType)
+    type: TileType;
 
     @ApiProperty({})
     @IsOptional()

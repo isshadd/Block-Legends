@@ -1,3 +1,5 @@
+import { ItemType } from '@common/enums/item-type';
+
 export interface ItemShared {
-    name: string;
+    type: ItemType;
 }

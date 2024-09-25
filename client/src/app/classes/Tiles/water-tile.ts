@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
+import { TileType } from '../../../../../common/enums/tile-type';
 import { Item } from '../Items/item';
-import { TileType } from './enums/tile-type';
 
 @Injectable({
     providedIn: 'root',
 })
 export class WaterTile extends TerrainTile {
-    name: string = 'WaterTile';
     type: TileType = TileType.Water;
     description: string = 'Eau';
     imageUrl: string = 'assets/images/tiles/water.jpg';

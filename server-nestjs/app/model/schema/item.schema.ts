@@ -1,3 +1,4 @@
+import { ItemType } from '@common/enums/item-type';
 import { ItemShared } from '@common/interfaces/item-shared';
 import { Prop, Schema } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
@@ -6,7 +7,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class Item implements ItemShared {
     @ApiProperty({})
     @Prop({ required: true })
-    name: string;
+    type: ItemType;
 }
 
 export type ItemDocument = Item;

@@ -1,3 +1,5 @@
+import { ItemType } from '@common/enums/item-type';
+
 export class CreateItemSharedDto {
-    name: string;
+    type: ItemType;
 }
