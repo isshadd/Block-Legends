@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
+import { Chestplate } from '@app/classes/Items/chestplate';
+import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { Elytra } from '@app/classes/Items/elytra';
+import { EnchantedBook } from '@app/classes/Items/enchanted-book';
+import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
+import { Potion } from '@app/classes/Items/potion';
+import { Totem } from '@app/classes/Items/totem';
 import { ItemType } from '@common/enums/item-type';
 
 @Injectable({
@@ -10,8 +17,20 @@ export class ItemFactoryService {
 
     createItem(type: ItemType): Item {
         switch (type) {
-            case ItemType.Item:
-                return new Item();
+            case ItemType.Sword:
+                return new DiamondSword();
+            case ItemType.Elytra:
+                return new Elytra();
+            case ItemType.Totem:
+                return new Totem();
+            case ItemType.Potion:
+                return new Potion();
+            case ItemType.EnchantedBook:
+                return new EnchantedBook();
+            case ItemType.Chestplate:
+                return new Chestplate();
+            case ItemType.Flag:
+                return new Flag();
             default:
                 return new Item();
         }

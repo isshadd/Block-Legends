@@ -1,3 +1,9 @@
 export enum ItemType {
-    Item = 'Item',
+    Chestplate = 'Shield',
+    Sword = 'Sword',
+    Elytra = 'Elytra',
+    EnchantedBook = 'EnchantedBook',
+    Potion = 'Potion',
+    Totem = 'Totem',
+    Flag = 'Flag',
 }

@@ -71,7 +71,7 @@ export class MainPageComponent {
                     {
                         type: TileType.Grass,
                         item: {
-                            type: ItemType.Item,
+                            type: ItemType.Totem,
                         },
                     },
                     {
@@ -83,7 +83,7 @@ export class MainPageComponent {
                     {
                         type: TileType.Grass,
                         item: {
-                            type: ItemType.Item,
+                            type: ItemType.Chestplate,
                         },
                     },
                     {
