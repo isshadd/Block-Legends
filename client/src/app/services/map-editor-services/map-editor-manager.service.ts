@@ -15,12 +15,14 @@ export class MapEditorManagerService {
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
-    ) {}
+    ) {
+        this.createNewGrid();
+    }
 
     map: MapShared = {
         name: '',
         description: '',
-        size: 10,
+        size: 20,
         tiles: [],
     };
 
@@ -31,6 +33,7 @@ export class MapEditorManagerService {
     isDraggingRight: boolean = false;
 
     newMap(size: number) {
+        this.grid = [];
         this.map = {
             name: '',
             description: '',
@@ -41,6 +44,7 @@ export class MapEditorManagerService {
     }
 
     loadMap(map: MapShared) {
+        this.grid = [];
         this.map = map;
         this.loadGrid();
     }
@@ -110,9 +114,11 @@ export class MapEditorManagerService {
     }
 
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
+        console.log('entity', entity);
         if (event.button === 0) {
             if (this.sideMenuSelectedEntity) {
                 if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
+                    console.log('Item added');
                     entity.item = this.sideMenuSelectedEntity;
                     this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
                     this.sideMenuSelectedEntity = null;
@@ -122,15 +128,16 @@ export class MapEditorManagerService {
                 }
             }
         } else if (event.button === 2) {
-            if (!this.isItem(entity) && !(entity instanceof GrassTile)) {
+            this.isDraggingRight = true;
+            if (!(entity instanceof GrassTile)) {
                 this.isDraggingRight = true;
                 event.preventDefault();
                 this.tileCopyCreator(new GrassTile(), entity);
             } else if (this.isTerrainTile(entity)) {
                 entity.item = null;
                 console.log('Item deleted');
+            } else {
             }
-            console.log('Dragging ended');
         }
     }
     onMouseMoveMapTile(entity: Tile) {

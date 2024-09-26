@@ -6,5 +6,5 @@ import { Tile } from './tile';
     providedIn: 'root',
 })
 export class TerrainTile extends Tile {
-    item: Item | null;
+    item: Item | null = null;
 }
