@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { Game } from '@common/game.interface';
 import { CreateGameComponent } from './create-game.component';
-import { Game } from '/Users/issamhaddadi/Desktop/Projet 2/LOG2990-104/common/game.interface';
 
 const GAME_SIZE = 30;
 

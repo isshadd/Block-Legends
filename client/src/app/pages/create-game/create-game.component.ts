@@ -10,6 +10,4 @@ import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.com
     templateUrl: './create-game.component.html',
     styleUrl: './create-game.component.scss',
 })
-export class CreateGameComponent {
-    constructor() {}
-}
+export class CreateGameComponent {}
