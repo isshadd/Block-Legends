@@ -132,7 +132,11 @@ export class MapEditorManagerService {
                 this.isDraggingRight = true;
                 event.preventDefault();
                 this.tileCopyCreator(new GrassTile(), entity);
+            } else if (this.isTerrainTile(entity)) {
+                entity.item = null;
+                console.log('Item deleted');
             }
+            console.log('Dragging ended');
         }
     }
     onMouseMoveMapTile(entity: Tile) {
@@ -141,9 +145,13 @@ export class MapEditorManagerService {
                 this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
             }
         } else if (this.isDraggingRight) {
-            console.log('Right click');
             if (this.isDraggingRight && !(entity instanceof GrassTile)) {
                 this.tileCopyCreator(new GrassTile(), entity);
+            }
+
+            if (entity instanceof GrassTile && entity.item) {
+                console.log('Item deleted dragging');
+                entity.item = null;
             }
         }
     }
@@ -151,8 +159,6 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
-        console.log('Dragging ended');
-        //TODO: item can not be deleted with right click
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
