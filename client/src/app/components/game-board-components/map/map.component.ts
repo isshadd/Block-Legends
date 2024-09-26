@@ -4,7 +4,6 @@ import { PlaceableEntityComponent } from '@app/components/game-board-components/
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { VisibleStateComponent } from '../visible-state/visible-state.component';
 
-const MAPSIZE = 20;
 @Component({
     selector: 'app-map',
     standalone: true,
@@ -14,9 +13,7 @@ const MAPSIZE = 20;
 })
 export class MapComponent {
     // Temp for testing
-    constructor(public mapEditorManagerService: MapEditorManagerService) {
-        mapEditorManagerService.setMapSize(MAPSIZE);
-    }
+    constructor(public mapEditorManagerService: MapEditorManagerService) {}
 
     onMouseDown(event: MouseEvent, tile: Tile) {
         this.mapEditorManagerService.onMouseDownMapTile(event, tile);

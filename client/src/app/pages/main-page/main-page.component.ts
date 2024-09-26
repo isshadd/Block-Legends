@@ -57,7 +57,8 @@ export class MainPageComponent {
 
     //**************Temp */
     mapEditorNewMap(): void {
-        this.mapEditorManagerService.newMap();
+        const MAP_SIZE = 20;
+        this.mapEditorManagerService.newMap(MAP_SIZE);
     }
 
     mapEditorLoadMap(): void {

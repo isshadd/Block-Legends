@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Item } from '@app/classes/Items/item';
-import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
-import { WallTile } from '@app/classes/Tiles/wall-tile';
-import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { MapShared } from '@common/interfaces/map-shared';
+import { TileFactoryService } from '../game-board-services/tile-factory.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapEditorManagerService {
+    constructor(public tileFactoryService: TileFactoryService) {}
+
     map: MapShared = {
         name: '',
         description: '',
@@ -27,11 +26,11 @@ export class MapEditorManagerService {
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
 
-    newMap() {
+    newMap(size: number) {
         this.map = {
             name: '',
             description: '',
-            size: 10,
+            size: size,
             tiles: [],
         };
         this.gridCreator(this.map.size);
@@ -79,28 +78,6 @@ export class MapEditorManagerService {
         return (placeableEntity as Item).testItem !== undefined;
     }
 
-    copyTypeTile(tile: Tile): Tile {
-        if (tile instanceof GrassTile) {
-            return new GrassTile(tile);
-        } else if (tile instanceof IceTile) {
-            return new IceTile(tile);
-        } else if (tile instanceof WaterTile) {
-            return new WaterTile(tile);
-        } else if (tile instanceof WallTile) {
-            return new WallTile(tile);
-        } else if (tile instanceof DoorTile) {
-            return new DoorTile(tile);
-        } else {
-            return new Tile(tile);
-        }
-    }
-
-    createATileCopy(sideMenuSelectedEntity: Tile, entity: PlaceableEntity): Tile {
-        let tileCopy = this.copyTypeTile(sideMenuSelectedEntity);
-        tileCopy.coordinates = { x: entity.coordinates.x, y: entity.coordinates.y };
-        return tileCopy;
-    }
-
     onMouseEnter(entity: PlaceableEntity) {
         if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.hovered;
     }
@@ -110,7 +87,7 @@ export class MapEditorManagerService {
     }
 
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
-        let tileCopy = this.createATileCopy(copiedTile, selectedTile);
+        let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
         this.grid[selectedTile.coordinates.y][selectedTile.coordinates.x] = tileCopy;
         tileCopy.visibleState = VisibleState.notSelected;

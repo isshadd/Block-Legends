@@ -12,14 +12,4 @@ export class Tile implements PlaceableEntity {
     imageUrl: string;
     coordinates: Vec2;
     visibleState: VisibleState;
-
-    constructor(copy?: Tile) {
-        if (copy) {
-            this.type = copy.type;
-            this.description = copy.description;
-            this.imageUrl = copy.imageUrl;
-            this.coordinates = copy.coordinates;
-            this.visibleState = copy.visibleState;
-        }
-    }
 }

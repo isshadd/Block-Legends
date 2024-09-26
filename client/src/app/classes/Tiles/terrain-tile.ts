@@ -7,9 +7,4 @@ import { Tile } from './tile';
 })
 export class TerrainTile extends Tile {
     item: Item | null;
-
-    constructor(copy?: TerrainTile) {
-        super(copy);
-        this.item = copy?.item ?? null;
-    }
 }
