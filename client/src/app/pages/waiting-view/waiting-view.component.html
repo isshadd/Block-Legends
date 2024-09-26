@@ -13,9 +13,11 @@
             <div class="players-list">
                 <h3>Joueurs :</h3>
                 <ul>
-                    <li *ngFor="let player of players" [ngClass]="{ organizer: player === this.organizerCharacter }">
+                    @for(player of players; track player) {
+                    <li [ngClass]="{ organizer: player === this.organizerCharacter }">
                         <span>{{ player.name }}</span>
                     </li>
+                    }
                 </ul>
             </div>
             @if(this.organizerCharacter.isOrganizer) {

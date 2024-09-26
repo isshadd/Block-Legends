@@ -30,9 +30,3 @@ describe('CharacterFormComponent', () => {
         expect(component.savedName).toBe('Nom du personnage');
     });
 });
-
-// it('should save the name', () => {
-//     component.character.name = 'Test';
-//     component.saveName();
-//     expect(component.savedName).toBe('Test');
-// });

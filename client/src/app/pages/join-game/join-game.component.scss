@@ -1,11 +1,5 @@
 @import 'src/_variables.scss';
 
-body {
-    background-color: $background;
-    height: 100vh;
-    margin: 0;
-}
-
 .container {
     display: flex;
     justify-content: center;

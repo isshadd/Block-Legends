@@ -4,8 +4,10 @@
         <h1>Liste des jeux : {{ this.selectedMode }}</h1>
     </div>
     <div>
-        <ul class="game-list" *ngIf="getFilteredGames().length > 0; else noGames">
-            <li *ngFor="let game of getFilteredGames()" class="game-item">
+        @if(getFilteredGames().length > 0){
+        <ul class="game-list">
+            @for(game of getFilteredGames(); track game) {
+            <li class="game-item">
                 <div class="game-box">
                     <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
                     <div class="game-details">
@@ -15,10 +17,15 @@
                     <button (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
                 </div>
             </li>
+            }
         </ul>
+        } @else(){
         <ng-template #noGames>
             <p>Aucun jeu disponible pour le mode sélectionné.</p>
         </ng-template>
+        }
     </div>
-    <div *ngIf="gameStatus" class="alert alert-warning">{{ gameStatus }}</div>
+    @if(gameStatus){
+    <div class="alert alert-warning">{{ gameStatus }}</div>
+    }
 </div>

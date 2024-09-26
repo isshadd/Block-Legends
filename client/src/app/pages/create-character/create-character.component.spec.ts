@@ -3,18 +3,33 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
+import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
+import { ModalComponent } from '@app/components/modal/modal.component';
 import { CreateCharacterComponent } from './create-character.component';
 
 describe('CreateCharacterComponent', () => {
     let component: CreateCharacterComponent;
     let fixture: ComponentFixture<CreateCharacterComponent>;
     let mockRouter: jasmine.SpyObj<Router>;
+    let mockAvatar: jasmine.SpyObj<AvatarSelectionComponent>;
+    let mockFormCharacter: jasmine.SpyObj<CharacterFormComponent>;
+    let mockModal: jasmine.SpyObj<ModalComponent>;
 
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockAvatar = jasmine.createSpyObj('AvatarSelectionComponent', ['selectAvatar']);
+        mockFormCharacter = jasmine.createSpyObj('CharacterFormComponent', ['saveName']);
+        mockModal = jasmine.createSpyObj('ModalComponent', ['onConfirm', 'onCancel']);
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         await TestBed.configureTestingModule({
-            imports: [FormsModule, CreateCharacterComponent],
-            providers: [{ provide: Router, useValue: mockRouter }],
+            imports: [FormsModule, CreateCharacterComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
+            providers: [
+                { provide: Router, useValue: mockRouter },
+                { provide: AvatarSelectionComponent, useValue: mockAvatar },
+                { provide: CharacterFormComponent, useValue: mockFormCharacter },
+                { provide: ModalComponent, useValue: mockModal },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreateCharacterComponent);
@@ -66,5 +81,29 @@ describe('CreateCharacterComponent', () => {
         component.confirmBack();
         expect(component.isModalOpen).toBeFalse();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-game']);
+    });
+
+    it('should call selectAvatar on AvatarSelectionComponent when an avatar is selected', () => {
+        component.character = new PlayerCharacter('Test', 'test-avatar', new PlayerAttributes());
+        mockAvatar.selectAvatar('test-avatar');
+        expect(mockAvatar.selectAvatar).toHaveBeenCalledWith('test-avatar');
+    });
+
+    it('should call saveName on CharacterFormComponent when name is saved', () => {
+        component.character = new PlayerCharacter('Test', '', new PlayerAttributes());
+        mockFormCharacter.saveName();
+        expect(mockFormCharacter.saveName).toHaveBeenCalled();
+    });
+
+    it('should call onConfirm on ModalComponent when confirm button is clicked', () => {
+        component.openModal();
+        mockModal.onConfirm();
+        expect(mockModal.onConfirm).toHaveBeenCalled();
+    });
+
+    it('should call onCancel on ModalComponent when cancel button is clicked', () => {
+        component.openModal();
+        mockModal.onCancel();
+        expect(mockModal.onCancel).toHaveBeenCalled();
     });
 });

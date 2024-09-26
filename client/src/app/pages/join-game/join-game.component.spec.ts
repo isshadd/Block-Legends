@@ -32,7 +32,7 @@ describe('JoinGameComponent', () => {
     /*
     it('should not allow letters in the access code', () => {
         const event: Partial<KeyboardEvent> = {
-            key: 'abbffj',
+            key: 'a',
             preventDefault: jasmine.createSpy('preventDefault'),
         };
 

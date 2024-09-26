@@ -13,6 +13,35 @@ describe('GameListComponent', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockModeService: jasmine.SpyObj<ModeService>;
+    const game: Game = {
+        id: 0,
+        name: 'JeuTest',
+        size: GAME_SIZE,
+        mode: 'Combat classique',
+        imageUrl: '',
+        lastModificationDate: new Date('2024-10-23'),
+        isVisible: true,
+    };
+    const gameNotVisible: Game = {
+        id: 0,
+        name: 'JeuTest',
+        size: GAME_SIZE,
+        mode: 'Combat classique',
+        imageUrl: '',
+        lastModificationDate: new Date('2024-10-23'),
+        isVisible: false,
+    };
+    const games: Game[] = [
+        {
+            id: 0,
+            name: 'JeuTest',
+            size: GAME_SIZE,
+            mode: 'Combat classique',
+            imageUrl: '',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: true,
+        },
+    ];
 
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
@@ -33,15 +62,6 @@ describe('GameListComponent', () => {
     });
 
     it('should select a game', () => {
-        const game: Game = {
-            id: 0,
-            name: 'JeuTest',
-            size: GAME_SIZE,
-            mode: 'Combat classique',
-            imageUrl: '',
-            lastModificationDate: new Date('2024-10-23'),
-            isVisible: true,
-        };
         component.selectGame(game);
         expect(component.selectedGame).toEqual(game);
     });
@@ -52,30 +72,12 @@ describe('GameListComponent', () => {
     });
 
     it('should navigate to the create-character page', () => {
-        const game: Game = {
-            id: 0,
-            name: 'JeuTest',
-            size: GAME_SIZE,
-            mode: 'Combat classique',
-            imageUrl: '',
-            lastModificationDate: new Date('2024-10-23'),
-            isVisible: true,
-        };
         component.selectGame(game);
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should hide the game if it is not visible', () => {
-        const game: Game = {
-            id: 0,
-            name: 'JeuTest',
-            size: GAME_SIZE,
-            mode: 'Combat classique',
-            imageUrl: '',
-            lastModificationDate: new Date('2024-10-23'),
-            isVisible: false,
-        };
-        component.selectGame(game);
+        component.selectGame(gameNotVisible);
         expect(component.selectedGame).toBeNull();
         expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
     });
@@ -88,17 +90,6 @@ describe('GameListComponent', () => {
     });
 
     it('should filter games by mode', () => {
-        const games: Game[] = [
-            {
-                id: 0,
-                name: 'JeuTest',
-                size: GAME_SIZE,
-                mode: 'Combat classique',
-                imageUrl: '',
-                lastModificationDate: new Date('2024-10-23'),
-                isVisible: true,
-            },
-        ];
         component.games = games;
         component.selectedMode = null;
         expect(component.getFilteredGames()).toEqual([games[0]]);

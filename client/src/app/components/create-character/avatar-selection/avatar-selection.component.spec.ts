@@ -7,6 +7,7 @@ import { AvatarSelectionComponent } from './avatar-selection.component';
 describe('AvatarSelectionComponent', () => {
     let component: AvatarSelectionComponent;
     let fixture: ComponentFixture<AvatarSelectionComponent>;
+    const avatars = [{ name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' }];
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -16,7 +17,7 @@ describe('AvatarSelectionComponent', () => {
         fixture = TestBed.createComponent(AvatarSelectionComponent);
         component = fixture.componentInstance;
 
-        component.character = new PlayerCharacter('Nom du personnage', '', new PlayerAttributes());
+        component.character = new PlayerCharacter('Test', '', new PlayerAttributes());
 
         fixture.detectChanges();
     });
@@ -26,13 +27,11 @@ describe('AvatarSelectionComponent', () => {
     });
 
     it('should select an avatar', () => {
-        const avatars = [{ name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' }];
         component.selectAvatar(avatars[0].imgSrc1);
         expect(component.character.avatar).toBe(avatars[0].imgSrc1);
     });
 
     it('should get the selected avatar', () => {
-        const avatars = [{ name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' }];
         component.character.avatar = avatars[0].imgSrc1;
         expect(component.getSelectedAvatar()).toEqual(avatars[0]);
     });

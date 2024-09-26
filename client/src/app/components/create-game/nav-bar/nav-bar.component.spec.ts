@@ -19,4 +19,10 @@ describe('NavBarComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should select a mode', () => {
+        const mode = 'Combat classique';
+        component.selectMode(mode);
+        expect(component.selectedMode).toEqual(mode);
+    });
 });

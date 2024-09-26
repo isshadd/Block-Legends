@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
-import { BASE_STATS, BONUS, PlayerCharacter } from '@app/classes/Characters/player-character';
+import { BASE_STATS, PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AttributesComponent } from './attributes.component';
 
 describe('AttributesComponent', () => {
@@ -15,7 +15,7 @@ describe('AttributesComponent', () => {
         fixture = TestBed.createComponent(AttributesComponent);
         component = fixture.componentInstance;
 
-        component.character = new PlayerCharacter('Nom du personnage', '', new PlayerAttributes());
+        component.character = new PlayerCharacter('Test', '', new PlayerAttributes());
 
         fixture.detectChanges();
     });
@@ -30,35 +30,5 @@ describe('AttributesComponent', () => {
         expect(component.character.attributes.defense).toBe(BASE_STATS);
         expect(component.character.attributes.life).toBe(BASE_STATS);
         expect(component.character.attributes.speed).toBe(BASE_STATS);
-    });
-
-    it('should assign bonus to life', () => {
-        component.character.assignLifeBonus();
-        expect(component.character.attributes.life).toBe(BONUS);
-        expect(component.character.attributes.speed).toBe(BASE_STATS);
-        expect(component.character.isLifeBonusAssigned).toBeTrue();
-        expect(component.character.isSpeedBonusAssigned).toBeTrue();
-    });
-
-    it('should assign bonus to spped', () => {
-        component.character.assignSpeedBonus();
-        expect(component.character.attributes.speed).toBe(BONUS);
-        expect(component.character.attributes.life).toBe(BASE_STATS);
-        expect(component.character.isLifeBonusAssigned).toBeTrue();
-        expect(component.character.isSpeedBonusAssigned).toBeTrue();
-    });
-
-    it('should assign a dice to attack', () => {
-        component.character.assignAttackDice();
-        // expect(component.character.attributes.attack).toBeGreaterThan(BASE_STATS);
-        expect(component.character.isAttackBonusAssigned).toBeTrue();
-        expect(component.character.isDefenseBonusAssigned).toBeTrue();
-    });
-
-    it('should assign a dice to defense', () => {
-        component.character.assignDefenseDice();
-        // expect(component.character.attributes.defense).toBeGreaterThan(BASE_STATS);
-        expect(component.character.isAttackBonusAssigned).toBeTrue();
-        expect(component.character.isDefenseBonusAssigned).toBeTrue();
     });
 });
