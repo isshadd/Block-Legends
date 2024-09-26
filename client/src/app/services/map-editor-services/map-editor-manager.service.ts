@@ -5,13 +5,17 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { MapShared } from '@common/interfaces/map-shared';
+import { ItemFactoryService } from '../game-board-services/item-factory.service';
 import { TileFactoryService } from '../game-board-services/tile-factory.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapEditorManagerService {
-    constructor(public tileFactoryService: TileFactoryService) {}
+    constructor(
+        public tileFactoryService: TileFactoryService,
+        public itemFactoryService: ItemFactoryService,
+    ) {}
 
     map: MapShared = {
         name: '',
@@ -33,27 +37,39 @@ export class MapEditorManagerService {
             size: size,
             tiles: [],
         };
-        this.gridCreator(this.map.size);
+        this.createNewGrid();
     }
 
     loadMap(map: MapShared) {
         this.map = map;
+        this.loadGrid();
     }
 
-    gridCreator(tileNumber: number) {
-        for (let i = 0; i < tileNumber; i++) {
+    createNewGrid() {
+        for (let i = 0; i < this.map.size; i++) {
             this.grid.push([]);
-            for (let j = 0; j < tileNumber; j++) {
-                const newTile = new GrassTile();
+            for (let j = 0; j < this.map.size; j++) {
+                const newTile: GrassTile = new GrassTile();
                 this.grid[i].push(newTile);
                 newTile.coordinates = { x: j, y: i };
             }
         }
     }
 
-    setMapSize(size: number) {
-        this.grid = [];
-        this.gridCreator(size);
+    loadGrid() {
+        for (let i = 0; i < this.map.tiles.length; i++) {
+            this.grid.push([]);
+            for (let j = 0; j < this.map.tiles[i].length; j++) {
+                const newTile: Tile = this.tileFactoryService.createTile(this.map.tiles[i][j].type);
+                this.grid[i].push(newTile);
+                newTile.coordinates = { x: j, y: i };
+
+                if (this.isTerrainTile(newTile)) {
+                    const itemType = this.map.tiles[i][j].item?.type;
+                    if (itemType) newTile.item = this.itemFactoryService.createItem(itemType);
+                }
+            }
+        }
     }
 
     cancelSelectionSideMenu() {

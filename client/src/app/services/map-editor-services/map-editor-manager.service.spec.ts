@@ -20,7 +20,7 @@ describe('MapEditorManagerService', () => {
     it('should create a square grid of BaseTiles', () => {
         const MAP_SIZE = 2;
 
-        service.gridCreator(MAP_SIZE);
+        service.createNewGrid(MAP_SIZE);
 
         grid = [
             [new GrassTile(), new GrassTile()],
@@ -37,10 +37,10 @@ describe('MapEditorManagerService', () => {
     });
 
     it('should not create a grid if the size is 0 or smaller', () => {
-        service.gridCreator(0);
+        service.createNewGrid(0);
         expect(service.grid).toEqual([]);
 
-        service.gridCreator(-1);
+        service.createNewGrid(-1);
         expect(service.grid).toEqual([]);
     });
 
@@ -48,7 +48,7 @@ describe('MapEditorManagerService', () => {
         const INITIAL_MAP_SIZE = 2;
         const FINAL_MAP_SIZE = 4;
 
-        service.gridCreator(INITIAL_MAP_SIZE);
+        service.createNewGrid(INITIAL_MAP_SIZE);
         service.setMapSize(FINAL_MAP_SIZE);
         expect(service.grid.length).toBe(FINAL_MAP_SIZE);
         expect(service.grid[0].length).toBe(FINAL_MAP_SIZE);
