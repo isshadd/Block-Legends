@@ -1,6 +1,7 @@
+import { TileType } from '@common/enums/tile-type';
 import { ItemShared } from './item-shared';
 
 export interface TileShared {
-    name: string;
+    type: TileType;
     item?: ItemShared | null;
 }

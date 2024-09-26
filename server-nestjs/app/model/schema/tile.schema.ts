@@ -1,3 +1,4 @@
+import { TileType } from '@common/enums/tile-type';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Prop, Schema } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
@@ -7,7 +8,7 @@ import { Item } from './item.schema';
 export class Tile implements TileShared {
     @ApiProperty({})
     @Prop({ required: true })
-    name: string;
+    type: TileType;
 
     @ApiProperty({})
     @Prop({ type: Item, required: false, default: null })

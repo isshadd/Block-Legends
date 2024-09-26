@@ -3,6 +3,8 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { ItemType } from '@common/enums/item-type';
+import { TileType } from '@common/enums/tile-type';
 import { Message } from '@common/message';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -66,25 +68,25 @@ export class MainPageComponent {
             tiles: [
                 [
                     {
-                        name: 'GrassTile',
+                        type: TileType.Grass,
                         item: {
-                            name: 'Magic Wand',
+                            type: ItemType.Item,
                         },
                     },
                     {
-                        name: 'GrassTile',
+                        type: TileType.Grass,
                         item: null,
                     },
                 ],
                 [
                     {
-                        name: 'GrassTile',
+                        type: TileType.Grass,
                         item: {
-                            name: 'Item',
+                            type: ItemType.Item,
                         },
                     },
                     {
-                        name: 'WaterTile',
+                        type: TileType.Water,
                         item: null,
                     },
                 ],
