@@ -1,4 +1,4 @@
-@import 'src/_variables.scss'; 
+@import 'src/_variables.scss';
 .container {
     min-height: 100vh;
     height: auto;
@@ -32,7 +32,7 @@
 }
 
 .footer-item p :nth-child(even) {
-    color: $primary-light;
+    color: lighten($primary, 20%);
 }
 .footer-item p :nth-child(odd) {
     color: $primary-light;
