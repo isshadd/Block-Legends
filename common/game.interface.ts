@@ -6,4 +6,5 @@ export interface Game {
     imageUrl: string;
     lastModificationDate: Date;
     isVisible: boolean;
+    description?: string;
 }

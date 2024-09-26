@@ -29,6 +29,8 @@ describe('AdministrationPageManagerService', () => {
                 imageUrl: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
                 lastModificationDate: new Date('2024-10-23'),
                 isVisible: true,
+                description:
+                    'League of Legends is a team-based strategy game where two teams of five powerful champions face off to destroy the other’s base. Choose from over 140 champions to make epic plays, secure kills, and take down towers as you battle your way to victory.',
             },
             {
                 id: 1,
@@ -39,6 +41,8 @@ describe('AdministrationPageManagerService', () => {
                     'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
                 lastModificationDate: new Date('2020-01-03'),
                 isVisible: true,
+                description:
+                    'Minecraft is a game about placing blocks and going on adventures. Explore randomly generated worlds and build amazing things from the simplest of homes to the grandest of castles.',
             },
         ];
         service.games = mockGames;
@@ -80,6 +84,7 @@ describe('AdministrationPageManagerService', () => {
             imageUrl: '',
             lastModificationDate: new Date(),
             isVisible: true,
+            description: '',
         };
         const initialLength = service.games.length;
         service.deleteGame(gameToDelete);

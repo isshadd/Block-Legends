@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { Game } from '@common/game.interface';
@@ -6,6 +7,7 @@ import { Game } from '@common/game.interface';
     selector: 'app-list-game',
     templateUrl: './listGame.component.html',
     styleUrls: ['./listGame.component.scss'],
+    imports: [CommonModule],
     standalone: true,
 })
 export class ListGameComponent {
