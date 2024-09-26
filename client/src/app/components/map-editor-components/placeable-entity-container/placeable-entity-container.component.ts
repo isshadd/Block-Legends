@@ -16,4 +16,16 @@ export class PlaceableEntityContainerComponent {
     constructor(public mapEditorManagerService: MapEditorManagerService) {}
     @Input() containerTitle: string;
     @Input() containerItems: PlaceableEntity[];
+
+    onMouseEnter(entity: PlaceableEntity) {
+        this.mapEditorManagerService.onMouseEnter(entity);
+    }
+
+    onMouseLeave(entity: PlaceableEntity) {
+        this.mapEditorManagerService.onMouseLeave(entity);
+    }
+
+    onMouseDown(entity: PlaceableEntity) {
+        this.mapEditorManagerService.onMouseDownSideMenu(entity);
+    }
 }

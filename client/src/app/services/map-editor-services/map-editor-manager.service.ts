@@ -34,6 +34,7 @@ export class MapEditorManagerService {
             size: 10,
             tiles: [],
         };
+        this.gridCreator(this.map.size);
     }
 
     loadMap(map: MapShared) {
@@ -178,9 +179,5 @@ export class MapEditorManagerService {
             this.sideMenuSelectedEntity = entity;
             this.cancelSelectionMap();
         }
-    }
-
-    onRightClick(event: MouseEvent) {
-        event.preventDefault();
     }
 }
