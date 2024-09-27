@@ -18,7 +18,7 @@ export class AdministrationPageManagerService {
         this.gameServerCommunicationService.deleteOneGame(game.name).subscribe();
         this.games = this.games.filter((elem) => elem.name !== game.name);
     }
-    
+
     toggleVisibility(game: Game): void {
         game.isVisible = !game.isVisible;
     }
