@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { Game } from 'src/app/classes/Games-create-game/game-interface';
+import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
+import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
+import { Game } from '@common/game.interface';
 import { CreateGameComponent } from './create-game.component';
 
 const GAME_SIZE = 30;
@@ -8,13 +9,18 @@ const GAME_SIZE = 30;
 describe('CreateGameComponent', () => {
     let component: CreateGameComponent;
     let fixture: ComponentFixture<CreateGameComponent>;
-    let mockRouter: jasmine.SpyObj<Router>;
+    let mockNavBarComponent: jasmine.SpyObj<NavBarComponent>;
+    let mockGameListComponent: jasmine.SpyObj<GameListComponent>;
 
     beforeEach(async () => {
-        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockNavBarComponent = jasmine.createSpyObj('NavBarComponent', ['selectMode']);
+        mockGameListComponent = jasmine.createSpyObj('GameListComponent', ['selectGame']);
         await TestBed.configureTestingModule({
             imports: [CreateGameComponent],
-            providers: [{ provide: Router, useValue: mockRouter }],
+            providers: [
+                { provide: NavBarComponent, useValue: mockNavBarComponent },
+                { provide: GameListComponent, useValue: mockGameListComponent },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(CreateGameComponent);
@@ -26,48 +32,23 @@ describe('CreateGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should select a game', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
-        component.selectGame(game);
-        expect(component.selectedGame).toEqual(game);
-    });
-
-    it('should navigate to the home page', () => {
-        component.homeButton();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
-    });
-
-    it('should navigate to the create-character page', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', true);
-        component.selectGame(game);
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character']);
-    });
-
-    it('should hide the game if it is not visible', () => {
-        const game = new Game('jeu1', GAME_SIZE, 'Combat classique', 'img', false);
-        component.selectGame(game);
-        expect(component.selectedGame).toBeNull();
-        expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
-    });
-
-    it('should select a mode', () => {
+    it('should call selectMode on NavBarComponent', () => {
         const mode = 'Combat classique';
-        component.selectMode(mode);
-        expect(component.selectedMode).toEqual(mode);
+        mockNavBarComponent.selectMode(mode);
+        expect(mockNavBarComponent.selectMode).toHaveBeenCalledWith(mode);
     });
 
-    it('should filter games by mode', () => {
-        const games = [
-            {
-                name: 'League Of Legends',
-                size: GAME_SIZE,
-                mode: 'Combat classique',
-                imgSrc: 'string',
-                visible: true,
-            },
-        ];
-        component.games = games;
-        component.selectedMode = null;
-        expect(component.getFilteredGames()).toEqual([games[0]]);
+    it('should contain a game list', () => {
+        const game: Game = {
+            id: 0,
+            name: 'JeuTest',
+            size: GAME_SIZE,
+            mode: 'Combat classique',
+            imageUrl: '',
+            lastModificationDate: new Date('2024-10-23'),
+            isVisible: true,
+        };
+        mockGameListComponent.selectGame(game);
+        expect(mockGameListComponent.selectGame).toHaveBeenCalledWith(game);
     });
 });
