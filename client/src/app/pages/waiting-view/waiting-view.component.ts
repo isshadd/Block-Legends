@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService, VP_NUMBER } from '@app/services/game.service';
+import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({

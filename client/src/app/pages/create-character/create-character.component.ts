@@ -8,7 +8,7 @@ import { AttributesComponent } from '@app/components/create-character/attributes
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game-services/game.service';
 
 @Component({
     selector: 'app-create-character',
