@@ -125,7 +125,7 @@ export class MapEditorManagerService {
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
-        this.grid[selectedTile.coordinates.y][selectedTile.coordinates.x] = tileCopy;
+        this.grid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
         tileCopy.visibleState = VisibleState.notSelected;
     }
 
