@@ -23,4 +23,16 @@ export class MapService {
     async getMap(id: string): Promise<Map> {
         return await this.mapModel.findOne({ _id: id });
     }
+
+    async modifyMap(id: string, map: CreateMapDto): Promise<void> {
+        const filterQuery = { _id: id };
+        try {
+            const res = await this.mapModel.updateOne(filterQuery, map);
+            if (res.matchedCount === 0) {
+                throw new Error('Could not find map');
+            }
+        } catch (error) {
+            throw new Error(`Failed to update document: ${error}`);
+        }
+    }
 }
