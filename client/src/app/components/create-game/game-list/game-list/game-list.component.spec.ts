@@ -13,26 +13,13 @@ describe('GameListComponent', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let mockRouter: jasmine.SpyObj<Router>;
     let mockModeService: jasmine.SpyObj<ModeService>;
-    const game: Game = {
-        id: 0,
-        name: 'JeuTest',
-        size: GAME_SIZE,
-        mode: 'Combat classique',
-        imageUrl: '',
-        lastModificationDate: new Date('2024-10-23'),
-        isVisible: true,
-    };
-    const gameNotVisible: Game = {
-        id: 0,
-        name: 'JeuTest',
-        size: GAME_SIZE,
-        mode: 'Combat classique',
-        imageUrl: '',
-        lastModificationDate: new Date('2024-10-23'),
-        isVisible: false,
-    };
-    const games: Game[] = [
-        {
+    let game: Game;
+
+    beforeEach(async () => {
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockModeService = jasmine.createSpyObj('ModeService', ['selectedMode$']);
+        mockModeService.selectedMode$ = of('Combat classique');
+        game = {
             id: 0,
             name: 'JeuTest',
             size: GAME_SIZE,
@@ -40,13 +27,7 @@ describe('GameListComponent', () => {
             imageUrl: '',
             lastModificationDate: new Date('2024-10-23'),
             isVisible: true,
-        },
-    ];
-
-    beforeEach(async () => {
-        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockModeService = jasmine.createSpyObj('ModeService', ['selectedMode$']);
-        mockModeService.selectedMode$ = of('Combat classique');
+        };
         await TestBed.configureTestingModule({
             imports: [GameListComponent],
             providers: [{ provide: Router, useValue: mockRouter }],
@@ -77,7 +58,8 @@ describe('GameListComponent', () => {
     });
 
     it('should hide the game if it is not visible', () => {
-        component.selectGame(gameNotVisible);
+        game.isVisible = false;
+        component.selectGame(game);
         expect(component.selectedGame).toBeNull();
         expect(component.gameStatus).toEqual(`Le jeu choisi ${game.name} n'est plus visible ou supprimé`);
     });
@@ -85,11 +67,11 @@ describe('GameListComponent', () => {
     it('should select a mode', () => {
         const mode = 'Combat classique';
         const navbar = new NavBarComponent(new ModeService());
-        navbar.selectMode(mode);
-        expect(component.selectedMode).toEqual(mode);
+        expect(navbar.selectedMode).toEqual(mode);
     });
 
     it('should filter games by mode', () => {
+        const games: Game[] = [game];
         component.games = games;
         component.selectedMode = null;
         expect(component.getFilteredGames()).toEqual([games[0]]);

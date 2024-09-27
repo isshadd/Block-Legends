@@ -68,12 +68,9 @@ describe('WaitingViewComponent', () => {
     });
 
     it('should not allow another player to join if the game is full', () => {
-        component.addVirtualPlayers();
-        component.addVirtualPlayers();
-        component.addVirtualPlayers();
-        component.addVirtualPlayers();
-        component.addVirtualPlayers();
-        component.addVirtualPlayers();
+        for (let i = 0; i < VP_NUMBER + 1; i++) {
+            component.addVirtualPlayers();
+        }
         expect(component.players.length).toBe(VP_NUMBER + 1);
         expect(component.maxPlayerMessage).toBe('Le nombre maximum de joueurs est atteint !');
     });

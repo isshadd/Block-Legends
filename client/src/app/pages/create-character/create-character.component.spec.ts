@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
@@ -15,6 +16,7 @@ describe('CreateCharacterComponent', () => {
     let mockAvatar: jasmine.SpyObj<AvatarSelectionComponent>;
     let mockFormCharacter: jasmine.SpyObj<CharacterFormComponent>;
     let mockModal: jasmine.SpyObj<ModalComponent>;
+    let mockAttributes: jasmine.SpyObj<AttributesComponent>;
 
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
@@ -22,6 +24,7 @@ describe('CreateCharacterComponent', () => {
         mockFormCharacter = jasmine.createSpyObj('CharacterFormComponent', ['saveName']);
         mockModal = jasmine.createSpyObj('ModalComponent', ['onConfirm', 'onCancel']);
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        mockAttributes = jasmine.createSpyObj('AttributesComponent', ['character', 'characterStatus']);
         await TestBed.configureTestingModule({
             imports: [FormsModule, CreateCharacterComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
             providers: [
@@ -29,6 +32,7 @@ describe('CreateCharacterComponent', () => {
                 { provide: AvatarSelectionComponent, useValue: mockAvatar },
                 { provide: CharacterFormComponent, useValue: mockFormCharacter },
                 { provide: ModalComponent, useValue: mockModal },
+                { provide: PlayerAttributes, useValue: mockAttributes },
             ],
         }).compileComponents();
 
@@ -57,12 +61,14 @@ describe('CreateCharacterComponent', () => {
     });
 
     it('should set the character to organizer and navigate to the waiting view if valid', () => {
-        component.character = new PlayerCharacter('Test', 'test', new PlayerAttributes());
+        mockAttributes.character.attributes = new PlayerAttributes();
+        component.character = new PlayerCharacter('Test', 'test', mockAttributes.character.attributes);
         component.character.isAttackBonusAssigned = true;
         component.character.isDefenseBonusAssigned = true;
         component.character.isLifeBonusAssigned = true;
         component.character.isSpeedBonusAssigned = true;
         component.createCharacter();
+        expect(mockAttributes.character.attributes).toEqual(component.character.attributes);
         expect(component.character.isOrganizer).toBeTrue();
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/waiting-view']);
     });
