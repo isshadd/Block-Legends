@@ -12,7 +12,7 @@
         max-width: 26%;
         height: auto;
         background-color: $primary-dark;
-        overflow: scroll;
+        overflow-y: scroll;
         scrollbar-width: thin;
         scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
         padding: 10px;
@@ -21,7 +21,7 @@
             font-size: 150%;
         }
     }
-    
+
     #map-container {
         display: flex;
         flex-grow: 1;
