@@ -18,6 +18,7 @@ export class WaitingViewComponent implements OnInit {
     playersCounter = 0;
     maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
     isMaxPlayer: boolean;
+    storedCharacter = this.gameService.getStoredCharacter();
 
     constructor(
         @Inject(GameService) private gameService: GameService,
@@ -26,16 +27,21 @@ export class WaitingViewComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.gameService.generateAccessCode();
-        this.accessCode = this.gameService.getAccessCode();
-        this.gameService.character$.subscribe((character) => {
-            if (character) {
-                this.organizerCharacter = character;
-                character.isOrganizer = true;
-                this.players.push(this.organizerCharacter);
-                this.cdr.detectChanges();
-            }
-        });
+        if (this.storedCharacter) {
+            this.organizerCharacter = this.storedCharacter;
+            this.players.push(this.organizerCharacter);
+        } else {
+            this.gameService.generateAccessCode();
+            this.accessCode = this.gameService.getAccessCode();
+            this.gameService.character$.subscribe((character) => {
+                if (character) {
+                    this.organizerCharacter = character;
+                    character.isOrganizer = true;
+                    this.players.push(this.organizerCharacter);
+                    this.cdr.detectChanges();
+                }
+            });
+        }
     }
 
     addVirtualPlayers(): void {
@@ -49,6 +55,7 @@ export class WaitingViewComponent implements OnInit {
     }
 
     playerLeave(): void {
+        this.gameService.clearLocalStorage();
         this.router.navigate(['/home']);
     }
 }

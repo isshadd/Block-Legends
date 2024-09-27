@@ -6,6 +6,7 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 const MATH_1000 = 1000;
 const MATH_9000 = 9000;
 export const VP_NUMBER = 5;
+const STORAGE_KEY = 'currentCharacter';
 
 @Injectable({
     providedIn: 'root',
@@ -38,9 +39,33 @@ export class GameService {
 
     setCharacter(character: PlayerCharacter) {
         this.characterSubject.next(character);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
     }
 
     getCharacter(): PlayerCharacter {
         return this.characterSubject.getValue();
+    }
+
+    getStoredCharacter(): PlayerCharacter | null {
+        const storedData = localStorage.getItem(STORAGE_KEY);
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            return new PlayerCharacter(
+                parsedData.name,
+                parsedData.avatar,
+                new PlayerAttributes(
+                    parsedData.attributes.attack,
+                    parsedData.attributes.defense,
+                    parsedData.attributes.speed,
+                    parsedData.attributes.life,
+                ),
+            );
+        }
+        return null;
+    }
+
+    clearLocalStorage(): void {
+        localStorage.removeItem(STORAGE_KEY);
+        this.characterSubject.next(new PlayerCharacter('', '', new PlayerAttributes()));
     }
 }
