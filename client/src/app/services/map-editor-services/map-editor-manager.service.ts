@@ -149,11 +149,13 @@ export class MapEditorManagerService {
 
     itemPlacer(item: Item, selectedTile: TerrainTile) {
         if (selectedTile.item) {
+            console.log('Item in selectedtile removed');
             this.itemRemover(selectedTile);
         }
         if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
             console.log('Item added');
             item.itemLimit--;
+            console.log(item);
             selectedTile.item = this.sideMenuSelectedEntity as Item;
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
             if (item.itemLimit === 0 && this.sideMenuSelectedEntity) {
@@ -164,34 +166,52 @@ export class MapEditorManagerService {
         }
     }
 
-    itemRemover(selectedTile: TerrainTile) {
-        if (!selectedTile.item) return;
+    itemRemover(selectedTile: Tile) {
+        if (!this.isTerrainTile(selectedTile) || !selectedTile.item) return;
         selectedTile.item.itemLimit++;
+        console.log(selectedTile.item);
+        console.log('Item limit increased');
+        console.log(selectedTile.item.visibleState);
         selectedTile.item.visibleState = VisibleState.notSelected;
+        console.log(selectedTile.item);
+        console.log(selectedTile.item.visibleState);
         selectedTile.item = null;
+    }
+    leftClickMapTile(entity: Tile) {
+        this.isDraggingLeft = true;
+        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) {
+            console.log('Same type');
+            return;
+        }
+        if (!this.sideMenuSelectedEntity) return;
+        if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
+            this.itemPlacer(this.sideMenuSelectedEntity, entity);
+        } else if (!this.isItem(this.sideMenuSelectedEntity)) {
+            this.itemRemover(entity);
+            this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
+        }
+    }
+
+    rightClickMapTile(event: MouseEvent, entity: Tile) {
+        this.isDraggingRight = true;
+        event.preventDefault();
+        if (entity instanceof GrassTile && !entity.item) return;
+        if ((entity as TerrainTile)?.item) {
+            console.log('It has an item and its deleted');
+            this.itemRemover(entity);
+        } else if (!this.isTerrainTile(entity) || (this.isTerrainTile(entity) && !entity.item)) {
+            console.log('No item and grass created');
+            this.tileCopyCreator(new GrassTile(), entity);
+        }
     }
 
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
         console.log('entity', entity);
         if (event.button === 0) {
-            if (this.sideMenuSelectedEntity) {
-                if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
-                    this.itemPlacer(this.sideMenuSelectedEntity, entity);
-                } else if (!this.isItem(this.sideMenuSelectedEntity)) {
-                    this.isDraggingLeft = true;
-                    this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
-                }
-            }
+            this.leftClickMapTile(entity);
         } else if (event.button === 2) {
             this.isDraggingRight = true;
-            if (!(entity instanceof GrassTile) && ((this.isTerrainTile(entity) && !entity.item) || !this.isTerrainTile(entity))) {
-                this.isDraggingRight = true;
-                event.preventDefault();
-                this.tileCopyCreator(new GrassTile(), entity);
-            } else if (this.isTerrainTile(entity)) {
-                this.itemRemover(entity);
-                console.log('Item deleted');
-            }
+            this.rightClickMapTile(event, entity);
         }
     }
     onMouseMoveMapTile(entity: Tile) {
