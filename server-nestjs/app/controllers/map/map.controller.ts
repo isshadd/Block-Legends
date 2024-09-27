@@ -69,7 +69,7 @@ export class MapController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/:id')
-    async modifyCourse(@Param('id') id: string, @Body() mapDto: CreateMapDto, @Res() response: Response) {
+    async patchMap(@Param('id') id: string, @Body() mapDto: CreateMapDto, @Res() response: Response) {
         try {
             await this.mapService.modifyMap(id, mapDto);
             response.status(HttpStatus.OK).send();
