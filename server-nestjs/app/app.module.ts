@@ -17,7 +17,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         MongooseModule.forRootAsync({
-            imports: [ConfigModule, MongooseModule.forRoot('mongodb+srv://nicolasbilodeau:Nicolas123@cluster0.rrbzp.mongodb.net/LOG2990_104_Nicolas?retryWrites=true&w=majority&appName=Cluster0')],
+            imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (config: ConfigService) => ({
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
@@ -26,7 +26,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
-    controllers: [CourseController, DateController, ExampleController, GameAdminController], // Add GameAdminController
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameAdminService], // Add GameAdminService
+    controllers: [CourseController, DateController, ExampleController, GameAdminController], 
+    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameAdminService],
 })
 export class AppModule {}
