@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game.service';
-import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({
@@ -11,12 +10,11 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
     imports: [CommonModule],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    providers: [GameService],
 })
 export class WaitingViewComponent implements OnInit {
     accessCode: number;
     players: PlayerCharacter[] = [];
-    organizerCharacter = new PlayerCharacter('Organisateur ♛', '', new PlayerAttributes());
+    organizerCharacter: PlayerCharacter;
     playersCounter = 0;
     maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
     isMaxPlayer: boolean;
@@ -30,12 +28,15 @@ export class WaitingViewComponent implements OnInit {
     ngOnInit(): void {
         this.gameService.generateAccessCode();
         this.accessCode = this.gameService.getAccessCode();
-        this.organizerCharacter.setOrganizer();
-
-        if (this.organizerCharacter.isOrganizer === true) {
-            this.players.push(this.organizerCharacter);
-            this.cdr.detectChanges();
-        }
+        this.gameService.character$.subscribe((character) => {
+            if (character) {
+                this.organizerCharacter = character;
+                character.isOrganizer = true;
+                this.players.push(this.organizerCharacter);
+                this.cdr.detectChanges();
+            }
+        });
+        console.log(this.organizerCharacter);
     }
 
     addVirtualPlayers(): void {
