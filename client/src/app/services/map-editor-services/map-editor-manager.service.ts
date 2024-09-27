@@ -140,6 +140,9 @@ export class MapEditorManagerService {
     }
 
     itemPlacer(item: Item, selectedTile: TerrainTile) {
+        if (selectedTile.item) {
+            this.itemRemover(selectedTile);
+        }
         if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
             console.log('Item added');
             item.itemLimit--;
