@@ -13,6 +13,10 @@ export class MapEditorOptionsMenuComponent {
     constructor(public mapEditorManagerService: MapEditorManagerService) {}
 
     onResetClick() {
-        this.mapEditorManagerService.reset();
+        this.mapEditorManagerService.resetMap();
+    }
+
+    onSaveClick() {
+        this.mapEditorManagerService.saveMap();
     }
 }
