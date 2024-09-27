@@ -26,7 +26,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         MongooseModule.forFeature([{ name: Course.name, schema: courseSchema }]),
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
-    controllers: [CourseController, DateController, ExampleController, GameAdminController], 
+    controllers: [CourseController, DateController, ExampleController, GameAdminController],
     providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameAdminService],
 })
 export class AppModule {}
