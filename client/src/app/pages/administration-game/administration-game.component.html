@@ -1,25 +1,7 @@
 <div class="admin_page">
     <h1 id="title">Liste des jeux:</h1>
     <ul class="game_list">
-        <li *ngFor="let game of games" [ngClass]="{ invisible: !game.isVisible, visible: game.isVisible }">
-            <img [src]="game.imageUrl" />
-            <div class="game_info">
-                <h3>{{ game.name }}</h3>
-                <div class="info_preamble">
-                    <p>Taille: {{ game.size }} tuiles</p>
-                    <p>Mode: {{ game.mode }}</p>
-                    <p>Dernière modification: {{ game.lastModificationDate | date: 'shortDate' }}</p>
-                </div>
-                <div class="action_icons">
-                    <span class="material-icons" (click)="deleteGame(game)" title="Supprimer">delete</span>
-                    <span class="material-icons" routerLink="/main-page" title="Éditer">edit</span>
-                    <span class="material-icons" title="Exporter">file_download</span>
-                    <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
-                        {{ game.isVisible ? 'visibility' : 'visibility_off' }}
-                    </span>
-                </div>
-            </div>
-        </li>
+        <app-list-game></app-list-game>
     </ul>
     <div class="button_container">
         <a routerLink="/main-page"><button id="btnImport">Importer</button></a>
