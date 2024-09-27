@@ -26,7 +26,6 @@ export class GameAdminController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
     @ApiOkResponse({
         description: 'Delete a game',
     })
@@ -42,7 +41,6 @@ export class GameAdminController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
     @ApiOkResponse({
         description: 'Empty the database',
     })
