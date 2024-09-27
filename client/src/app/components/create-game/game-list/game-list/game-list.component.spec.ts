@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
-import { ModeService } from '@app/services/gameMode.service';
+import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { Game } from '@common/game.interface';
 import { of } from 'rxjs';
 import { GameListComponent } from './game-list.component';

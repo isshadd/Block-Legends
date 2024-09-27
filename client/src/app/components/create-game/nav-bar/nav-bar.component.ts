@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { ModeService } from '@app/services/gameMode.service';
+import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 
 @Component({
     selector: 'app-nav-bar',

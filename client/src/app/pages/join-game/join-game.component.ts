@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // import { Router } from '@angular/router';
 /* import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
-import { GameService } from '@app/services/game.service';
+import { GameService } from '@app/services/game-services/game.service';
 
 export const MIN_CHAR = 48;
 export const MAX_CHAR = 57;
