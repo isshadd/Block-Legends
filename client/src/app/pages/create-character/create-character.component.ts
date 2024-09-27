@@ -55,6 +55,7 @@ export class CreateCharacterComponent {
         if (missingFields.length > 0) {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
         } else {
+            this.character.name += ' ♔';
             this.character.setOrganizer();
             this.gameService.setCharacter(this.character);
             this.router.navigate(['/waiting-view']);

@@ -27,16 +27,17 @@ export class WaitingViewComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        this.gameService.generateAccessCode();
+        this.accessCode = this.gameService.getAccessCode();
         if (this.storedCharacter) {
             this.organizerCharacter = this.storedCharacter;
+            this.organizerCharacter.setOrganizer();
             this.players.push(this.organizerCharacter);
         } else {
-            this.gameService.generateAccessCode();
-            this.accessCode = this.gameService.getAccessCode();
             this.gameService.character$.subscribe((character) => {
                 if (character) {
                     this.organizerCharacter = character;
-                    character.isOrganizer = true;
+                    character.setOrganizer();
                     this.players.push(this.organizerCharacter);
                     this.cdr.detectChanges();
                 }

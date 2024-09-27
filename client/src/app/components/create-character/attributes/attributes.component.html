@@ -1,25 +1,25 @@
 <div class="attributes">
     <h3>Attributs :</h3>
-    <div class="attribute" id="life">
-        <label>Vie :</label>
+    <div class="attribute" id="life" matTooltip="le nombre de points de vie du personnage">
+        <label>VIE :</label>
         <div name="life">{{ character.attributes.life }}</div>
         <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2 à la vie</button>
     </div>
-    <div class="attribute" id="speed">
-        <label>Rapidité :</label>
+    <div class="attribute" id="speed" matTooltip="détermine l’ordre des tours et correspond aussi aux points de mouvement par tour">
+        <label>RAPIDITE :</label>
         <div name="speed">{{ character.attributes.speed }}</div>
         <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2 à la rapidité</button>
     </div>
-    <div class="attribute" id="attack">
-        <label>Attaque :</label>
+    <div class="attribute" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">
+        <label>ATTAQUE :</label>
         <div name="attack">{{ character.attributes.attack }}</div>
         <select [(ngModel)]="selectedAttackDice" (change)="assignAttackDice($event)" class="large-emojis">
             <option value="dice6">🎲 dé à 6 faces</option>
             <option value="dice4">🎲 dé à 4 faces</option>
         </select>
     </div>
-    <div class="attribute" id="defense">
-        <label>Défense :</label>
+    <div class="attribute" id="defense" matTooltip="représente la capacité à bloquer l’attaque d’un adversaire">
+        <label>DEFENSE :</label>
         <div name="defense">{{ character.attributes.defense }}</div>
         <select [(ngModel)]="selectedDefenseDice" (change)="assignDefenseDice($event)" class="large-emojis">
             <option value="dice6">🎲 dé à 6 faces</option>

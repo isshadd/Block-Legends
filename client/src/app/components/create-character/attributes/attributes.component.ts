@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-attributes',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, MatTooltipModule],
     templateUrl: './attributes.component.html',
     styleUrl: './attributes.component.scss',
 })
