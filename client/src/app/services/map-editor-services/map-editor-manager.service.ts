@@ -153,7 +153,7 @@ export class MapEditorManagerService {
         console.log('entity', entity);
         if (event.button === 0) {
             if (this.sideMenuSelectedEntity) {
-                if (this.isItem(this.sideMenuSelectedEntity) && this.sideMenuSelectedEntity.itemLimit !== 0 && this.isTerrainTile(entity)) {
+                if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
                     this.itemPlacer(this.sideMenuSelectedEntity, entity);
                 } else if (this.sideMenuSelectedEntity && !this.isItem(this.sideMenuSelectedEntity)) {
                     this.isDraggingLeft = true;
@@ -201,6 +201,10 @@ export class MapEditorManagerService {
             entity.visibleState = VisibleState.notSelected;
             this.sideMenuSelectedEntity = null;
             this.cancelSelectionMap();
+        } else if (entity.visibleState === VisibleState.disabled) {
+            //item limit reached
+            console.log('Item limit reached and disabled');
+            return;
         } else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             //another entity selected
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
