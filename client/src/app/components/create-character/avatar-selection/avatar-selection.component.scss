@@ -1,0 +1,50 @@
+@import 'src/_variables.scss';
+
+.avatar-selection {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background-color: $primary-dark;
+    border: 5px solid #000;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, auto);
+    gap: 10px;
+    font-size: 0.5rem;
+}
+
+.avatar-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 5px;
+    transition: border-color 0.3s;
+    text-align: center;
+    justify-content: center;
+}
+
+.avatar-item:hover {
+    border-color: #007bff;
+}
+
+.avatar-item img {
+    width: 50px;
+    height: auto;
+    display: block;
+}
+
+.selected-avatar img {
+    width: 150px; /* Adjust the width as needed */
+    height: 200px; /* Adjust the height as needed */
+    object-fit: contain; /* Ensures the image fits within the area without being cut */
+    border-radius: 10px;
+}
+.selected-avatar {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    text-align: center;
+    justify-content: center;
+}

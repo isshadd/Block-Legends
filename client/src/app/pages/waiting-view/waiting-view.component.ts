@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { GameService } from '@app/services/game.service';
+import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-waiting-view',
@@ -9,39 +10,42 @@ import { GameService } from '@app/services/game.service';
     imports: [CommonModule],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    providers: [GameService],
 })
 export class WaitingViewComponent implements OnInit {
     accessCode: number;
-    players: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number }[] = [];
-    isOrganizer: boolean = true;
-    organizerCharacter: { name: string; avatar: string; life: number; speed: number; attack: number; defense: number } = {
-        name: 'Organizer', // A CHANGER PLUS TARD, CECI EST SEULEMENT POUR LE TEST DE LA PAGE
-        avatar: '',
-        life: 4,
-        speed: 4,
-        attack: 4,
-        defense: 4,
-    };
-    virtualPlayersCounter = 0;
+    players: PlayerCharacter[] = [];
+    organizerCharacter: PlayerCharacter;
+    playersCounter = 0;
+    maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
+    isMaxPlayer: boolean;
 
     constructor(
         @Inject(GameService) private gameService: GameService,
         private router: Router,
+        private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit(): void {
         this.gameService.generateAccessCode();
         this.accessCode = this.gameService.getAccessCode();
-
-        if (this.isOrganizer) {
-            this.players.push(this.organizerCharacter);
-        }
+        this.gameService.character$.subscribe((character) => {
+            if (character) {
+                this.organizerCharacter = character;
+                character.isOrganizer = true;
+                this.players.push(this.organizerCharacter);
+                this.cdr.detectChanges();
+            }
+        });
     }
 
     addVirtualPlayers(): void {
-        this.players.push(this.gameService.generateVirtualCharacters()[this.virtualPlayersCounter]);
-        this.virtualPlayersCounter += 1;
+        if (this.playersCounter < VP_NUMBER) {
+            this.players.push(this.gameService.generateVirtualCharacters()[this.playersCounter]);
+            this.playersCounter += 1;
+        } else if (this.playersCounter >= VP_NUMBER) {
+            this.maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
+            this.isMaxPlayer = true;
+        }
     }
 
     playerLeave(): void {

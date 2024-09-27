@@ -1,0 +1,21 @@
+<div class="info-char">
+    <label for="avatar">Avatar : </label>
+    <div class="avatar-selection">
+        <div class="avatar-grid">
+            @for(avatar of avatars; track avatar) {
+            <div class="avatar-item" (click)="selectAvatar(avatar.imgSrc1)">
+                <img [src]="avatar.imgSrc1" [alt]="avatar.name" [class.selected]="character.avatar === avatar.imgSrc1" />
+                <small>{{ avatar.name }}</small>
+            </div>
+            }
+        </div>
+        <div class="selected-avatar">
+            @if(character.avatar){
+            <img [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name" />
+            } @else{
+            <p>Choisissez<br />votre avatar</p>
+            }
+            <p>{{ getSelectedAvatar()?.name }}</p>
+        </div>
+    </div>
+</div>

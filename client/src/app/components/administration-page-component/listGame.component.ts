@@ -1,4 +1,6 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { Game } from '@common/game.interface';
 
@@ -6,8 +8,8 @@ import { Game } from '@common/game.interface';
     selector: 'app-list-game',
     templateUrl: './listGame.component.html',
     styleUrls: ['./listGame.component.scss'],
+    imports: [CommonModule, RouterLink],
     standalone: true,
-    providers: [AdministrationPageManagerService],
 })
 export class ListGameComponent {
     constructor(private administrationService: AdministrationPageManagerService) {}
@@ -20,7 +22,7 @@ export class ListGameComponent {
         this.administrationService.deleteGame(game);
     }
 
-    toggleVisibity(game: Game): void {
+    toggleVisibility(game: Game): void {
         this.administrationService.toggleVisibility(game);
     }
 }

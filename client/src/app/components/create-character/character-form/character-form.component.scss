@@ -1,0 +1,19 @@
+.info-char {
+    background-color: #4f5d75;
+    border: 5px solid #000;
+    width: max-content;
+}
+
+#name {
+    width: max-content;
+}
+
+.name-creation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    input {
+        text-align: center;
+    }
+}
