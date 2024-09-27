@@ -12,15 +12,15 @@ import { Game } from '@common/game.interface';
 export class ListGameComponent {
     constructor(private administrationService: AdministrationPageManagerService) {}
 
-    GetGames(): Game[] {
+    getGames(): Game[] {
         return this.administrationService.games;
     }
 
-    DeleteGame(game: Game): void {
+    deleteGame(game: Game): void {
         this.administrationService.deleteGame(game);
     }
 
-    ToggleVisibity(game: Game): void {
+    toggleVisibity(game: Game): void {
         this.administrationService.toggleVisibility(game);
     }
 }

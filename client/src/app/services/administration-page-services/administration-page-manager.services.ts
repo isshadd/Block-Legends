@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Game } from '@common/game.interface';
-import { CommunicationService } from '../communication.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 
 @Injectable({
     providedIn: 'root',
@@ -8,14 +8,14 @@ import { CommunicationService } from '../communication.service';
 export class AdministrationPageManagerService {
     games: Game[];
 
-    constructor(private communicationService: CommunicationService) {
-        this.communicationService.getGames().subscribe((games: Game[]) => {
+    constructor(private gameServerCommunicationService: GameServerCommunicationService) {
+        this.gameServerCommunicationService.getGames().subscribe((games: Game[]) => {
             this.games = games;
         });
     }
 
     deleteGame(game: Game): void {
-        this.communicationService.deleteOneGame(game.name).subscribe();
+        this.gameServerCommunicationService.deleteOneGame(game.name).subscribe();
         this.games = this.games.filter((elem) => elem.name !== game.name);
     }
 

@@ -36,7 +36,7 @@ export class MainPageComponent {
             },
         });
     }
-  
+
     getMessagesFromServer(): void {
         this.communicationService
             .basicGet()
