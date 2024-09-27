@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { VP_NUMBER } from '@app/services/game.service';
+import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { BASE_STATS } from 'src/app/classes/Characters/player-attributes';
 import { WaitingViewComponent } from './waiting-view.component';
 
@@ -12,12 +12,17 @@ describe('WaitingViewComponent', () => {
     let component: WaitingViewComponent;
     let fixture: ComponentFixture<WaitingViewComponent>;
     let mockRouter: MockRouter;
+    let mockGameService: GameService;
 
     beforeEach(() => {
         mockRouter = new MockRouter();
+        mockGameService = new GameService();
 
         TestBed.configureTestingModule({
-            providers: [{ provide: Router, useValue: mockRouter }],
+            providers: [
+                { provide: Router, useValue: mockRouter },
+                { provide: GameService, useValue: mockGameService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(WaitingViewComponent);
@@ -36,7 +41,7 @@ describe('WaitingViewComponent', () => {
 
     it('should add organizer to the players list if user is organizer', () => {
         expect(component.players.length).toBe(1);
-        expect(component.players[0].name).toBe('Organisateur ♛');
+        expect(component.players[0].name).toBe(mockGameService.getCharacter().name);
     });
 
     it('sould create a valid virtual player', () => {

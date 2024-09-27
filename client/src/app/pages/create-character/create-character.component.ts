@@ -57,7 +57,6 @@ export class CreateCharacterComponent {
         } else {
             this.character.setOrganizer();
             this.gameService.setCharacter(this.character);
-            console.log(this.character);
             this.router.navigate(['/waiting-view']);
         }
     }

@@ -36,7 +36,6 @@ export class WaitingViewComponent implements OnInit {
                 this.cdr.detectChanges();
             }
         });
-        console.log(this.organizerCharacter);
     }
 
     addVirtualPlayers(): void {
