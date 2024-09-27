@@ -50,3 +50,12 @@ button[disabled] {
     border: 2px solid #000;
     justify-content: space-around;
 }
+
+select{
+    background-color: darken($primary-dark, 10%);
+    color: $primary-light;
+}
+
+select:hover{
+    background-color: darken($primary-dark, 20%);
+}
