@@ -1,0 +1,9 @@
+@import 'src/_variables.scss';
+
+.navbar-title {
+    background-color: #333;
+    font-size: 1.5em;
+    text-align: center;
+    padding-bottom: 10px;
+    color: $primary-light;
+}
