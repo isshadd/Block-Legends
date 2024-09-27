@@ -22,7 +22,6 @@ describe('ListGameComponent', () => {
         component = fixture.componentInstance;
 
         mockGame = {
-            id: 0,
             name: 'League Of Legends',
             size: 30,
             mode: 'CTF',

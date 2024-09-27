@@ -6,7 +6,7 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
     providedIn: 'root',
 })
 export class AdministrationPageManagerService {
-    games: Game[];
+    games: Game[] = [];
 
     constructor(private gameServerCommunicationService: GameServerCommunicationService) {
         this.gameServerCommunicationService.getGames().subscribe((games: Game[]) => {
