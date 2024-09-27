@@ -132,6 +132,9 @@ export class MapEditorManagerService {
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
+        if (this.isTerrainTile(selectedTile) && selectedTile.item && this.isTerrainTile(tileCopy)) {
+            tileCopy.item = this.itemFactoryService.copyItem(selectedTile.item);
+        }
         this.grid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
         tileCopy.visibleState = VisibleState.notSelected;
     }
@@ -149,13 +152,21 @@ export class MapEditorManagerService {
             this.sideMenuSelectedEntity = null;
         }
     }
+
+    itemRemover(selectedTile: TerrainTile) {
+        if (!selectedTile.item) return;
+        selectedTile.item.itemLimit++;
+        selectedTile.item.visibleState = VisibleState.notSelected;
+        selectedTile.item = null;
+    }
+
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
         console.log('entity', entity);
         if (event.button === 0) {
             if (this.sideMenuSelectedEntity) {
                 if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
                     this.itemPlacer(this.sideMenuSelectedEntity, entity);
-                } else if (this.sideMenuSelectedEntity && !this.isItem(this.sideMenuSelectedEntity)) {
+                } else if (!this.isItem(this.sideMenuSelectedEntity)) {
                     this.isDraggingLeft = true;
                     this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
                 }
@@ -167,9 +178,8 @@ export class MapEditorManagerService {
                 event.preventDefault();
                 this.tileCopyCreator(new GrassTile(), entity);
             } else if (this.isTerrainTile(entity)) {
-                entity.item = null;
+                this.itemRemover(entity);
                 console.log('Item deleted');
-            } else {
             }
         }
     }
@@ -182,10 +192,8 @@ export class MapEditorManagerService {
             if (this.isDraggingRight && !(entity instanceof GrassTile)) {
                 this.tileCopyCreator(new GrassTile(), entity);
             }
-
-            if (entity instanceof GrassTile && entity.item) {
-                console.log('Item deleted dragging');
-                entity.item = null;
+            if (this.isTerrainTile(entity)) {
+                this.itemRemover(entity);
             }
         }
     }
