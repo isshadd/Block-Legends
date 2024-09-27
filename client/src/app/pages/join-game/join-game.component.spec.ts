@@ -23,17 +23,22 @@ describe('JoinGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should join game', () => {
+    it('should not join a game if code is incorrect', () => {
         component.accessCode = 1111;
         component.joinGame();
+        expect(component.errorMessage).toBe("Le code d'accès est invalide !");
     });
 
     /*
-    // ne fonctionne pas encore car la méthode joinGame n'est pas encore correctement implémentée
-    it('should navigate to waiting view', () => {
-        component.accessCode = 1111;
-        component.joinGame();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/waiting-view']);
+    it('should not allow letters in the access code', () => {
+        const event: Partial<KeyboardEvent> = {
+            key: 'a',
+            preventDefault: jasmine.createSpy('preventDefault'),
+        };
+
+        component.allowOnlyNumbers(event as KeyboardEvent);
+
+        expect(event.preventDefault).toHaveBeenCalled();
     });
     */
 });

@@ -1,0 +1,23 @@
+<div class="attributes">
+    <h3>Attributs :</h3>
+    <div class="attribute" id="life">
+        <label>Vie :</label>
+        <div name="life">{{ character.attributes.life }}</div>
+        <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2 à la vie</button>
+    </div>
+    <div class="attribute" id="speed">
+        <label>Rapidité :</label>
+        <div name="speed">{{ character.attributes.speed }}</div>
+        <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2 à la rapidité</button>
+    </div>
+    <div class="attribute" id="attack">
+        <label>Attaque :</label>
+        <div name="attack">{{ character.attributes.attack }}</div>
+        <button class="dark-button" type="button" (click)="character.assignAttackDice()">Assigner un dé à l'attaque</button>
+    </div>
+    <div class="attribute" id="defense">
+        <label>Défense :</label>
+        <div name="defense">{{ character.attributes.defense }}</div>
+        <button class="dark-button" type="button" (click)="character.assignDefenseDice()">Assigner un dé à la défense</button>
+    </div>
+</div>
