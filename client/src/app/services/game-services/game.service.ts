@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
@@ -11,7 +12,13 @@ export const VP_NUMBER = 5;
 })
 export class GameService {
     characters: PlayerCharacter[] = [];
+    character$: Observable<PlayerCharacter>;
     private accessCode: number;
+    private characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', '', new PlayerAttributes()));
+
+    constructor() {
+        this.character$ = this.characterSubject.asObservable();
+    }
 
     generateAccessCode(): void {
         this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);
@@ -27,5 +34,13 @@ export class GameService {
             this.characters.push(character);
         }
         return this.characters;
+    }
+
+    setCharacter(character: PlayerCharacter) {
+        this.characterSubject.next(character);
+    }
+
+    getCharacter(): PlayerCharacter {
+        return this.characterSubject.getValue();
     }
 }

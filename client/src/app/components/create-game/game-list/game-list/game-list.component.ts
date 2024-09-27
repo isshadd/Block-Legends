@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ModeService } from '@app/services/gameMode.service';
+import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { Game } from '@common/game.interface';
 
 @Component({
