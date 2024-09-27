@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="header-container">
+        <button (click)="homeButton()" class="home-button" routerLink="/home">🏠</button>
+        <h1>Liste des jeux : {{ this.selectedMode }}</h1>
+    </div>
+    <div>
+        @if(getFilteredGames().length > 0){
+        <ul class="game-list">
+            @for(game of getFilteredGames(); track game) {
+            <li class="game-item">
+                <div class="game-box">
+                    <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
+                    <div class="game-details">
+                        <h2>{{ game.name }}</h2>
+                        <p>Taille de la carte: {{ game.size }}</p>
+                    </div>
+                    <button (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
+                </div>
+            </li>
+            }
+        </ul>
+        } @else(){
+        <ng-template #noGames>
+            <p>Aucun jeu disponible pour le mode sélectionné.</p>
+        </ng-template>
+        }
+    </div>
+    @if(gameStatus){
+    <div class="alert alert-warning">{{ gameStatus }}</div>
+    }
+</div>
