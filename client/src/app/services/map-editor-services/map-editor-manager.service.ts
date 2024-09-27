@@ -96,7 +96,7 @@ export class MapEditorManagerService {
         }
     }
 
-    reset() {
+    resetMap() {
         this.loadGrid();
     }
 
