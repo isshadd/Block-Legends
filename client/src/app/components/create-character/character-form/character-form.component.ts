@@ -26,4 +26,8 @@ export class CharacterFormComponent {
     saveName() {
         this.savedName = this.character.name;
     }
+
+    isNameValid(): boolean {
+        return this.savedName !== null && this.savedName.trim().length > 0;
+    }
 }

@@ -25,8 +25,23 @@ describe('CharacterFormComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should save character name', () => {
+    it('should save the name when valid', () => {
+        component.character.name = 'ValidName';
         component.saveName();
-        expect(component.savedName).toBe('Nom du personnage');
+        expect(component.savedName).toEqual('ValidName');
+    });
+
+    it('should validate the name correctly', () => {
+        component.character.name = 'ValidName';
+        component.saveName();
+        expect(component.isNameValid()).toBe(true);
+
+        component.character.name = '    ';
+        component.saveName();
+        expect(component.isNameValid()).toBe(false);
+
+        component.character.name = '';
+        component.saveName();
+        expect(component.isNameValid()).toBe(false);
     });
 });
