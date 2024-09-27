@@ -33,7 +33,6 @@ export class MapEditorManagerService {
     isDraggingRight: boolean = false;
 
     newMap(size: number) {
-        this.grid = [];
         this.map = {
             name: '',
             description: '',
@@ -44,23 +43,28 @@ export class MapEditorManagerService {
     }
 
     loadMap(map: MapShared) {
-        this.grid = [];
         this.map = map;
         this.loadGrid();
     }
 
     createNewGrid() {
+        this.grid = [];
+        this.map.tiles = [];
+
         for (let i = 0; i < this.map.size; i++) {
             this.grid.push([]);
+            this.map.tiles.push([]);
             for (let j = 0; j < this.map.size; j++) {
                 const newTile: GrassTile = new GrassTile();
                 this.grid[i].push(newTile);
+                this.map.tiles[i].push({ type: newTile.type });
                 newTile.coordinates = { x: i, y: j };
             }
         }
     }
 
     loadGrid() {
+        this.grid = [];
         for (let i = 0; i < this.map.tiles.length; i++) {
             this.grid.push([]);
             for (let j = 0; j < this.map.tiles[i].length; j++) {
@@ -90,6 +94,10 @@ export class MapEditorManagerService {
                 });
             }
         }
+    }
+
+    reset() {
+        this.loadGrid();
     }
 
     cancelSelectionSideMenu() {
