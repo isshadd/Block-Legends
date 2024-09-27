@@ -13,11 +13,17 @@
     <div class="attribute" id="attack">
         <label>Attaque :</label>
         <div name="attack">{{ character.attributes.attack }}</div>
-        <button class="dark-button" type="button" (click)="character.assignAttackDice()">Assigner un dé à l'attaque</button>
+        <select [(ngModel)]="selectedAttackDice" (change)="assignAttackDice($event)" class="large-emojis">
+            <option value="dice6">🎲 dé à 6 faces</option>
+            <option value="dice4">🎲 dé à 4 faces</option>
+        </select>
     </div>
     <div class="attribute" id="defense">
         <label>Défense :</label>
         <div name="defense">{{ character.attributes.defense }}</div>
-        <button class="dark-button" type="button" (click)="character.assignDefenseDice()">Assigner un dé à la défense</button>
+        <select [(ngModel)]="selectedDefenseDice" (change)="assignDefenseDice($event)" class="large-emojis">
+            <option value="dice6">🎲 dé à 6 faces</option>
+            <option value="dice4">🎲 dé à 4 faces</option>
+        </select>
     </div>
 </div>

@@ -14,4 +14,31 @@ export class AttributesComponent {
     @Input() character: PlayerCharacter;
 
     characterStatus: string | null;
+
+    selectedAttackDice: string = 'dice6'
+    selectedDefenseDice: string = 'dice4'
+
+    assignAttackDice(event: Event): void {
+        const target = event.target as HTMLSelectElement;
+        const dice = target.value;
+        this.selectedAttackDice = dice;
+        this.character.assignAttackDice();
+        if (dice === 'dice6') {
+            this.selectedDefenseDice = 'dice4';
+        } else {
+            this.selectedDefenseDice = 'dice6';
+        }
+    }
+
+    assignDefenseDice(event: Event): void {
+        const target = event.target as HTMLSelectElement;
+        const dice = target.value;
+        this.selectedDefenseDice = dice;
+        this.character.assignDefenseDice();
+        if (dice === 'dice4') {
+            this.selectedAttackDice = 'dice6';
+        } else {
+            this.selectedAttackDice = 'dice4';
+        }
+    }
 }

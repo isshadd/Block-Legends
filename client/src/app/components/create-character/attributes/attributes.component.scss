@@ -32,3 +32,11 @@ button[disabled] {
     cursor: not-allowed;
     border: 2px solid $secondary;
 }
+
+.large-emojis option {
+    font-size: 1em; /* Augmentez cette valeur pour rendre les émojis encore plus grands */
+}
+.large-emojis {
+    font-size: 1em; /* Augmentez cette valeur pour rendre les émojis encore plus grands */
+    height: auto; /* Permet à la hauteur de s'ajuster automatiquement */
+}
