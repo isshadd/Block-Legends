@@ -106,6 +106,12 @@ export class MapEditorManagerService {
         }
     }
 
+    makeSelection(entity: PlaceableEntity) {
+        entity.visibleState = VisibleState.selected; //selection of the entity
+        this.sideMenuSelectedEntity = entity;
+        this.cancelSelectionMap();
+    }
+
     isTerrainTile(tile: Tile): tile is TerrainTile {
         return (tile as TerrainTile).item !== undefined;
     }
@@ -115,11 +121,12 @@ export class MapEditorManagerService {
     }
 
     onMouseEnter(entity: PlaceableEntity) {
-        if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.hovered;
+        if (entity.visibleState === VisibleState.notSelected) entity.visibleState = VisibleState.hovered;
     }
 
     onMouseLeave(entity: PlaceableEntity) {
-        if (entity.visibleState !== VisibleState.selected) entity.visibleState = VisibleState.notSelected;
+        if (entity.visibleState !== VisibleState.selected && entity.visibleState !== VisibleState.disabled)
+            entity.visibleState = VisibleState.notSelected;
     }
 
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
@@ -129,23 +136,33 @@ export class MapEditorManagerService {
         tileCopy.visibleState = VisibleState.notSelected;
     }
 
+    itemPlacer(item: Item, selectedTile: TerrainTile) {
+        if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
+            console.log('Item added');
+            item.itemLimit--;
+            selectedTile.item = this.sideMenuSelectedEntity as Item;
+            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
+            if (item.itemLimit === 0 && this.sideMenuSelectedEntity) {
+                console.log('Item limit reached');
+                this.sideMenuSelectedEntity.visibleState = VisibleState.disabled;
+            }
+            this.sideMenuSelectedEntity = null;
+        }
+    }
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
         console.log('entity', entity);
         if (event.button === 0) {
             if (this.sideMenuSelectedEntity) {
-                if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
-                    console.log('Item added');
-                    entity.item = this.sideMenuSelectedEntity;
-                    this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-                    this.sideMenuSelectedEntity = null;
-                } else if (!this.isItem(this.sideMenuSelectedEntity)) {
+                if (this.isItem(this.sideMenuSelectedEntity) && this.sideMenuSelectedEntity.itemLimit !== 0 && this.isTerrainTile(entity)) {
+                    this.itemPlacer(this.sideMenuSelectedEntity, entity);
+                } else if (this.sideMenuSelectedEntity && !this.isItem(this.sideMenuSelectedEntity)) {
                     this.isDraggingLeft = true;
                     this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
                 }
             }
         } else if (event.button === 2) {
             this.isDraggingRight = true;
-            if (!(entity instanceof GrassTile)) {
+            if (!(entity instanceof GrassTile) && ((this.isTerrainTile(entity) && !entity.item) || !this.isTerrainTile(entity))) {
                 this.isDraggingRight = true;
                 event.preventDefault();
                 this.tileCopyCreator(new GrassTile(), entity);
@@ -187,13 +204,9 @@ export class MapEditorManagerService {
         } else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             //another entity selected
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-            entity.visibleState = VisibleState.selected;
-            this.sideMenuSelectedEntity = entity;
-            this.cancelSelectionMap();
+            this.makeSelection(entity);
         } else {
-            entity.visibleState = VisibleState.selected; //selection of the entity
-            this.sideMenuSelectedEntity = entity;
-            this.cancelSelectionMap();
+            this.makeSelection(entity);
         }
     }
 }

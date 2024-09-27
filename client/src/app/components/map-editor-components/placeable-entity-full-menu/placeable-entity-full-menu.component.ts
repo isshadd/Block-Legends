@@ -10,6 +10,7 @@ import { Elytra } from '@app/classes/Items/elytra';
 import { EnchantedBook } from '@app/classes/Items/enchanted-book';
 import { Flag } from '@app/classes/Items/flag';
 import { Potion } from '@app/classes/Items/potion';
+import { Spawn } from '@app/classes/Items/spawn';
 import { Totem } from '@app/classes/Items/totem';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
@@ -29,7 +30,7 @@ export class PlaceableEntityFullMenuComponent {
         },
         {
             title: 'Objets',
-            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Flag()],
+            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Flag(), new Spawn()],
         },
     ];
 }

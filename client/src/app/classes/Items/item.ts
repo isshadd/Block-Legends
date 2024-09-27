@@ -13,5 +13,6 @@ export class Item implements PlaceableEntity {
     coordinates: Vec2 = { x: -1, y: -1 };
     visibleState: VisibleState = VisibleState.notSelected;
     isPlaced: boolean = false;
+    itemLimit: number = 1;
     testItem: string = 'test'; //TODO: remove this
 }

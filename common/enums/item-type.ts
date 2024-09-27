@@ -6,4 +6,5 @@ export enum ItemType {
     Potion = 'Potion',
     Totem = 'Totem',
     Flag = 'Flag',
+    Spawn = 'Spawn',
 }
