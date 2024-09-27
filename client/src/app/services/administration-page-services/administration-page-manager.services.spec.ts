@@ -7,6 +7,7 @@ describe('AdministrationPageManagerService', () => {
     let mockGames: Game[];
     let gameToDelete: Game;
     let gameToToggle: Game;
+    const GAMESLENGTH = 4;
     beforeEach(() => {
         TestBed.configureTestingModule({});
         service = TestBed.inject(AdministrationPageManagerService);
@@ -45,7 +46,6 @@ describe('AdministrationPageManagerService', () => {
     });
 
     it('should have a list of games', () => {
-        const GAMESLENGTH = 4;
         expect(service.games.length).toBe(GAMESLENGTH);
     });
 
