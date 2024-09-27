@@ -26,7 +26,7 @@ export class TileFactoryService {
             case TileType.Door:
                 return new DoorTile();
             default:
-                return new GrassTile();
+                return new Tile();
         }
     }
 

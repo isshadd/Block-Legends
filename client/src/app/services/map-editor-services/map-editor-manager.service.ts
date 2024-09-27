@@ -55,7 +55,7 @@ export class MapEditorManagerService {
             for (let j = 0; j < this.map.size; j++) {
                 const newTile: GrassTile = new GrassTile();
                 this.grid[i].push(newTile);
-                newTile.coordinates = { x: j, y: i };
+                newTile.coordinates = { x: i, y: j };
             }
         }
     }
@@ -66,12 +66,28 @@ export class MapEditorManagerService {
             for (let j = 0; j < this.map.tiles[i].length; j++) {
                 const newTile: Tile = this.tileFactoryService.createTile(this.map.tiles[i][j].type);
                 this.grid[i].push(newTile);
-                newTile.coordinates = { x: j, y: i };
+                newTile.coordinates = { x: i, y: j };
 
                 if (this.isTerrainTile(newTile)) {
                     const itemType = this.map.tiles[i][j].item?.type;
                     if (itemType) newTile.item = this.itemFactoryService.createItem(itemType);
                 }
+            }
+        }
+    }
+
+    saveMap() {
+        this.map.tiles = [];
+        for (let i = 0; i < this.grid.length; i++) {
+            this.map.tiles.push([]);
+            for (let j = 0; j < this.grid[i].length; j++) {
+                this.map.tiles[i].push({
+                    type: this.grid[i][j].type,
+                    item:
+                        this.isTerrainTile(this.grid[i][j]) && (this.grid[i][j] as TerrainTile).item?.type !== undefined
+                            ? { type: (this.grid[i][j] as TerrainTile).item!.type }
+                            : null,
+                });
             }
         }
     }
