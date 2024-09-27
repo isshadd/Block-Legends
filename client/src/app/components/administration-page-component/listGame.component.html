@@ -5,7 +5,7 @@
         <div class="text_info">
             <h3>{{ game.name }}</h3>
             <div class="infos">
-                <p>Taille: {{ game.size }} tuiles</p>
+                <p>Taille: {{ game.size }} x {{ game.size }}</p>
                 <p>Mode: {{ game.mode }}</p>
                 <p>Dernière modification: {{ game.lastModificationDate | date: 'shortDate' }}</p>
             </div>
@@ -15,7 +15,7 @@
         </div>
         <div class="action_icons">
             <span class="material-icons" (click)="deleteGame(game)" title="Supprimer">delete</span>
-            <span class="material-icons" routerLink="/main-page" title="Éditer">edit</span>
+            <span class="material-icons" routerLink="/map-editor" title="Éditer">edit</span>
             <span class="material-icons" title="Exporter">file_download</span>
             <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
                 {{ game.isVisible ? 'visibility' : 'visibility_off' }}

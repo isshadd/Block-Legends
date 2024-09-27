@@ -6,6 +6,7 @@ import { ListGameComponent } from './listGame.component';
 describe('ListGameComponent', () => {
     let component: ListGameComponent;
     let administrationService: jasmine.SpyObj<AdministrationPageManagerService>;
+    let mockGame: Game;
 
     beforeEach(() => {
         const spy = jasmine.createSpyObj('AdministrationPageManagerService', ['deleteGame', 'toggleVisibility'], { games: [] });
@@ -19,14 +20,8 @@ describe('ListGameComponent', () => {
 
         const fixture = TestBed.createComponent(ListGameComponent);
         component = fixture.componentInstance;
-    });
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy();
-    });
-
-    it('should call deleteGame on the service when DeleteGame is called', () => {
-        const mockGame = {
+        mockGame = {
             id: 0,
             name: 'League Of Legends',
             size: 30,
@@ -34,24 +29,21 @@ describe('ListGameComponent', () => {
             imageUrl: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
             lastModificationDate: new Date('2024-10-23'),
             isVisible: true,
+            description: 'none',
         };
+    });
 
+    it('should create the component', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should call deleteGame on the service when DeleteGame is called', () => {
         component.deleteGame(mockGame);
         expect(administrationService.deleteGame).toHaveBeenCalled();
         expect(administrationService.deleteGame).toHaveBeenCalledWith(mockGame);
     });
 
     it('should call toggleVisibility on the service when ToggleVisibility is called', () => {
-        const mockGame: Game = {
-            id: 1,
-            name: 'Test Game',
-            isVisible: true,
-            size: 100,
-            mode: 'singleplayer',
-            imageUrl: 'http://example.com/image.png',
-            lastModificationDate: new Date(),
-        };
-
         component.toggleVisibility(mockGame);
         expect(administrationService.toggleVisibility).toHaveBeenCalledWith(mockGame);
     });

@@ -6,5 +6,5 @@ export interface Game {
     imageUrl: string;
     lastModificationDate: Date;
     isVisible: boolean;
-    description?: string;
+    description?: string; ////a verifier si c'est optionnel ou pas
 }
