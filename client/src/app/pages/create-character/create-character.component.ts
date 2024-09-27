@@ -8,6 +8,7 @@ import { AttributesComponent } from '@app/components/create-character/attributes
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
+import { GameService } from '@app/services/game-services/game.service';
 
 @Component({
     selector: 'app-create-character',
@@ -23,7 +24,10 @@ export class CreateCharacterComponent {
 
     characterStatus: string | null;
 
-    constructor(private router: Router) {}
+    constructor(
+        private router: Router,
+        private gameService: GameService,
+    ) {}
 
     createCharacter() {
         const missingFields: string[] = [];
@@ -52,6 +56,7 @@ export class CreateCharacterComponent {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
         } else {
             this.character.setOrganizer();
+            this.gameService.setCharacter(this.character);
             this.router.navigate(['/waiting-view']);
         }
     }
