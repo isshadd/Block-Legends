@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { Game } from '@common/game.interface';
 
 @Component({
@@ -12,49 +14,25 @@ import { Game } from '@common/game.interface';
     styleUrl: './game-list.component.scss',
 })
 export class GameListComponent implements OnInit {
-    games: Game[] = [
-        {
-            name: 'League Of Legends',
-            size: 30,
-            mode: 'Capture de drapeau',
-            imageUrl: 'https://i.pinimg.com/originals/e6/3a/b7/e63ab723f3bd980125e1e5ab7d8c5081.png',
-            lastModificationDate: new Date('2024-10-23'),
-            isVisible: true,
-        },
-        {
-            name: 'Minecraft',
-            size: 38,
-            mode: 'Combat classique',
-            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            lastModificationDate: new Date('2020-01-03'),
-            isVisible: true,
-        },
-        {
-            name: 'Penguin Diner',
-            size: 25,
-            mode: 'Combat classique',
-            imageUrl: 'https://tcf.admeen.org/game/4500/4373/400x246/penguin-diner.jpg',
-            lastModificationDate: new Date('2005-12-12'),
-            isVisible: true,
-        },
-        {
-            name: 'Super Mario',
-            size: 36,
-            mode: 'Capture de drapeau',
-            imageUrl: 'https://image.uniqlo.com/UQ/ST3/eu/imagesother/2020/ut/gaming/pc-ut-hero-mario-35.jpg',
-            lastModificationDate: new Date('2010-06-01'),
-            isVisible: true,
-        },
-    ];
-
     selectedGame: Game | null;
     gameStatus: string | null;
     selectedMode: string | null = 'Combat classique';
+    games: Game[] = [];
 
     constructor(
         private modeService: ModeService,
         private router: Router,
-    ) {}
+        private administrationService: AdministrationPageManagerService,
+        private gameServerCommunicationService: GameServerCommunicationService,
+    ) {
+        this.gameServerCommunicationService.getGames().subscribe((games: Game[]) => {
+            this.games = games;
+        });
+    }
+
+    getGames(): Game[] {
+        return this.administrationService.games;
+    }
 
     ngOnInit(): void {
         this.modeService.selectedMode$.subscribe((mode) => {
