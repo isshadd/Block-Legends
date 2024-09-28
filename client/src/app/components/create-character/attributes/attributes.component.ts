@@ -16,8 +16,8 @@ export class AttributesComponent {
 
     characterStatus: string | null;
 
-    selectedAttackDice: string = 'dice6'
-    selectedDefenseDice: string = 'dice4'
+    selectedAttackDice: string = 'dice6';
+    selectedDefenseDice: string = 'dice4';
 
     assignAttackDice(event: Event): void {
         const target = event.target as HTMLSelectElement;

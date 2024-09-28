@@ -36,6 +36,10 @@ describe('ListGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should get the games from the service', () => {
+        expect(component.getGames()).toEqual(administrationService.games);
+    });
+
     it('should call deleteGame on the service when DeleteGame is called', () => {
         component.deleteGame(mockGame);
         expect(administrationService.deleteGame).toHaveBeenCalled();
