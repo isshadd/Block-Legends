@@ -10,6 +10,7 @@ export class PlayerCharacter {
     isDefenseBonusAssigned: boolean = true;
     isOrganizer: boolean = false;
     dice: string;
+    isNameValid: boolean = false;
     constructor(
         public name: string,
         public avatar: string,

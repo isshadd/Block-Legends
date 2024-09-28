@@ -50,10 +50,10 @@ export class CreateCharacterComponent {
                     break;
             }
         });
-
-        // If there are any missing fields, display the error message
         if (missingFields.length > 0) {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
+        } else if (!this.character.isNameValid) {
+            this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
             this.character.name += ' ♔';
             this.character.setOrganizer();
