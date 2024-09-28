@@ -20,6 +20,7 @@ describe('GameListComponent', () => {
         mockModeService = jasmine.createSpyObj('ModeService', ['selectedMode$']);
         mockModeService.selectedMode$ = of('Combat classique');
         game = {
+            id: 0,
             name: 'JeuTest',
             size: GAME_SIZE,
             mode: 'Combat classique',
