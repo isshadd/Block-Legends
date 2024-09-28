@@ -39,6 +39,7 @@ export class ItemFactoryService {
     copyItem(item: Item): Item {
         const newItem = this.createItem(item.type);
         newItem.coordinates = { x: item.coordinates.x, y: item.coordinates.y };
+        newItem.itemLimit = item.itemLimit;
         return newItem;
     }
 }

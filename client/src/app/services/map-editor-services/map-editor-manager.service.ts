@@ -156,7 +156,7 @@ export class MapEditorManagerService {
             console.log('Item added');
             item.itemLimit--;
             console.log(item);
-            selectedTile.item = this.sideMenuSelectedEntity as Item;
+            selectedTile.item = item;
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
             if (item.itemLimit === 0 && this.sideMenuSelectedEntity) {
                 console.log('Item limit reached');
@@ -168,27 +168,26 @@ export class MapEditorManagerService {
 
     itemRemover(selectedTile: Tile) {
         if (!this.isTerrainTile(selectedTile) || !selectedTile.item) return;
-        selectedTile.item.itemLimit++;
         console.log(selectedTile.item);
         console.log('Item limit increased');
-        console.log(selectedTile.item.visibleState);
         selectedTile.item.visibleState = VisibleState.notSelected;
+        selectedTile.item.itemLimit++;
         console.log(selectedTile.item);
-        console.log(selectedTile.item.visibleState);
         selectedTile.item = null;
     }
+
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
+        if (!this.sideMenuSelectedEntity) return;
         if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) {
             console.log('Same type');
             return;
         }
-        if (!this.sideMenuSelectedEntity) return;
         if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
         } else if (!this.isItem(this.sideMenuSelectedEntity)) {
-            this.itemRemover(entity);
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
+            // this.itemRemover(entity); //TODOis it necessary?
         }
     }
 
@@ -197,10 +196,8 @@ export class MapEditorManagerService {
         event.preventDefault();
         if (entity instanceof GrassTile && !entity.item) return;
         if ((entity as TerrainTile)?.item) {
-            console.log('It has an item and its deleted');
             this.itemRemover(entity);
         } else if (!this.isTerrainTile(entity) || (this.isTerrainTile(entity) && !entity.item)) {
-            console.log('No item and grass created');
             this.tileCopyCreator(new GrassTile(), entity);
         }
     }
@@ -210,21 +207,22 @@ export class MapEditorManagerService {
         if (event.button === 0) {
             this.leftClickMapTile(entity);
         } else if (event.button === 2) {
-            this.isDraggingRight = true;
             this.rightClickMapTile(event, entity);
         }
     }
     onMouseMoveMapTile(entity: Tile) {
-        if (this.isDraggingLeft) {
-            if (this.sideMenuSelectedEntity && this.isDraggingLeft) {
-                this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
-            }
-        } else if (this.isDraggingRight) {
-            if (this.isDraggingRight && !(entity instanceof GrassTile)) {
-                this.tileCopyCreator(new GrassTile(), entity);
-            }
+        if (this.sideMenuSelectedEntity && this.isDraggingLeft) {
+            this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
+        }
+        if (this.isDraggingRight) {
             if (this.isTerrainTile(entity)) {
+                // if (entity.item) {
+                //     entity.item.itemLimit--;
+                // }
                 this.itemRemover(entity);
+            }
+            if (!(entity instanceof GrassTile)) {
+                this.tileCopyCreator(new GrassTile(), entity);
             }
         }
     }
@@ -240,11 +238,8 @@ export class MapEditorManagerService {
             entity.visibleState = VisibleState.notSelected;
             this.sideMenuSelectedEntity = null;
             this.cancelSelectionMap();
-        } else if (entity.visibleState === VisibleState.disabled) {
-            //item limit reached
-            console.log('Item limit reached and disabled');
-            return;
-        } else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
+        } else if (entity.visibleState === VisibleState.disabled) return; //item limit reached
+        else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             //another entity selected
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
             this.makeSelection(entity);
