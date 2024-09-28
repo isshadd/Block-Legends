@@ -14,7 +14,6 @@ import { Game } from '@common/game.interface';
 export class GameListComponent implements OnInit {
     games: Game[] = [
         {
-            id: 0,
             name: 'League Of Legends',
             size: 30,
             mode: 'Capture de drapeau',
@@ -23,7 +22,6 @@ export class GameListComponent implements OnInit {
             isVisible: true,
         },
         {
-            id: 1,
             name: 'Minecraft',
             size: 38,
             mode: 'Combat classique',
@@ -32,7 +30,6 @@ export class GameListComponent implements OnInit {
             isVisible: true,
         },
         {
-            id: 2,
             name: 'Penguin Diner',
             size: 25,
             mode: 'Combat classique',
@@ -41,7 +38,6 @@ export class GameListComponent implements OnInit {
             isVisible: true,
         },
         {
-            id: 3,
             name: 'Super Mario',
             size: 36,
             mode: 'Capture de drapeau',
