@@ -5,8 +5,12 @@
     flex-direction: column;
     background-color: $primary-dark;
     color: $primary-light;
-
     padding: 10px;
+
+    #modal-title {
+        align-self: center;
+        font-size: 150%;
+    }
 
     form {
         margin-top: 20px;

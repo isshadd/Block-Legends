@@ -21,8 +21,8 @@ export class MapEditorModalComponent {
         @Inject(MAT_DIALOG_DATA) public data: MapShared,
     ) {
         this.infoForm = this.formBuilder.group({
-            name: ['', Validators.required],
-            description: ['', Validators.required],
+            name: [data.name, Validators.required],
+            description: [data.description, Validators.required],
         });
     }
 
