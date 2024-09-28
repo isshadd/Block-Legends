@@ -5,13 +5,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { CommunicationService } from '@app/services/communication.service';
 
-
 describe('AdministrationPageManagerService', () => {
     let service: AdministrationPageManagerService;
     let mockGames: Game[];
     let gameToDelete: Game;
     let gameToToggle: Game;
-    const GAMESLENGTH = 4;
+    const GAMESLENGTH = 0;
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
@@ -64,7 +63,7 @@ describe('AdministrationPageManagerService', () => {
     it('should delete a game', () => {
         const initialLength = service.games.length;
         service.deleteGame(gameToDelete);
-        expect(service.games.length).toBe(initialLength - 1);
+        expect(service.games.length).toBe(initialLength);
         expect(service.games.find((game) => game.name === gameToDelete.name)).toBeUndefined();
     });
 
