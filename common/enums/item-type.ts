@@ -1,5 +1,5 @@
 export enum ItemType {
-    Chestplate = 'Shield',
+    Chestplate = 'Chestplate',
     Sword = 'Sword',
     Elytra = 'Elytra',
     EnchantedBook = 'EnchantedBook',

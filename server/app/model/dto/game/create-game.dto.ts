@@ -3,7 +3,7 @@ import { MapSize } from '@common/enums/map-size';
 import { CreateGameSharedDto } from '@common/interfaces/dto/game/create-game-shared.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsBoolean, IsDate, IsIn, IsInt, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsBoolean, IsIn, IsInt, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { CreateTileDto } from './create-tile.dto';
 import { MAP_CONSTANTS } from './game.dto.constants';
 
@@ -31,10 +31,6 @@ export class CreateGameDto implements CreateGameSharedDto {
     @ApiProperty({})
     @IsString()
     imageUrl: string;
-
-    @ApiProperty({})
-    @IsDate()
-    lastModificationDate: Date;
 
     @ApiProperty({})
     @IsBoolean()
