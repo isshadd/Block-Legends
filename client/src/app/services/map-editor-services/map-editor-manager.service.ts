@@ -4,7 +4,9 @@ import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
-import { MapShared } from '@common/interfaces/map-shared';
+import { GameMode } from '@common/enums/game-mode';
+import { MapSize } from '@common/enums/map-size';
+import { GameShared } from '@common/interfaces/game-shared';
 import { ItemFactoryService } from '../game-board-services/item-factory.service';
 import { TileFactoryService } from '../game-board-services/tile-factory.service';
 
@@ -19,10 +21,14 @@ export class MapEditorManagerService {
         this.createNewGrid();
     }
 
-    map: MapShared = {
+    game: GameShared = {
         name: '',
         description: '',
-        size: 20,
+        size: MapSize.SMALL,
+        mode: GameMode.CTF,
+        imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
+        lastModificationDate: new Date(),
+        isVisible: false,
         tiles: [],
     };
 
@@ -32,32 +38,36 @@ export class MapEditorManagerService {
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
 
-    newMap(size: number) {
-        this.map = {
+    newGame(size: MapSize, mode: GameMode) {
+        this.game = {
             name: '',
             description: '',
             size: size,
+            mode: mode,
+            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
+            lastModificationDate: new Date(),
+            isVisible: false,
             tiles: [],
         };
         this.createNewGrid();
     }
 
-    loadMap(map: MapShared) {
-        this.map = map;
+    loadGame(game: GameShared) {
+        this.game = game;
         this.loadGrid();
     }
 
     createNewGrid() {
         this.grid = [];
-        this.map.tiles = [];
+        this.game.tiles = [];
 
-        for (let i = 0; i < this.map.size; i++) {
+        for (let i = 0; i < this.game.size; i++) {
             this.grid.push([]);
-            this.map.tiles.push([]);
-            for (let j = 0; j < this.map.size; j++) {
+            this.game.tiles.push([]);
+            for (let j = 0; j < this.game.size; j++) {
                 const newTile: GrassTile = new GrassTile();
                 this.grid[i].push(newTile);
-                this.map.tiles[i].push({ type: newTile.type });
+                this.game.tiles[i].push({ type: newTile.type });
                 newTile.coordinates = { x: i, y: j };
             }
         }
@@ -65,15 +75,15 @@ export class MapEditorManagerService {
 
     loadGrid() {
         this.grid = [];
-        for (let i = 0; i < this.map.tiles.length; i++) {
+        for (let i = 0; i < this.game.tiles.length; i++) {
             this.grid.push([]);
-            for (let j = 0; j < this.map.tiles[i].length; j++) {
-                const newTile: Tile = this.tileFactoryService.createTile(this.map.tiles[i][j].type);
+            for (let j = 0; j < this.game.tiles[i].length; j++) {
+                const newTile: Tile = this.tileFactoryService.createTile(this.game.tiles[i][j].type);
                 this.grid[i].push(newTile);
                 newTile.coordinates = { x: i, y: j };
 
                 if (this.isTerrainTile(newTile)) {
-                    const itemType = this.map.tiles[i][j].item?.type;
+                    const itemType = this.game.tiles[i][j].item?.type;
                     if (itemType) newTile.item = this.itemFactoryService.createItem(itemType);
                 }
             }
@@ -81,11 +91,11 @@ export class MapEditorManagerService {
     }
 
     saveMap() {
-        this.map.tiles = [];
+        this.game.tiles = [];
         for (let i = 0; i < this.grid.length; i++) {
-            this.map.tiles.push([]);
+            this.game.tiles.push([]);
             for (let j = 0; j < this.grid[i].length; j++) {
-                this.map.tiles[i].push({
+                this.game.tiles[i].push({
                     type: this.grid[i][j].type,
                     item:
                         this.isTerrainTile(this.grid[i][j]) && (this.grid[i][j] as TerrainTile).item?.type !== undefined
@@ -96,7 +106,7 @@ export class MapEditorManagerService {
         }
     }
 
-    resetMap() {
+    resetGame() {
         this.loadGrid();
     }
 

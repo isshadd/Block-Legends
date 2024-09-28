@@ -1,49 +1,48 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Game } from '@common/game.interface';
-import { CommunicationService } from '@app/services/communication.service';
-import { Observable } from 'rxjs';
+import { CreateGameSharedDto } from '@common/interfaces/dto/game/create-game-shared.dto';
+import { UpdateGameSharedDto } from '@common/interfaces/dto/game/update-game-shared.dto';
+import { GameShared } from '@common/interfaces/game-shared';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { HttpClient, HttpResponse, HttpStatusCode } from '@angular/common/http';
-import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameServerCommunicationService {
-    private readonly baseUrl: string = environment.serverUrl;
+    private readonly baseUrl: string = `${environment.serverUrl}/game`;
 
-    constructor(
-        private communicationService: CommunicationService,
-        private readonly http: HttpClient,
-    ) {}
+    constructor(private readonly http: HttpClient) {}
 
-    dataDelete(): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game-admin/`, { observe: 'response', responseType: 'text' }).pipe(
-            tap((response) => {
-                if (response.status === HttpStatusCode.Ok) {
-                    // Send a message to the server
-                    this.communicationService
-                        .basicPost({ title: 'Operation Successful', body: 'The database has been emptied successfully.' })
-                        .subscribe();
-                }
-            }),
-        );
+    getGames(): Observable<GameShared[]> {
+        return this.http.get<GameShared[]>(`${this.baseUrl}/`).pipe(catchError(this.handleError<GameShared[]>('getAllGames', [])));
     }
 
-    deleteOneGame(gameName: string): Observable<HttpResponse<string>> {
-        return this.http.delete(`${this.baseUrl}/game-admin/${gameName}`, { observe: 'response', responseType: 'text' }).pipe(
-            tap((response) => {
-                if (response.status === HttpStatusCode.Ok) {
-                    // Send a message to the server
-                    this.communicationService
-                        .basicPost({ title: 'Operation Successful', body: `The game ${gameName} has been deleted successfully.` })
-                        .subscribe();
-                }
-            }),
-        );
+    getGame(id: string): Observable<GameShared> {
+        return this.http.get<GameShared>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<GameShared>(`getGame id=${id}`)));
     }
 
-    getGames(): Observable<Game[]> {
-        return this.http.get<Game[]>(`${this.baseUrl}/game-admin/`).pipe(catchError(this.communicationService.handleError<Game[]>('getGames', [])));
+    addGame(game: CreateGameSharedDto): Observable<GameShared> {
+        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleError<GameShared>('addGame')));
+    }
+
+    updateGame(id: string, game: UpdateGameSharedDto): Observable<void> {
+        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleError<void>('updateGame')));
+    }
+
+    deleteGame(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
+    }
+
+    emptyDatabase(): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/`).pipe(catchError(this.handleError<void>('emptyDatabase')));
+    }
+
+    private handleError<T>(operation = 'operation', result?: T) {
+        return (error: any): Observable<T> => {
+            console.error(`${operation} failed: ${error.message}`);
+            return of(result as T);
+        };
     }
 }

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
-import { Game } from '@common/game.interface';
+import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
     selector: 'app-list-game',
@@ -14,15 +14,18 @@ import { Game } from '@common/game.interface';
 export class ListGameComponent {
     constructor(private administrationService: AdministrationPageManagerService) {}
 
-    getGames(): Game[] {
+    getGames(): GameShared[] {
         return this.administrationService.games;
     }
 
-    deleteGame(game: Game): void {
-        this.administrationService.deleteGame(game);
+    deleteGame(id: string | null | undefined): void {
+        if (!id || id === undefined) {
+            return;
+        }
+        this.administrationService.deleteGame(id);
     }
 
-    toggleVisibility(game: Game): void {
+    toggleVisibility(game: GameShared): void {
         this.administrationService.toggleVisibility(game);
     }
 }

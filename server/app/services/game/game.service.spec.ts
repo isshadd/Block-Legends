@@ -3,10 +3,10 @@ import { Logger } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-import { GameAdminService } from './game-admin.service';
+import { GameService } from './game.service';
 
 describe('GameAdminService', () => {
-    let service: GameAdminService;
+    let service: GameService;
     let gameModel: Model<GameDocument>;
 
     beforeEach(async () => {
@@ -23,7 +23,7 @@ describe('GameAdminService', () => {
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                GameAdminService,
+                GameService,
                 Logger,
                 {
                     provide: getModelToken(Game.name),
@@ -32,7 +32,7 @@ describe('GameAdminService', () => {
             ],
         }).compile();
 
-        service = module.get<GameAdminService>(GameAdminService);
+        service = module.get<GameService>(GameService);
     });
 
     it('should be defined', () => {

@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
-import { Game } from '@common/game.interface';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { GameShared } from '@common/interfaces/game-shared';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AdministrationPageManagerService {
-    games: Game[] = [];
+    games: GameShared[] = [];
 
     constructor(private gameServerCommunicationService: GameServerCommunicationService) {
-        this.gameServerCommunicationService.getGames().subscribe((games: Game[]) => {
+        this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
             this.games = games;
         });
     }
 
-    deleteGame(game: Game): void {
-        this.gameServerCommunicationService.deleteOneGame(game.name).subscribe();
-        this.games = this.games.filter((elem) => elem.name !== game.name);
+    deleteGame(id: string): void {
+        this.gameServerCommunicationService.deleteGame(id).subscribe();
+        this.games = this.games.filter((elem) => elem._id !== id);
     }
 
-    toggleVisibility(game: Game): void {
+    toggleVisibility(game: GameShared): void {
         game.isVisible = !game.isVisible;
     }
 }

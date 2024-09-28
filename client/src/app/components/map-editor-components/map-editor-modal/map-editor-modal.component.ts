@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MapShared } from '@common/interfaces/map-shared';
+import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
     selector: 'app-map-editor-modal',
@@ -20,7 +20,7 @@ export class MapEditorModalComponent {
     constructor(
         public dialogRef: MatDialogRef<MapEditorModalComponent>,
         private formBuilder: FormBuilder,
-        @Inject(MAT_DIALOG_DATA) public data: MapShared,
+        @Inject(MAT_DIALOG_DATA) public data: GameShared,
     ) {
         this.infoForm = this.formBuilder.group({
             name: [data.name, [Validators.required, Validators.maxLength(this.NAME_MAX_LENGTH)]],

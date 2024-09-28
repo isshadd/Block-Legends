@@ -1,4 +1,4 @@
-import { TileType } from '@common/enums/tile-type';
+import { TileType } from '../../../enums/tile-type';
 import { CreateItemSharedDto } from './item-shared.dto';
 
 export class CreateTileSharedDto {

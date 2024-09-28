@@ -1,25 +1,25 @@
+import { GameService } from '@app/services/game/game.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameAdminController } from './game-admin.controller';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { GameAdminService } from '@app/services/game-admin/game-admin.service';
+import { GameController } from './game.controller';
 
 describe('GameAdminController', () => {
-    let controller: GameAdminController;
-    let gameAdminService: SinonStubbedInstance<GameAdminService>;
+    let controller: GameController;
+    let gameAdminService: SinonStubbedInstance<GameService>;
 
     beforeEach(async () => {
-        gameAdminService = createStubInstance(GameAdminService);
+        gameAdminService = createStubInstance(GameService);
         const module: TestingModule = await Test.createTestingModule({
-            controllers: [GameAdminController],
+            controllers: [GameController],
             providers: [
                 {
-                    provide: GameAdminService,
+                    provide: GameService,
                     useValue: gameAdminService,
                 },
             ],
         }).compile();
 
-        controller = module.get<GameAdminController>(GameAdminController);
+        controller = module.get<GameController>(GameController);
     });
 
     it('should be defined', () => {

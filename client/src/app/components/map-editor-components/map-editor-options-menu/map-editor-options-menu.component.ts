@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-import { MapShared } from '@common/interfaces/map-shared';
+import { GameShared } from '@common/interfaces/game-shared';
 import { MapEditorModalComponent } from '../map-editor-modal/map-editor-modal.component';
 
 @Component({
@@ -21,19 +21,19 @@ export class MapEditorOptionsMenuComponent {
     onOptionsClick() {
         const dialogRef = this.modal.open(MapEditorModalComponent, {
             width: '400px',
-            data: this.mapEditorManagerService.map,
+            data: this.mapEditorManagerService.game,
         });
 
-        dialogRef.afterClosed().subscribe((result: MapShared) => {
+        dialogRef.afterClosed().subscribe((result: GameShared) => {
             if (result) {
-                this.mapEditorManagerService.map.name = result.name;
-                this.mapEditorManagerService.map.description = result.description;
+                this.mapEditorManagerService.game.name = result.name;
+                this.mapEditorManagerService.game.description = result.description;
             }
         });
     }
 
     onResetClick() {
-        this.mapEditorManagerService.resetMap();
+        this.mapEditorManagerService.resetGame();
     }
 
     onSaveClick() {
