@@ -21,8 +21,10 @@
                 <button mat-button (click)="onCreateClick()">Créer</button>
             </div>
         </div>
-        <span *ngIf="errorMessage" class="error-message">
+        @if(errorMessage){
+        <span class="error-message">
             {{ errorMessage }}
         </span>
+        }
     </body>
 </html>

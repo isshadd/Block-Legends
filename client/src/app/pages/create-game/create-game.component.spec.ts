@@ -40,7 +40,6 @@ describe('CreateGameComponent', () => {
 
     it('should contain a game list', () => {
         const game: Game = {
-            id: 0,
             name: 'JeuTest',
             size: GAME_SIZE,
             mode: 'Combat classique',
