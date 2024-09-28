@@ -8,7 +8,6 @@ export class CreateGameSharedDto {
     size: MapSize;
     mode: GameMode;
     imageUrl: string;
-    lastModificationDate: Date;
     isVisible: boolean;
     tiles: TileShared[][];
 }

@@ -8,7 +8,7 @@ import { Tile } from '../schema/tile.schema';
 
 export type GameDocument = Game & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Game implements GameShared {
     @ApiProperty()
     _id?: string;
@@ -32,10 +32,6 @@ export class Game implements GameShared {
     @ApiProperty()
     @Prop({ required: true })
     imageUrl: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    lastModificationDate: Date;
 
     @ApiProperty()
     @Prop({ required: true })

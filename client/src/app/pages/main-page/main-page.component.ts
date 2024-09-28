@@ -69,7 +69,6 @@ export class MainPageComponent {
             size: MapSize.SMALL,
             mode: GameMode.CTF,
             imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            lastModificationDate: new Date(),
             isVisible: false,
             tiles: [
                 [

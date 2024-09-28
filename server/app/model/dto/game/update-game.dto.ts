@@ -1,7 +1,7 @@
 import { UpdateGameSharedDto } from '@common/interfaces/dto/game/update-game-shared.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayNotEmpty, IsArray, IsBoolean, IsDate, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsBoolean, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { CreateTileDto } from './create-tile.dto';
 import { MAP_CONSTANTS } from './game.dto.constants';
 
@@ -22,10 +22,6 @@ export class UpdateGameDto implements UpdateGameSharedDto {
     @IsOptional()
     @IsString()
     imageUrl?: string;
-
-    @ApiProperty({})
-    @IsDate()
-    lastModificationDate: Date;
 
     @ApiProperty({ required: false })
     @IsOptional()

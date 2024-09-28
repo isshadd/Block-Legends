@@ -4,12 +4,13 @@ import { TileShared } from './tile-shared';
 
 export interface GameShared {
     _id?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
     name: string;
     description: string;
     size: MapSize;
     mode: GameMode;
     imageUrl: string;
-    lastModificationDate: Date;
     isVisible: boolean;
     tiles: TileShared[][];
 }

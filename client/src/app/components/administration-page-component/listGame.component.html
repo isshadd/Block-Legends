@@ -7,7 +7,7 @@
             <div class="infos">
                 <p>Taille: {{ game.size }} x {{ game.size }}</p>
                 <p>Mode: {{ game.mode }}</p>
-                <p>Dernière modification: {{ game.lastModificationDate | date: 'shortDate' }}</p>
+                <p>Dernière modification: {{ game.updatedAt | date: 'shortDate' }}</p>
             </div>
         </div>
         <div class="description">
