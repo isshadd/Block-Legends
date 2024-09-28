@@ -1,5 +1,5 @@
 export const MAP_CONSTANTS = {
-    NAME_MAX_LENGTH: 100,
+    NAME_MAX_LENGTH: 50,
     DESCRIPTION_MAX_LENGTH: 255,
     ALLOWED_SIZES: [10, 15, 20] as const,
 };

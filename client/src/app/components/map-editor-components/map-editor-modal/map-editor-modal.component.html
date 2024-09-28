@@ -7,6 +7,8 @@
                 <input matInput formControlName="name" required />
                 @if (infoForm.get('name')?.hasError('required')) {
                 <mat-error> Nom de jeu est requis</mat-error>
+                } @if (infoForm.get('name')?.hasError('maxlength')) {
+                <mat-error> Nom de jeu ne doit pas dépasser {{ NAME_MAX_LENGTH }} caractères</mat-error>
                 }
             </mat-form-field>
 
@@ -15,6 +17,8 @@
                 <textarea matInput formControlName="description" required></textarea>
                 @if (infoForm.get('description')?.hasError('required')) {
                 <mat-error> Description du jeu est requise</mat-error>
+                } @if (infoForm.get('description')?.hasError('maxlength')) {
+                <mat-error> Nom de jeu ne doit pas dépasser {{ DESCRIPTION_MAX_LENGTH }} caractères</mat-error>
                 }
             </mat-form-field>
         </form>

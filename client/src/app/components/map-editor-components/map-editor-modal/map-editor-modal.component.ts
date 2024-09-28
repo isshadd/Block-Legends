@@ -14,6 +14,8 @@ import { MapShared } from '@common/interfaces/map-shared';
 })
 export class MapEditorModalComponent {
     infoForm: FormGroup;
+    readonly NAME_MAX_LENGTH: number = 50;
+    readonly DESCRIPTION_MAX_LENGTH: number = 255;
 
     constructor(
         public dialogRef: MatDialogRef<MapEditorModalComponent>,
@@ -21,8 +23,8 @@ export class MapEditorModalComponent {
         @Inject(MAT_DIALOG_DATA) public data: MapShared,
     ) {
         this.infoForm = this.formBuilder.group({
-            name: [data.name, Validators.required],
-            description: [data.description, Validators.required],
+            name: [data.name, [Validators.required, Validators.maxLength(this.NAME_MAX_LENGTH)]],
+            description: [data.description, [Validators.required, Validators.maxLength(this.DESCRIPTION_MAX_LENGTH)]],
         });
     }
 

@@ -6,6 +6,7 @@
     background-color: $primary-dark;
     color: $primary-light;
     padding: 10px;
+    height: auto;
 
     #modal-title {
         align-self: center;
@@ -22,6 +23,7 @@
 
             mat-error {
                 color: $primary-light;
+                font-size: 50%;
             }
         }
     }
@@ -30,5 +32,9 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+    }
+
+    .dark-button:disabled {
+        background-color: darken($primary-light, 50%);
     }
 }
