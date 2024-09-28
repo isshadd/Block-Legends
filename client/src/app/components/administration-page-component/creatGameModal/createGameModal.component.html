@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Create Game Modal</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <div class="navbar-title">Création d'une nouvelle partie:</div>
+        <app-nav-bar></app-nav-bar>
+        <div class="selection">
+            <div class="size_selection">
+                <h4>Sélectionnez une taille</h4>
+                <label><input type="radio" name="taille" value="petit" (click)="selectSize('Petit')" /> Petit : 10 x 10</label>
+                <label><input type="radio" name="taille" value="moyen" (click)="selectSize('Moyen')" /> Moyen: 15 x 15</label>
+                <label><input type="radio" name="taille" value="grand" (click)="selectSize('Grand')" /> Grand: 20 x 20</label>
+            </div>
+            <div class="buttons">
+                <button mat-button (click)="onNoClick()">Annuler</button>
+                <button mat-button (click)="onCreateClick()">Créer</button>
+            </div>
+        </div>
+        @if(errorMessage){
+        <span class="error-message">
+            {{ errorMessage }}
+        </span>
+        }
+    </body>
+</html>

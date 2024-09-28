@@ -4,7 +4,7 @@
         <app-list-game></app-list-game>
     </ul>
     <div class="button_container">
-        <a routerLink="/main-page"><button id="btnImport">Importer</button></a>
-        <a routerLink="/create-game"><button id="btnCreat">Créer un jeu</button></a>
+        <button id="btnImport">Importer</button>
+        <button id="btnCreat" (click)="openCreateGameModal()">Créer un jeu</button>
     </div>
 </div>
