@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Game } from '@common/game.interface';
 import { AdministrationPageManagerService } from './administration-page-manager.services';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { CommunicationService } from '@app/services/communication.service';
 
@@ -13,7 +13,7 @@ describe('AdministrationPageManagerService', () => {
     const GAMESLENGTH = 0;
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [],
+            imports: [HttpClientTestingModule],
             providers: [AdministrationPageManagerService, GameServerCommunicationService, CommunicationService],
         });
         service = TestBed.inject(AdministrationPageManagerService);
