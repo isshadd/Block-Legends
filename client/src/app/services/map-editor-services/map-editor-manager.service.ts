@@ -51,6 +51,23 @@ export class MapEditorManagerService {
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
 
+    sideMenuTileFinder(tile: Tile) {
+        for (const searchedTile of this.placeableEntitiesSections[0].entities) {
+            if ((searchedTile as Tile).type === tile.type) {
+                return searchedTile;
+            }
+        }
+        return null;
+    }
+
+    sideMenuItemFinder(item: Item) {
+        for (const searchedItem of this.placeableEntitiesSections[1].entities) {
+            if ((searchedItem as Item).type === item.type) {
+                return searchedItem;
+            }
+        }
+        return null;
+    }
     cancelSelectionSideMenu() {
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
@@ -68,6 +85,7 @@ export class MapEditorManagerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.selected; //selection of the entity
         this.sideMenuSelectedEntity = entity;
+        console.log(this.sideMenuSelectedEntity?.description, 'selected');
         this.cancelSelectionMap();
     }
 
@@ -99,8 +117,10 @@ export class MapEditorManagerService {
             this.itemRemover(selectedTile);
         }
         if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
+            console.log(item.description, 'limit is', item.itemLimit);
             item.itemLimit--;
             selectedTile.item = this.itemFactoryService.copyItem(item);
+            console.log(selectedTile.item?.description, 'placed');
             if (item.itemLimit === 0) {
                 this.sideMenuSelectedEntity.visibleState = VisibleState.disabled;
             }
@@ -110,8 +130,13 @@ export class MapEditorManagerService {
 
     itemRemover(selectedTile: Tile) {
         if (!this.gameMapDataManagerService.isTerrainTile(selectedTile) || !selectedTile.item) return;
-        selectedTile.item.itemLimit++;
-        selectedTile.item.visibleState = VisibleState.notSelected;
+        const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
+        if (foundItem) {
+            foundItem.itemLimit++;
+            if (foundItem.visibleState === VisibleState.disabled) {
+                foundItem.visibleState = VisibleState.notSelected;
+            }
+        }
         selectedTile.item = null;
     }
 

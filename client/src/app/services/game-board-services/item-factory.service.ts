@@ -6,6 +6,7 @@ import { EnchantedBook } from '@app/classes/Items/enchanted-book';
 import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
 import { Potion } from '@app/classes/Items/potion';
+import { Spawn } from '@app/classes/Items/spawn';
 import { Totem } from '@app/classes/Items/totem';
 import { ItemType } from '@common/enums/item-type';
 
@@ -31,6 +32,8 @@ export class ItemFactoryService {
                 return new Chestplate();
             case ItemType.Flag:
                 return new Flag();
+            case ItemType.Spawn:
+                return new Spawn();
             default:
                 return new Item();
         }
@@ -38,6 +41,7 @@ export class ItemFactoryService {
 
     copyItem(item: Item): Item {
         const newItem = this.createItem(item.type);
+        console.log('newItem', newItem.description);
         newItem.coordinates = { x: item.coordinates.x, y: item.coordinates.y };
         newItem.itemLimit = item.itemLimit;
         return newItem;
