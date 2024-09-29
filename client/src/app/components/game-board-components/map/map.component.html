@@ -14,7 +14,7 @@
             (mouseleave)="onMouseLeave(tile)"
             (contextmenu)="onContextMenu($event)"
         ></app-placeable-entity>
-        @if (mapEditorManagerService.isTerrainTile(tile)) {
+        @if (gameMapDataManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
         }
         <app-visible-state [placeableEntity]="tile" class="layer-3"></app-visible-state>

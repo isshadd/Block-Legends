@@ -35,6 +35,17 @@ export class MapEditorManagerService {
         public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
 
+    placeableEntitiesSections: PlaceableEntitySection[] = [
+        {
+            title: 'Tuiles',
+            entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
+        },
+        {
+            title: 'Objets',
+            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Flag(), new Spawn()],
+        },
+    ];
+
     selectedEntity: PlaceableEntity | null;
     sideMenuSelectedEntity: null | PlaceableEntity;
     isDraggingLeft: boolean = false;
@@ -60,14 +71,6 @@ export class MapEditorManagerService {
         this.cancelSelectionMap();
     }
 
-    isTerrainTile(tile: Tile): tile is TerrainTile {
-        return (tile as TerrainTile).item !== undefined;
-    }
-
-    isItem(placeableEntity: PlaceableEntity): placeableEntity is Item {
-        return (placeableEntity as Item).testItem !== undefined;
-    }
-
     onMouseEnter(entity: PlaceableEntity) {
         if (entity.visibleState === VisibleState.notSelected) entity.visibleState = VisibleState.hovered;
     }
@@ -80,7 +83,11 @@ export class MapEditorManagerService {
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
-        if (this.isTerrainTile(selectedTile) && selectedTile.item && this.isTerrainTile(tileCopy)) {
+        if (
+            this.gameMapDataManagerService.isTerrainTile(selectedTile) &&
+            selectedTile.item &&
+            this.gameMapDataManagerService.isTerrainTile(tileCopy)
+        ) {
             tileCopy.item = this.itemFactoryService.copyItem(selectedTile.item);
         }
         this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
@@ -102,7 +109,7 @@ export class MapEditorManagerService {
     }
 
     itemRemover(selectedTile: Tile) {
-        if (!this.isTerrainTile(selectedTile) || !selectedTile.item) return;
+        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile) || !selectedTile.item) return;
         selectedTile.item.itemLimit++;
         selectedTile.item.visibleState = VisibleState.notSelected;
         selectedTile.item = null;
@@ -114,9 +121,9 @@ export class MapEditorManagerService {
         if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) {
             return;
         }
-        if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
+        if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
-        } else if (!this.isItem(this.sideMenuSelectedEntity)) {
+        } else if (!this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity)) {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
         }
     }
@@ -127,7 +134,7 @@ export class MapEditorManagerService {
         if (entity instanceof GrassTile && !entity.item) return;
         if ((entity as TerrainTile)?.item) {
             this.itemRemover(entity);
-        } else if (!this.isTerrainTile(entity) || (this.isTerrainTile(entity) && !entity.item)) {
+        } else if (!this.gameMapDataManagerService.isTerrainTile(entity) || (this.gameMapDataManagerService.isTerrainTile(entity) && !entity.item)) {
             this.tileCopyCreator(new GrassTile(), entity);
         }
     }
@@ -144,7 +151,7 @@ export class MapEditorManagerService {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
         }
         if (this.isDraggingRight) {
-            if (this.isTerrainTile(entity)) {
+            if (this.gameMapDataManagerService.isTerrainTile(entity)) {
                 this.itemRemover(entity);
             }
             if (!(entity instanceof GrassTile)) {
