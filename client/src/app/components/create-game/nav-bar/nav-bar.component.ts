@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ModeService } from '@app/services/game-mode-services/gameMode.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { GameMode } from '@common/enums/game-mode';
 
 @Component({
     selector: 'app-nav-bar',
@@ -10,12 +10,14 @@ import { ModeService } from '@app/services/game-mode-services/gameMode.service';
     styleUrl: './nav-bar.component.scss',
 })
 export class NavBarComponent {
-    selectedMode: string | null = 'Combat classique';
+    @Output() select = new EventEmitter<GameMode>();
 
-    constructor(private modeService: ModeService) {}
+    GameMode = GameMode;
 
-    selectMode(mode: string): void {
+    selectedMode: GameMode = GameMode.Classique;
+
+    selectMode(mode: GameMode): void {
         this.selectedMode = mode;
-        this.modeService.setSelectedMode(mode);
+        this.select.emit(this.selectedMode);
     }
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
+import { GameMode } from '@common/enums/game-mode';
 import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
@@ -15,7 +16,7 @@ export class GameListComponent implements OnInit {
     games: GameShared[] = [];
     selectedGame: GameShared | null;
     gameStatus: string | null;
-    selectedMode: string | null = 'Combat classique';
+    selectedMode: GameMode = GameMode.Classique;
 
     constructor(
         private modeService: ModeService,

@@ -18,11 +18,7 @@ export class CreateGameModalComponent {
     selectedSize: MapSize = MapSize.SMALL;
     selectedMode: GameMode = GameMode.Classique;
     errorMessage: string = '';
-    MAP_SIZES = {
-        SMALL: MapSize.SMALL,
-        MEDIUM: MapSize.MEDIUM,
-        LARGE: MapSize.LARGE,
-    };
+    MapSize = MapSize;
 
     constructor(
         public dialogRef: MatDialogRef<CreateGameModalComponent>,
@@ -47,5 +43,9 @@ export class CreateGameModalComponent {
     selectSize(size: MapSize): void {
         this.selectedSize = size;
         this.errorMessage = '';
+    }
+
+    selectMode(mode: GameMode): void {
+        this.selectedMode = mode;
     }
 }
