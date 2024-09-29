@@ -1,3 +1,5 @@
+/* eslint-disable import/no-deprecated */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
@@ -16,7 +18,7 @@ describe('CreateGameComponent', () => {
         mockNavBarComponent = jasmine.createSpyObj('NavBarComponent', ['selectMode']);
         mockGameListComponent = jasmine.createSpyObj('GameListComponent', ['selectGame']);
         await TestBed.configureTestingModule({
-            imports: [CreateGameComponent],
+            imports: [CreateGameComponent, HttpClientTestingModule],
             providers: [
                 { provide: NavBarComponent, useValue: mockNavBarComponent },
                 { provide: GameListComponent, useValue: mockGameListComponent },
