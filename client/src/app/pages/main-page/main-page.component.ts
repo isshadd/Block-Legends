@@ -2,11 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-import { GameMode } from '@common/enums/game-mode';
-import { ItemType } from '@common/enums/item-type';
-import { MapSize } from '@common/enums/map-size';
-import { TileType } from '@common/enums/tile-type';
 import { Message } from '@common/message';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -22,10 +17,7 @@ export class MainPageComponent {
     readonly title: string = 'LOG2990';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-    constructor(
-        private readonly communicationService: CommunicationService,
-        public mapEditorManagerService: MapEditorManagerService,
-    ) {}
+    constructor(private readonly communicationService: CommunicationService) {}
 
     sendTimeToServer(): void {
         const newTimeMessage: Message = {
@@ -56,47 +48,4 @@ export class MainPageComponent {
             )
             .subscribe(this.message);
     }
-
-    //**************Temp */
-    mapEditorNewMap(): void {
-        this.mapEditorManagerService.newGame(MapSize.SMALL, GameMode.CTF);
-    }
-
-    mapEditorLoadMap(): void {
-        this.mapEditorManagerService.loadGame({
-            name: 'Test load',
-            description: 'Test description',
-            size: MapSize.SMALL,
-            mode: GameMode.CTF,
-            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            isVisible: false,
-            tiles: [
-                [
-                    {
-                        type: TileType.Grass,
-                        item: {
-                            type: ItemType.Totem,
-                        },
-                    },
-                    {
-                        type: TileType.Grass,
-                        item: null,
-                    },
-                ],
-                [
-                    {
-                        type: TileType.Grass,
-                        item: {
-                            type: ItemType.Chestplate,
-                        },
-                    },
-                    {
-                        type: TileType.Water,
-                        item: null,
-                    },
-                ],
-            ],
-        });
-    }
-    //**************Temp */
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { VisibleStateComponent } from '../visible-state/visible-state.component';
 
@@ -13,7 +14,10 @@ import { VisibleStateComponent } from '../visible-state/visible-state.component'
 })
 export class MapComponent {
     // Temp for testing
-    constructor(public mapEditorManagerService: MapEditorManagerService) {}
+    constructor(
+        public mapEditorManagerService: MapEditorManagerService,
+        public gameMapDataManagerService: GameMapDataManagerService,
+    ) {}
 
     onMouseDown(event: MouseEvent, tile: Tile) {
         this.mapEditorManagerService.onMouseDownMapTile(event, tile);

@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 
@@ -23,7 +23,7 @@ export class CreateGameModalComponent {
     constructor(
         public dialogRef: MatDialogRef<CreateGameModalComponent>,
         private router: Router,
-        public mapEditorManagerService: MapEditorManagerService,
+        public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
 
     onNoClick(): void {
@@ -33,7 +33,7 @@ export class CreateGameModalComponent {
     onCreateClick(): void {
         if (this.selectedSize) {
             this.dialogRef.close();
-            this.mapEditorManagerService.newGame(this.selectedSize, this.selectedMode);
+            this.gameMapDataManagerService.newGame(this.selectedSize, this.selectedMode);
             this.router.navigate(['/map-editor']);
         } else {
             this.errorMessage = 'Vous devez sélectionner une taille avant de créer un jeu.';
