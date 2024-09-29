@@ -7,6 +7,7 @@ import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
+import { GameServerCommunicationService } from '../game-server-communication.service';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
@@ -17,6 +18,7 @@ export class GameMapDataManagerService {
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
+        public gameServerCommunicationService: GameServerCommunicationService,
     ) {
         this.createNewGrid();
     }
@@ -89,9 +91,31 @@ export class GameMapDataManagerService {
     }
 
     save() {
+        if (this.currentName === '' || this.currentDescription === '') return;
+
         this.databaseGame.name = this.currentName;
         this.databaseGame.description = this.currentDescription;
         this.saveMap();
+
+        if (this.databaseGame._id === undefined) {
+            this.createGameInDb();
+        } else {
+            this.saveGameInDb();
+        }
+    }
+
+    createGameInDb() {
+        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe((game) => {
+            this.databaseGame = game;
+            console.log(this.databaseGame);
+        });
+    }
+
+    saveGameInDb() {
+        if (this.databaseGame._id === undefined) return;
+        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe(() => {
+            console.log(this.databaseGame);
+        });
     }
 
     saveMap() {
