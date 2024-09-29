@@ -6,7 +6,8 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 const MATH_1000 = 1000;
 const MATH_9000 = 9000;
 export const VP_NUMBER = 5;
-const STORAGE_KEY = 'currentCharacter';
+const STORAGE_KEY_CHAR = 'currentCharacter';
+const STRORAGE_KEY_CODE = 'accessCode';
 
 @Injectable({
     providedIn: 'root',
@@ -25,6 +26,18 @@ export class GameService {
         this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);
     }
 
+    storeCode(): void {
+        localStorage.setItem(STRORAGE_KEY_CODE, JSON.stringify(this.accessCode));
+    }
+
+    getAccessCodeFromStorage(): number | null {
+        const storedCode = localStorage.getItem(STRORAGE_KEY_CODE);
+        if (storedCode) {
+            return JSON.parse(storedCode);
+        }
+        return null;
+    }
+
     getAccessCode(): number {
         return this.accessCode;
     }
@@ -39,7 +52,7 @@ export class GameService {
 
     setCharacter(character: PlayerCharacter) {
         this.characterSubject.next(character);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
+        localStorage.setItem(STORAGE_KEY_CHAR, JSON.stringify(character));
     }
 
     getCharacter(): PlayerCharacter {
@@ -47,7 +60,7 @@ export class GameService {
     }
 
     getStoredCharacter(): PlayerCharacter | null {
-        const storedData = localStorage.getItem(STORAGE_KEY);
+        const storedData = localStorage.getItem(STORAGE_KEY_CHAR);
         if (storedData) {
             const parsedData = JSON.parse(storedData);
             return new PlayerCharacter(
@@ -65,7 +78,8 @@ export class GameService {
     }
 
     clearLocalStorage(): void {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(STORAGE_KEY_CHAR);
+        localStorage.removeItem(STRORAGE_KEY_CODE);
         this.characterSubject.next(new PlayerCharacter('', '', new PlayerAttributes()));
     }
 }
