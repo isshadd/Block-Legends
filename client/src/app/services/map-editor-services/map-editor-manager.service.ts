@@ -1,12 +1,29 @@
 import { Injectable } from '@angular/core';
+import { Chestplate } from '@app/classes/Items/chestplate';
+import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { Elytra } from '@app/classes/Items/elytra';
+import { EnchantedBook } from '@app/classes/Items/enchanted-book';
+import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
+import { Potion } from '@app/classes/Items/potion';
+import { Spawn } from '@app/classes/Items/spawn';
+import { Totem } from '@app/classes/Items/totem';
+import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WallTile } from '@app/classes/Tiles/wall-tile';
+import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '../game-board-services/item-factory.service';
 import { TileFactoryService } from '../game-board-services/tile-factory.service';
+
+class PlaceableEntitySection {
+    title: string;
+    entities: PlaceableEntity[];
+}
 
 @Injectable({
     providedIn: 'root',
@@ -72,17 +89,12 @@ export class MapEditorManagerService {
 
     itemPlacer(item: Item, selectedTile: TerrainTile) {
         if (selectedTile.item) {
-            console.log('Item in selectedtile removed');
             this.itemRemover(selectedTile);
         }
         if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
-            console.log('Item added');
             item.itemLimit--;
-            console.log(item);
-            selectedTile.item = item;
-            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-            if (item.itemLimit === 0 && this.sideMenuSelectedEntity) {
-                console.log('Item limit reached');
+            selectedTile.item = this.itemFactoryService.copyItem(item);
+            if (item.itemLimit === 0) {
                 this.sideMenuSelectedEntity.visibleState = VisibleState.disabled;
             }
             this.sideMenuSelectedEntity = null;
@@ -91,11 +103,8 @@ export class MapEditorManagerService {
 
     itemRemover(selectedTile: Tile) {
         if (!this.isTerrainTile(selectedTile) || !selectedTile.item) return;
-        console.log(selectedTile.item);
-        console.log('Item limit increased');
-        selectedTile.item.visibleState = VisibleState.notSelected;
         selectedTile.item.itemLimit++;
-        console.log(selectedTile.item);
+        selectedTile.item.visibleState = VisibleState.notSelected;
         selectedTile.item = null;
     }
 
@@ -103,14 +112,12 @@ export class MapEditorManagerService {
         this.isDraggingLeft = true;
         if (!this.sideMenuSelectedEntity) return;
         if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) {
-            console.log('Same type');
             return;
         }
         if (this.isItem(this.sideMenuSelectedEntity) && this.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
         } else if (!this.isItem(this.sideMenuSelectedEntity)) {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
-            // this.itemRemover(entity); //TODOis it necessary?
         }
     }
 
@@ -126,7 +133,6 @@ export class MapEditorManagerService {
     }
 
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
-        console.log('entity', entity);
         if (event.button === 0) {
             this.leftClickMapTile(entity);
         } else if (event.button === 2) {
@@ -139,9 +145,6 @@ export class MapEditorManagerService {
         }
         if (this.isDraggingRight) {
             if (this.isTerrainTile(entity)) {
-                // if (entity.item) {
-                //     entity.item.itemLimit--;
-                // }
                 this.itemRemover(entity);
             }
             if (!(entity instanceof GrassTile)) {
