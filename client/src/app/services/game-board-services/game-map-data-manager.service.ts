@@ -21,7 +21,7 @@ export class GameMapDataManagerService {
         this.createNewGrid();
     }
 
-    game: GameShared = {
+    databaseGame: GameShared = {
         name: '',
         description: '',
         size: MapSize.SMALL,
@@ -31,10 +31,12 @@ export class GameMapDataManagerService {
         tiles: [],
     };
 
-    grid: Tile[][] = [];
+    currentGrid: Tile[][] = [];
+    currentName = '';
+    currentDescription = '';
 
     newGame(size: MapSize, mode: GameMode) {
-        this.game = {
+        this.databaseGame = {
             name: '',
             description: '',
             size: size,
@@ -47,53 +49,61 @@ export class GameMapDataManagerService {
     }
 
     loadGame(game: GameShared) {
-        this.game = game;
+        this.databaseGame = game;
+        this.currentName = game.name;
+        this.currentDescription = game.description;
         this.loadGrid();
     }
 
     createNewGrid() {
-        this.grid = [];
-        this.game.tiles = [];
+        this.currentGrid = [];
+        this.databaseGame.tiles = [];
 
-        for (let i = 0; i < this.game.size; i++) {
-            this.grid.push([]);
-            this.game.tiles.push([]);
-            for (let j = 0; j < this.game.size; j++) {
+        for (let i = 0; i < this.databaseGame.size; i++) {
+            this.currentGrid.push([]);
+            this.databaseGame.tiles.push([]);
+            for (let j = 0; j < this.databaseGame.size; j++) {
                 const newTile: GrassTile = new GrassTile();
-                this.grid[i].push(newTile);
-                this.game.tiles[i].push({ type: newTile.type });
+                this.currentGrid[i].push(newTile);
+                this.databaseGame.tiles[i].push({ type: newTile.type });
                 newTile.coordinates = { x: i, y: j };
             }
         }
     }
 
     loadGrid() {
-        this.grid = [];
-        for (let i = 0; i < this.game.tiles.length; i++) {
-            this.grid.push([]);
-            for (let j = 0; j < this.game.tiles[i].length; j++) {
-                const newTile: Tile = this.tileFactoryService.createTile(this.game.tiles[i][j].type);
-                this.grid[i].push(newTile);
+        this.currentGrid = [];
+        for (let i = 0; i < this.databaseGame.tiles.length; i++) {
+            this.currentGrid.push([]);
+            for (let j = 0; j < this.databaseGame.tiles[i].length; j++) {
+                const newTile: Tile = this.tileFactoryService.createTile(this.databaseGame.tiles[i][j].type);
+                this.currentGrid[i].push(newTile);
                 newTile.coordinates = { x: i, y: j };
 
                 if (this.isTerrainTile(newTile)) {
-                    const itemType = this.game.tiles[i][j].item?.type;
+                    const itemType = this.databaseGame.tiles[i][j].item?.type;
                     if (itemType) newTile.item = this.itemFactoryService.createItem(itemType);
                 }
             }
         }
     }
 
+    save() {
+        this.databaseGame.name = this.currentName;
+        this.databaseGame.description = this.currentDescription;
+        this.saveMap();
+    }
+
     saveMap() {
-        this.game.tiles = [];
-        for (let i = 0; i < this.grid.length; i++) {
-            this.game.tiles.push([]);
-            for (let j = 0; j < this.grid[i].length; j++) {
-                this.game.tiles[i].push({
-                    type: this.grid[i][j].type,
+        this.databaseGame.tiles = [];
+        for (let i = 0; i < this.currentGrid.length; i++) {
+            this.databaseGame.tiles.push([]);
+            for (let j = 0; j < this.currentGrid[i].length; j++) {
+                this.databaseGame.tiles[i].push({
+                    type: this.currentGrid[i][j].type,
                     item:
-                        this.isTerrainTile(this.grid[i][j]) && (this.grid[i][j] as TerrainTile).item?.type !== undefined
-                            ? { type: (this.grid[i][j] as TerrainTile).item!.type }
+                        this.isTerrainTile(this.currentGrid[i][j]) && (this.currentGrid[i][j] as TerrainTile).item?.type !== undefined
+                            ? { type: (this.currentGrid[i][j] as TerrainTile).item!.type }
                             : null,
                 });
             }
@@ -101,6 +111,8 @@ export class GameMapDataManagerService {
     }
 
     resetGame() {
+        this.currentName = this.databaseGame.name;
+        this.currentDescription = this.databaseGame.description;
         this.loadGrid();
     }
 

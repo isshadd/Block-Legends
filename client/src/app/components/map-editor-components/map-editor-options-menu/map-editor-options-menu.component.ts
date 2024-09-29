@@ -20,14 +20,13 @@ export class MapEditorOptionsMenuComponent {
 
     onOptionsClick() {
         const dialogRef = this.modal.open(MapEditorModalComponent, {
-            width: '400px',
-            data: this.gameMapDataManagerService.game,
+            data: { name: this.gameMapDataManagerService.currentName, description: this.gameMapDataManagerService.currentDescription },
         });
 
         dialogRef.afterClosed().subscribe((result: GameShared) => {
             if (result) {
-                this.gameMapDataManagerService.game.name = result.name;
-                this.gameMapDataManagerService.game.description = result.description;
+                this.gameMapDataManagerService.currentName = result.name;
+                this.gameMapDataManagerService.currentDescription = result.description;
             }
         });
     }
@@ -37,6 +36,10 @@ export class MapEditorOptionsMenuComponent {
     }
 
     onSaveClick() {
-        this.gameMapDataManagerService.saveMap();
+        if (this.gameMapDataManagerService.currentName === '' || this.gameMapDataManagerService.currentDescription === '') {
+            this.onOptionsClick();
+            return;
+        }
+        this.gameMapDataManagerService.save();
     }
 }

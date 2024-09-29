@@ -66,7 +66,7 @@ export class MapEditorManagerService {
         if (this.isTerrainTile(selectedTile) && selectedTile.item && this.isTerrainTile(tileCopy)) {
             tileCopy.item = this.itemFactoryService.copyItem(selectedTile.item);
         }
-        this.gameMapDataManagerService.grid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
+        this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
         tileCopy.visibleState = VisibleState.notSelected;
     }
 
