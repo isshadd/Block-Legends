@@ -107,15 +107,12 @@ export class GameMapDataManagerService {
     createGameInDb() {
         this.gameServerCommunicationService.addGame(this.databaseGame).subscribe((game) => {
             this.databaseGame = game;
-            console.log(this.databaseGame);
         });
     }
 
     saveGameInDb() {
         if (this.databaseGame._id === undefined) return;
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe(() => {
-            console.log(this.databaseGame);
-        });
+        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe();
     }
 
     saveMap() {
