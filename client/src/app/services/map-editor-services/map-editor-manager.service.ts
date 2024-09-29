@@ -85,7 +85,7 @@ export class MapEditorManagerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.selected; //selection of the entity
         this.sideMenuSelectedEntity = entity;
-        console.log(this.sideMenuSelectedEntity?.description, 'selected');
+        console.log(entity.description, 'selected');
         this.cancelSelectionMap();
     }
 
@@ -117,14 +117,13 @@ export class MapEditorManagerService {
             this.itemRemover(selectedTile);
         }
         if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
-            console.log(item.description, 'limit is', item.itemLimit);
+            console.log(item.description, 'placed');
             item.itemLimit--;
             selectedTile.item = this.itemFactoryService.copyItem(item);
-            console.log(selectedTile.item?.description, 'placed');
             if (item.itemLimit === 0) {
                 this.sideMenuSelectedEntity.visibleState = VisibleState.disabled;
+                this.sideMenuSelectedEntity = null;
             }
-            this.sideMenuSelectedEntity = null;
         }
     }
 
@@ -188,6 +187,12 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
+        console.log(this.sideMenuSelectedEntity);
+        if (this.sideMenuSelectedEntity) {
+            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
+            console.log(this.sideMenuSelectedEntity.description, 'unselected');
+            this.sideMenuSelectedEntity = null;
+        }
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
@@ -199,7 +204,6 @@ export class MapEditorManagerService {
         } else if (entity.visibleState === VisibleState.disabled) return; //item limit reached
         else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             //another entity selected
-            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
             this.makeSelection(entity);
         } else {
             this.makeSelection(entity);
