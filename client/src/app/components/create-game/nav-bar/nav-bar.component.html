@@ -4,13 +4,13 @@
             src="https://www.clipartmax.com/png/middle/326-3260345_minecraft-swords-crossed-png-minecraft-diamond-sword-crossed.png"
             alt="Combat Classique"
         />
-        <button (click)="selectMode('Combat classique')" [ngClass]="{ active: selectedMode === 'Combat classique' }">
+        <button class="dark-button" (click)="selectMode('Combat classique')" [ngClass]="{ active: selectedMode === 'Combat classique' }">
             Combat Classique
         </button>
     </div>
     <div class="mode-option">
         <img src="https://lasertag.com.au/upload/modules/Badge-Capture-the-Flag-Game.jpg" alt="Capture de Drapeau" />
-        <button (click)="selectMode('Capture de drapeau')" [ngClass]="{ active: selectedMode === 'Capture de drapeau' }">
+        <button class="dark-button" (click)="selectMode('Capture de drapeau')" [ngClass]="{ active: selectedMode === 'Capture de drapeau' }">
             Capture de Drapeau
         </button>
     </div>
