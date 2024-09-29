@@ -71,7 +71,7 @@ export class GameController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/:id')
-    async patchMap(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
+    async patchGame(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
         try {
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
