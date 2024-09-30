@@ -14,7 +14,6 @@ import { VisibleStateComponent } from '../visible-state/visible-state.component'
     styleUrl: './map.component.scss',
 })
 export class MapComponent {
-    // Temp for testing
     constructor(
         public mapEditorManagerService: MapEditorManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
