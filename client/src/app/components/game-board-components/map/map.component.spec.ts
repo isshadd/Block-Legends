@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { GrassTile } from '@app/classes/Tiles/base-tile';
+import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { MapComponent } from './map.component';
-import SpyObj = jasmine.SpyObj;
 
 describe('MapComponent', () => {
     let component: MapComponent;
