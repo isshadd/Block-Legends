@@ -5,6 +5,7 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMode } from '@common/enums/game-mode';
+import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { GameServerCommunicationService } from '../game-server-communication.service';
@@ -164,5 +165,15 @@ export class GameMapDataManagerService {
     isGameModeCTF() {
         if (this.databaseGame === undefined) return false;
         return this.databaseGame.mode === GameMode.CTF;
+    }
+
+    gameSize(): MapSize {
+        return this.databaseGame.size;
+    }
+
+    itemLimit(): number {
+        if (this.gameSize() === MapSize.SMALL) return 2;
+        if (this.gameSize() === MapSize.MEDIUM) return 4;
+        return 6;
     }
 }
