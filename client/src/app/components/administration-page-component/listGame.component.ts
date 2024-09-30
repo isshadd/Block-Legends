@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -16,6 +16,7 @@ export class ListGameComponent {
     constructor(
         private administrationService: AdministrationPageManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
+        private router: Router,
     ) {
         this.administrationService.setGames();
     }
@@ -36,6 +37,8 @@ export class ListGameComponent {
     }
 
     editGame(game: GameShared): void {
-        this.gameMapDataManagerService.loadGame(game);
+        localStorage.setItem('isNewGame', JSON.stringify(false));
+        localStorage.setItem('gameToEdit', JSON.stringify(game));
+        this.router.navigate(['/map-editor']);
     }
 }

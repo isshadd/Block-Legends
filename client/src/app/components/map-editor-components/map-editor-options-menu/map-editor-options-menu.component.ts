@@ -18,9 +18,6 @@ export class MapEditorOptionsMenuComponent {
     optionsNotificationState = ButtonNotificationState.HIDDEN;
     saveNotificationState = ButtonNotificationState.HIDDEN;
 
-    optionsNotificationDescription = '';
-    saveNotificationDescription = '';
-
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public modal: MatDialog,
@@ -54,24 +51,37 @@ export class MapEditorOptionsMenuComponent {
 
     getOptionsNotificationState(): ButtonNotificationState {
         if (!this.gameMapDataManagerService.hasValidNameAndDescription()) {
-            this.optionsNotificationDescription = 'Il faut donner un nom et une description à la carte';
             return ButtonNotificationState.ALERT;
         } else {
-            this.optionsNotificationDescription = '';
             return ButtonNotificationState.HIDDEN;
+        }
+    }
+
+    getOptionsNotificationDescription(): string {
+        if (!this.gameMapDataManagerService.hasValidNameAndDescription()) {
+            return 'Il faut donner un nom et une description à la carte';
+        } else {
+            return '';
         }
     }
 
     getSaveNotificationState(): ButtonNotificationState {
         if (!this.gameMapDataManagerService.isSavedGame()) {
-            this.saveNotificationDescription = "La carte n'est pas sauvegardée";
             return ButtonNotificationState.ALERT;
         }
         if (this.gameMapDataManagerService.isGameUpdated) {
-            this.saveNotificationDescription = 'La carte a été modifiée';
             return ButtonNotificationState.WARNING;
         }
-        this.saveNotificationDescription = 'La carte est sauvegardée';
         return ButtonNotificationState.SUCCESS;
+    }
+
+    getSaveNotificationDescription(): string {
+        if (!this.gameMapDataManagerService.isSavedGame()) {
+            return "La carte n'est pas sauvegardée";
+        }
+        if (this.gameMapDataManagerService.isGameUpdated) {
+            return 'La carte a été modifiée';
+        }
+        return 'La carte est sauvegardée';
     }
 }

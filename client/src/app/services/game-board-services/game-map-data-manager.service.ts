@@ -4,8 +4,6 @@ import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
-import { GameMode } from '@common/enums/game-mode';
-import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { GameServerCommunicationService } from '../game-server-communication.service';
@@ -20,35 +18,17 @@ export class GameMapDataManagerService {
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
-    ) {
-        this.createNewGrid();
-    }
+    ) {}
 
-    databaseGame: GameShared = {
-        name: '',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.Classique,
-        imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-        isVisible: false,
-        tiles: [],
-    };
+    databaseGame: GameShared;
 
     currentGrid: Tile[][] = [];
     currentName = '';
     currentDescription = '';
     isGameUpdated: boolean = false;
 
-    newGame(size: MapSize, mode: GameMode) {
-        this.databaseGame = {
-            name: '',
-            description: '',
-            size: size,
-            mode: mode,
-            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            isVisible: false,
-            tiles: [],
-        };
+    newGame(game: GameShared) {
+        this.databaseGame = game;
         this.resetCurrentValues();
         this.createNewGrid();
     }
@@ -103,6 +83,8 @@ export class GameMapDataManagerService {
         }
 
         this.isGameUpdated = false;
+        localStorage.setItem('isNewGame', JSON.stringify(false));
+        localStorage.setItem('gameToEdit', JSON.stringify(this.databaseGame));
     }
 
     createGameInDb() {
