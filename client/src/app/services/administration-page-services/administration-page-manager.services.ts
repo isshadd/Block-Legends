@@ -9,6 +9,10 @@ export class AdministrationPageManagerService {
     games: GameShared[] = [];
 
     constructor(private gameServerCommunicationService: GameServerCommunicationService) {
+        this.setGames();
+    }
+
+    setGames(): void {
         this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
             this.games = games;
         });
