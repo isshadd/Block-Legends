@@ -3,6 +3,7 @@ import { Chestplate } from '@app/classes/Items/chestplate';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { Elytra } from '@app/classes/Items/elytra';
 import { EnchantedBook } from '@app/classes/Items/enchanted-book';
+import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
 import { Potion } from '@app/classes/Items/potion';
 import { Spawn } from '@app/classes/Items/spawn';
@@ -36,16 +37,24 @@ export class MapEditorManagerService {
         public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
 
-    placeableEntitiesSections: PlaceableEntitySection[] = [
-        {
-            title: 'Tuiles',
-            entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
-        },
-        {
-            title: 'Objets',
-            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Spawn()],
-        },
-    ];
+    placeableEntitiesSections: PlaceableEntitySection[] = [];
+
+    init() {
+        this.placeableEntitiesSections = [
+            {
+                title: 'Tuiles',
+                entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
+            },
+            {
+                title: 'Objets',
+                entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Spawn()],
+            },
+        ];
+
+        if (this.gameMapDataManagerService.isGameModeCTF()) {
+            this.placeableEntitiesSections[1].entities.push(new Flag());
+        }
+    }
 
     selectedEntity: PlaceableEntity | null;
     sideMenuSelectedEntity: null | PlaceableEntity;

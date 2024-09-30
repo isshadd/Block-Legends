@@ -4,6 +4,7 @@ import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { GameMode } from '@common/enums/game-mode';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { GameServerCommunicationService } from '../game-server-communication.service';
@@ -158,5 +159,10 @@ export class GameMapDataManagerService {
     isSavedGame(): boolean {
         if (this.databaseGame === undefined) return false;
         return this.databaseGame._id !== undefined;
+    }
+
+    isGameModeCTF() {
+        if (this.databaseGame === undefined) return false;
+        return this.databaseGame.mode === GameMode.CTF;
     }
 }
