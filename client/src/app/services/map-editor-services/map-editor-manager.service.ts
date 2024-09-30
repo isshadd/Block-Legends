@@ -68,16 +68,32 @@ export class MapEditorManagerService {
         }
         return null;
     }
+
+    sideMenuEntityFinder(entity: PlaceableEntity) {
+        let foundTile = this.sideMenuTileFinder(this.sideMenuSelectedEntity as Tile) as Tile | null;
+        if (foundTile) return foundTile;
+
+        let foundItem = this.sideMenuItemFinder(this.sideMenuSelectedEntity as Item) as Item | null;
+        if (foundItem) return foundItem;
+
+        return null;
+    }
+
     cancelSelectionSideMenu() {
         if (this.sideMenuSelectedEntity) {
-            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
+            let foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity)?.visibleState;
+            if (foundEntity) foundEntity = VisibleState.notSelected;
+
+            this.selectedEntity = null;
             this.sideMenuSelectedEntity = null;
         }
     }
 
     cancelSelectionMap() {
         if (this.selectedEntity) {
-            this.selectedEntity.visibleState = VisibleState.notSelected;
+            let foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity)?.visibleState;
+            if (foundEntity) foundEntity = VisibleState.notSelected;
+
             this.selectedEntity = null;
         }
     }
@@ -142,9 +158,8 @@ export class MapEditorManagerService {
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
         if (!this.sideMenuSelectedEntity) return;
-        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) {
-            return;
-        }
+        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) return;
+
         if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
         } else if (!this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity)) {
@@ -156,6 +171,7 @@ export class MapEditorManagerService {
         this.isDraggingRight = true;
         event.preventDefault();
         if (entity instanceof GrassTile && !entity.item) return;
+
         if ((entity as TerrainTile)?.item) {
             this.itemRemover(entity);
         } else if (!this.gameMapDataManagerService.isTerrainTile(entity) || (this.gameMapDataManagerService.isTerrainTile(entity) && !entity.item)) {
