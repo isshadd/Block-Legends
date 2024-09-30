@@ -85,7 +85,6 @@ export class MapEditorManagerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.selected; //selection of the entity
         this.sideMenuSelectedEntity = entity;
-        console.log(entity.description, 'selected');
         this.cancelSelectionMap();
     }
 
@@ -116,12 +115,13 @@ export class MapEditorManagerService {
         if (selectedTile.item) {
             this.itemRemover(selectedTile);
         }
-        if (item.itemLimit >= 1 && this.sideMenuSelectedEntity) {
-            console.log(item.description, 'placed');
-            item.itemLimit--;
+        let foundItem = this.sideMenuItemFinder(item) as Item | null;
+        if (!foundItem) return;
+        if (foundItem.itemLimit >= 1) {
+            foundItem.itemLimit--;
             selectedTile.item = this.itemFactoryService.copyItem(item);
-            if (item.itemLimit === 0) {
-                this.sideMenuSelectedEntity.visibleState = VisibleState.disabled;
+            if (foundItem.itemLimit === 0) {
+                foundItem.visibleState = VisibleState.disabled;
                 this.sideMenuSelectedEntity = null;
             }
         }
@@ -190,7 +190,6 @@ export class MapEditorManagerService {
         console.log(this.sideMenuSelectedEntity);
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-            console.log(this.sideMenuSelectedEntity.description, 'unselected');
             this.sideMenuSelectedEntity = null;
         }
     }
