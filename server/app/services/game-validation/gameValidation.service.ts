@@ -17,11 +17,6 @@ export class GameValidationService {
             errors.push('Le nom du jeu doit être unique et la description est obligatoire.');
         }
 
-        const isTilesValid = await this.isMapTilesValid(game);
-        if (!isTilesValid) {
-            errors.push('Plus de la moitié de la map doit être composée de tiles de type Grass, Water ou Ice.');
-        }
-
         const isDoorPlacementValid = await this.isDoorPlacementValid(game);
         if (!isDoorPlacementValid) {
             errors.push('La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.');
@@ -43,8 +38,9 @@ export class GameValidationService {
         return !existingGame && descriptionValid;
     }
 
-    async isMapTilesValid(game: Game | UpdateGameDto): Promise<boolean> {
+    async isMapTilesValid(game: Game, size: number): Promise<boolean> {
         let terrainTileCount = 0;
+
         game.tiles.forEach((row) => {
             row.forEach((tile) => {
                 if (tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice) {
@@ -52,53 +48,52 @@ export class GameValidationService {
                 }
             });
         });
-        const totalTiles = game.size * game.size;
+
+        const totalTiles = size * size;
         return terrainTileCount > totalTiles / 2;
-    } //retourne vrai si la moitie de la map est composée de tiles de type Grass, Water ou Ice
+    }
 
     async isTileTerrain(tile: Tile) {
         return tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice;
-    } //retourne vrai si le type de la tile est Grass, Water ou Ice
+    }
 
     async isTileWall(tile: Tile) {
         return tile.type === TileType.Wall;
     } //retourne vrai si le type de la tile est Wall
 
     async isDoorPlacementValid(game: Game | UpdateGameDto): Promise<boolean> {
-        let doorValid = true;
-
         for (let i = 0; i < game.tiles.length; i++) {
             for (let j = 0; j < game.tiles[i].length; j++) {
                 const tile = game.tiles[i][j];
 
                 if (tile.type === TileType.Door) {
                     // Check if the door is not on the edges of the grid
-                    if (i > 0 && i < game.tiles.length - 1 && j > 0 && j < game.tiles[i].length - 1) {
-                        const horizontalCondition = await this.isHorizontalAxeDoorValid(game, i, j);
-                        const verticalCondition = await this.isVerticalAxeDoorValid(game, i, j);
+                    if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
+                        return false; // Door is on the edge, which is invalid
+                    }
 
-                        if (!horizontalCondition && !verticalCondition) {
-                            doorValid = false;
-                            break; // Exit the loops if invalid placement is found
-                        }
-                    } else {
-                        doorValid = false; // Door is on the edge, which is invalid
-                        break;
+                    const horizontalCondition = await this.isHorizontalAxeDoorValid(game, i, j);
+                    const verticalCondition = await this.isVerticalAxeDoorValid(game, i, j);
+
+                    // If both conditions are false, the door placement is invalid
+                    if (!horizontalCondition && !verticalCondition) {
+                        return false; // Invalid placement found
                     }
                 }
             }
-            if (!doorValid) break; // Exit the loops if invalid placement is found
         }
-        return doorValid; // Return true if all doors have valid placement
+
+        return true; // Return true if all doors have valid placements
     }
 
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
-        return (
-            this.isTileWall(game.tiles[i][j + 1]) &&
-            this.isTileWall(game.tiles[i][j - 1]) &&
-            this.isTileTerrain(game.tiles[i + 1][j]) &&
-            this.isTileTerrain(game.tiles[i - 1][j])
-        );
+        const wallLeft = this.isTileWall(game.tiles[i][j - 1]); // Wall to the left
+        const wallRight = this.isTileWall(game.tiles[i][j + 1]); // Wall to the right
+        const terrainAbove = this.isTileTerrain(game.tiles[i - 1][j]); // Terrain above
+        const terrainBelow = this.isTileTerrain(game.tiles[i + 1][j]); // Terrain below
+
+        // Return true only if all conditions are met
+        return wallLeft && wallRight && terrainAbove && terrainBelow;
     }
 
     async isVerticalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
