@@ -9,6 +9,9 @@
             (mouseenter)="onMouseEnter(item)"
             (mouseleave)="onMouseLeave(item)"
             (click)="onMouseDown(item)"
+            cdkDrag
+            (cdkDragStarted)="onDragStarted(item)"
+            (cdkDragEnded)="onDragEnded()"
         ></app-placeable-entity>
         <app-visible-state [placeableEntity]="item" class="layer-2"></app-visible-state>
     </div>
