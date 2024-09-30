@@ -3,16 +3,20 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { ButtonNotificationComponent, ButtonNotificationState } from '../button-notification/button-notification.component';
 import { MapEditorModalComponent } from '../map-editor-modal/map-editor-modal.component';
 
 @Component({
     selector: 'app-map-editor-options-menu',
     standalone: true,
-    imports: [MatIconModule],
+    imports: [MatIconModule, ButtonNotificationComponent],
     templateUrl: './map-editor-options-menu.component.html',
     styleUrl: './map-editor-options-menu.component.scss',
 })
 export class MapEditorOptionsMenuComponent {
+    optionsNotificationState = ButtonNotificationState.HIDDEN;
+    saveNotificationState = ButtonNotificationState.HIDDEN;
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public modal: MatDialog,
@@ -41,5 +45,17 @@ export class MapEditorOptionsMenuComponent {
             return;
         }
         this.gameMapDataManagerService.save();
+    }
+
+    getOptionsNotificationState(): ButtonNotificationState {
+        if (this.gameMapDataManagerService.currentName === '' || this.gameMapDataManagerService.currentDescription === '') {
+            return ButtonNotificationState.ALERT;
+        } else {
+            return ButtonNotificationState.HIDDEN;
+        }
+    }
+
+    getSaveNotificationState(): ButtonNotificationState {
+        return this.saveNotificationState;
     }
 }

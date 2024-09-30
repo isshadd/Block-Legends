@@ -1,0 +1,18 @@
+.indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: transparent;
+    z-index: 2;
+}
+
+.warning {
+    background-color: yellow;
+}
+
+.alert {
+    background-color: red;
+}
