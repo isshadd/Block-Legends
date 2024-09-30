@@ -20,7 +20,7 @@ describe('GameListComponent', () => {
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
-            declarations: [GameListComponent],
+            imports: [GameListComponent],
             providers: [
                 { provide: ModeService, useValue: modeServiceSpy },
                 { provide: Router, useValue: routerSpy },

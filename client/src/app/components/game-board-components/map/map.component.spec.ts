@@ -1,3 +1,4 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
@@ -23,10 +24,11 @@ describe('MapComponent', () => {
         const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', ['']);
 
         await TestBed.configureTestingModule({
-            declarations: [MapComponent],
+            imports: [MapComponent],
             providers: [
                 { provide: MapEditorManagerService, useValue: mapEditorSpy },
                 { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
+                provideHttpClientTesting(),
             ],
         }).compileComponents();
 
