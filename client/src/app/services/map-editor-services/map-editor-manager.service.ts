@@ -3,7 +3,6 @@ import { Chestplate } from '@app/classes/Items/chestplate';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { Elytra } from '@app/classes/Items/elytra';
 import { EnchantedBook } from '@app/classes/Items/enchanted-book';
-import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
 import { Potion } from '@app/classes/Items/potion';
 import { Spawn } from '@app/classes/Items/spawn';
@@ -44,7 +43,7 @@ export class MapEditorManagerService {
         },
         {
             title: 'Objets',
-            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Flag(), new Spawn()],
+            entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Spawn()],
         },
     ];
 
@@ -52,6 +51,15 @@ export class MapEditorManagerService {
     sideMenuSelectedEntity: null | PlaceableEntity;
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
+    draggedEntity: PlaceableEntity | null;
+
+    startDrag(entity: PlaceableEntity) {
+        this.draggedEntity = entity;
+    }
+
+    endDrag() {
+        this.draggedEntity = null;
+    }
 
     sideMenuTileFinder(tile: Tile) {
         for (const searchedTile of this.placeableEntitiesSections[0].entities) {
@@ -72,10 +80,10 @@ export class MapEditorManagerService {
     }
 
     sideMenuEntityFinder(entity: PlaceableEntity) {
-        let foundTile = this.sideMenuTileFinder(this.sideMenuSelectedEntity as Tile) as Tile | null;
+        let foundTile = this.sideMenuTileFinder(entity as Tile) as Tile | null;
         if (foundTile) return foundTile;
 
-        let foundItem = this.sideMenuItemFinder(this.sideMenuSelectedEntity as Item) as Item | null;
+        let foundItem = this.sideMenuItemFinder(entity as Item) as Item | null;
         if (foundItem) return foundItem;
 
         return null;
@@ -132,7 +140,8 @@ export class MapEditorManagerService {
         tileCopy.visibleState = VisibleState.notSelected;
     }
 
-    itemPlacer(item: Item, selectedTile: TerrainTile) {
+    itemPlacer(item: Item, selectedTile: Tile) {
+        if(!this.gameMapDataManagerService.isTerrainTile(selectedTile)) return;
         if (selectedTile.item) {
             this.itemRemover(selectedTile);
         }
@@ -223,6 +232,7 @@ export class MapEditorManagerService {
 
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
+            this.sideMenuSelectedEntity = null;
         }
     }
 
