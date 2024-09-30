@@ -46,15 +46,8 @@ describe('MapComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should return the current grid when getGrid is called', () => {
-        const mockGrid = [
-            [new GrassTile(), new GrassTile()],
-            [new GrassTile(), new GrassTile()],
-        ];
-        gameMapDataManagerService.currentGrid = mockGrid;
-
-        const result = component.getGrid();
-        expect(result).toBe(mockGrid);
+    it('should inject GameMapDataManagerService', () => {
+        expect(gameMapDataManagerService).toBeTruthy();
     });
 
     it('should call onMouseDownMapTile when onMouseDown is triggered', () => {

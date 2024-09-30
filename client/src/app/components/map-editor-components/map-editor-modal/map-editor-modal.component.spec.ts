@@ -15,9 +15,8 @@ describe('MapEditorModalComponent', () => {
         const matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
         await TestBed.configureTestingModule({
-            imports: [ReactiveFormsModule, NoopAnimationsModule],
+            imports: [ReactiveFormsModule, NoopAnimationsModule, MapEditorModalComponent],
             providers: [FormBuilder, { provide: MatDialogRef, useValue: matDialogRefSpy }, { provide: MAT_DIALOG_DATA, useValue: mockDialogData }],
-            declarations: [MapEditorModalComponent],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapEditorModalComponent);

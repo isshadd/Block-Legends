@@ -50,6 +50,10 @@ describe('PlaceableEntityContainerComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should inject gameMapDataManagerService', () => {
+        expect(gameMapDataManagerService).toBeTruthy();
+    });
+
     it('should call onMouseEnter on MapEditorManagerService when onMouseEnter is triggered', () => {
         component.onMouseEnter(mockEntity);
         expect(mapEditorManagerService.onMouseEnter).toHaveBeenCalledWith(mockEntity);
