@@ -6,6 +6,7 @@ import { EnchantedBook } from '@app/classes/Items/enchanted-book';
 import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
 import { Potion } from '@app/classes/Items/potion';
+import { RandomItem } from '@app/classes/Items/random-item';
 import { Spawn } from '@app/classes/Items/spawn';
 import { Totem } from '@app/classes/Items/totem';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
@@ -47,7 +48,16 @@ export class MapEditorManagerService {
             },
             {
                 title: 'Objets',
-                entities: [new DiamondSword(), new Chestplate(), new Elytra(), new EnchantedBook(), new Totem(), new Potion(), new Spawn()],
+                entities: [
+                    new DiamondSword(),
+                    new Chestplate(),
+                    new Elytra(),
+                    new EnchantedBook(),
+                    new Totem(),
+                    new Potion(),
+                    new Spawn(),
+                    new RandomItem(),
+                ],
             },
         ];
 
