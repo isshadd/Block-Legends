@@ -187,7 +187,7 @@ export class MapEditorManagerService {
         }
     }
     onMouseMoveMapTile(entity: Tile) {
-        if (this.sideMenuSelectedEntity && this.isDraggingLeft) {
+        if (this.sideMenuSelectedEntity && !this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.isDraggingLeft) {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
         }
         if (this.isDraggingRight) {
@@ -203,11 +203,11 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
-        console.log(this.sideMenuSelectedEntity);
+        
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-            this.sideMenuSelectedEntity = null;
         }
+        this.sideMenuSelectedEntity = null;
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
