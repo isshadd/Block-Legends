@@ -116,12 +116,13 @@ export class MapEditorManagerService {
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
-        if (
-            this.gameMapDataManagerService.isTerrainTile(selectedTile) &&
-            selectedTile.item &&
-            this.gameMapDataManagerService.isTerrainTile(tileCopy)
-        ) {
-            tileCopy.item = this.itemFactoryService.copyItem(selectedTile.item);
+        if ((selectedTile as TerrainTile)?.item) {
+            let foundItem = (selectedTile as TerrainTile).item ? (this.sideMenuItemFinder((selectedTile as TerrainTile).item!) as Item | null) : null;
+            if (this.gameMapDataManagerService.isTerrainTile(selectedTile) && this.gameMapDataManagerService.isTerrainTile(tileCopy)) {
+                tileCopy.item = foundItem;
+            } else {
+                this.itemRemover(selectedTile);
+            }
         }
         this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
         tileCopy.visibleState = VisibleState.notSelected;
@@ -203,7 +204,7 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
-        
+
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
         }
