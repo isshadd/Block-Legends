@@ -16,7 +16,9 @@ export class ListGameComponent {
     constructor(
         private administrationService: AdministrationPageManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
-    ) {}
+    ) {
+        this.administrationService.setGames();
+    }
 
     getGames(): GameShared[] {
         return this.administrationService.games;

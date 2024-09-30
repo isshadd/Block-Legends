@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 export enum ButtonNotificationState {
     WARNING = 'warning',
     ALERT = 'alert',
+    SUCCESS = 'success',
     HIDDEN = 'hidden',
 }
 

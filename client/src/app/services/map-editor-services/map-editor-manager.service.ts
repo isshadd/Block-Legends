@@ -117,6 +117,7 @@ export class MapEditorManagerService {
 
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
+        this.gameMapDataManagerService.isGameUpdated = true;
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
         console.log('tileCopy', tileCopy.description);
         if ((selectedTile as TerrainTile)?.item) {
@@ -140,6 +141,7 @@ export class MapEditorManagerService {
         if (foundItem.itemLimit >= 1) {
             foundItem.itemLimit--;
             selectedTile.item = this.itemFactoryService.copyItem(item);
+            this.gameMapDataManagerService.isGameUpdated = true;
             if (foundItem.itemLimit === 0) {
                 foundItem.visibleState = VisibleState.disabled;
                 this.sideMenuSelectedEntity = null;
@@ -157,6 +159,7 @@ export class MapEditorManagerService {
             }
         }
         selectedTile.item = null;
+        this.gameMapDataManagerService.isGameUpdated = true;
     }
 
     leftClickMapTile(entity: Tile) {
