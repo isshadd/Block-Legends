@@ -141,7 +141,7 @@ export class MapEditorManagerService {
     }
 
     itemPlacer(item: Item, selectedTile: Tile) {
-        if(!this.gameMapDataManagerService.isTerrainTile(selectedTile)) return;
+        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile)) return;
         if (selectedTile.item) {
             this.itemRemover(selectedTile);
         }

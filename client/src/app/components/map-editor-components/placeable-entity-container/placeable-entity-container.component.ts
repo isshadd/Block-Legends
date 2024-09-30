@@ -4,17 +4,21 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-
+import { ItemLimitCounterComponent } from '../item-limit-counter/item-limit-counter.component';
 @Component({
     selector: 'app-placeable-entity-container',
     standalone: true,
-    imports: [PlaceableEntityComponent, MatTooltipModule, VisibleStateComponent, DragDropModule],
+    imports: [PlaceableEntityComponent, MatTooltipModule, VisibleStateComponent, DragDropModule, ItemLimitCounterComponent],
     templateUrl: './placeable-entity-container.component.html',
     styleUrl: './placeable-entity-container.component.scss',
 })
 export class PlaceableEntityContainerComponent {
-    constructor(public mapEditorManagerService: MapEditorManagerService) {}
+    constructor(
+        public mapEditorManagerService: MapEditorManagerService,
+        public gameMapDataManager: GameMapDataManagerService,
+    ) {}
     @Input() containerTitle: string;
     @Input() containerItems: PlaceableEntity[];
 
