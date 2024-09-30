@@ -18,6 +18,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '../game-board-services/item-factory.service';
@@ -48,22 +49,12 @@ export class MapEditorManagerService {
             },
             {
                 title: 'Objets',
-                entities: [
-                    new DiamondSword(),
-                    new Chestplate(),
-                    new Elytra(),
-                    new EnchantedBook(),
-                    new Totem(),
-                    new Potion(),
-                    new Spawn(),
-                    new RandomItem(),
-                ],
+                entities: [],
             },
         ];
 
-        if (this.gameMapDataManagerService.isGameModeCTF()) {
-            this.placeableEntitiesSections[1].entities.push(new Flag());
-        }
+        this.resetItemList();
+        this.setItemLimit();
     }
 
     selectedEntity: PlaceableEntity | null;
@@ -71,7 +62,47 @@ export class MapEditorManagerService {
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
     draggedEntity: PlaceableEntity | null;
+    itemLimitCounter: number = 0;
 
+    resetItemList() {
+        this.itemLimitCounter = 0;
+        this.placeableEntitiesSections[1] = {
+            title: 'Objets',
+            entities: [
+                new DiamondSword(),
+                new Chestplate(),
+                new Elytra(),
+                new EnchantedBook(),
+                new Totem(),
+                new Potion(),
+                new Spawn(),
+                new RandomItem(),
+            ],
+        };
+        if (this.gameMapDataManagerService.isGameModeCTF()) {
+            this.placeableEntitiesSections[1].entities.push(new Flag());
+        }
+    }
+    setItemLimit() {
+        let itemLimit = this.gameMapDataManagerService.itemLimit();
+        if (itemLimit === 2) {
+            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 2;
+            this.itemLimitCounter = 2;
+            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+        } else if (itemLimit === 4) {
+            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 4;
+            this.itemLimitCounter = 4;
+            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+        } else {
+            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 6;
+            this.itemLimitCounter = 6;
+            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+        }
+    }
+    setItemLimitCounter(number: number) {
+        this.itemLimitCounter += number;
+        (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+    }
     startDrag(entity: PlaceableEntity) {
         this.draggedEntity = entity;
     }
@@ -168,11 +199,19 @@ export class MapEditorManagerService {
         if (!foundItem) return;
         if (foundItem.itemLimit >= 1) {
             foundItem.itemLimit--;
+            if (item.type !== ItemType.Spawn) this.setItemLimitCounter(-1);
             selectedTile.item = this.itemFactoryService.copyItem(item);
             this.gameMapDataManagerService.isGameUpdated = true;
             if (foundItem.itemLimit === 0) {
                 foundItem.visibleState = VisibleState.disabled;
                 this.sideMenuSelectedEntity = null;
+            }
+            if (this.itemLimitCounter === 0) {
+                this.sideMenuItemsDisabler();
+            }
+            if (this.itemLimitCounter > 0) {
+                this.sideMenuItemsEnabler();
+                console.log('itemLimitCounter', this.itemLimitCounter);
             }
         }
     }
@@ -182,8 +221,17 @@ export class MapEditorManagerService {
         const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
         if (foundItem) {
             foundItem.itemLimit++;
-            if (foundItem.visibleState === VisibleState.disabled) {
-                foundItem.visibleState = VisibleState.notSelected;
+            if (foundItem.type !== ItemType.Spawn) this.setItemLimitCounter(1);
+            if (foundItem.itemLimit === 0) {
+                foundItem.visibleState = VisibleState.disabled;
+                this.sideMenuSelectedEntity = null;
+            }
+            if (this.itemLimitCounter === 0) {
+                this.sideMenuItemsDisabler();
+            }
+            if (this.itemLimitCounter > 0) {
+                this.sideMenuItemsEnabler();
+                console.log('itemLimitCounter', this.itemLimitCounter);
             }
         }
         selectedTile.item = null;
@@ -267,6 +315,46 @@ export class MapEditorManagerService {
             this.makeSelection(entity);
         } else {
             this.makeSelection(entity);
+        }
+    }
+
+    itemCheckup() {
+        this.resetItemList();
+        this.gameMapDataManagerService.currentGrid.forEach((row) => {
+            row.forEach((tile) => {
+                if (this.gameMapDataManagerService.isTerrainTile(tile) && tile.item) {
+                    let foundItem = this.sideMenuItemFinder(tile.item) as Item | null;
+
+                    if (foundItem) {
+                        if (foundItem.type !== ItemType.Spawn) this.itemLimitCounter--;
+                        if (foundItem.itemLimit === 0) {
+                            foundItem.visibleState = VisibleState.disabled;
+                        }
+                    }
+                    if (this.itemLimitCounter === 0) {
+                        this.sideMenuItemsDisabler();
+                    }
+                    if (this.itemLimitCounter > 0) {
+                        this.sideMenuItemsEnabler();
+                    }
+                }
+            });
+        });
+    }
+
+    sideMenuItemsDisabler() {
+        for (const item of this.placeableEntitiesSections[1].entities) {
+            if (item.visibleState === VisibleState.notSelected && (item as Item).type !== ItemType.Spawn) {
+                item.visibleState = VisibleState.disabled;
+            }
+        }
+    }
+
+    sideMenuItemsEnabler() {
+        for (const item of this.placeableEntitiesSections[1].entities) {
+            if ((item as Item).itemLimit > 0) {
+                item.visibleState = VisibleState.notSelected;
+            }
         }
     }
 }

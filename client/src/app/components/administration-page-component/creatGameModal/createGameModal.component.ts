@@ -17,7 +17,6 @@ import { MapSize } from '@common/enums/map-size';
 export class CreateGameModalComponent {
     selectedSize: MapSize = MapSize.SMALL;
     selectedMode: GameMode = GameMode.Classique;
-    errorMessage: string = '';
     MapSize = MapSize;
 
     constructor(
@@ -44,14 +43,11 @@ export class CreateGameModalComponent {
                 tiles: [],
             });
             this.router.navigate(['/map-editor']);
-        } else {
-            this.errorMessage = 'Vous devez sélectionner une taille avant de créer un jeu.';
         }
     }
 
     selectSize(size: MapSize): void {
         this.selectedSize = size;
-        this.errorMessage = '';
     }
 
     selectMode(mode: GameMode): void {

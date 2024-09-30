@@ -45,9 +45,6 @@ export class GameListComponent implements OnInit {
     }
 
     getFilteredGames() {
-        if (!this.selectedMode) {
-            return this.games;
-        }
         return this.games.filter((game) => game.isVisible && game.mode === this.selectedMode);
     }
 }
