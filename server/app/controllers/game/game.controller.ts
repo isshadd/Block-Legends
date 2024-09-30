@@ -2,6 +2,7 @@ import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameService } from '@app/services/game/game.service';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -9,7 +10,7 @@ import { Response } from 'express';
 @ApiTags('Games')
 @Controller('game')
 export class GameController {
-    constructor(private readonly gameService: GameService) {}
+    constructor(private readonly gameService: GameService, private readonly gameValidationService : GameValidationService) {}
 
     @ApiOkResponse({
         description: 'Returns all games',
@@ -107,6 +108,22 @@ export class GameController {
         try {
             await this.gameService.emptyDB();
             response.status(HttpStatus.OK).send();
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+
+    @ApiOkResponse({
+        description: 'Get the number of spawn points',
+    })
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Get('/:id/spawn-points')
+    async getSpawnPoints(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const count = await this.gameValidationService.getNumberOfSpawnPoints(id);
+            response.status(HttpStatus.OK).json(count);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }

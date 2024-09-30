@@ -12,7 +12,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
-
+import { GameValidationService } from './services/game-validation/gameValidation.service';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -27,6 +27,6 @@ import { GameController } from './controllers/game/game.controller';
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
     controllers: [CourseController, DateController, ExampleController, GameController],
-    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameService],
+    providers: [ChatGateway, CourseService, DateService, ExampleService, Logger, GameService, GameValidationService],
 })
 export class AppModule {}
