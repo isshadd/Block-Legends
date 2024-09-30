@@ -11,11 +11,13 @@ import { Totem } from '@app/classes/Items/totem';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
+import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { TileType } from '@common/enums/tile-type';
 import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '../game-board-services/item-factory.service';
 import { TileFactoryService } from '../game-board-services/tile-factory.service';
@@ -116,6 +118,7 @@ export class MapEditorManagerService {
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
+        console.log('tileCopy', tileCopy.description);
         if ((selectedTile as TerrainTile)?.item) {
             let foundItem = (selectedTile as TerrainTile).item ? (this.sideMenuItemFinder((selectedTile as TerrainTile).item!) as Item | null) : null;
             if (this.gameMapDataManagerService.isTerrainTile(selectedTile) && this.gameMapDataManagerService.isTerrainTile(tileCopy)) {
@@ -159,7 +162,17 @@ export class MapEditorManagerService {
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
         if (!this.sideMenuSelectedEntity) return;
-        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type) return;
+        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type && entity.type !== TileType.Door && entity.type !== TileType.OpenDoor) return;
+        if (this.gameMapDataManagerService.isDoor(entity) && this.gameMapDataManagerService.isDoor(this.sideMenuSelectedEntity as Tile)) {
+            if (entity instanceof DoorTile) {
+                console.log('DoorTile');
+                this.tileCopyCreator(new OpenDoor(), entity);
+                return;
+            } else if (entity instanceof OpenDoor) {
+                this.tileCopyCreator(new DoorTile(), entity);
+                return;
+            }
+        }
 
         if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
@@ -208,7 +221,6 @@ export class MapEditorManagerService {
         if (this.sideMenuSelectedEntity) {
             this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
         }
-        this.sideMenuSelectedEntity = null;
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {

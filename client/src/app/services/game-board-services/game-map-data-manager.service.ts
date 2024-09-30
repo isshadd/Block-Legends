@@ -6,6 +6,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
+import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { GameServerCommunicationService } from '../game-server-communication.service';
 import { ItemFactoryService } from './item-factory.service';
@@ -145,5 +146,9 @@ export class GameMapDataManagerService {
 
     isItem(placeableEntity: PlaceableEntity): placeableEntity is Item {
         return (placeableEntity as Item).testItem !== undefined;
+    }
+
+    isDoor(tile: Tile): boolean {
+        return tile.type === TileType.Door || tile.type === TileType.OpenDoor;
     }
 }
