@@ -37,8 +37,7 @@ export class ListGameComponent {
     }
 
     editGame(game: GameShared): void {
-        localStorage.setItem('isNewGame', JSON.stringify(false));
-        localStorage.setItem('gameToEdit', JSON.stringify(game));
+        this.gameMapDataManagerService.setLocalStorageVariables(false, game);
         this.router.navigate(['/map-editor']);
     }
 }

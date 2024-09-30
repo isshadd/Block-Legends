@@ -68,8 +68,7 @@ export class MapEditorOptionsMenuComponent {
     getSaveNotificationState(): ButtonNotificationState {
         if (!this.gameMapDataManagerService.isSavedGame()) {
             return ButtonNotificationState.ALERT;
-        }
-        if (this.gameMapDataManagerService.isGameUpdated) {
+        } else if (this.gameMapDataManagerService.isGameUpdated) {
             return ButtonNotificationState.WARNING;
         }
         return ButtonNotificationState.SUCCESS;
@@ -78,8 +77,7 @@ export class MapEditorOptionsMenuComponent {
     getSaveNotificationDescription(): string {
         if (!this.gameMapDataManagerService.isSavedGame()) {
             return "La carte n'est pas sauvegardée";
-        }
-        if (this.gameMapDataManagerService.isGameUpdated) {
+        } else if (this.gameMapDataManagerService.isGameUpdated) {
             return 'La carte a été modifiée';
         }
         return 'La carte est sauvegardée';

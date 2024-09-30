@@ -83,19 +83,32 @@ export class GameMapDataManagerService {
         }
 
         this.isGameUpdated = false;
-        localStorage.setItem('isNewGame', JSON.stringify(false));
-        localStorage.setItem('gameToEdit', JSON.stringify(this.databaseGame));
+    }
+
+    setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
+        localStorage.setItem('isNewGame', JSON.stringify(isNewGame));
+        localStorage.setItem('gameToEdit', JSON.stringify(game));
+    }
+
+    getLocalStorageIsNewGame(): boolean {
+        return JSON.parse(localStorage.getItem('isNewGame') || 'false');
+    }
+
+    getLocalStorageGameToEdit(): GameShared {
+        return JSON.parse(localStorage.getItem('gameToEdit') || '{}');
     }
 
     createGameInDb() {
         this.gameServerCommunicationService.addGame(this.databaseGame).subscribe((game) => {
             this.databaseGame = game;
+            this.setLocalStorageVariables(false, this.databaseGame);
         });
     }
 
     saveGameInDb() {
-        if (this.databaseGame._id === undefined) return;
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe();
+        if (!this.isSavedGame()) return;
+        this.gameServerCommunicationService.updateGame(this.databaseGame._id!, this.databaseGame).subscribe();
+        this.setLocalStorageVariables(false, this.databaseGame);
     }
 
     saveMap() {
@@ -143,6 +156,7 @@ export class GameMapDataManagerService {
     }
 
     isSavedGame(): boolean {
+        if (this.databaseGame === undefined) return false;
         return this.databaseGame._id !== undefined;
     }
 }

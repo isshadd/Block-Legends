@@ -26,14 +26,14 @@ export class MapEditorComponent {
         public gameServerCommunicationService: GameServerCommunicationService,
         private router: Router,
     ) {
-        this.isNewGame = JSON.parse(localStorage.getItem('isNewGame') || 'false');
-        this.gameToEdit = JSON.parse(localStorage.getItem('gameToEdit') || '{}');
+        this.isNewGame = this.gameMapDataManagerService.getLocalStorageIsNewGame();
+        this.gameToEdit = this.gameMapDataManagerService.getLocalStorageGameToEdit();
 
         if (this.isNewGame) {
             this.gameMapDataManagerService.newGame(this.gameToEdit);
         } else {
-            if (!this.gameToEdit._id || this.gameToEdit._id === '') {
-                this.router.navigate(['/administration']);
+            if (!this.gameToEdit._id) {
+                this.router.navigate(['/administration-game']);
                 return;
             }
 
