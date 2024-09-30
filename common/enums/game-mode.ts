@@ -1,4 +1,4 @@
 export enum GameMode {
-    CTF = 'CTF',
-    Classique = 'Classique',
+    CTF = 'Capture de drapeau',
+    Classique = 'Combat classique',
 }

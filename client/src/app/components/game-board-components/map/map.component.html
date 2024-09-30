@@ -13,6 +13,8 @@
             (mousemove)="onMouseMove(tile)"
             (mouseleave)="onMouseLeave(tile)"
             (contextmenu)="onContextMenu($event)"
+            cdkDropList
+            (cdkDropListDropped)="onDrop(tile)"
         ></app-placeable-entity>
         @if (gameMapDataManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>

@@ -5,7 +5,7 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMode } from '@common/enums/game-mode';
-import { MapSize } from '@common/enums/map-size';
+import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { GameServerCommunicationService } from '../game-server-communication.service';
 import { ItemFactoryService } from './item-factory.service';
@@ -19,48 +19,29 @@ export class GameMapDataManagerService {
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
-    ) {
-        this.createNewGrid();
-    }
+    ) {}
 
-    databaseGame: GameShared = {
-        name: '',
-        description: '',
-        size: MapSize.SMALL,
-        mode: GameMode.Classique,
-        imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-        isVisible: false,
-        tiles: [],
-    };
+    databaseGame: GameShared;
 
     currentGrid: Tile[][] = [];
     currentName = '';
     currentDescription = '';
+    isGameUpdated: boolean = false;
 
-    newGame(size: MapSize, mode: GameMode) {
-        this.databaseGame = {
-            name: '',
-            description: '',
-            size: size,
-            mode: mode,
-            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
-            isVisible: false,
-            tiles: [],
-        };
+    newGame(game: GameShared) {
+        this.databaseGame = game;
+        this.resetCurrentValues();
         this.createNewGrid();
     }
 
     loadGame(game: GameShared) {
         this.databaseGame = game;
-        this.currentName = game.name;
-        this.currentDescription = game.description;
+        this.resetCurrentValues();
         this.loadGrid();
     }
 
     createNewGrid() {
-        this.currentGrid = [];
         this.databaseGame.tiles = [];
-
         for (let i = 0; i < this.databaseGame.size; i++) {
             this.currentGrid.push([]);
             this.databaseGame.tiles.push([]);
@@ -74,7 +55,6 @@ export class GameMapDataManagerService {
     }
 
     loadGrid() {
-        this.currentGrid = [];
         for (let i = 0; i < this.databaseGame.tiles.length; i++) {
             this.currentGrid.push([]);
             for (let j = 0; j < this.databaseGame.tiles[i].length; j++) {
@@ -91,7 +71,7 @@ export class GameMapDataManagerService {
     }
 
     save() {
-        if (this.currentName === '' || this.currentDescription === '') return;
+        if (!this.hasValidNameAndDescription()) return;
 
         this.databaseGame.name = this.currentName;
         this.databaseGame.description = this.currentDescription;
@@ -102,17 +82,34 @@ export class GameMapDataManagerService {
         } else {
             this.saveGameInDb();
         }
+
+        this.isGameUpdated = false;
+    }
+
+    setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
+        localStorage.setItem('isNewGame', JSON.stringify(isNewGame));
+        localStorage.setItem('gameToEdit', JSON.stringify(game));
+    }
+
+    getLocalStorageIsNewGame(): boolean {
+        return JSON.parse(localStorage.getItem('isNewGame') || 'false');
+    }
+
+    getLocalStorageGameToEdit(): GameShared {
+        return JSON.parse(localStorage.getItem('gameToEdit') || '{}');
     }
 
     createGameInDb() {
         this.gameServerCommunicationService.addGame(this.databaseGame).subscribe((game) => {
             this.databaseGame = game;
+            this.setLocalStorageVariables(false, this.databaseGame);
         });
     }
 
     saveGameInDb() {
-        if (this.databaseGame._id === undefined) return;
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe();
+        if (!this.isSavedGame()) return;
+        this.gameServerCommunicationService.updateGame(this.databaseGame._id!, this.databaseGame).subscribe();
+        this.setLocalStorageVariables(false, this.databaseGame);
     }
 
     saveMap() {
@@ -132,9 +129,15 @@ export class GameMapDataManagerService {
     }
 
     resetGame() {
+        this.resetCurrentValues();
+        this.loadGrid();
+    }
+
+    resetCurrentValues() {
+        this.isGameUpdated = false;
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
-        this.loadGrid();
+        this.currentGrid = [];
     }
 
     isTerrainTile(tile: Tile): tile is TerrainTile {
@@ -143,5 +146,23 @@ export class GameMapDataManagerService {
 
     isItem(placeableEntity: PlaceableEntity): placeableEntity is Item {
         return (placeableEntity as Item).testItem !== undefined;
+    }
+
+    isDoor(tile: Tile): boolean {
+        return tile.type === TileType.Door || tile.type === TileType.OpenDoor;
+    }
+
+    hasValidNameAndDescription(): boolean {
+        return this.currentName !== '' && this.currentDescription !== '';
+    }
+
+    isSavedGame(): boolean {
+        if (this.databaseGame === undefined) return false;
+        return this.databaseGame._id !== undefined;
+    }
+
+    isGameModeCTF() {
+        if (this.databaseGame === undefined) return false;
+        return this.databaseGame.mode === GameMode.CTF;
     }
 }

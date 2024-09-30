@@ -6,6 +6,7 @@ import { EnchantedBook } from '@app/classes/Items/enchanted-book';
 import { Flag } from '@app/classes/Items/flag';
 import { Item } from '@app/classes/Items/item';
 import { Potion } from '@app/classes/Items/potion';
+import { RandomItem } from '@app/classes/Items/random-item';
 import { Spawn } from '@app/classes/Items/spawn';
 import { Totem } from '@app/classes/Items/totem';
 import { ItemType } from '@common/enums/item-type';
@@ -34,6 +35,8 @@ export class ItemFactoryService {
                 return new Flag();
             case ItemType.Spawn:
                 return new Spawn();
+            case ItemType.Random:
+                return new RandomItem();
             default:
                 return new Item();
         }

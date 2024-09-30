@@ -7,4 +7,5 @@ export enum ItemType {
     Totem = 'Totem',
     Flag = 'Flag',
     Spawn = 'Spawn',
+    Random = 'Random',
 }
