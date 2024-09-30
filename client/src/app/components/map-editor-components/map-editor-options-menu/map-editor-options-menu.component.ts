@@ -31,6 +31,7 @@ export class MapEditorOptionsMenuComponent {
             if (result) {
                 this.gameMapDataManagerService.currentName = result.name;
                 this.gameMapDataManagerService.currentDescription = result.description;
+                this.gameMapDataManagerService.isGameUpdated = true;
             }
         });
     }
@@ -40,7 +41,7 @@ export class MapEditorOptionsMenuComponent {
     }
 
     onSaveClick() {
-        if (this.gameMapDataManagerService.currentName === '' || this.gameMapDataManagerService.currentDescription === '') {
+        if (!this.gameMapDataManagerService.hasValidNameAndDescription()) {
             this.onOptionsClick();
             return;
         }
@@ -48,7 +49,7 @@ export class MapEditorOptionsMenuComponent {
     }
 
     getOptionsNotificationState(): ButtonNotificationState {
-        if (this.gameMapDataManagerService.currentName === '' || this.gameMapDataManagerService.currentDescription === '') {
+        if (!this.gameMapDataManagerService.hasValidNameAndDescription()) {
             return ButtonNotificationState.ALERT;
         } else {
             return ButtonNotificationState.HIDDEN;
@@ -56,6 +57,12 @@ export class MapEditorOptionsMenuComponent {
     }
 
     getSaveNotificationState(): ButtonNotificationState {
-        return this.saveNotificationState;
+        if (!this.gameMapDataManagerService.isSavedGame()) {
+            return ButtonNotificationState.ALERT;
+        }
+        if (this.gameMapDataManagerService.isGameUpdated) {
+            return ButtonNotificationState.WARNING;
+        }
+        return ButtonNotificationState.SUCCESS;
     }
 }

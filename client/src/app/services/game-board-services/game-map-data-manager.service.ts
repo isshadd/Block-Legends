@@ -36,6 +36,7 @@ export class GameMapDataManagerService {
     currentGrid: Tile[][] = [];
     currentName = '';
     currentDescription = '';
+    isGameUpdated: boolean = false;
 
     newGame(size: MapSize, mode: GameMode) {
         this.databaseGame = {
@@ -88,7 +89,7 @@ export class GameMapDataManagerService {
     }
 
     save() {
-        if (this.currentName === '' || this.currentDescription === '') return;
+        if (!this.hasValidNameAndDescription()) return;
 
         this.databaseGame.name = this.currentName;
         this.databaseGame.description = this.currentDescription;
@@ -99,6 +100,8 @@ export class GameMapDataManagerService {
         } else {
             this.saveGameInDb();
         }
+
+        this.isGameUpdated = false;
     }
 
     createGameInDb() {
@@ -134,6 +137,7 @@ export class GameMapDataManagerService {
     }
 
     resetCurrentValues() {
+        this.isGameUpdated = false;
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
         this.currentGrid = [];
@@ -145,5 +149,13 @@ export class GameMapDataManagerService {
 
     isItem(placeableEntity: PlaceableEntity): placeableEntity is Item {
         return (placeableEntity as Item).testItem !== undefined;
+    }
+
+    hasValidNameAndDescription(): boolean {
+        return this.currentName !== '' && this.currentDescription !== '';
+    }
+
+    isSavedGame(): boolean {
+        return this.databaseGame._id !== undefined;
     }
 }
