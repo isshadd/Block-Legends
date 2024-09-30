@@ -47,20 +47,18 @@ export class GameMapDataManagerService {
             isVisible: false,
             tiles: [],
         };
+        this.resetCurrentValues();
         this.createNewGrid();
     }
 
     loadGame(game: GameShared) {
         this.databaseGame = game;
-        this.currentName = game.name;
-        this.currentDescription = game.description;
+        this.resetCurrentValues();
         this.loadGrid();
     }
 
     createNewGrid() {
-        this.currentGrid = [];
         this.databaseGame.tiles = [];
-
         for (let i = 0; i < this.databaseGame.size; i++) {
             this.currentGrid.push([]);
             this.databaseGame.tiles.push([]);
@@ -74,7 +72,6 @@ export class GameMapDataManagerService {
     }
 
     loadGrid() {
-        this.currentGrid = [];
         for (let i = 0; i < this.databaseGame.tiles.length; i++) {
             this.currentGrid.push([]);
             for (let j = 0; j < this.databaseGame.tiles[i].length; j++) {
@@ -132,9 +129,14 @@ export class GameMapDataManagerService {
     }
 
     resetGame() {
+        this.resetCurrentValues();
+        this.loadGrid();
+    }
+
+    resetCurrentValues() {
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
-        this.loadGrid();
+        this.currentGrid = [];
     }
 
     isTerrainTile(tile: Tile): tile is TerrainTile {
