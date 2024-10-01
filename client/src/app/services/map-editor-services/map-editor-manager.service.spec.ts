@@ -316,6 +316,16 @@ describe('MapEditorManagerService', () => {
         expect(service.sideMenuItemsDisabler).toHaveBeenCalled();
     });
 
+    it('item remover should not accept not terrain tiles', () => {
+        const tile = new WallTile();
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(false);
+        spyOn(service, 'sideMenuItemFinder');
+
+        service.itemRemover(tile);
+
+        expect(service.sideMenuItemFinder).not.toHaveBeenCalled();
+    });
+
     it('should handle left-click on map tile with selected entity', () => {
         const tile = new GrassTile();
         tile.coordinates = { x: 0, y: 0 };
@@ -338,6 +348,17 @@ describe('MapEditorManagerService', () => {
 
         expect(service.itemPlacer).toHaveBeenCalledWith(selectedItem, tile);
         expect(service.cancelSelectionSideMenu).toHaveBeenCalled();
+    });
+
+    it('should handle left-click on map tile with bad values', () => {
+        const tile = new DoorTile();
+        tile.coordinates = { x: 0, y: 0 };
+        service.sideMenuSelectedEntity = null;
+        spyOn(service, 'tileCopyCreator');
+
+        service.leftClickMapTile(tile);
+
+        expect(service.tileCopyCreator).not.toHaveBeenCalled();
     });
 
     it('should handle left-click on map with closed doors', () => {
@@ -385,6 +406,27 @@ describe('MapEditorManagerService', () => {
         service.rightClickMapTile(event, tile);
 
         expect(service.itemRemover).toHaveBeenCalledWith(tile);
+    });
+
+    it('should handle right-click on map tile with bad values', () => {
+        const tile = new GrassTile();
+        tile.coordinates = { x: 0, y: 0 };
+        const event = new MouseEvent('contextmenu');
+        spyOn(event, 'preventDefault');
+        spyOn(service, 'tileCopyCreator');
+
+        service.rightClickMapTile(event, tile);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(service.tileCopyCreator).not.toHaveBeenCalled();
+
+        const tile2 = new WallTile();
+        tile2.coordinates = { x: 0, y: 0 };
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+
+        service.rightClickMapTile(event, tile2);
+
+        expect(service.tileCopyCreator).toHaveBeenCalled();
     });
 
     it('should call leftClickMapTile when left mouse button is clicked', () => {

@@ -22,7 +22,6 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ItemType } from '@common/enums/item-type';
-import { TileType } from '@common/enums/tile-type';
 
 class PlaceableEntitySection {
     title: string;
@@ -267,7 +266,6 @@ export class MapEditorManagerService {
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
         if (!this.sideMenuSelectedEntity) return;
-        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type && entity.type !== TileType.Door && entity.type !== TileType.OpenDoor) return;
         if (this.gameMapDataManagerService.isDoor(entity) && this.gameMapDataManagerService.isDoor(this.sideMenuSelectedEntity as Tile)) {
             if (entity instanceof DoorTile) {
                 this.tileCopyCreator(new OpenDoor(), entity);
