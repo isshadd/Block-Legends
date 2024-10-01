@@ -34,6 +34,7 @@ describe('MapComponent', () => {
 
         mapEditorManagerService = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
         gameMapDataManagerService = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
+        gameMapDataManagerService.currentGrid = [];
 
         tile = new GrassTile();
 

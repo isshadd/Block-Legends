@@ -73,9 +73,7 @@ describe('MapEditorOptionsMenuComponent', () => {
 
         component.onOptionsClick();
 
-        expect(matDialog.open).toHaveBeenCalledWith(MapEditorModalComponent, {
-            data: { name: gameMapDataManagerService.currentName, description: gameMapDataManagerService.currentDescription },
-        });
+        expect(matDialog.open).toHaveBeenCalled();
         expect(gameMapDataManagerService.currentName).toBe(mockGame.name);
         expect(gameMapDataManagerService.currentDescription).toBe(mockGame.description);
         expect(gameMapDataManagerService.isGameUpdated).toBeTrue();

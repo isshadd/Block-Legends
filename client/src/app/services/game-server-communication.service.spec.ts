@@ -20,6 +20,9 @@ describe('GameServerCommunicationService', () => {
             providers: [GameServerCommunicationService, provideHttpClientTesting()],
         });
 
+        service = TestBed.inject(GameServerCommunicationService);
+        httpTestingController = TestBed.inject(HttpTestingController);
+
         games = [
             {
                 _id: '1',
@@ -44,9 +47,6 @@ describe('GameServerCommunicationService', () => {
         };
 
         updateGameDto = { description: 'Updated description' };
-
-        service = TestBed.inject(GameServerCommunicationService);
-        httpTestingController = TestBed.inject(HttpTestingController);
     });
 
     afterEach(() => {
@@ -58,8 +58,8 @@ describe('GameServerCommunicationService', () => {
     });
 
     it('should fetch all games using GET', () => {
-        service.getGames().subscribe((games) => {
-            expect(games).toEqual(games);
+        service.getGames().subscribe((response) => {
+            expect(response).toEqual(games);
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
@@ -120,11 +120,10 @@ describe('GameServerCommunicationService', () => {
     });
 
     it('should handle error when fetching all games', () => {
-        games = [];
         const errorMessage = 'getAllGames failed: 404 error';
 
-        service.getGames().subscribe((games) => {
-            expect(games).toEqual([]);
+        service.getGames().subscribe((response) => {
+            expect(response).toEqual([]);
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);

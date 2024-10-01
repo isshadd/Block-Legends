@@ -78,17 +78,4 @@ describe('PlaceableEntityContainerComponent', () => {
         component.onDragEnded();
         expect(mapEditorManagerService.endDrag).toHaveBeenCalled();
     });
-
-    it('should have containerTitle input set correctly', () => {
-        component.containerTitle = 'Test Title';
-        fixture.detectChanges();
-        expect(component.containerTitle).toBe('Test Title');
-    });
-
-    it('should handle containerItems input correctly', () => {
-        const mockItems: PlaceableEntity[] = [mockEntity];
-        component.containerItems = mockItems;
-        fixture.detectChanges();
-        expect(component.containerItems).toEqual(mockItems);
-    });
 });

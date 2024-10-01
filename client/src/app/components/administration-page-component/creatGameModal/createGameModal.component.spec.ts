@@ -19,7 +19,7 @@ describe('CreateGameModalComponent', () => {
         const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', ['setLocalStorageVariables']);
 
         await TestBed.configureTestingModule({
-            declarations: [CreateGameModalComponent],
+            imports: [CreateGameModalComponent],
             providers: [
                 { provide: MatDialogRef, useValue: dialogRefSpy },
                 { provide: Router, useValue: routerSpy },
@@ -57,7 +57,7 @@ describe('CreateGameModalComponent', () => {
             description: '',
             size: component.selectedSize,
             mode: component.selectedMode,
-            imageUrl: 'test.jpg',
+            imageUrl: 'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
             isVisible: false,
             tiles: [],
         });
