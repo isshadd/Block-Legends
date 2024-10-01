@@ -34,14 +34,14 @@ describe('CharacterFormComponent', () => {
     it('should validate the name correctly', () => {
         component.character.name = 'ValidName';
         component.saveName();
-        expect(component.isNameValid()).toBe(true);
+        expect(component.character.isNameValid).toBe(true);
 
         component.character.name = '    ';
         component.saveName();
-        expect(component.isNameValid()).toBe(false);
+        expect(component.character.isNameValid).toBe(false);
 
         component.character.name = '';
         component.saveName();
-        expect(component.isNameValid()).toBe(false);
+        expect(component.character.isNameValid).toBe(false);
     });
 });

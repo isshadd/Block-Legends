@@ -1,6 +1,10 @@
+/* eslint-disable import/no-deprecated */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -12,6 +16,8 @@ describe('GameListComponent', () => {
     let fixture: ComponentFixture<GameListComponent>;
     let modeService: jasmine.SpyObj<ModeService>;
     let router: jasmine.SpyObj<Router>;
+    let mockGameServerCommunicationService: jasmine.SpyObj<GameServerCommunicationService>;
+    let mockAdministrationService: jasmine.SpyObj<AdministrationPageManagerService>;
 
     let mockGames: GameShared[];
 
@@ -19,13 +25,20 @@ describe('GameListComponent', () => {
         const modeServiceSpy = jasmine.createSpyObj('ModeService', ['selectedMode$']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-        await TestBed.configureTestingModule({
-            imports: [GameListComponent],
-            providers: [
-                { provide: ModeService, useValue: modeServiceSpy },
-                { provide: Router, useValue: routerSpy },
+        mockAdministrationService = jasmine.createSpyObj('AdministrationPageManagerService', [], {
+            games: [
+                {
+                    _id: '1',
+                    name: 'Game 1',
+                    isVisible: true,
+                    mode: GameMode.Classique,
+                    description: 'Description 1',
+                    size: MapSize.SMALL,
+                    imageUrl: '',
+                    tiles: [],
+                },
             ],
-        }).compileComponents();
+        });
 
         mockGames = [
             {
@@ -50,6 +63,25 @@ describe('GameListComponent', () => {
             },
         ];
 
+        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGames', 'getGame']);
+
+        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', {
+            getGames: of(mockGames),
+            getGame: of(mockGames[0]),
+        });
+
+        Object.defineProperty(modeServiceSpy, 'selectedMode$', { get: () => of(GameMode.Classique) });
+
+        await TestBed.configureTestingModule({
+            imports: [GameListComponent, HttpClientTestingModule],
+            providers: [
+                { provide: ModeService, useValue: modeServiceSpy },
+                { provide: Router, useValue: routerSpy },
+                { provide: GameServerCommunicationService, useValue: mockGameServerCommunicationService },
+                { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
+            ],
+        }).compileComponents();
+
         fixture = TestBed.createComponent(GameListComponent);
         component = fixture.componentInstance;
         modeService = TestBed.inject(ModeService) as jasmine.SpyObj<ModeService>;
@@ -67,6 +99,19 @@ describe('GameListComponent', () => {
         expect(component.selectedMode).toBe(GameMode.Classique);
     });
 
+    it('should populate games from GameServerCommunicationService', () => {
+        component.ngOnInit();
+        expect(mockGameServerCommunicationService.getGames).toHaveBeenCalled();
+        expect(component.games.length).toBe(2);
+        expect(component.games).toEqual(mockGames);
+    });
+
+    it('should return games from AdministrationPageManagerService', () => {
+        const games = component.getGames();
+        expect(games.length).toBe(1);
+        expect(games[0]).toEqual(mockGames[0]);
+    });
+
     it('should navigate to /home when homeButton is called', () => {
         component.homeButton();
         expect(router.navigate).toHaveBeenCalledWith(['/home']);
@@ -76,17 +121,18 @@ describe('GameListComponent', () => {
         const visibleGame = mockGames[0];
         component.selectGame(visibleGame);
 
-        expect(component.selectedGame).toBe(visibleGame);
+        expect(component.selectedGame).toEqual(visibleGame);
         expect(component.gameStatus).toBeNull();
         expect(router.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should not select a game and set gameStatus when an invisible game is selected', () => {
-        const invisibleGame = mockGames[1];
+        mockGames[0].isVisible = false;
+        const invisibleGame = mockGames[0];
         component.selectGame(invisibleGame);
 
         expect(component.selectedGame).toBeNull();
-        expect(component.gameStatus).toBe(`Le jeu choisi ${invisibleGame.name} n'est plus visible ou supprimé`);
+        expect(component.gameStatus).toBe(`Le jeu choisi ${invisibleGame.name} n'est plus disponible`);
         expect(router.navigate).not.toHaveBeenCalled();
     });
 

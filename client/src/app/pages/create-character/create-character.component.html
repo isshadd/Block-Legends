@@ -1,5 +1,5 @@
 <div class="glob">
-    <h1>Création de personnage - League of Versions</h1>
+    <h1>Création de personnage</h1>
     <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
         <app-character-form [character]="character"></app-character-form>
         <app-avatar-selection [character]="character"></app-avatar-selection>
@@ -8,8 +8,8 @@
         <div id="message">{{ characterStatus }}</div>
         }
         <div class="button-create-character">
-            <button id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
-            <button id="create" type="submit">Créer le personnage</button>
+            <button class="dark-button" id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
+            <button class="dark-button" id="create" type="submit">Créer le personnage</button>
         </div>
     </form>
     @if(isModalOpen) {
