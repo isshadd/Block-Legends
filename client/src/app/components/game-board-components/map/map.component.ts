@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Item } from '@app/classes/Items/item';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
@@ -9,7 +10,7 @@ import { VisibleStateComponent } from '../visible-state/visible-state.component'
 @Component({
     selector: 'app-map',
     standalone: true,
-    imports: [PlaceableEntityComponent, VisibleStateComponent],
+    imports: [PlaceableEntityComponent, VisibleStateComponent, MatTooltipModule],
     templateUrl: './map.component.html',
     styleUrl: './map.component.scss',
 })
