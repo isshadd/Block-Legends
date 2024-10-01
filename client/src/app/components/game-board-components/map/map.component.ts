@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
+import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-import { VisibleStateComponent } from '../visible-state/visible-state.component';
 
 @Component({
     selector: 'app-map',

@@ -25,7 +25,6 @@ export class AdministrationPageManagerService {
 
     toggleVisibility(game: GameShared): void {
         if (!game._id) {
-            console.error('Game id is not defined');
             return;
         }
         game.isVisible = !game.isVisible;

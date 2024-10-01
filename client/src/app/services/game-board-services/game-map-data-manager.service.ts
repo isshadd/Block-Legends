@@ -4,11 +4,11 @@ import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
-import { GameServerCommunicationService } from '../game-server-communication.service';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
@@ -16,18 +16,17 @@ import { TileFactoryService } from './tile-factory.service';
     providedIn: 'root',
 })
 export class GameMapDataManagerService {
+    databaseGame: GameShared;
+    currentGrid: Tile[][] = [];
+    currentName = '';
+    currentDescription = '';
+    isGameUpdated: boolean = false;
+
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
     ) {}
-
-    databaseGame: GameShared;
-
-    currentGrid: Tile[][] = [];
-    currentName = '';
-    currentDescription = '';
-    isGameUpdated: boolean = false;
 
     newGame(game: GameShared) {
         this.databaseGame = game;
@@ -109,7 +108,9 @@ export class GameMapDataManagerService {
 
     saveGameInDb() {
         if (!this.isSavedGame()) return;
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id!, this.databaseGame).subscribe();
+        if (this.databaseGame._id) {
+            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe();
+        }
         this.setLocalStorageVariables(false, this.databaseGame);
     }
 
@@ -117,14 +118,16 @@ export class GameMapDataManagerService {
         this.databaseGame.tiles = [];
         for (let i = 0; i < this.currentGrid.length; i++) {
             this.databaseGame.tiles.push([]);
-            for (let j = 0; j < this.currentGrid[i].length; j++) {
-                this.databaseGame.tiles[i].push({
-                    type: this.currentGrid[i][j].type,
-                    item:
-                        this.isTerrainTile(this.currentGrid[i][j]) && (this.currentGrid[i][j] as TerrainTile).item?.type !== undefined
-                            ? { type: (this.currentGrid[i][j] as TerrainTile).item!.type }
-                            : null,
-                });
+            for (const tile of this.currentGrid[i]) {
+                if (this.isTerrainTile(tile)) {
+                    const currentTile: TerrainTile = tile as TerrainTile;
+                    this.databaseGame.tiles[i].push({
+                        type: currentTile.type,
+                        item: currentTile.item && this.isItem(currentTile.item) ? { type: currentTile.item.type } : null,
+                    });
+                } else {
+                    this.databaseGame.tiles[i].push({ type: tile.type });
+                }
             }
         }
     }
@@ -172,8 +175,12 @@ export class GameMapDataManagerService {
     }
 
     itemLimit(): number {
-        if (this.gameSize() === MapSize.SMALL) return 2;
-        if (this.gameSize() === MapSize.MEDIUM) return 4;
-        return 6;
+        const ITEM_LIMITS = {
+            [MapSize.SMALL]: 2,
+            [MapSize.MEDIUM]: 4,
+            [MapSize.LARGE]: 6,
+        };
+
+        return ITEM_LIMITS[this.gameSize()];
     }
 }

@@ -16,32 +16,31 @@ export class GameServerCommunicationService {
     constructor(private readonly http: HttpClient) {}
 
     getGames(): Observable<GameShared[]> {
-        return this.http.get<GameShared[]>(`${this.baseUrl}/`).pipe(catchError(this.handleError<GameShared[]>('getAllGames', [])));
+        return this.http.get<GameShared[]>(`${this.baseUrl}/`).pipe(catchError(this.handleError<GameShared[]>()));
     }
 
     getGame(id: string): Observable<GameShared> {
-        return this.http.get<GameShared>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<GameShared>(`getGame id=${id}`)));
+        return this.http.get<GameShared>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<GameShared>()));
     }
 
     addGame(game: CreateGameSharedDto): Observable<GameShared> {
-        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleError<GameShared>('addGame')));
+        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleError<GameShared>()));
     }
 
     updateGame(id: string, game: UpdateGameSharedDto): Observable<void> {
-        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleError<void>('updateGame')));
+        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleError<void>()));
     }
 
     deleteGame(id: string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>()));
     }
 
     emptyDatabase(): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/`).pipe(catchError(this.handleError<void>('emptyDatabase')));
+        return this.http.delete<void>(`${this.baseUrl}/`).pipe(catchError(this.handleError<void>()));
     }
 
-    private handleError<T>(operation = 'operation', result?: T) {
-        return (error: any): Observable<T> => {
-            console.error(`${operation} failed: ${error.message}`);
+    private handleError<T>(result?: T) {
+        return (): Observable<T> => {
             return of(result as T);
         };
     }

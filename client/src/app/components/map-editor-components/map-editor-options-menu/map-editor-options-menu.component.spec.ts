@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ButtonNotificationState } from '@app/components/map-editor-components/button-notification/button-notification.component';
+import { MapEditorModalComponent } from '@app/components/map-editor-components/map-editor-modal/map-editor-modal.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { of } from 'rxjs';
-import { ButtonNotificationState } from '../button-notification/button-notification.component';
-import { MapEditorModalComponent } from '../map-editor-modal/map-editor-modal.component';
 import { MapEditorOptionsMenuComponent } from './map-editor-options-menu.component';
 
 describe('MapEditorOptionsMenuComponent', () => {

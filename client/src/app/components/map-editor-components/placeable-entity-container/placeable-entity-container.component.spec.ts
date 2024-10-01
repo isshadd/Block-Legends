@@ -38,7 +38,7 @@ describe('PlaceableEntityContainerComponent', () => {
             description: 'Test Description',
             imageUrl: 'test-url',
             coordinates: { x: 0, y: 0 },
-            visibleState: VisibleState.notSelected,
+            visibleState: VisibleState.NotSelected,
         };
 
         fixture = TestBed.createComponent(PlaceableEntityContainerComponent);

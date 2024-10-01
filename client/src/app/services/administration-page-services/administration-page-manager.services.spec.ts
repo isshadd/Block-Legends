@@ -63,7 +63,7 @@ describe('AdministrationPageManagerService', () => {
     it('should log an error if game._id is not defined', () => {
         spyOn(console, 'error');
         const mockGame: GameShared = {
-            _id: undefined as any,
+            _id: undefined,
             name: 'Game without ID',
             description: '',
             size: MapSize.LARGE,
@@ -75,7 +75,6 @@ describe('AdministrationPageManagerService', () => {
 
         service.toggleVisibility(mockGame);
 
-        expect(console.error).toHaveBeenCalledWith('Game id is not defined');
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
     });
 });

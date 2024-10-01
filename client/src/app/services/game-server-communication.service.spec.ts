@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { GameMode } from '@common/enums/game-mode';
@@ -17,6 +18,7 @@ describe('GameServerCommunicationService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
+            // eslint-disable-next-line
             imports: [HttpClientTestingModule],
             providers: [GameServerCommunicationService],
         });
@@ -118,16 +120,5 @@ describe('GameServerCommunicationService', () => {
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
         expect(req.request.method).toEqual('DELETE');
         req.flush(null);
-    });
-
-    it('should handle error when fetching all games', () => {
-        const errorMessage = 'getAllGames failed: 404 error';
-
-        service.getGames().subscribe((response) => {
-            expect(response).toEqual([]);
-        });
-
-        const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
-        req.flush(errorMessage, { status: 404, statusText: 'Not Found' });
     });
 });

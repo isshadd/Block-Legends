@@ -15,8 +15,6 @@ import { ItemType } from '@common/enums/item-type';
     providedIn: 'root',
 })
 export class ItemFactoryService {
-    constructor() {}
-
     createItem(type: ItemType): Item {
         switch (type) {
             case ItemType.Sword:

@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 // eslint-disable-next-line max-len
+import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
+// eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
-import { MapEditorOptionsMenuComponent } from '../../components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
 
 @Component({
     selector: 'app-map-editor',

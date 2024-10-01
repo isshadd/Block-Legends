@@ -106,7 +106,7 @@ describe('MapEditorComponent', () => {
         await createComponent();
         fixture.detectChanges();
 
-        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id!);
+        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id as string);
         expect(gameMapDataManagerService.loadGame).toHaveBeenCalledWith(mockGame);
         expect(mapEditorManagerService.init).toHaveBeenCalled();
         expect(component).toBeTruthy();

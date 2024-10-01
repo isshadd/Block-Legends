@@ -7,6 +7,6 @@ import { Tile } from './tile';
 })
 export class OpenDoor extends Tile {
     type: TileType = TileType.OpenDoor;
-    description: string = "Porte ouverte. Vous pouvez maintenant la franchir.";
+    description: string = 'Porte ouverte. Vous pouvez maintenant la franchir.';
     imageUrl: string = 'assets/images/tiles/open-door.png';
 }
