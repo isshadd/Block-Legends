@@ -41,6 +41,7 @@ export class MapEditorComponent {
             this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
                 this.gameMapDataManagerService.loadGame(game);
                 this.mapEditorManagerService.init();
+                this.mapEditorManagerService.mapItemCheckup();
             });
         }
     }
