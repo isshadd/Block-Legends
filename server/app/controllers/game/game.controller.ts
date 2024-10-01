@@ -3,7 +3,6 @@ import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameService } from '@app/services/game/game.service';
-import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -139,54 +138,5 @@ export class GameController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
-    @ApiOkResponse({
-        description: 'Validates the game depending on the number of spawn points',
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/:id/isValidSizeBySpawnPoints')
-    async isValidSizeBySpawnPoints(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const isValid = await this.gameValidationService.isValidSizeBySpawnPoints(id);
-            response.status(HttpStatus.OK).json(isValid);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-
-    @ApiOkResponse({
-        description: 'Generates matrix of 1 and 0',
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/:id/Matrix')
-    async mapToMatrix(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const matrix = await this.gameValidationService.mapToMatrix(id);
-            response.status(HttpStatus.OK).json(matrix);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-
-    @ApiOkResponse({
-        description: 'Map validation',
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/:id/MapValidation')
-    async mapIsValid(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const matrix = await this.gameValidationService.mapIsValid(id);
-            response.status(HttpStatus.OK).json(matrix);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-    
 
 }
