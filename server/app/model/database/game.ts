@@ -1,22 +1,33 @@
+import { Tile } from '@app/model/schema/tile.schema';
+import { GameMode } from '@common/enums/game-mode';
+import { MapSize } from '@common/enums/map-size';
+import { GameShared } from '@common/interfaces/game-shared';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 
 export type GameDocument = Game & Document;
 
-@Schema()
-export class Game {
+@Schema({ timestamps: true })
+export class Game implements GameShared {
+    @ApiProperty()
+    _id?: string;
+
     @ApiProperty()
     @Prop({ required: true })
     name: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    size: number;
+    description: string;
 
     @ApiProperty()
     @Prop({ required: true })
-    mode: string;
+    size: MapSize;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    mode: GameMode;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -24,14 +35,11 @@ export class Game {
 
     @ApiProperty()
     @Prop({ required: true })
-    lastModificationDate: Date;
-
-    @ApiProperty()
-    @Prop({ required: true })
     isVisible: boolean;
 
     @ApiProperty()
-    _id?: string;
+    @Prop({ required: true })
+    tiles: Tile[][];
 }
 
 export const gameSchema = SchemaFactory.createForClass(Game);

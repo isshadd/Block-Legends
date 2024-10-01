@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
-import { Vec2 } from '@app/interfaces/vec2';
+import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { ItemType } from '@common/enums/item-type';
+import { Vec2 } from '@common/interfaces/vec2';
 
 @Injectable({
     providedIn: 'root',
 })
 export class Item implements PlaceableEntity {
-    name: string = 'Item';
-    description: string = 'Item';
-    imageUrl: string = 'assets/images/item/baseItem.png'; // minecraftWiki
+    type: ItemType;
+    description: string;
+    imageUrl: string; // minecraftWiki
     coordinates: Vec2 = { x: -1, y: -1 };
+    visibleState: VisibleState = VisibleState.NotSelected;
+    isPlaced: boolean = false;
+    itemLimit: number = 1;
+    testItem: string = 'test'; // TODO: remove this
 }

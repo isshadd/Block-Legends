@@ -1,0 +1,40 @@
+@import 'src/_variables.scss';
+
+#modal-container {
+    display: flex;
+    flex-direction: column;
+    background-color: $primary-dark;
+    color: $primary-light;
+    padding: 10px;
+    height: auto;
+
+    #modal-title {
+        align-self: center;
+        font-size: 150%;
+    }
+
+    form {
+        margin-top: 20px;
+        margin-bottom: 20px;
+
+        mat-form-field {
+            width: 100%;
+            margin-top: 10px;
+
+            mat-error {
+                color: $primary-light;
+                font-size: 50%;
+            }
+        }
+    }
+
+    #modal-options {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .dark-button:disabled {
+        background-color: darken($primary-light, 50%);
+    }
+}

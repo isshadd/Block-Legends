@@ -1,11 +1,5 @@
 @import 'src/_variables.scss';
 
-.admin_page {
-    background-color: $background;
-    background-size: 100%;
-    padding: 20px;
-}
-
 .game_list {
     font-size: 2rem;
     color: $primary-light;
@@ -29,17 +23,4 @@
     display: flex;
     justify-content: space-between;
     padding: 20px;
-}
-
-.button_container button {
-    padding: 10px 30px;
-    margin-right: 20px;
-    font-size: medium;
-    background-color: $primary-dark;
-    color: $primary-light;
-}
-
-.button_container button:hover {
-    background-color: $secondary;
-    color: $primary-dark;
 }

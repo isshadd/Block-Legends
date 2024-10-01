@@ -1,0 +1,13 @@
+#options-menu {
+    padding: 10px;
+
+    .button-container {
+        position: relative;
+
+        .dark-button {
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+    }
+}

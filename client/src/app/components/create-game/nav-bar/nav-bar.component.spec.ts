@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { GameMode } from '@common/enums/game-mode';
 import { NavBarComponent } from './nav-bar.component';
 
 describe('NavBarComponent', () => {
@@ -21,7 +22,7 @@ describe('NavBarComponent', () => {
     });
 
     it('should select a mode', () => {
-        const mode = 'Combat classique';
+        const mode = GameMode.Classique;
         component.selectMode(mode);
         expect(component.selectedMode).toEqual(mode);
     });
