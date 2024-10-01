@@ -116,7 +116,7 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should create a new game in the database if _id is undefined', () => {
-        service.databaseGame = {
+        const originalGame: GameShared = {
             _id: undefined,
             name: 'Game to Save',
             description: 'Description',
@@ -126,17 +126,26 @@ describe('GameMapDataManagerService', () => {
             imageUrl: '',
             isVisible: false,
         };
+        service.databaseGame = originalGame;
         service.currentName = 'Game to Save';
         service.currentDescription = 'Description';
 
-        const returnedGame: GameShared = { ...service.databaseGame, _id: 'new_id' };
+        const returnedGame: GameShared = { ...originalGame, _id: 'new_id' };
         gameServerCommunicationServiceSpy.addGame.and.returnValue(of(returnedGame));
+
+        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
 
         service.save();
 
-        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(service.databaseGame);
+        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
+
         expect(service.databaseGame._id).toBe('new_id');
+
         expect(service.isGameUpdated).toBeFalse();
+
+        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
+        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, returnedGame);
+
         expect(localStorage.getItem('isNewGame')).toBe('false');
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
     });
@@ -184,16 +193,11 @@ describe('GameMapDataManagerService', () => {
         expect(service.getLocalStorageGameToEdit()).toEqual(mockGame);
     });
 
-    // it('should return default values if local storage is empty', () => {
-    //     expect(service.getLocalStorageIsNewGame()).toBeFalse();
-    //     expect(service.getLocalStorageGameToEdit()).toEqual('{}');
-    // });
-
-    it('should call addGame and update local storage upon creation', () => {
+    it('should correctly save non-TerrainTile types by pushing { type: tile.type } to databaseGame.tiles', () => {
         service.databaseGame = {
-            _id: undefined,
-            name: 'New Game',
-            description: 'Description',
+            _id: 'test_id',
+            name: 'Test Game',
+            description: 'A test game description',
             mode: GameMode.CTF,
             size: MapSize.SMALL,
             tiles: [],
@@ -201,13 +205,57 @@ describe('GameMapDataManagerService', () => {
             isVisible: false,
         };
 
-        const returnedGame: GameShared = { ...service.databaseGame, _id: 'new_id' };
+        const grassTile = new DoorTile();
+        grassTile.type = TileType.Door;
+
+        service.currentGrid = [[grassTile]];
+
+        service.saveMap();
+
+        expect(service.databaseGame.tiles.length).toBe(1);
+        expect(service.databaseGame.tiles[0].length).toBe(1);
+        expect(service.databaseGame.tiles[0][0]).toEqual(jasmine.objectContaining({ type: TileType.Door }));
+    });
+    
+    it('should call addGame with the game having _id: undefined and update local storage with the returned game having _id: new_id', () => {
+        // **Arrange**
+
+        // Initialize databaseGame with _id: undefined to simulate a new game
+        const originalGame: GameShared = {
+            _id: undefined,
+            name: 'New Game',
+            description: 'Description',
+            mode: GameMode.CTF, // Assuming 'CTF' corresponds to 'Capture de drapeau'
+            size: MapSize.SMALL, // Assuming size 10 corresponds to SMALL
+            tiles: [],
+            imageUrl: '',
+            isVisible: false,
+        };
+        service.databaseGame = originalGame;
+
+        // Spy on setLocalStorageVariables to monitor its invocation
+        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
+
+        // Mock the addGame method to return a game with _id: 'new_id'
+        const returnedGame: GameShared = { ...originalGame, _id: 'new_id' };
         gameServerCommunicationServiceSpy.addGame.and.returnValue(of(returnedGame));
 
+        // **Act**
         service.createGameInDb();
 
-        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(service.databaseGame);
+        // **Assert**
+
+        // Verify that addGame was called with the original game (_id: undefined)
+        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
+
+        // Verify that databaseGame is updated with the returned game (_id: 'new_id')
         expect(service.databaseGame).toEqual(returnedGame);
+
+        // Verify that setLocalStorageVariables was called once with false and the returned game
+        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
+        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, returnedGame);
+
+        // Verify that localStorage is updated correctly
         expect(localStorage.getItem('isNewGame')).toBe('false');
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
     });
@@ -220,9 +268,6 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should call setLocalStorageVariables with false and the current game when the game is saved', () => {
-        // **Arrange**
-
-        // Initialize databaseGame with a valid _id to simulate a saved game
         const mockGame: GameShared = {
             _id: 'existing_id',
             name: 'Existing Game',
@@ -235,36 +280,24 @@ describe('GameMapDataManagerService', () => {
         };
         service.databaseGame = mockGame;
 
-        // Spy on isSavedGame to return true
         spyOn(service, 'isSavedGame').and.returnValue(true);
 
-        // Spy on setLocalStorageVariables to monitor its invocation
         const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
 
-        // Optionally, spy on updateGame if you want to verify its call as well
         gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
 
-        // **Act**
         service.saveGameInDb();
 
-        // **Assert**
-
-        // Verify that updateGame was called with correct parameters
         expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', mockGame);
 
-        // Verify that setLocalStorageVariables was called once with false and the current game
         expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
         expect(setLocalStorageSpy).toHaveBeenCalledWith(false, mockGame);
 
-        // Additionally, you can verify localStorage if needed
         expect(localStorage.getItem('isNewGame')).toBe('false');
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(mockGame));
     });
 
     it('should not call setLocalStorageVariables if the game is not saved', () => {
-        // **Arrange**
-
-        // Initialize databaseGame without an _id to simulate an unsaved game
         const mockGame: GameShared = {
             _id: undefined,
             name: 'Unsaved Game',
@@ -277,30 +310,25 @@ describe('GameMapDataManagerService', () => {
         };
         service.databaseGame = mockGame;
 
-        // Spy on isSavedGame to return false
         spyOn(service, 'isSavedGame').and.returnValue(false);
 
-        // Spy on setLocalStorageVariables to monitor its invocation
         const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
 
-        // **Act**
         service.saveGameInDb();
 
-        // **Assert**
-
-        // Verify that updateGame was not called
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
 
-        // Verify that setLocalStorageVariables was not called
         expect(setLocalStorageSpy).not.toHaveBeenCalled();
 
-        // Additionally, verify that localStorage remains unchanged
         expect(localStorage.getItem('isNewGame')).toBeNull();
         expect(localStorage.getItem('gameToEdit')).toBeNull();
     });
 
     it('should update the game in the database if _id is defined', () => {
-        service.databaseGame = {
+        // **Arrange**
+
+        // Initialize databaseGame with a defined _id to simulate a saved game
+        const existingGame: GameShared = {
             _id: 'existing_id',
             name: 'Existing Game',
             description: 'Description',
@@ -310,11 +338,23 @@ describe('GameMapDataManagerService', () => {
             imageUrl: '',
             isVisible: false,
         };
+        service.databaseGame = existingGame;
+
+        gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
+
+        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
+
         service.saveGameInDb();
 
-        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', service.databaseGame);
+        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', existingGame);
+
+        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
+        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, existingGame);
+
         expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(service.databaseGame));
+        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(existingGame));
+
+        expect(service.isGameUpdated).toBeFalse();
     });
 
     it('should correctly save the current grid to the database game tiles', () => {
@@ -384,23 +424,23 @@ describe('GameMapDataManagerService', () => {
     it('should correctly identify non-Item', () => {
         const nonItem = { name: 'Not an Item' };
 
-        expect(service.isItem(nonItem as unknown)).toBeFalse();
+        expect(service.isItem(nonItem as any)).toBeFalse();
     });
 
     it('should return true for Door type', () => {
-        const doorTile = { type: TileType.Door } as unknown;
+        const doorTile = { type: TileType.Door } as any;
 
         expect(service.isDoor(doorTile)).toBeTrue();
     });
 
     it('should return true for OpenDoor type', () => {
-        const openDoorTile = { type: TileType.OpenDoor } as unknown;
+        const openDoorTile = { type: TileType.OpenDoor } as any;
 
         expect(service.isDoor(openDoorTile)).toBeTrue();
     });
 
     it('should return false for other tile types', () => {
-        const grassTile = { type: TileType.Grass } as unknown;
+        const grassTile = { type: TileType.Grass } as any;
 
         expect(service.isDoor(grassTile)).toBeFalse();
     });
