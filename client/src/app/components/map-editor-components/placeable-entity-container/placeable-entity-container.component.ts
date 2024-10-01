@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
@@ -13,6 +13,7 @@ import { ItemLimitCounterComponent } from '../item-limit-counter/item-limit-coun
     imports: [PlaceableEntityComponent, MatTooltipModule, VisibleStateComponent, DragDropModule, ItemLimitCounterComponent],
     templateUrl: './placeable-entity-container.component.html',
     styleUrl: './placeable-entity-container.component.scss',
+    encapsulation: ViewEncapsulation.None,
 })
 export class PlaceableEntityContainerComponent {
     constructor(

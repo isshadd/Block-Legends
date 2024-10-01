@@ -9,7 +9,7 @@ import { TileType } from '../../../../../common/enums/tile-type';
 })
 export class WallTile extends Tile {
     type: TileType = TileType.Wall;
-    description: string = 'Mur';
+    description: string = 'Mur. Impossible de passer.';
     imageUrl: string = 'assets/images/tiles/brickwall.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
     visibleState: VisibleState = VisibleState.notSelected;

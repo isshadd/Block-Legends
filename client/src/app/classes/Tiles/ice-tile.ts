@@ -10,7 +10,7 @@ import { Item } from '../Items/item';
 })
 export class IceTile extends TerrainTile {
     type: TileType = TileType.Ice;
-    description: string = 'Glace';
+    description: string = 'Glace. Risque de chute en marchant dessus.';
     imageUrl: string = 'assets/images/tiles/ice.jpg';
     coordinates: Vec2 = { x: -1, y: -1 };
     item: Item | null = null;
