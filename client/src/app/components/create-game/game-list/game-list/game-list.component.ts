@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
-import { Game } from '@common/game.interface';
+import { GameMode } from '@common/enums/game-mode';
+import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
     selector: 'app-game-list',
@@ -14,10 +15,10 @@ import { Game } from '@common/game.interface';
     styleUrl: './game-list.component.scss',
 })
 export class GameListComponent implements OnInit {
-    selectedGame: Game | null;
+    games: GameShared[] = [];
+    selectedGame: GameShared | null;
     gameStatus: string | null;
-    selectedMode: string | null = 'Combat classique';
-    games: Game[] = [];
+    selectedMode: GameMode = GameMode.Classique;
 
     constructor(
         private modeService: ModeService,
@@ -25,12 +26,12 @@ export class GameListComponent implements OnInit {
         private administrationService: AdministrationPageManagerService,
         private gameServerCommunicationService: GameServerCommunicationService,
     ) {
-        this.gameServerCommunicationService.getGames().subscribe((games: Game[]) => {
+        this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
             this.games = games;
         });
     }
 
-    getGames(): Game[] {
+    getGames(): GameShared[] {
         return this.administrationService.games;
     }
 
@@ -44,7 +45,7 @@ export class GameListComponent implements OnInit {
         this.router.navigate(['/home']);
     }
 
-    selectGame(game: Game) {
+    selectGame(game: GameShared) {
         if (!game.isVisible) {
             this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
             this.selectedGame = null;
@@ -56,9 +57,6 @@ export class GameListComponent implements OnInit {
     }
 
     getFilteredGames() {
-        if (!this.selectedMode) {
-            return this.games;
-        }
         return this.games.filter((game) => game.isVisible && game.mode === this.selectedMode);
     }
 }

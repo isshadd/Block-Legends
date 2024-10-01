@@ -23,7 +23,6 @@ describe('CreateCharacterComponent', () => {
         mockAvatar = jasmine.createSpyObj('AvatarSelectionComponent', ['selectAvatar']);
         mockFormCharacter = jasmine.createSpyObj('CharacterFormComponent', ['saveName']);
         mockModal = jasmine.createSpyObj('ModalComponent', ['onConfirm', 'onCancel']);
-        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockAttributes = jasmine.createSpyObj('AttributesComponent', ['character', 'characterStatus']);
         await TestBed.configureTestingModule({
             imports: [FormsModule, CreateCharacterComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],

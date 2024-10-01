@@ -72,6 +72,6 @@ export class CreateCharacterComponent {
 
     confirmBack() {
         this.closeModal();
-        this.router.navigate(['/create-game']).then(() => { window.location.reload(); });
+        this.router.navigate(['/create-game']);
     }
 }

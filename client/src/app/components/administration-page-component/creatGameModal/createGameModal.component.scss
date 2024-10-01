@@ -28,17 +28,10 @@
     flex-direction: column;
 }
 
-.buttons button {
+.dark-button {
     padding: 10px 30px;
     margin-right: 20px;
     font-size: medium;
-    background-color: $primary-dark;
-    color: $primary-light;
-}
-
-.buttons button:hover {
-    background-color: $secondary;
-    color: $primary-dark;
 }
 
 body {

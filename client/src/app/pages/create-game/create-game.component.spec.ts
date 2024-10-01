@@ -3,10 +3,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
-import { Game } from '@common/game.interface';
+import { GameMode } from '@common/enums/game-mode';
+import { MapSize } from '@common/enums/map-size';
+import { GameShared } from '@common/interfaces/game-shared';
 import { CreateGameComponent } from './create-game.component';
-
-const GAME_SIZE = 30;
 
 describe('CreateGameComponent', () => {
     let component: CreateGameComponent;
@@ -35,21 +35,29 @@ describe('CreateGameComponent', () => {
     });
 
     it('should call selectMode on NavBarComponent', () => {
-        const mode = 'Combat classique';
+        const mode = GameMode.Classique;
         mockNavBarComponent.selectMode(mode);
         expect(mockNavBarComponent.selectMode).toHaveBeenCalledWith(mode);
     });
 
     it('should contain a game list', () => {
-        const game: Game = {
+        const game: GameShared = {
             name: 'JeuTest',
-            size: GAME_SIZE,
-            mode: 'Combat classique',
-            imageUrl: '',
-            lastModificationDate: new Date('2024-10-23'),
+            description: 'Description du jeu',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'test.jpg',
             isVisible: true,
+            tiles: [],
         };
         mockGameListComponent.selectGame(game);
         expect(mockGameListComponent.selectGame).toHaveBeenCalledWith(game);
+    });
+
+    it('should select game mode', () => {
+        const mode: GameMode = GameMode.Classique;
+        spyOn(component.modeService, 'setSelectedMode').and.callThrough();
+        component.selectMode(mode);
+        expect(component.modeService.setSelectedMode).toHaveBeenCalledWith(mode);
     });
 });

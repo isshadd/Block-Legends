@@ -16,9 +16,6 @@ export class AdministrationGameComponent {
     constructor(public dialog: MatDialog) {}
 
     openCreateGameModal(): void {
-        this.dialog.open(CreateGameModalComponent, {
-            width: '700px',
-            height: '400px',
-        });
+        this.dialog.open(CreateGameModalComponent);
     }
 }

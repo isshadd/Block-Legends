@@ -1,0 +1,30 @@
+<div id="modal-container">
+    <div id="modal-title">Paramètres</div>
+    <div mat-dialog-content>
+        <form [formGroup]="infoForm">
+            <mat-form-field appearance="fill">
+                <mat-label>Nom du jeu</mat-label>
+                <input matInput formControlName="name" required />
+                @if (infoForm.get('name')?.hasError('required')) {
+                <mat-error> Nom de jeu est requis</mat-error>
+                } @if (infoForm.get('name')?.hasError('maxlength')) {
+                <mat-error> Nom de jeu ne doit pas dépasser {{ nameMaxLength }} caractères</mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Description du jeu</mat-label>
+                <textarea matInput formControlName="description" required></textarea>
+                @if (infoForm.get('description')?.hasError('required')) {
+                <mat-error> Description du jeu est requise</mat-error>
+                } @if (infoForm.get('description')?.hasError('maxlength')) {
+                <mat-error> Nom de jeu ne doit pas dépasser {{ descriptionMaxLenght }} caractères</mat-error>
+                }
+            </mat-form-field>
+        </form>
+    </div>
+    <div mat-dialog-actions id="modal-options">
+        <button class="dark-button" (click)="onSaveClick()" [disabled]="!infoForm.valid">Ok</button>
+        <button class="dark-button" (click)="onCloseClick()">Retour</button>
+    </div>
+</div>
