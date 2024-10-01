@@ -1,259 +1,297 @@
-// import { TestBed } from '@angular/core/testing';
-// import { Flag } from '@app/classes/Items/flag';
-// import { Item } from '@app/classes/Items/item';
-// import { GrassTile } from '@app/classes/Tiles/grass-tile';
-// import { IceTile } from '@app/classes/Tiles/ice-tile';
-// import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-// import { Tile } from '@app/classes/Tiles/tile';
-// import { WaterTile } from '@app/classes/Tiles/water-tile';
-// import { VisibleState } from '@app/interfaces/placeable-entity';
-// import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-// import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
-// import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
-// import { MapEditorManagerService } from './map-editor-manager.service';
+import { TestBed } from '@angular/core/testing';
+import { Chestplate } from '@app/classes/Items/chestplate';
+import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { RandomItem } from '@app/classes/Items/random-item';
+import { DoorTile } from '@app/classes/Tiles/door-tile';
+import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { IceTile } from '@app/classes/Tiles/ice-tile';
+import { WaterTile } from '@app/classes/Tiles/water-tile';
+import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { MapEditorManagerService } from './map-editor-manager.service';
 
-// describe('MapEditorManagerService', () => {
-//     let service: MapEditorManagerService;
-//     let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
-//     let itemFactoryServiceSpy: jasmine.SpyObj<ItemFactoryService>;
-//     let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
+describe('MapEditorManagerService', () => {
+    let service: MapEditorManagerService;
+    let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
+    let itemFactoryServiceSpy: jasmine.SpyObj<ItemFactoryService>;
+    let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
-//     beforeEach(() => {
-//         const tileSpy = jasmine.createSpyObj('TileFactoryService', ['copyFromTile']);
-//         const itemSpy = jasmine.createSpyObj('ItemFactoryService', ['copyItem']);
-//         const gameMapSpy = jasmine.createSpyObj('GameMapDataManagerService', ['isGameModeCTF', 'itemLimit', 'isTerrainTile', 'isItem', 'isDoor']);
+    beforeEach(() => {
+        const tileSpy = jasmine.createSpyObj('TileFactoryService', ['copyFromTile']);
+        const itemSpy = jasmine.createSpyObj('ItemFactoryService', ['copyItem']);
+        const gameMapSpy = jasmine.createSpyObj('GameMapDataManagerService', ['isGameModeCTF', 'itemLimit', 'isTerrainTile', 'isItem', 'isDoor']);
 
-//         TestBed.configureTestingModule({
-//             providers: [
-//                 MapEditorManagerService,
-//                 { provide: TileFactoryService, useValue: tileSpy },
-//                 { provide: ItemFactoryService, useValue: itemSpy },
-//                 { provide: GameMapDataManagerService, useValue: gameMapSpy },
-//             ],
-//         });
+        TestBed.configureTestingModule({
+            providers: [
+                MapEditorManagerService,
+                { provide: TileFactoryService, useValue: tileSpy },
+                { provide: ItemFactoryService, useValue: itemSpy },
+                { provide: GameMapDataManagerService, useValue: gameMapSpy },
+            ],
+        });
 
-//         service = TestBed.inject(MapEditorManagerService);
-//         tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
-//         itemFactoryServiceSpy = TestBed.inject(ItemFactoryService) as jasmine.SpyObj<ItemFactoryService>;
-//         gameMapDataManagerServiceSpy = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
-//     });
+        service = TestBed.inject(MapEditorManagerService);
+        tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
+        itemFactoryServiceSpy = TestBed.inject(ItemFactoryService) as jasmine.SpyObj<ItemFactoryService>;
+        gameMapDataManagerServiceSpy = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
 
-//     it('should initialize placeableEntitiesSections correctly', () => {
-//         service.init();
+        service.init();
+    });
 
-//         expect(service.placeableEntitiesSections.length).toBe(2);
-//         expect(service.placeableEntitiesSections[0].title).toBe('Tuiles');
-//         expect(service.placeableEntitiesSections[0].entities.length).toBe(4);
-//         expect(service.placeableEntitiesSections[1].title).toBe('Objets');
-//         expect(service.placeableEntitiesSections[1].entities.length).toBe(8);
-//     });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 
-//     it('should reset item list correctly without CTF', () => {
-//         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
-//         service.init();
+    it('should initialize placeable entities sections correctly', () => {
+        service.init();
 
-//         expect(service.placeableEntitiesSections[1].entities.length).toBe(8);
-//     });
+        expect(service.placeableEntitiesSections.length).toBe(2);
+        expect(service.placeableEntitiesSections[0].title).toBe('Tuiles');
+        expect(service.placeableEntitiesSections[1].title).toBe('Objets');
+    });
 
-//     it('should reset item list correctly with CTF', () => {
-//         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
-//         service.init();
+    it('should reset item list and set item limits', () => {
+        gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
+        gameMapDataManagerServiceSpy.itemLimit.and.returnValue(6);
+        service.resetItemList();
 
-//         expect(service.placeableEntitiesSections[1].entities.length).toBe(9);
+        const itemsSection = service.placeableEntitiesSections.find((section) => section.title === 'Objets');
+        expect(itemsSection?.entities.length).toBeGreaterThan(0);
+        expect(service.itemLimitCounter).toBe(gameMapDataManagerServiceSpy.itemLimit());
+    });
 
-//         const lastEntity = service.placeableEntitiesSections[1].entities[8];
-//         expect(lastEntity instanceof Flag).toBeTrue();
-//     });
+    it('should update item limit counter and update random item limit', () => {
+        service.itemLimitCounter = 6;
+        const randomItem = new RandomItem();
+        spyOn(service, 'getRandomItemItemInMenu').and.returnValue(randomItem);
 
-//     it('should set item limits correctly when itemLimit is 2', () => {
-//         gameMapDataManagerServiceSpy.itemLimit.and.returnValue(2);
-//         service.init();
+        service.updateItemLimitCounter(-1);
 
-//         service.setItemLimit();
+        expect(service.itemLimitCounter).toBe(5);
+        expect(randomItem.itemLimit).toBe(5);
+    });
 
-//         const spawnItem = service.placeableEntitiesSections[1].entities[6] as Item;
-//         const randomItem = service.placeableEntitiesSections[1].entities[7] as Item;
+    it('should get null when there is no placeable entities while getting random item', () => {
+        service.placeableEntitiesSections = [];
+        const randomItem = service.getRandomItemItemInMenu();
 
-//         expect(spawnItem.itemLimit).toBe(2);
-//         expect(randomItem.itemLimit).toBe(2);
-//         expect(service.itemLimitCounter).toBe(2);
-//     });
+        expect(randomItem).toBeNull();
+    });
 
-//     it('should set item limits correctly when itemLimit is 4', () => {
-//         gameMapDataManagerServiceSpy.itemLimit.and.returnValue(4);
-//         service.init();
+    it('should get null when there is no placeable entities while getting spawn item', () => {
+        service.placeableEntitiesSections = [];
+        const spawnItem = service.getSpawnItemInMenu();
 
-//         service.setItemLimit();
+        expect(spawnItem).toBeNull();
+    });
 
-//         const spawnItem = service.placeableEntitiesSections[1].entities[6] as Item;
-//         const randomItem = service.placeableEntitiesSections[1].entities[7] as Item;
+    it('should start and end dragging an entity', () => {
+        const entity: PlaceableEntity = new WaterTile();
+        service.startDrag(entity);
 
-//         expect(spawnItem.itemLimit).toBe(4);
-//         expect(randomItem.itemLimit).toBe(4);
-//         expect(service.itemLimitCounter).toBe(4);
-//     });
+        expect(service.draggedEntity).toBe(entity);
 
-//     it('should set item limits correctly when itemLimit is 6', () => {
-//         gameMapDataManagerServiceSpy.itemLimit.and.returnValue(6);
-//         service.init();
+        service.endDrag();
+        expect(service.draggedEntity).toBeNull();
+    });
 
-//         service.setItemLimit();
+    it('should find tile in sideMenu', () => {
+        const tile = new IceTile();
+        const sideMenuTile = service.sideMenuTileFinder(tile);
 
-//         const spawnItem = service.placeableEntitiesSections[1].entities[6] as Item;
-//         const randomItem = service.placeableEntitiesSections[1].entities[7] as Item;
+        expect(sideMenuTile).toEqual(jasmine.any(IceTile));
 
-//         expect(spawnItem.itemLimit).toBe(6);
-//         expect(randomItem.itemLimit).toBe(6);
-//         expect(service.itemLimitCounter).toBe(6);
-//     });
+        service.placeableEntitiesSections[0].entities = [];
+        const nullSideMenuTile = service.sideMenuTileFinder(tile);
 
-//     it('should select an entity and deselect map selection', () => {
-//         service.init();
-//         const entity: Item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         spyOn(service, 'cancelSelectionMap');
+        expect(nullSideMenuTile).toBeNull();
+    });
 
-//         service.makeSelection(entity);
+    it('should find item in sideMenu', () => {
+        const item = new DiamondSword();
+        const sideMenuItem = service.sideMenuItemFinder(item);
 
-//         expect(entity.visibleState).toBe(VisibleState.selected);
-//         expect(service.sideMenuSelectedEntity).toBe(entity);
-//         expect(service.cancelSelectionMap).toHaveBeenCalled();
-//     });
+        expect(sideMenuItem).toEqual(jasmine.any(DiamondSword));
 
-//     it('should place an item on the selected tile and update limits', () => {
-//         service.init();
-//         const item: Item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         const selectedTile: GrassTile = new GrassTile();
-//         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
-//         gameMapDataManagerServiceSpy.isItem.and.returnValue(true);
-//         itemFactoryServiceSpy.copyItem.and.returnValue(item);
+        service.placeableEntitiesSections[1].entities = [];
+        const nullSideMenuItem = service.sideMenuItemFinder(item);
 
-//         item.itemLimit = 1;
-//         service.itemLimitCounter = 1;
+        expect(nullSideMenuItem).toBeNull();
+    });
 
-//         service.itemPlacer(item, selectedTile);
+    it('should find entity in sideMenu', () => {
+        const entity1 = new WaterTile();
+        const sideMenuEntity1 = service.sideMenuEntityFinder(entity1);
 
-//         expect(selectedTile.item).toBe(item);
-//         expect(item.itemLimit).toBe(0);
-//         expect(service.itemLimitCounter).toBe(0);
-//         expect(item.visibleState).toBe(VisibleState.disabled);
-//         expect(service.sideMenuSelectedEntity).toBeNull();
-//     });
+        expect(sideMenuEntity1).toEqual(jasmine.any(WaterTile));
 
-//     it('should remove an item from the tile and update limits', () => {
-//         service.init();
-//         const item: Item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         const selectedTile: GrassTile = new GrassTile();
-//         selectedTile.item = item;
-//         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
-//         gameMapDataManagerServiceSpy.isItem.and.returnValue(true);
+        const entity2 = new DiamondSword();
+        const sideMenuEntity2 = service.sideMenuEntityFinder(entity2);
 
-//         item.itemLimit = 0;
-//         service.itemLimitCounter = 0;
+        expect(sideMenuEntity2).toEqual(jasmine.any(DiamondSword));
 
-//         service.itemRemover(selectedTile);
+        const entity3 = new GrassTile();
+        const sideMenuEntity3 = service.sideMenuEntityFinder(entity3);
 
-//         expect((selectedTile as TerrainTile).item).toBeNull();
-//         expect(item.itemLimit).toBe(1);
-//         expect(service.itemLimitCounter).toBe(1);
-//         expect(item.visibleState).toBe(VisibleState.notSelected);
-//     });
+        expect(sideMenuEntity3).toBeNull();
+    });
 
-//     it('should handle left click on map tile for item placement', () => {
-//         service.init();
-//         const entity: GrassTile = new GrassTile();
-//         const selectedEntity: Item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         service.sideMenuSelectedEntity = selectedEntity;
-//         gameMapDataManagerServiceSpy.isItem.and.returnValue(true);
-//         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+    it('should cancel the selection on sideMenu', () => {
+        const entity = new WaterTile();
+        const sideMenuEntity = new WaterTile();
+        service.sideMenuSelectedEntity = entity;
 
-//         spyOn(service, 'itemPlacer');
+        spyOn(service, 'sideMenuEntityFinder').and.returnValue(sideMenuEntity);
+        service.cancelSelectionSideMenu();
 
-//         service.onMouseDownMapTile({ button: 0 } as MouseEvent, entity);
+        expect(sideMenuEntity.visibleState).toBe(VisibleState.NotSelected);
+        expect(service.sideMenuSelectedEntity).toBeNull();
+    });
 
-//         expect(service.isDraggingLeft).toBeTrue();
-//         expect(service.itemPlacer).toHaveBeenCalledWith(selectedEntity, entity);
-//     });
+    it('should cancel selection map', () => {
+        const entity = new WaterTile();
+        const sideMenuEntity = new WaterTile();
+        service.selectedEntity = entity;
 
-//     it('should handle right click on map tile for item removal', () => {
-//         service.init();
-//         const entity: GrassTile = new GrassTile();
-//         entity.item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+        spyOn(service, 'sideMenuEntityFinder').and.returnValue(sideMenuEntity);
+        service.cancelSelectionMap();
 
-//         spyOn(service, 'itemRemover');
+        expect(sideMenuEntity.visibleState).toBe(VisibleState.NotSelected);
+        expect(service.selectedEntity).toBeNull();
+    });
 
-//         const mouseEvent = { button: 2, preventDefault: jasmine.createSpy('preventDefault') } as unknown as MouseEvent;
+    it('should select an entity and cancel map selection', () => {
+        const entity: PlaceableEntity = new WaterTile();
+        spyOn(service, 'cancelSelectionMap');
 
-//         service.onMouseDownMapTile(mouseEvent, entity);
+        service.makeSelection(entity);
 
-//         expect(service.isDraggingRight).toBeTrue();
-//         expect(mouseEvent.preventDefault).toHaveBeenCalled();
-//         expect(service.itemRemover).toHaveBeenCalledWith(entity);
-//     });
+        expect(entity.visibleState).toBe(VisibleState.Selected);
+        expect(service.sideMenuSelectedEntity).toBe(entity);
+        expect(service.cancelSelectionMap).toHaveBeenCalled();
+    });
 
-//     it('should handle dragging left to place tiles', () => {
-//         service.init();
-//         const entity: GrassTile = new GrassTile();
-//         const selectedEntity: IceTile = new IceTile();
-//         service.sideMenuSelectedEntity = selectedEntity;
-//         service.isDraggingLeft = true;
-//         gameMapDataManagerServiceSpy.isItem.and.returnValue(false);
-//         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
-//         tileFactoryServiceSpy.copyFromTile.and.returnValue(selectedEntity);
+    it('should show mouse enter and mouse leave', () => {
+        const entity: PlaceableEntity = new WaterTile();
+        service.onMouseEnter(entity);
 
-//         spyOn(service, 'tileCopyCreator');
+        expect(entity.visibleState).toBe(VisibleState.Hovered);
 
-//         service.onMouseMoveMapTile(entity);
+        service.onMouseLeave(entity);
 
-//         expect(service.tileCopyCreator).toHaveBeenCalledWith(selectedEntity, entity);
-//     });
+        expect(entity.visibleState).toBe(VisibleState.NotSelected);
+    });
 
-//     it('should handle dragging right to remove items and place grass tiles', () => {
-//         service.init();
-//         const entityWithItem: GrassTile = new GrassTile();
-//         entityWithItem.item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         const entityWithoutItem: DoorTile = new DoorTile();
-//         gameMapDataManagerServiceSpy.isItem.and.returnValue(false);
+    it('should copy a terrain tile under tile with item', () => {
+        const tile = new GrassTile();
+        tile.coordinates = { x: 0, y: 0 };
+        const item = new DiamondSword();
+        tile.item = item;
+        gameMapDataManagerServiceSpy.currentGrid = [[tile]];
 
-//         spyOn(service, 'itemRemover');
-//         tileFactoryServiceSpy.copyFromTile.and.returnValue(new GrassTile());
+        let copiedTile = new WaterTile();
+        copiedTile.coordinates = { x: -1, y: -1 };
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+        tileFactoryServiceSpy.copyFromTile.and.returnValue(copiedTile);
 
-//         service.isDraggingRight = true;
+        service.tileCopyCreator(copiedTile, tile);
 
-//         service.onMouseMoveMapTile(entityWithItem);
-//         expect(service.itemRemover).toHaveBeenCalledWith(entityWithItem);
-//         expect(tileFactoryServiceSpy.copyFromTile).not.toHaveBeenCalled();
+        expect(copiedTile.item).toEqual(tile.item);
+        expect(copiedTile.visibleState).toBe(VisibleState.NotSelected);
+    });
 
-//         service.onMouseMoveMapTile(entityWithoutItem);
-//         expect(tileFactoryServiceSpy.copyFromTile).toHaveBeenCalledWith(new GrassTile());
-//     });
+    it('should copy a non terrain tile without item', () => {
+        const tile = new GrassTile();
+        tile.coordinates = { x: 0, y: 0 };
+        const item = new DiamondSword();
+        tile.item = item;
+        gameMapDataManagerServiceSpy.currentGrid = [[tile]];
 
-//     it('should cancel selection from side menu', () => {
-//         service.init();
-//         const entity: Item = service.placeableEntitiesSections[1].entities[0] as Item;
-//         service.sideMenuSelectedEntity = entity;
-//         service.selectedEntity = new GrassTile();
-//         const foundEntity: Item = service.placeableEntitiesSections[1].entities[0] as Item;
+        let copiedTile = new DoorTile();
+        copiedTile.coordinates = { x: -1, y: -1 };
+        tileFactoryServiceSpy.copyFromTile.and.returnValue(copiedTile);
 
-//         spyOn(service, 'sideMenuEntityFinder').and.returnValue(foundEntity);
-//         service.cancelSelectionSideMenu();
+        gameMapDataManagerServiceSpy.isTerrainTile.withArgs(copiedTile).and.returnValue(false);
+        gameMapDataManagerServiceSpy.isTerrainTile.withArgs(tile).and.returnValue(true);
 
-//         expect(foundEntity.visibleState).toBe(VisibleState.notSelected);
-//         expect(service.selectedEntity).toBeNull();
-//         expect(service.sideMenuSelectedEntity).toBeNull();
-//     });
+        spyOn(service, 'itemRemover');
+        service.tileCopyCreator(copiedTile, tile);
 
-//     it('should cancel selection from map', () => {
-//         service.init();
-//         const entity: WaterTile = new WaterTile();
-//         service.selectedEntity = entity;
-//         entity.visibleState = VisibleState.selected;
-//         const foundEntity = service.placeableEntitiesSections[0].entities[1] as Tile;
+        expect(service.itemRemover).toHaveBeenCalledWith(tile);
+        expect(copiedTile.visibleState).toBe(VisibleState.NotSelected);
+    });
 
-//         spyOn(service, 'sideMenuEntityFinder').and.returnValue(foundEntity);
-//         service.cancelSelectionMap();
+    it('should place an item on a tile', () => {
+        const item = new DiamondSword();
+        const tile = new GrassTile();
+        tile.item = item;
+        service.itemLimitCounter = 6;
+        spyOn(service, 'updateItemLimitCounter');
+        spyOn(service, 'itemRemover');
+        spyOn(service, 'sideMenuItemsEnabler');
 
-//         expect(foundEntity.visibleState).toBe(VisibleState.notSelected);
-//         expect(service.selectedEntity).toBeNull();
-//     });
-// });
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+        itemFactoryServiceSpy.copyItem.and.returnValue(item);
+
+        service.itemPlacer(item, tile);
+
+        expect(service.itemRemover).toHaveBeenCalledWith(tile);
+        expect(tile.item).toEqual(jasmine.any(DiamondSword));
+        expect(service.updateItemLimitCounter).toHaveBeenCalledWith(-1);
+        expect(gameMapDataManagerServiceSpy.isGameUpdated).toBeTrue();
+        expect(service.sideMenuItemsEnabler).toHaveBeenCalled();
+
+        service.itemLimitCounter = 0;
+
+        const item2 = new Chestplate();
+        const tile2 = new GrassTile();
+
+        spyOn(service, 'sideMenuItemsDisabler');
+
+        service.itemPlacer(item2, tile2);
+
+        expect(service.sideMenuItemsDisabler).toHaveBeenCalled();
+    });
+
+    it('should remove an item from a tile', () => {
+        const item = new DiamondSword();
+        const tile = new GrassTile();
+        tile.item = item;
+        service.itemLimitCounter = 6;
+        spyOn(service, 'updateItemLimitCounter');
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+
+        service.itemRemover(tile);
+
+        expect(tile.item).toBeNull();
+        expect(service.updateItemLimitCounter).toHaveBeenCalledWith(1);
+        expect(gameMapDataManagerServiceSpy.isGameUpdated).toBeTrue();
+    });
+
+    it('should handle left-click on map tile with selected entity', () => {
+        const tile = new GrassTile();
+        tile.coordinates = { x: 0, y: 0 };
+        const selectedTile = new WaterTile();
+        service.sideMenuSelectedEntity = selectedTile;
+        spyOn(service, 'tileCopyCreator');
+
+        service.leftClickMapTile(tile);
+
+        expect(service.tileCopyCreator).toHaveBeenCalledWith(selectedTile, tile);
+    });
+
+    it('should handle right-click on map tile', () => {
+        const tile = new WaterTile();
+        tile.coordinates = { x: 0, y: 0 };
+        const event = new MouseEvent('contextmenu');
+        spyOn(event, 'preventDefault');
+        spyOn(service, 'tileCopyCreator');
+
+        service.rightClickMapTile(event, tile);
+
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(service.tileCopyCreator).toHaveBeenCalledWith(jasmine.any(GrassTile), tile);
+    });
+});

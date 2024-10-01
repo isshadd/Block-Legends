@@ -243,10 +243,6 @@ export class MapEditorManagerService {
             else {
                 foundItem.visibleState = VisibleState.NotSelected;
             }
-            if (foundItem.itemLimit === 0) {
-                foundItem.visibleState = VisibleState.Disabled;
-                this.sideMenuSelectedEntity = null;
-            }
             if (this.itemLimitCounter === 0) {
                 this.sideMenuItemsDisabler();
             }
@@ -274,6 +270,7 @@ export class MapEditorManagerService {
 
         if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
+            this.cancelSelectionSideMenu();
         } else if (!this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity)) {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
         }
