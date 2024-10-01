@@ -1,35 +1,34 @@
-import { Component, Input } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 // eslint-disable-next-line max-len
-import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { PlaceableEntityFullMenuComponent } from './placeable-entity-full-menu.component';
 
-@Component({
-    selector: 'app-placeable-entity-container',
-    standalone: true,
-    template: '',
-})
-class MockPlaceableEntityContainerComponent {
-    @Input() containerTitle: string;
-    @Input() containerItems: PlaceableEntity[];
-}
 describe('PlaceableEntityFullMenuComponent', () => {
     let component: PlaceableEntityFullMenuComponent;
     let fixture: ComponentFixture<PlaceableEntityFullMenuComponent>;
+    let mapEditorManagerService: jasmine.SpyObj<MapEditorManagerService>;
 
     beforeEach(async () => {
-        TestBed.overrideComponent(PlaceableEntityFullMenuComponent, {
-            add: { imports: [MockPlaceableEntityContainerComponent] },
-            remove: { imports: [PlaceableEntityContainerComponent] },
-        });
+        const mapEditorSpy = jasmine.createSpyObj('MapEditorManagerService', ['someMethod']);
+
+        await TestBed.configureTestingModule({
+            imports: [PlaceableEntityFullMenuComponent],
+            providers: [{ provide: MapEditorManagerService, useValue: mapEditorSpy }, provideHttpClientTesting()],
+        }).compileComponents();
+
+        mapEditorManagerService = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
 
         fixture = TestBed.createComponent(PlaceableEntityFullMenuComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
 
-    it('should create the component without dependencies', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should inject mapEditorManagerService', () => {
+        expect(mapEditorManagerService).toBeTruthy();
     });
 });

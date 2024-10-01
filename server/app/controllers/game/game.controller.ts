@@ -62,13 +62,13 @@ export class GameController {
         try {
             const validationResult = await this.gameValidationService.validateGame(createGameDto);
             if (!validationResult.isValid) {
-                return response.status(HttpStatus.BAD_REQUEST).send(validationResult.errors.join('\n'));
+                return response.status(HttpStatus.BAD_REQUEST).json({ errors: validationResult.errors });
             }
-            const isTilesValid = await this.gameValidationService.isMapTilesValid(createGameDto, createGameDto.size);
+            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(createGameDto, createGameDto.size);
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
-                    .send('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                    .json({ errors: ['Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.'] });
             }
 
             const newGame: Game = await this.gameService.addGame(createGameDto);
@@ -90,15 +90,15 @@ export class GameController {
         try {
             const existingGame = await this.gameService.getGame(id);
             const updatedGame: Game = { ...existingGame, ...gameDto };
-            const isTilesValid = await this.gameValidationService.isMapTilesValid(updatedGame, existingGame.size);
+            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(updatedGame, existingGame.size);
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
-                    .send('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                    .json('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
             }
             const validationResult = await this.gameValidationService.validateGame(updatedGame);
             if (!validationResult.isValid) {
-                return response.status(HttpStatus.BAD_REQUEST).send(validationResult.errors.join('\n'));
+                return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
             }
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
@@ -138,5 +138,4 @@ export class GameController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
 }

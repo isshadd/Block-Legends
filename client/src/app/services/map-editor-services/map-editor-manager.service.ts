@@ -54,7 +54,6 @@ export class MapEditorManagerService {
         ];
 
         this.resetItemList();
-        this.setItemLimit();
     }
 
     selectedEntity: PlaceableEntity | null;
@@ -82,7 +81,9 @@ export class MapEditorManagerService {
         if (this.gameMapDataManagerService.isGameModeCTF()) {
             this.placeableEntitiesSections[1].entities.push(new Flag());
         }
+        this.setItemLimit();
     }
+
     setItemLimit() {
         let itemLimit = this.gameMapDataManagerService.itemLimit();
         if (itemLimit === 2) {
@@ -320,12 +321,17 @@ export class MapEditorManagerService {
 
     itemCheckup() {
         this.resetItemList();
+        this.mapItemCheckup();
+    }
+
+    mapItemCheckup() {
         this.gameMapDataManagerService.currentGrid.forEach((row) => {
             row.forEach((tile) => {
                 if (this.gameMapDataManagerService.isTerrainTile(tile) && tile.item) {
                     let foundItem = this.sideMenuItemFinder(tile.item) as Item | null;
 
                     if (foundItem) {
+                        foundItem.itemLimit--;
                         if (foundItem.type !== ItemType.Spawn) this.itemLimitCounter--;
                         if (foundItem.itemLimit === 0) {
                             foundItem.visibleState = VisibleState.disabled;
