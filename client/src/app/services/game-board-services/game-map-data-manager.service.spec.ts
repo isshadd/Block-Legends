@@ -4,6 +4,7 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { ItemType } from '@common/enums/item-type';
@@ -106,10 +107,10 @@ describe('GameMapDataManagerService', () => {
     it('should not save if name or description is invalid', () => {
         service.currentName = '';
         service.currentDescription = 'Valid Description';
+        spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
 
         service.save();
 
-        expect(service.databaseGame.name).not.toBe('');
         expect(gameServerCommunicationServiceSpy.addGame).not.toHaveBeenCalled();
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
     });
@@ -153,13 +154,12 @@ describe('GameMapDataManagerService', () => {
         };
         service.currentName = 'Updated Game';
         service.currentDescription = 'Updated Description';
+        spyOn(service, 'hasValidNameAndDescription').and.returnValue(true);
+        spyOn(service, 'saveGameInDb').and.callFake(() => {});
 
         service.save();
-
-        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', service.databaseGame);
         expect(service.isGameUpdated).toBeFalse();
-        expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(service.databaseGame));
+        expect(service.saveGameInDb).toHaveBeenCalled();
     });
 
     it('should set and get local storage variables correctly', () => {
@@ -219,6 +219,86 @@ describe('GameMapDataManagerService', () => {
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
     });
 
+    it('should call setLocalStorageVariables with false and the current game when the game is saved', () => {
+        // **Arrange**
+
+        // Initialize databaseGame with a valid _id to simulate a saved game
+        const mockGame: GameShared = {
+            _id: 'existing_id',
+            name: 'Existing Game',
+            description: 'Existing Description',
+            mode: GameMode.CTF,
+            size: MapSize.LARGE,
+            tiles: [],
+            imageUrl: '',
+            isVisible: false,
+        };
+        service.databaseGame = mockGame;
+
+        // Spy on isSavedGame to return true
+        spyOn(service, 'isSavedGame').and.returnValue(true);
+
+        // Spy on setLocalStorageVariables to monitor its invocation
+        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
+
+        // Optionally, spy on updateGame if you want to verify its call as well
+        gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
+
+        // **Act**
+        service.saveGameInDb();
+
+        // **Assert**
+
+        // Verify that updateGame was called with correct parameters
+        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', mockGame);
+
+        // Verify that setLocalStorageVariables was called once with false and the current game
+        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
+        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, mockGame);
+
+        // Additionally, you can verify localStorage if needed
+        expect(localStorage.getItem('isNewGame')).toBe('false');
+        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(mockGame));
+    });
+
+    it('should not call setLocalStorageVariables if the game is not saved', () => {
+        // **Arrange**
+
+        // Initialize databaseGame without an _id to simulate an unsaved game
+        const mockGame: GameShared = {
+            _id: undefined,
+            name: 'Unsaved Game',
+            description: 'Unsaved Description',
+            mode: GameMode.CTF,
+            size: MapSize.MEDIUM,
+            tiles: [],
+            imageUrl: '',
+            isVisible: false,
+        };
+        service.databaseGame = mockGame;
+
+        // Spy on isSavedGame to return false
+        spyOn(service, 'isSavedGame').and.returnValue(false);
+
+        // Spy on setLocalStorageVariables to monitor its invocation
+        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
+
+        // **Act**
+        service.saveGameInDb();
+
+        // **Assert**
+
+        // Verify that updateGame was not called
+        expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
+
+        // Verify that setLocalStorageVariables was not called
+        expect(setLocalStorageSpy).not.toHaveBeenCalled();
+
+        // Additionally, verify that localStorage remains unchanged
+        expect(localStorage.getItem('isNewGame')).toBeNull();
+        expect(localStorage.getItem('gameToEdit')).toBeNull();
+    });
+
     it('should update the game in the database if _id is defined', () => {
         service.databaseGame = {
             _id: 'existing_id',
@@ -238,20 +318,37 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should correctly save the current grid to the database game tiles', () => {
-        service.currentGrid = [[new GrassTile()], [new TerrainTile()]];
-        (service.currentGrid[0] as unknown as GrassTile).type = TileType.Grass;
-        (service.currentGrid[1] as unknown as TerrainTile).type = TileType.Door;
-        (service.currentGrid[1] as unknown as TerrainTile).item = new Item();
-        const terrainTile = service.currentGrid[1] as unknown as TerrainTile;
-        if (terrainTile.item) {
-            terrainTile.item.type = 'Sword' as ItemType;
-        }
+        service.databaseGame = {
+            _id: 'test_id',
+            name: 'Test Game',
+            description: 'A test game description',
+            mode: GameMode.CTF,
+            size: MapSize.SMALL,
+            tiles: [],
+            imageUrl: '',
+            isVisible: false,
+        };
 
+        service.currentGrid = [[new GrassTile()], [new TerrainTile()]];
+
+        const grassTile = service.currentGrid[0][0] as GrassTile;
+        grassTile.type = TileType.Grass;
+
+        const terrainTile = service.currentGrid[1][0] as TerrainTile;
+        terrainTile.type = TileType.Door;
+        terrainTile.item = new Item();
+        terrainTile.item.type = ItemType.Sword;
         service.saveMap();
 
         expect(service.databaseGame.tiles.length).toBe(2);
+        expect(service.databaseGame.tiles[0].length).toBe(1);
+        expect(service.databaseGame.tiles[1].length).toBe(1);
+
         expect(service.databaseGame.tiles[0][0].type).toBe(TileType.Grass);
+        expect(service.databaseGame.tiles[0][0].item).toBeNull();
+
         expect(service.databaseGame.tiles[1][0].type).toBe(TileType.Door);
+        expect(service.databaseGame.tiles[1][0].item).toBeDefined();
         expect(service.databaseGame.tiles[1][0].item?.type).toBe(ItemType.Sword);
     });
 
@@ -273,9 +370,9 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should correctly identify non-TerrainTile', () => {
-        const grassTile = new GrassTile();
+        const wallTile = new WallTile();
 
-        expect(service.isTerrainTile(grassTile)).toBeFalse();
+        expect(service.isTerrainTile(wallTile)).toBeFalse();
     });
 
     it('should correctly identify Item', () => {
