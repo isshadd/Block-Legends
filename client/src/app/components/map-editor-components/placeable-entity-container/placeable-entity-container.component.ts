@@ -35,11 +35,11 @@ export class PlaceableEntityContainerComponent {
         this.mapEditorManagerService.onMouseDownSideMenu(entity);
     }
 
-    onDragStarted(entity: PlaceableEntity) {
-        this.mapEditorManagerService.startDrag(entity);
-    }
+    // onDragStarted(entity: PlaceableEntity) {
+    //     this.mapEditorManagerService.startDrag(entity);
+    // }
 
-    onDragEnded() {
-        this.mapEditorManagerService.endDrag();
-    }
+    // onDragEnded() {
+    //     this.mapEditorManagerService.endDrag();
+    // }
 }

@@ -1,6 +1,5 @@
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
@@ -81,18 +80,18 @@ describe('MapComponent', () => {
         expect(event.preventDefault).toHaveBeenCalled();
     });
 
-    it('should call itemPlacer when onDrop is triggered with a dragged item', () => {
-        const draggedItem: DiamondSword = new DiamondSword();
-        mapEditorManagerService.draggedEntity = draggedItem;
+    // it('should call itemPlacer when onDrop is triggered with a dragged item', () => {
+    //     const draggedItem: DiamondSword = new DiamondSword();
+    //     mapEditorManagerService.draggedEntity = draggedItem;
 
-        component.onDrop(tile);
-        expect(mapEditorManagerService.itemPlacer).toHaveBeenCalledWith(draggedItem, tile);
-    });
+    //     component.onDrop(tile);
+    //     expect(mapEditorManagerService.itemPlacer).toHaveBeenCalledWith(draggedItem, tile);
+    // });
 
-    it('should not call itemPlacer when onDrop is triggered with no dragged item', () => {
-        mapEditorManagerService.draggedEntity = null;
+    // it('should not call itemPlacer when onDrop is triggered with no dragged item', () => {
+    //     mapEditorManagerService.draggedEntity = null;
 
-        component.onDrop(tile);
-        expect(mapEditorManagerService.itemPlacer).not.toHaveBeenCalled();
-    });
+    //     component.onDrop(tile);
+    //     expect(mapEditorManagerService.itemPlacer).not.toHaveBeenCalled();
+    // });
 });

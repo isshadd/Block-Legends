@@ -100,10 +100,12 @@ export class MapEditorManagerService {
             (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
         }
     }
+    
     setItemLimitCounter(number: number) {
         this.itemLimitCounter += number;
         (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
     }
+    
     startDrag(entity: PlaceableEntity) {
         this.draggedEntity = entity;
     }

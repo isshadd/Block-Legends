@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Item } from '@app/classes/Items/item';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -40,10 +39,10 @@ export class MapComponent {
         event.preventDefault();
     }
 
-    onDrop(tile: Tile) {
-        let draggedItem = this.mapEditorManagerService.draggedEntity;
-        if (draggedItem) {
-            this.mapEditorManagerService.itemPlacer(draggedItem as Item, tile as Tile);
-        }
-    }
+    // onDrop(tile: Tile) {
+    //     let draggedItem = this.mapEditorManagerService.draggedEntity;
+    //     if (draggedItem) {
+    //         this.mapEditorManagerService.itemPlacer(draggedItem as Item, tile as Tile);
+    //     }
+    // }
 }
