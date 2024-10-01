@@ -7,16 +7,12 @@ import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { ExampleService } from '@app/services/example/example.service';
 import { title } from 'process';
-import { Message } from '@common/message';
 import { Item } from '@app/model/schema/item.schema';
 import { MapSize } from '@common/enums/map-size';
 import { Directions } from '@common/interfaces/directions';
 
 @Injectable()
 export class GameValidationService {
-    message : Message = {title : "`SpawnPoint found ",
-    body : "A spawn point has been found",  
-    };
     constructor(private readonly gameService: GameService, private readonly exampleService : ExampleService) {}
 
     async isGameNameUnique(name: string): Promise<boolean> {
