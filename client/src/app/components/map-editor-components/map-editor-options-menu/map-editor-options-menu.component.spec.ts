@@ -131,6 +131,14 @@ describe('MapEditorOptionsMenuComponent', () => {
         expect(component.getSaveNotificationState()).toBe(ButtonNotificationState.SUCCESS);
     });
 
+    it('should return correct options notification description', () => {
+        gameMapDataManagerService.hasValidNameAndDescription.and.returnValue(false);
+        expect(component.getOptionsNotificationDescription()).toBe('Il faut donner un nom et une description à la carte');
+
+        gameMapDataManagerService.hasValidNameAndDescription.and.returnValue(true);
+        expect(component.getOptionsNotificationDescription()).toBe('');
+    });
+
     it('should return correct save notification description', () => {
         gameMapDataManagerService.isSavedGame.and.returnValue(false);
         expect(component.getSaveNotificationDescription()).toBe("La carte n'est pas sauvegardée");
