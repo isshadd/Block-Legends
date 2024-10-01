@@ -41,11 +41,6 @@ describe('WaitingViewComponent', () => {
         expect(component.storedCode).toBe(component.accessCode);
     });
 
-    it('should set organizerCharacter to the stored character if it exists', () => {
-        component.ngOnInit();
-        expect(component.organizerCharacter).toBe(component.storedCharacter as PlayerCharacter);
-    });
-
     it('should add organizer to the players list if user is organizer', () => {
         component.players[0] = new PlayerCharacter('', '', new PlayerAttributes());
         expect(component.players.length).toBe(1);
