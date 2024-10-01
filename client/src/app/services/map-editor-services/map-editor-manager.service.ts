@@ -158,8 +158,8 @@ export class MapEditorManagerService {
 
     cancelSelectionSideMenu() {
         if (this.sideMenuSelectedEntity) {
-            let foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity)?.visibleState;
-            if (foundEntity) foundEntity = VisibleState.NotSelected;
+            let foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity);
+            if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
 
             this.selectedEntity = null;
             this.sideMenuSelectedEntity = null;
@@ -315,11 +315,6 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
-
-        if (this.sideMenuSelectedEntity) {
-            this.sideMenuSelectedEntity.visibleState = VisibleState.NotSelected;
-            this.sideMenuSelectedEntity = null;
-        }
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
@@ -331,6 +326,7 @@ export class MapEditorManagerService {
         } else if (entity.visibleState === VisibleState.Disabled) return; // item limit reached
         else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             // another entity selected
+            this.cancelSelectionSideMenu();
             this.makeSelection(entity);
         } else {
             this.makeSelection(entity);
