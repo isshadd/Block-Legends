@@ -303,6 +303,26 @@ describe('GameMapDataManagerService', () => {
         expect(service.getLocalStorageIsNewGame()).toBeFalse();
     });
 
+    it('should return the game object when gameToEdit is set in localStorage', () => {
+        const mockGame: GameShared = {
+            _id: 'game_id',
+            name: 'Test Game',
+            description: 'Test Description',
+            mode: GameMode.CTF,
+            size: MapSize.MEDIUM,
+            tiles: [],
+            imageUrl: '',
+            isVisible: true,
+        };
+        localStorage.setItem('gameToEdit', JSON.stringify(mockGame));
+        expect(service.getLocalStorageGameToEdit()).toEqual(mockGame);
+    });
+
+    it('should return an empty object when gameToEdit is not set in localStorage', () => {
+        localStorage.removeItem('gameToEdit');
+        expect(service.getLocalStorageGameToEdit()).toEqual({} as GameShared);
+    });
+
     it('should not call setLocalStorageVariables if the game is not saved', () => {
         const mockGame: GameShared = {
             _id: undefined,
@@ -328,6 +348,16 @@ describe('GameMapDataManagerService', () => {
 
         expect(localStorage.getItem('isNewGame')).toBeNull();
         expect(localStorage.getItem('gameToEdit')).toBeNull();
+    });
+
+    it('should return false when databaseGame is undefined', () => {
+        service.databaseGame = undefined as unknown as GameShared;
+        expect(service.isSavedGame()).toBeFalse();
+    });
+
+    it('should return false when databaseGame is undefined', () => {
+        service.databaseGame = undefined as unknown as GameShared;
+        expect(service.isGameModeCTF()).toBeFalse();
     });
 
     it('should update the game in the database if _id is defined', () => {
