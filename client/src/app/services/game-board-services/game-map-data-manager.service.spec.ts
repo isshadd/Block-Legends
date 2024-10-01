@@ -216,7 +216,7 @@ describe('GameMapDataManagerService', () => {
         expect(service.databaseGame.tiles[0].length).toBe(1);
         expect(service.databaseGame.tiles[0][0]).toEqual(jasmine.objectContaining({ type: TileType.Door }));
     });
-    
+
     it('should call addGame with the game having _id: undefined and update local storage with the returned game having _id: new_id', () => {
         // **Arrange**
 
@@ -233,29 +233,20 @@ describe('GameMapDataManagerService', () => {
         };
         service.databaseGame = originalGame;
 
-        // Spy on setLocalStorageVariables to monitor its invocation
         const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
 
-        // Mock the addGame method to return a game with _id: 'new_id'
         const returnedGame: GameShared = { ...originalGame, _id: 'new_id' };
         gameServerCommunicationServiceSpy.addGame.and.returnValue(of(returnedGame));
 
-        // **Act**
         service.createGameInDb();
 
-        // **Assert**
-
-        // Verify that addGame was called with the original game (_id: undefined)
         expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
 
-        // Verify that databaseGame is updated with the returned game (_id: 'new_id')
         expect(service.databaseGame).toEqual(returnedGame);
 
-        // Verify that setLocalStorageVariables was called once with false and the returned game
         expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
         expect(setLocalStorageSpy).toHaveBeenCalledWith(false, returnedGame);
 
-        // Verify that localStorage is updated correctly
         expect(localStorage.getItem('isNewGame')).toBe('false');
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
     });
@@ -295,6 +286,21 @@ describe('GameMapDataManagerService', () => {
 
         expect(localStorage.getItem('isNewGame')).toBe('false');
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(mockGame));
+    });
+
+    it('should return true when isNewGame is set to true in localStorage', () => {
+        localStorage.setItem('isNewGame', 'true');
+        expect(service.getLocalStorageIsNewGame()).toBeTrue();
+    });
+
+    it('should return false when isNewGame is set to false in localStorage', () => {
+        localStorage.setItem('isNewGame', 'false');
+        expect(service.getLocalStorageIsNewGame()).toBeFalse();
+    });
+
+    it('should return false when isNewGame is not set in localStorage', () => {
+        localStorage.removeItem('isNewGame');
+        expect(service.getLocalStorageIsNewGame()).toBeFalse();
     });
 
     it('should not call setLocalStorageVariables if the game is not saved', () => {
