@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { Item } from '@app/classes/Items/item';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
@@ -19,6 +20,7 @@ import { TileFactoryService } from './tile-factory.service';
 describe('GameMapDataManagerService', () => {
     let service: GameMapDataManagerService;
     let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
+    let itemFactoryServiceSpy: jasmine.SpyObj<ItemFactoryService>;
     let gameServerCommunicationServiceSpy: jasmine.SpyObj<GameServerCommunicationService>;
 
     beforeEach(() => {
@@ -37,6 +39,7 @@ describe('GameMapDataManagerService', () => {
 
         service = TestBed.inject(GameMapDataManagerService);
         tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
+        itemFactoryServiceSpy = TestBed.inject(ItemFactoryService) as jasmine.SpyObj<ItemFactoryService>;
         gameServerCommunicationServiceSpy = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
 
         // Clear localStorage before each test
@@ -361,9 +364,6 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should update the game in the database if _id is defined', () => {
-        // **Arrange**
-
-        // Initialize databaseGame with a defined _id to simulate a saved game
         const existingGame: GameShared = {
             _id: 'existing_id',
             name: 'Existing Game',
@@ -436,6 +436,27 @@ describe('GameMapDataManagerService', () => {
 
         expect(service.resetCurrentValues).toHaveBeenCalled();
         expect(service.loadGrid).toHaveBeenCalled();
+    });
+
+    it('should load correctly', () => {
+        service.databaseGame = {
+            _id: 'test_id',
+            name: 'Test Game',
+            description: 'A test game description',
+            mode: GameMode.CTF,
+            size: MapSize.SMALL,
+            tiles: [[{ type: TileType.Grass, item: { type: ItemType.Sword } }, { type: TileType.Grass }]],
+            imageUrl: '',
+            isVisible: false,
+        };
+
+        spyOn(service, 'isTerrainTile').and.returnValue(true);
+        tileFactoryServiceSpy.createTile.and.returnValue(new GrassTile());
+        itemFactoryServiceSpy.createItem.and.returnValue(new DiamondSword());
+
+        service.loadGrid();
+
+        expect(service.currentGrid.length).toBe(1);
     });
 
     it('should correctly identify TerrainTile', () => {
