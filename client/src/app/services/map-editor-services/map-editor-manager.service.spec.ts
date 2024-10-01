@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@app/classes/Items/chestplate';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
@@ -58,8 +59,9 @@ describe('MapEditorManagerService', () => {
     });
 
     it('should reset item list and set item limits', () => {
+        const ITEM_LIMIT = 6;
         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
-        gameMapDataManagerServiceSpy.itemLimit.and.returnValue(6);
+        gameMapDataManagerServiceSpy.itemLimit.and.returnValue(ITEM_LIMIT);
         service.resetItemList();
 
         const itemsSection = service.placeableEntitiesSections.find((section) => section.title === 'Objets');
@@ -74,8 +76,9 @@ describe('MapEditorManagerService', () => {
 
         service.updateItemLimitCounter(-1);
 
-        expect(service.itemLimitCounter).toBe(5);
-        expect(randomItem.itemLimit).toBe(5);
+        const expectedItemLimitCounter = 5;
+        expect(service.itemLimitCounter).toBe(expectedItemLimitCounter);
+        expect(randomItem.itemLimit).toBe(expectedItemLimitCounter);
     });
 
     it('should get null when there is no placeable entities while getting random item', () => {
@@ -196,7 +199,7 @@ describe('MapEditorManagerService', () => {
         tile.item = item;
         gameMapDataManagerServiceSpy.currentGrid = [[tile]];
 
-        let copiedTile = new WaterTile();
+        const copiedTile = new WaterTile();
         copiedTile.coordinates = { x: -1, y: -1 };
         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
         tileFactoryServiceSpy.copyFromTile.and.returnValue(copiedTile);
@@ -214,7 +217,7 @@ describe('MapEditorManagerService', () => {
         tile.item = item;
         gameMapDataManagerServiceSpy.currentGrid = [[tile]];
 
-        let copiedTile = new DoorTile();
+        const copiedTile = new DoorTile();
         copiedTile.coordinates = { x: -1, y: -1 };
         tileFactoryServiceSpy.copyFromTile.and.returnValue(copiedTile);
 

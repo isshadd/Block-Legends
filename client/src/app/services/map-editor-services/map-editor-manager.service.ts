@@ -157,7 +157,7 @@ export class MapEditorManagerService {
 
     cancelSelectionSideMenu() {
         if (this.sideMenuSelectedEntity) {
-            let foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity);
+            const foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity);
             if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
 
             this.selectedEntity = null;
@@ -167,7 +167,7 @@ export class MapEditorManagerService {
 
     cancelSelectionMap() {
         if (this.selectedEntity) {
-            let foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity);
+            const foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity);
             if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
 
             this.selectedEntity = null;

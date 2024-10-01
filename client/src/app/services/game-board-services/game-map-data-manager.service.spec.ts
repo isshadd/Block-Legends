@@ -384,23 +384,23 @@ describe('GameMapDataManagerService', () => {
     it('should correctly identify non-Item', () => {
         const nonItem = { name: 'Not an Item' };
 
-        expect(service.isItem(nonItem as any)).toBeFalse();
+        expect(service.isItem(nonItem as unknown)).toBeFalse();
     });
 
     it('should return true for Door type', () => {
-        const doorTile = { type: TileType.Door } as any;
+        const doorTile = { type: TileType.Door } as unknown;
 
         expect(service.isDoor(doorTile)).toBeTrue();
     });
 
     it('should return true for OpenDoor type', () => {
-        const openDoorTile = { type: TileType.OpenDoor } as any;
+        const openDoorTile = { type: TileType.OpenDoor } as unknown;
 
         expect(service.isDoor(openDoorTile)).toBeTrue();
     });
 
     it('should return false for other tile types', () => {
-        const grassTile = { type: TileType.Grass } as any;
+        const grassTile = { type: TileType.Grass } as unknown;
 
         expect(service.isDoor(grassTile)).toBeFalse();
     });
