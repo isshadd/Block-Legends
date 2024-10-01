@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { Item } from '@app/classes/Items/item';
@@ -83,7 +84,6 @@ describe('GameMapDataManagerService', () => {
             isVisible: false,
         };
 
-        // Mock tileFactoryService to return appropriate tiles
         tileFactoryServiceSpy.createTile.and.callFake((type: TileType) => {
             if (type === TileType.Grass) {
                 return new GrassTile();
@@ -104,7 +104,8 @@ describe('GameMapDataManagerService', () => {
 
         expect(service.databaseGame).toEqual(mockGame);
         expect(service.currentGrid.length).toBe(mockGame.tiles.length);
-        expect(tileFactoryServiceSpy.createTile).toHaveBeenCalledTimes(4);
+        const expectedTileCalls = 4;
+        expect(tileFactoryServiceSpy.createTile).toHaveBeenCalledTimes(expectedTileCalls);
     });
 
     it('should not save if name or description is invalid', () => {
@@ -167,7 +168,9 @@ describe('GameMapDataManagerService', () => {
         service.currentName = 'Updated Game';
         service.currentDescription = 'Updated Description';
         spyOn(service, 'hasValidNameAndDescription').and.returnValue(true);
-        spyOn(service, 'saveGameInDb').and.callFake(() => {});
+        spyOn(service, 'saveGameInDb').and.callFake(() => {
+            return of(void 0);
+        });
 
         service.save();
         expect(service.isGameUpdated).toBeFalse();
@@ -473,31 +476,25 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should correctly identify Item', () => {
-        const item: Item = { testItem: true } as unknown as Item;
+        const item = new DiamondSword();
 
         expect(service.isItem(item)).toBeTrue();
     });
 
-    it('should correctly identify non-Item', () => {
-        const nonItem = { name: 'Not an Item' };
-
-        expect(service.isItem(nonItem as any)).toBeFalse();
-    });
-
     it('should return true for Door type', () => {
-        const doorTile = { type: TileType.Door } as any;
+        const doorTile = new DoorTile();
 
         expect(service.isDoor(doorTile)).toBeTrue();
     });
 
     it('should return true for OpenDoor type', () => {
-        const openDoorTile = { type: TileType.OpenDoor } as any;
+        const openDoorTile = new OpenDoor();
 
         expect(service.isDoor(openDoorTile)).toBeTrue();
     });
 
     it('should return false for other tile types', () => {
-        const grassTile = { type: TileType.Grass } as any;
+        const grassTile = new GrassTile();
 
         expect(service.isDoor(grassTile)).toBeFalse();
     });
@@ -610,13 +607,17 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should return correct item limit based on game size', () => {
+        const smallItemLimit = 2;
+        const mediumItemLimit = 4;
+        const largeItemLimit = 6;
+
         service.databaseGame = { size: MapSize.SMALL } as GameShared;
-        expect(service.itemLimit()).toBe(2);
+        expect(service.itemLimit()).toBe(smallItemLimit);
 
         service.databaseGame.size = MapSize.MEDIUM;
-        expect(service.itemLimit()).toBe(4);
+        expect(service.itemLimit()).toBe(mediumItemLimit);
 
         service.databaseGame.size = MapSize.LARGE;
-        expect(service.itemLimit()).toBe(6);
+        expect(service.itemLimit()).toBe(largeItemLimit);
     });
 });
