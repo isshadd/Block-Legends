@@ -83,16 +83,41 @@ export class MapEditorManagerService {
         this.setItemLimit();
     }
 
-    setItemLimit() {
-        const itemLimit = this.gameMapDataManagerService.itemLimit();
-        (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = itemLimit;
-        this.itemLimitCounter = itemLimit;
-        (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = itemLimit;
+    getRandomItemItemInMenu(): RandomItem | null {
+        for (const entities of this.placeableEntitiesSections) {
+            for (const item of entities.entities) {
+                if ((item as Item).type === ItemType.Random) return item as RandomItem;
+            }
+        }
+        return null;
     }
 
-    setItemLimitCounter(number: number) {
-        this.itemLimitCounter += number;
-        (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+    getSpawnItemInMenu(): Spawn | null {
+        for (const entities of this.placeableEntitiesSections) {
+            for (const item of entities.entities) {
+                if ((item as Item).type === ItemType.Spawn) return item as Spawn;
+            }
+        }
+        return null;
+    }
+
+    setItemLimit() {
+        this.itemLimitCounter = this.gameMapDataManagerService.itemLimit();
+
+        const itemsToUpdate = [this.getRandomItemItemInMenu(), this.getSpawnItemInMenu()];
+        for (const item of itemsToUpdate) {
+            if (item) {
+                item.itemLimit = this.itemLimitCounter;
+            }
+        }
+    }
+
+    updateItemLimitCounter(amount: number) {
+        this.itemLimitCounter += amount;
+        const randomItem = this.getRandomItemItemInMenu();
+        if (randomItem) {
+            randomItem.itemLimit = this.itemLimitCounter;
+        }
     }
 
     startDrag(entity: PlaceableEntity) {
@@ -193,7 +218,7 @@ export class MapEditorManagerService {
         if (!foundItem) return;
         if (foundItem.itemLimit >= 1) {
             foundItem.itemLimit--;
-            if (item.type !== ItemType.Spawn) this.setItemLimitCounter(-1);
+            if (item.type !== ItemType.Spawn) this.updateItemLimitCounter(-1);
             selectedTile.item = this.itemFactoryService.copyItem(item);
             this.gameMapDataManagerService.isGameUpdated = true;
             if (foundItem.itemLimit === 0) {
@@ -214,7 +239,10 @@ export class MapEditorManagerService {
         const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
         if (foundItem) {
             foundItem.itemLimit++;
-            if (foundItem.type !== ItemType.Spawn) this.setItemLimitCounter(1);
+            if (foundItem.type !== ItemType.Spawn) this.updateItemLimitCounter(1);
+            else {
+                foundItem.visibleState = VisibleState.NotSelected;
+            }
             if (foundItem.itemLimit === 0) {
                 foundItem.visibleState = VisibleState.Disabled;
                 this.sideMenuSelectedEntity = null;
@@ -322,7 +350,9 @@ export class MapEditorManagerService {
 
                     if (foundItem) {
                         foundItem.itemLimit--;
-                        if (foundItem.type !== ItemType.Spawn) this.itemLimitCounter--;
+                        if (foundItem.type !== ItemType.Spawn) {
+                            this.updateItemLimitCounter(-1);
+                        }
                         if (foundItem.itemLimit === 0) {
                             foundItem.visibleState = VisibleState.Disabled;
                         }
