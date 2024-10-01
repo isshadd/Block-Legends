@@ -35,9 +35,15 @@ describe('WaitingViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should generate and display the access code on initialization', () => {
+    it('should generate, store and display the access code on initialization', () => {
         component.ngOnInit();
         expect(component.accessCode).toBeDefined();
+        expect(component.storedCode).toBe(component.accessCode);
+    });
+
+    it('should set organizerCharacter to the stored character if it exists', () => {
+        component.ngOnInit();
+        expect(component.organizerCharacter).toBe(component.storedCharacter as PlayerCharacter);
     });
 
     it('should add organizer to the players list if user is organizer', () => {

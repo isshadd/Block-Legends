@@ -78,7 +78,6 @@ describe('ListGameComponent', () => {
     it('should call deleteGame on the service when DeleteGame is called', () => {
         component.deleteGame(mockGames[0]._id);
         expect(administrationService.deleteGame).toHaveBeenCalled();
-        //expect(administrationService.deleteGame).toHaveBeenCalledWith();
     });
 
     it('should return the list of games from the administration service', () => {

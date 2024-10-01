@@ -40,24 +40,6 @@ describe('GameListComponent', () => {
             ],
         });
 
-        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGames']);
-
-        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', {
-            getGames: of(mockGames),
-        });
-
-        Object.defineProperty(modeServiceSpy, 'selectedMode$', { get: () => of(GameMode.Classique) });
-
-        await TestBed.configureTestingModule({
-            imports: [GameListComponent, HttpClientTestingModule],
-            providers: [
-                { provide: ModeService, useValue: modeServiceSpy },
-                { provide: Router, useValue: routerSpy },
-                { provide: GameServerCommunicationService, useValue: mockGameServerCommunicationService },
-                { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
-            ],
-        }).compileComponents();
-
         mockGames = [
             {
                 _id: '1',
@@ -80,6 +62,25 @@ describe('GameListComponent', () => {
                 tiles: [],
             },
         ];
+
+        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGames', 'getGame']);
+
+        mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', {
+            getGames: of(mockGames),
+            getGame: of(mockGames[0]),
+        });
+
+        Object.defineProperty(modeServiceSpy, 'selectedMode$', { get: () => of(GameMode.Classique) });
+
+        await TestBed.configureTestingModule({
+            imports: [GameListComponent, HttpClientTestingModule],
+            providers: [
+                { provide: ModeService, useValue: modeServiceSpy },
+                { provide: Router, useValue: routerSpy },
+                { provide: GameServerCommunicationService, useValue: mockGameServerCommunicationService },
+                { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
+            ],
+        }).compileComponents();
 
         fixture = TestBed.createComponent(GameListComponent);
         component = fixture.componentInstance;
@@ -111,11 +112,6 @@ describe('GameListComponent', () => {
         expect(games[0]).toEqual(mockGames[0]);
     });
 
-    it('should select a game', () => {
-        component.selectGame(mockGames[0]);
-        expect(component.selectedGame).toEqual(mockGames[0]);
-    });
-
     it('should navigate to /home when homeButton is called', () => {
         component.homeButton();
         expect(router.navigate).toHaveBeenCalledWith(['/home']);
@@ -125,17 +121,18 @@ describe('GameListComponent', () => {
         const visibleGame = mockGames[0];
         component.selectGame(visibleGame);
 
-        expect(component.selectedGame).toBe(visibleGame);
+        expect(component.selectedGame).toEqual(visibleGame);
         expect(component.gameStatus).toBeNull();
         expect(router.navigate).toHaveBeenCalledWith(['/create-character']);
     });
 
     it('should not select a game and set gameStatus when an invisible game is selected', () => {
-        const invisibleGame = mockGames[1];
+        mockGames[0].isVisible = false;
+        const invisibleGame = mockGames[0];
         component.selectGame(invisibleGame);
 
         expect(component.selectedGame).toBeNull();
-        expect(component.gameStatus).toBe(`Le jeu choisi ${invisibleGame.name} n'est plus visible ou supprimé`);
+        expect(component.gameStatus).toBe(`Le jeu choisi ${invisibleGame.name} n'est plus disponible`);
         expect(router.navigate).not.toHaveBeenCalled();
     });
 
