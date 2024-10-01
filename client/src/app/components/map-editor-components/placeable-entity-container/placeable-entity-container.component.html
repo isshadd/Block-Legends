@@ -9,8 +9,14 @@
             (mouseenter)="onMouseEnter(item)"
             (mouseleave)="onMouseLeave(item)"
             (click)="onMouseDown(item)"
+            cdkDrag
+            (cdkDragStarted)="onDragStarted(item)"
+            (cdkDragEnded)="onDragEnded()"
         ></app-placeable-entity>
         <app-visible-state [placeableEntity]="item" class="layer-2"></app-visible-state>
+        @if(gameMapDataManager.isItem(item) && item.itemLimit > 0){
+        <app-item-limit-counter [currentCount]="item.itemLimit"></app-item-limit-counter>
+        }
     </div>
     }
 </div>

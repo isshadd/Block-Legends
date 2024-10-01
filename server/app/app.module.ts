@@ -13,6 +13,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
 import { GameValidationService } from './services/game-validation/gameValidation.service';
+
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),

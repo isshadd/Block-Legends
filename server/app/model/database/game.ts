@@ -1,10 +1,10 @@
+import { Tile } from '@app/model/schema/tile.schema';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
-import { Tile } from '../schema/tile.schema';
 
 export type GameDocument = Game & Document;
 

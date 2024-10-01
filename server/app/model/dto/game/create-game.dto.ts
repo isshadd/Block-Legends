@@ -8,24 +8,24 @@ import { CreateTileDto } from './create-tile.dto';
 import { MAP_CONSTANTS } from './game.dto.constants';
 
 export class CreateGameDto implements CreateGameSharedDto {
-    @ApiProperty({ maxLength: MAP_CONSTANTS.NAME_MAX_LENGTH })
+    @ApiProperty({ maxLength: MAP_CONSTANTS.nameMaxLength })
     @IsString()
-    @MaxLength(MAP_CONSTANTS.NAME_MAX_LENGTH)
+    @MaxLength(MAP_CONSTANTS.nameMaxLength)
     name: string;
 
-    @ApiProperty({ maxLength: MAP_CONSTANTS.DESCRIPTION_MAX_LENGTH })
+    @ApiProperty({ maxLength: MAP_CONSTANTS.descriptionMaxLength })
     @IsString()
-    @MaxLength(MAP_CONSTANTS.DESCRIPTION_MAX_LENGTH)
+    @MaxLength(MAP_CONSTANTS.descriptionMaxLength)
     description: string;
 
-    @ApiProperty({ enum: MAP_CONSTANTS.ALLOWED_SIZES })
+    @ApiProperty({ enum: MAP_CONSTANTS.allowedSizes })
     @IsInt()
-    @IsIn(MAP_CONSTANTS.ALLOWED_SIZES)
+    @IsIn(MAP_CONSTANTS.allowedSizes)
     size: MapSize;
 
-    @ApiProperty({ enum: MAP_CONSTANTS.ALLOWED_MODES })
+    @ApiProperty({ enum: MAP_CONSTANTS.allowedModes })
     @IsString()
-    @IsIn(MAP_CONSTANTS.ALLOWED_MODES)
+    @IsIn(MAP_CONSTANTS.allowedModes)
     mode: GameMode;
 
     @ApiProperty({})

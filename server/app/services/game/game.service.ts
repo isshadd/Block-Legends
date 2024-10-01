@@ -25,7 +25,7 @@ export class GameService {
         try {
             return await this.gameModel.create(game);
         } catch (error) {
-            throw Promise.reject(`Failed to insert map: ${error}`);
+            throw new Error(`Failed to insert game: ${error}`);
         }
     }
 
@@ -34,7 +34,7 @@ export class GameService {
         try {
             const res = await this.gameModel.updateOne(filterQuery, game);
             if (res.matchedCount === 0) {
-                throw new Error('Could not find map');
+                throw new Error('Could not find game');
             }
         } catch (error) {
             throw new Error(`Failed to update document: ${error}`);
@@ -47,10 +47,10 @@ export class GameService {
                 _id: id,
             });
             if (res.deletedCount === 0) {
-                return Promise.reject('Could not find game');
+                throw new Error('Could not find game');
             }
         } catch (error) {
-            return Promise.reject(`Failed to delete game: ${error}`);
+            throw new Error(`Failed to delete game: ${error}`);
         }
     }
 
@@ -58,7 +58,7 @@ export class GameService {
         try {
             await this.gameModel.deleteMany({});
         } catch (error) {
-            return Promise.reject(`Failed to delete games: ${error}`);
+            throw new Error(`Failed to delete games: ${error}`);
         }
     }
 }

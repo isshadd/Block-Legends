@@ -17,7 +17,6 @@ import { MapSize } from '@common/enums/map-size';
 export class CreateGameModalComponent {
     selectedSize: MapSize = MapSize.SMALL;
     selectedMode: GameMode = GameMode.Classique;
-    errorMessage: string = '';
     MapSize = MapSize;
 
     constructor(
@@ -33,16 +32,22 @@ export class CreateGameModalComponent {
     onCreateClick(): void {
         if (this.selectedSize) {
             this.dialogRef.close();
-            this.gameMapDataManagerService.newGame(this.selectedSize, this.selectedMode);
+            this.gameMapDataManagerService.setLocalStorageVariables(true, {
+                name: '',
+                description: '',
+                size: this.selectedSize,
+                mode: this.selectedMode,
+                imageUrl:
+                    'https://www.minecraft.net/content/dam/games/minecraft/key-art/Vanilla-PMP_Collection-Carousel-0_Tricky-Trials_1280x768.jpg',
+                isVisible: false,
+                tiles: [],
+            });
             this.router.navigate(['/map-editor']);
-        } else {
-            this.errorMessage = 'Vous devez sélectionner une taille avant de créer un jeu.';
         }
     }
 
     selectSize(size: MapSize): void {
         this.selectedSize = size;
-        this.errorMessage = '';
     }
 
     selectMode(mode: GameMode): void {

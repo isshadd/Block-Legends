@@ -4,4 +4,5 @@ export enum TileType {
     Ice = 'Ice',
     Door = 'Door',
     Wall = 'Wall',
+    OpenDoor = 'OpenDoor',
 }

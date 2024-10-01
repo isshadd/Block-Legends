@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
+import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
@@ -25,6 +26,8 @@ export class TileFactoryService {
                 return new WallTile();
             case TileType.Door:
                 return new DoorTile();
+            case TileType.OpenDoor:
+                return new OpenDoor();
             default:
                 return new Tile();
         }
