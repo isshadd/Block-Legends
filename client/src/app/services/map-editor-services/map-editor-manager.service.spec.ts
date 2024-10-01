@@ -8,6 +8,7 @@ import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
 import { OpenDoor } from '@app/classes/Tiles/open-door';
+import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -256,6 +257,36 @@ describe('MapEditorManagerService', () => {
         service.itemPlacer(item2, tile2);
 
         expect(service.sideMenuItemsDisabler).toHaveBeenCalled();
+    });
+
+    it('should not place an item on bad conditions', () => {
+        const item = new DiamondSword();
+        const tile = new WallTile();
+
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(false);
+        spyOn(service, 'sideMenuItemFinder').and.returnValue(item);
+
+        service.itemPlacer(item, tile);
+
+        expect(service.sideMenuItemFinder).not.toHaveBeenCalled();
+
+        const tile2 = new GrassTile();
+        item.itemLimit = 0;
+
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+
+        service.itemPlacer(item, tile2);
+
+        expect(service.sideMenuItemFinder).toHaveBeenCalled();
+        expect(itemFactoryServiceSpy.copyItem).not.toHaveBeenCalled();
+
+        item.itemLimit = 1;
+        service.sideMenuSelectedEntity = item;
+
+        service.itemPlacer(item, tile2);
+
+        expect(itemFactoryServiceSpy.copyItem).toHaveBeenCalled();
+        expect(item.visibleState).toBe(VisibleState.Disabled);
     });
 
     it('should remove an item from a tile', () => {
