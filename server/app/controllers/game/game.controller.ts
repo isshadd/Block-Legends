@@ -114,18 +114,52 @@ export class GameController {
     }
 
     @ApiOkResponse({
-        description: 'Get the number of spawn points',
+        description: 'Validates the game depending on the number of spawn points',
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
-    @Get('/:id/spawn-points')
-    async getSpawnPoints(@Param('id') id: string, @Res() response: Response) {
+    @Get('/:id/isValidSizeBySpawnPoints')
+    async isValidSizeBySpawnPoints(@Param('id') id: string, @Res() response: Response) {
         try {
-            const count = await this.gameValidationService.getNumberOfSpawnPoints(id);
-            response.status(HttpStatus.OK).json(count);
+            const isValid = await this.gameValidationService.isValidSizeBySpawnPoints(id);
+            response.status(HttpStatus.OK).json(isValid);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
+
+    @ApiOkResponse({
+        description: 'Generates matrix of 1 and 0',
+    })
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Get('/:id/Matrix')
+    async mapToMatrix(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const matrix = await this.gameValidationService.mapToMatrix(id);
+            response.status(HttpStatus.OK).json(matrix);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+
+    @ApiOkResponse({
+        description: 'Map validation',
+    })
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Get('/:id/MapValidation')
+    async mapIsValid(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const matrix = await this.gameValidationService.mapIsValid(id);
+            response.status(HttpStatus.OK).json(matrix);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+    
+
 }
