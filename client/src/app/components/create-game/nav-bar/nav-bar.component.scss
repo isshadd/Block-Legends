@@ -22,20 +22,20 @@
     border: 5px solid #000;
 }
 
-// .navbar-modes button {
-//     background-color: #444;
-//     color: white;
-//     border: none;
-//     padding: 10px 20px;
-//     margin: 0 5px;
-//     cursor: pointer;
-// }
+.navbar-modes button {
+    background-color: #444;
+    color: white;
+    border: 5px solid black;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+}
 
-// .navbar-modes button:hover {
-//     background-color: #555;
-// }
+.navbar-modes button:hover {
+    background-color: #555;
+}
 
-// .navbar-modes button.active {
-//     background-color: #007bff;
-//     color: white;
-// }
+.navbar-modes button.active {
+    background-color: #007bff;
+    color: white;
+}
