@@ -3,7 +3,6 @@ import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameService } from '@app/services/game/game.service';
-import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -63,13 +62,13 @@ export class GameController {
         try {
             const validationResult = await this.gameValidationService.validateGame(createGameDto);
             if (!validationResult.isValid) {
-                return response.status(HttpStatus.BAD_REQUEST).send(validationResult.errors.join('\n'));
+                return response.status(HttpStatus.BAD_REQUEST).json({ errors: validationResult.errors });
             }
             const isTilesValid = await this.gameValidationService.isMapTilesValid(createGameDto, createGameDto.size);
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
-                    .send('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                    .json({ errors: ['Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.'] });
             }
 
             const newGame: Game = await this.gameService.addGame(createGameDto);
@@ -95,11 +94,11 @@ export class GameController {
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
-                    .send('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                    .json('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
             }
             const validationResult = await this.gameValidationService.validateGame(updatedGame);
             if (!validationResult.isValid) {
-                return response.status(HttpStatus.BAD_REQUEST).send(validationResult.errors.join('\n'));
+                return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
             }
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
@@ -187,6 +186,4 @@ export class GameController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-    
-
 }

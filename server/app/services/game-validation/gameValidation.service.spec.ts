@@ -506,22 +506,4 @@ describe('GameValidationService', () => {
         tiles[2][1] = { type: TileType.Grass };
         return tiles;
     }
-
-    function createTilesWithInvalidDoor(size: number): Tile[][] {
-        const tiles: Tile[][] = [];
-        for (let i = 0; i < size; i++) {
-            tiles[i] = [];
-            for (let j = 0; j < size; j++) {
-                tiles[i][j] = { type: TileType.Grass }; // All tiles are grass for a valid map
-            }
-        }
-        tiles[1][1] = { type: TileType.Door }; // Invalid door placement
-
-        // Ensure the tile above and below the door are walls
-        tiles[1][0] = { type: TileType.Grass }; // Invalid: should be a wall
-        tiles[1][2] = { type: TileType.Wall }; // This should be a wall
-        tiles[0][1] = { type: TileType.Grass }; // Valid terrain above
-        tiles[2][1] = { type: TileType.Grass }; // Valid terrain below
-        return tiles;
-    }
 });

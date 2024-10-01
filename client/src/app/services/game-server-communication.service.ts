@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { CreateGameSharedDto } from '@common/interfaces/dto/game/create-game-shared.dto';
 import { UpdateGameSharedDto } from '@common/interfaces/dto/game/update-game-shared.dto';
 import { GameShared } from '@common/interfaces/game-shared';
-import { Observable, of } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -41,8 +41,8 @@ export class GameServerCommunicationService {
 
     private handleError<T>(operation = 'operation', result?: T) {
         return (error: any): Observable<T> => {
-            console.error(`${operation} failed: ${error.message}`);
-            return of(result as T);
+            const errorMsg = error.message || 'Une erreur est survenue'; // Extract error messages from the server response
+            return throwError(() => new Error(errorMsg)); // Pass the error messages
         };
     }
 }
