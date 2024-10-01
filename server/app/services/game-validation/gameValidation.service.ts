@@ -1,41 +1,38 @@
 import { Game } from '@app/model/database/game';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Tile } from '@app/model/schema/tile.schema';
-import { GameService } from '@app/services/game/game.service';
-import { Body, Injectable } from '@nestjs/common';
-import { ItemType } from '@common/enums/item-type';
-import { TileType } from '@common/enums/tile-type';
 import { ExampleService } from '@app/services/example/example.service';
-import { title } from 'process';
-import { Item } from '@app/model/schema/item.schema';
+import { GameService } from '@app/services/game/game.service';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { Directions } from '@common/interfaces/directions';
-import { Message } from '@common/message';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GameValidationService {
-    constructor(private readonly gameService: GameService, private readonly exampleService : ExampleService) {}
+    constructor(
+        private readonly gameService: GameService,
+        private readonly exampleService: ExampleService,
+    ) {}
 
     async isGameNameUnique(name: string): Promise<boolean> {
         const existingGame = await this.gameService.getGameByName(name);
         return !existingGame;
     } // retourne vrai si le nom du jeu est unique
 
-    async getNumberOfSpawnPoints(game: Game| UpdateGameDto): Promise<number> {
+    async getNumberOfSpawnPoints(game: Game | UpdateGameDto): Promise<number> {
         const existingGame = await this.gameService.getGameByName(game.name);
         let count = 0;
         for (let i = 0; i < existingGame.tiles.length; i++) {
-            for(let j = 0; j < existingGame.tiles[i].length; j++) {
-                if(existingGame.tiles[i][j].item && existingGame.tiles[i][j].item.type == "Spawn") {
-                        count++;
-                    }
+            for (let j = 0; j < existingGame.tiles[i].length; j++) {
+                if (existingGame.tiles[i][j].item && existingGame.tiles[i][j].item.type == 'Spawn') {
+                    count++;
                 }
             }
         }
         return count;
     }
+
     // retourne le nombre de points de spawn pour un jeu donné
 
     async isValidSizeBySpawnPoints(game: Game | UpdateGameDto): Promise<boolean> {
@@ -52,14 +49,10 @@ export class GameValidationService {
                 return false;
         }
     }
-    
+
     async mapToMatrix(name: string): Promise<number[][]> {
         const map = await this.gameService.getGameByName(name);
-        const matrix: number[][] = map.tiles.map(row => 
-            row.map(tile => 
-                tile.type === TileType.Wall || tile.type === TileType.Door ? 1 : 0
-            )
-        );
+        const matrix: number[][] = map.tiles.map((row) => row.map((tile) => (tile.type === TileType.Wall || tile.type === TileType.Door ? 1 : 0)));
         return matrix;
     }
 
@@ -86,7 +79,7 @@ export class GameValidationService {
             }
         }
     }
-    
+
     async mapIsValid(game: Game | UpdateGameDto): Promise<boolean> {
         const map = await this.mapToMatrix(game.name);
         const n = map.length;
