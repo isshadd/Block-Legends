@@ -19,7 +19,7 @@ export class GameServerCommunicationService {
         return this.http.get<GameShared[]>(`${this.baseUrl}/`).pipe(catchError(this.handleError<GameShared[]>()));
     }
 
-    getGame(id: string): Observable<GameShared> {
+    getGame(id: string | undefined): Observable<GameShared> {
         return this.http.get<GameShared>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<GameShared>()));
     }
 

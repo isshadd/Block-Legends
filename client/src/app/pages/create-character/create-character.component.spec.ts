@@ -23,7 +23,6 @@ describe('CreateCharacterComponent', () => {
         mockAvatar = jasmine.createSpyObj('AvatarSelectionComponent', ['selectAvatar']);
         mockFormCharacter = jasmine.createSpyObj('CharacterFormComponent', ['saveName']);
         mockModal = jasmine.createSpyObj('ModalComponent', ['onConfirm', 'onCancel']);
-        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         mockAttributes = jasmine.createSpyObj('AttributesComponent', ['character', 'characterStatus']);
         await TestBed.configureTestingModule({
             imports: [FormsModule, CreateCharacterComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
@@ -55,14 +54,22 @@ describe('CreateCharacterComponent', () => {
         component.character = new PlayerCharacter('', '', new PlayerAttributes());
         component.createCharacter();
         expect(component.characterStatus).toBe(
-            "Le formulaire de création de personnage n'est pas valide !" +
-                " Manquants: Nom, Avatar, Bonus d'attaque, Bonus de défense, Bonus de vie, Bonus de vitesse.",
+            "Le formulaire de création de personnage n'est pas valide !" + ' Manquants: Nom, Avatar, Bonus de vie, Bonus de vitesse.',
         );
+    });
+
+    it('should not create a character if the character name is invalid', () => {
+        component.character = new PlayerCharacter(' ', 'Test', mockAttributes.character.attributes);
+        component.character.isLifeBonusAssigned = true;
+        component.character.isSpeedBonusAssigned = true;
+        component.createCharacter();
+        expect(component.characterStatus).toBe('Le nom du personnage est invalide !');
     });
 
     it('should set the character to organizer and navigate to the waiting view if valid', () => {
         mockAttributes.character.attributes = new PlayerAttributes();
-        component.character = new PlayerCharacter('Test', 'test', mockAttributes.character.attributes);
+        component.character = new PlayerCharacter('Test', 'Test', mockAttributes.character.attributes);
+        component.character.isNameValid = true;
         component.character.isAttackBonusAssigned = true;
         component.character.isDefenseBonusAssigned = true;
         component.character.isLifeBonusAssigned = true;

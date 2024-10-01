@@ -18,6 +18,8 @@ export class WaitingViewComponent implements OnInit {
     playersCounter = 0;
     maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
     isMaxPlayer: boolean;
+    storedCharacter = this.gameService.getStoredCharacter();
+    storedCode = this.gameService.getAccessCodeFromStorage();
 
     constructor(
         @Inject(GameService) private gameService: GameService,
@@ -26,16 +28,27 @@ export class WaitingViewComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.gameService.generateAccessCode();
-        this.accessCode = this.gameService.getAccessCode();
-        this.gameService.character$.subscribe((character) => {
-            if (character) {
-                this.organizerCharacter = character;
-                character.isOrganizer = true;
-                this.players.push(this.organizerCharacter);
-                this.cdr.detectChanges();
-            }
-        });
+        if (!this.storedCode) {
+            this.gameService.generateAccessCode();
+            this.accessCode = this.gameService.getAccessCode();
+            this.gameService.storeCode();
+        } else {
+            this.accessCode = this.storedCode;
+        }
+        if (this.storedCharacter) {
+            this.organizerCharacter = this.storedCharacter;
+            this.organizerCharacter.setOrganizer();
+            this.players.push(this.organizerCharacter);
+        } else {
+            this.gameService.character$.subscribe((character) => {
+                if (character) {
+                    this.organizerCharacter = character;
+                    character.setOrganizer();
+                    this.players.push(this.organizerCharacter);
+                    this.cdr.detectChanges();
+                }
+            });
+        }
     }
 
     addVirtualPlayers(): void {
@@ -49,6 +62,7 @@ export class WaitingViewComponent implements OnInit {
     }
 
     playerLeave(): void {
+        this.gameService.clearLocalStorage();
         this.router.navigate(['/home']);
     }
 }
