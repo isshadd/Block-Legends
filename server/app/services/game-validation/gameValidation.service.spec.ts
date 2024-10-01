@@ -4,18 +4,23 @@ import { Tile } from '@app/model/schema/tile.schema';
 import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameService } from '@app/services/game/game.service';
 import { GameMode } from '@common/enums/game-mode';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
+import { mock } from 'node:test';
 
 describe('GameValidationService', () => {
     let gameValidationService: GameValidationService;
     let gameService: GameService;
 
     beforeEach(() => {
-        gameService = new GameService(null); // Mock your GameService here if needed
+        gameService = {
+            getGameByName: jest.fn(),
+        } as unknown as GameService; // Mock your GameService here if needed
         gameValidationService = new GameValidationService(gameService);
     });
 
+    
     describe('validateGame', () => {
         it('should return valid for a valid game', async () => {
             const game: Game = {
@@ -28,7 +33,9 @@ describe('GameValidationService', () => {
                 tiles: createValidTiles(10),
             };
 
-            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null); // No existing game with the same name
+            const mockExistingGame = game;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(mockExistingGame); // No existing game with the same name
             const result = await gameValidationService.validateGame(game);
             expect(result.isValid).toBe(true);
             expect(result.errors.length).toBe(0);
@@ -488,14 +495,122 @@ describe('GameValidationService', () => {
                 'La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.',
             );
         });
+
+        it('should return the correct number of spawn points', async () => {
+            const game = { name: 'testGame' } as Game;
+            const mockGame = {
+                tiles: [
+                    [{ item: { type: ItemType.Spawn } }, { item: { type: ItemType.EnchantedBook } }],
+                    [{ item: { type: ItemType.Spawn } }, { item: null }],
+                ],
+            };
+            (gameService.getGameByName as jest.Mock).mockResolvedValue(mockGame);
+    
+            const result = await gameValidationService.getNumberOfSpawnPoints(game);
+            expect(result).toBe(2);
+        });
+
+        it('should return invalid if the number of start points is not exactly 2 for a small sized map', async () => {
+            const game = {
+                tiles: createTilesWithInvalidSpawn(MapSize.SMALL),
+                name: 'Test Game',
+                description: 'A game description.',
+            } as UpdateGameDto;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            const result = await gameValidationService.isValidSizeBySpawnPoints(game);
+
+            expect(result).toBe(false);
+        });
+
+        it('should return invalid if the number of start points is not exactly 4 for a medium sized map', async () => {
+            const game = {
+                tiles: createTilesWithInvalidSpawn(MapSize.MEDIUM),
+                name: 'Test Game',
+                description: 'A game description.',
+            } as UpdateGameDto;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            const result = await gameValidationService.isValidSizeBySpawnPoints(game);
+
+            expect(result).toBe(false);
+        });
+
+        it('should return invalid if the number of start points is not exactly 6 for a large sized map', async () => {
+            const game = {
+                tiles: createTilesWithInvalidSpawn(MapSize.LARGE),
+                name: 'Test Game',
+                description: 'A game description.',
+            } as UpdateGameDto;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            const result = await gameValidationService.isValidSizeBySpawnPoints(game);
+
+            expect(result).toBe(false);
+        });
+
+        it('should map tiles to a matrix correctly', async () => {
+            const name = 'testGame';
+            const mockGame = {
+                tiles: [
+                    [{ type: TileType.Wall }, { type: TileType.Grass }],
+                    [{ type: TileType.Door }, { type: TileType.Water }],
+                    [{ type: TileType.Ice  }, { type: TileType.Wall }],
+                ],
+            };
+            (gameService.getGameByName as jest.Mock).mockResolvedValue(mockGame);
+    
+            const result = await gameValidationService.mapToMatrix(name);
+            expect(result).toEqual([
+                [1, 0],
+                [1, 0],
+                [0, 1],
+            ]);
+        });
+
+        it('should return invalid if a game map is invalid (Unaccessible terrain because of a wall or door)', async () => {
+            const game: UpdateGameDto = {
+                name: 'Game with invalid walls',
+                description: 'example description',
+                tiles: [
+                    [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                    [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Water }],
+                    [{ type: TileType.Ice }, { type: TileType.Ice }, { type: TileType.Ice }],
+                ],
+            };
+        const result = await gameValidationService.mapIsValid(game);
+        expect(result).toBe(false);
+        });
+
+        it('should return valid if a game map is valid (All terrain is accessible)', async () => {
+            const game: UpdateGameDto = {
+                name: 'Game with valid walls',
+                description: 'example description',
+                tiles: [
+                    [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                    [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Water }],
+                    [{ type: TileType.Ice }, { type: TileType.Ice }, { type: TileType.Ice }],
+                ],
+            };
+            const result = await gameValidationService.mapIsValid(game);
+            expect(result).toBe(true);
+            });
+                
     });
+
+        
 
     function createValidTiles(size: number): Tile[][] {
         const tiles: Tile[][] = [];
+        let spawnCount = appropriateSpawnCount(size);
         for (let i = 0; i < size; i++) {
             tiles[i] = [];
             for (let j = 0; j < size; j++) {
                 tiles[i][j] = { type: TileType.Grass }; // All tiles are grass for a valid map
+                if (spawnCount > 0) {
+                    tiles[i][j].item = { type: ItemType.Spawn };
+                    spawnCount--;
+                }
             }
         }
         // Place a door surrounded by walls and terrains
@@ -509,6 +624,7 @@ describe('GameValidationService', () => {
 
     function createTilesWithInvalidDoor(size: number): Tile[][] {
         const tiles: Tile[][] = [];
+
         for (let i = 0; i < size; i++) {
             tiles[i] = [];
             for (let j = 0; j < size; j++) {
@@ -522,6 +638,48 @@ describe('GameValidationService', () => {
         tiles[1][2] = { type: TileType.Wall }; // This should be a wall
         tiles[0][1] = { type: TileType.Grass }; // Valid terrain above
         tiles[2][1] = { type: TileType.Grass }; // Valid terrain below
+        return tiles;
+    }
+
+
+    function appropriateSpawnCount(size: number) : number {
+        let spawnCount = 0;
+        switch (size) {
+            case MapSize.SMALL:
+                spawnCount = 2;
+            case MapSize.MEDIUM:
+                spawnCount = 4;
+            case MapSize.LARGE:
+                spawnCount = 6;
+            default:
+                spawnCount = 0;
+        }
+        return spawnCount;
+    }
+
+    function createTilesWithInvalidSpawn(size : number ) : Tile[][] { 
+        const tiles: Tile[][] = [];
+        let invalidSpawnCount = 0
+        switch (size) {
+            case MapSize.SMALL:
+                invalidSpawnCount = 4;
+            case MapSize.MEDIUM:
+                invalidSpawnCount = 2;
+            case MapSize.LARGE:
+                invalidSpawnCount = 7;
+            default:
+                invalidSpawnCount = 0;
+        }
+        for(let i = 0; i < size; i++) {
+            tiles[i] = [];
+            for(let j = 0; j < size; j++) {
+                tiles[i][j] = { type: TileType.Grass };
+                if (invalidSpawnCount > 0 ) {
+                    tiles[i][j].item.type = ItemType.Spawn;
+                    invalidSpawnCount--;
+                }
+            }
+        }
         return tiles;
     }
 });
