@@ -1,4 +1,4 @@
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
@@ -17,7 +17,8 @@ describe('GameServerCommunicationService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [GameServerCommunicationService, provideHttpClientTesting()],
+            imports: [HttpClientTestingModule],
+            providers: [GameServerCommunicationService],
         });
 
         service = TestBed.inject(GameServerCommunicationService);
@@ -91,32 +92,32 @@ describe('GameServerCommunicationService', () => {
 
     it('should update a game by id using PATCH', () => {
         service.updateGame('1', updateGameDto).subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/1`);
         expect(req.request.method).toEqual('PATCH');
-        req.flush({});
+        req.flush(null);
     });
 
     it('should delete a game by id using DELETE', () => {
         service.deleteGame('1').subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/1`);
         expect(req.request.method).toEqual('DELETE');
-        req.flush({});
+        req.flush(null);
     });
 
     it('should empty the database using DELETE', () => {
         service.emptyDatabase().subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
         expect(req.request.method).toEqual('DELETE');
-        req.flush({});
+        req.flush(null);
     });
 
     it('should handle error when fetching all games', () => {
