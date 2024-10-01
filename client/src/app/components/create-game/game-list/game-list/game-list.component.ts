@@ -25,11 +25,7 @@ export class GameListComponent implements OnInit {
         private router: Router,
         private administrationService: AdministrationPageManagerService,
         private gameServerCommunicationService: GameServerCommunicationService,
-    ) {
-        this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
-            this.games = games;
-        });
-    }
+    ) {}
 
     getGames(): GameShared[] {
         return this.administrationService.games;
@@ -39,6 +35,9 @@ export class GameListComponent implements OnInit {
         this.modeService.selectedMode$.subscribe((mode) => {
             this.selectedMode = mode;
         });
+        this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
+            this.games = games;
+        });
     }
 
     homeButton() {
@@ -46,14 +45,16 @@ export class GameListComponent implements OnInit {
     }
 
     selectGame(game: GameShared) {
-        if (!game.isVisible) {
-            this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
-            this.selectedGame = null;
-        } else {
-            this.selectedGame = game;
-            this.gameStatus = null;
-            this.router.navigate(['/create-character']);
-        }
+        this.gameServerCommunicationService.getGame(game._id).subscribe((updatedGame: GameShared) => {
+            if (!updatedGame.isVisible) {
+                this.gameStatus = `Le jeu choisi ${updatedGame.name} n'est plus disponible`;
+                this.selectedGame = null;
+            } else {
+                this.selectedGame = updatedGame;
+                this.gameStatus = null;
+                this.router.navigate(['/create-character']);
+            }
+        });
     }
 
     getFilteredGames() {
