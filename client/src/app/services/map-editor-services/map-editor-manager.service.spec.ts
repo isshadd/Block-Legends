@@ -2,9 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@app/classes/Items/chestplate';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { RandomItem } from '@app/classes/Items/random-item';
+import { Spawn } from '@app/classes/Items/spawn';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { IceTile } from '@app/classes/Tiles/ice-tile';
+import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -244,7 +246,6 @@ describe('MapEditorManagerService', () => {
         expect(service.sideMenuItemsEnabler).toHaveBeenCalled();
 
         service.itemLimitCounter = 0;
-
         const item2 = new Chestplate();
         const tile2 = new GrassTile();
 
@@ -261,6 +262,7 @@ describe('MapEditorManagerService', () => {
         tile.item = item;
         service.itemLimitCounter = 6;
         spyOn(service, 'updateItemLimitCounter');
+        spyOn(service, 'sideMenuItemsEnabler');
         gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
 
         service.itemRemover(tile);
@@ -268,6 +270,17 @@ describe('MapEditorManagerService', () => {
         expect(tile.item).toBeNull();
         expect(service.updateItemLimitCounter).toHaveBeenCalledWith(1);
         expect(gameMapDataManagerServiceSpy.isGameUpdated).toBeTrue();
+        expect(service.sideMenuItemsEnabler).toHaveBeenCalled();
+
+        service.itemLimitCounter = 0;
+        const item2 = new Spawn();
+        const tile2 = new GrassTile();
+        tile2.item = item2;
+        spyOn(service, 'sideMenuItemsDisabler');
+
+        service.itemRemover(tile2);
+
+        expect(service.sideMenuItemsDisabler).toHaveBeenCalled();
     });
 
     it('should handle left-click on map tile with selected entity', () => {
@@ -280,6 +293,44 @@ describe('MapEditorManagerService', () => {
         service.leftClickMapTile(tile);
 
         expect(service.tileCopyCreator).toHaveBeenCalledWith(selectedTile, tile);
+
+        const selectedItem = new DiamondSword();
+        service.sideMenuSelectedEntity = selectedItem;
+        spyOn(service, 'itemPlacer');
+        spyOn(service, 'cancelSelectionSideMenu');
+        gameMapDataManagerServiceSpy.isItem.and.returnValue(true);
+        gameMapDataManagerServiceSpy.isTerrainTile.and.returnValue(true);
+
+        service.leftClickMapTile(tile);
+
+        expect(service.itemPlacer).toHaveBeenCalledWith(selectedItem, tile);
+        expect(service.cancelSelectionSideMenu).toHaveBeenCalled();
+    });
+
+    it('should handle left-click on map with closed doors', () => {
+        const selectedTile = new DoorTile();
+        selectedTile.coordinates = { x: 0, y: 0 };
+        service.sideMenuSelectedEntity = selectedTile;
+        gameMapDataManagerServiceSpy.isDoor.and.returnValue(true);
+        tileFactoryServiceSpy.copyFromTile.and.returnValue(new OpenDoor());
+        spyOn(service, 'tileCopyCreator');
+
+        service.leftClickMapTile(selectedTile);
+
+        expect(service.tileCopyCreator).toHaveBeenCalledWith(jasmine.any(OpenDoor), selectedTile);
+    });
+
+    it('should handle left-click on map with open doors', () => {
+        const selectedTile = new OpenDoor();
+        selectedTile.coordinates = { x: 0, y: 0 };
+        service.sideMenuSelectedEntity = selectedTile;
+        gameMapDataManagerServiceSpy.isDoor.and.returnValue(true);
+        tileFactoryServiceSpy.copyFromTile.and.returnValue(new DoorTile());
+        spyOn(service, 'tileCopyCreator');
+
+        service.leftClickMapTile(selectedTile);
+
+        expect(service.tileCopyCreator).toHaveBeenCalledWith(jasmine.any(DoorTile), selectedTile);
     });
 
     it('should handle right-click on map tile', () => {
