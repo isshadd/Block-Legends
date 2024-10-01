@@ -19,10 +19,6 @@ export class MapComponent {
         public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
 
-    getGrid() {
-        return this.gameMapDataManagerService.currentGrid;
-    }
-
     onMouseDown(event: MouseEvent, tile: Tile) {
         this.mapEditorManagerService.onMouseDownMapTile(event, tile);
     }

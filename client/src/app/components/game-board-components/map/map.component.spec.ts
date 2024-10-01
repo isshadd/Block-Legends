@@ -1,3 +1,4 @@
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
@@ -23,10 +24,11 @@ describe('MapComponent', () => {
         const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', ['']);
 
         await TestBed.configureTestingModule({
-            declarations: [MapComponent],
+            imports: [MapComponent],
             providers: [
                 { provide: MapEditorManagerService, useValue: mapEditorSpy },
                 { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
+                provideHttpClientTesting(),
             ],
         }).compileComponents();
 
@@ -44,15 +46,8 @@ describe('MapComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should return the current grid when getGrid is called', () => {
-        const mockGrid = [
-            [new GrassTile(), new GrassTile()],
-            [new GrassTile(), new GrassTile()],
-        ];
-        gameMapDataManagerService.currentGrid = mockGrid;
-
-        const result = component.getGrid();
-        expect(result).toBe(mockGrid);
+    it('should inject GameMapDataManagerService', () => {
+        expect(gameMapDataManagerService).toBeTruthy();
     });
 
     it('should call onMouseDownMapTile when onMouseDown is triggered', () => {

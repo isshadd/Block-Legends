@@ -33,7 +33,7 @@ export class MapEditorComponent {
             this.gameMapDataManagerService.newGame(this.gameToEdit);
             this.mapEditorManagerService.init();
         } else {
-            if (!this.gameToEdit._id) {
+            if (!this.gameToEdit || !this.gameToEdit._id) {
                 this.router.navigate(['/administration-game']);
                 return;
             }
@@ -41,6 +41,7 @@ export class MapEditorComponent {
             this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
                 this.gameMapDataManagerService.loadGame(game);
                 this.mapEditorManagerService.init();
+                this.mapEditorManagerService.mapItemCheckup();
             });
         }
     }

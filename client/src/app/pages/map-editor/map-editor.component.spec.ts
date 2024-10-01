@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 // eslint-disable-next-line max-len
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
@@ -17,6 +17,7 @@ describe('MapEditorComponent', () => {
     let gameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
     let gameServerCommunicationService: jasmine.SpyObj<GameServerCommunicationService>;
     let router: jasmine.SpyObj<Router>;
+    let activatedRoute: jasmine.SpyObj<ActivatedRoute>;
 
     let mockGame: GameShared;
 
@@ -30,14 +31,16 @@ describe('MapEditorComponent', () => {
         ]);
         const gameServerSpy = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], { params: of({}) });
 
         await TestBed.configureTestingModule({
-            declarations: [MapEditorComponent],
+            imports: [MapEditorComponent],
             providers: [
                 { provide: MapEditorManagerService, useValue: mapEditorSpy },
                 { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
                 { provide: GameServerCommunicationService, useValue: gameServerSpy },
                 { provide: Router, useValue: routerSpy },
+                { provide: ActivatedRoute, useValue: activatedRouteSpy },
             ],
         }).compileComponents();
 
@@ -58,10 +61,15 @@ describe('MapEditorComponent', () => {
         gameMapDataManagerService = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
         gameServerCommunicationService = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
         router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+        activatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
     });
 
     it('should create the component', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should inject activatedRoute', () => {
+        expect(activatedRoute).toBeTruthy();
     });
 
     it('should create a new game if isNewGame is true', () => {
@@ -81,7 +89,7 @@ describe('MapEditorComponent', () => {
 
         fixture.detectChanges();
 
-        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id as string);
+        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id!);
         expect(gameMapDataManagerService.loadGame).toHaveBeenCalledWith(mockGame);
         expect(mapEditorManagerService.init).toHaveBeenCalled();
     });
@@ -93,5 +101,10 @@ describe('MapEditorComponent', () => {
         fixture.detectChanges();
 
         expect(router.navigate).toHaveBeenCalledWith(['/administration-game']);
+    });
+
+    it('should call onMouseUpMapTile when onMouseUp is triggered', () => {
+        component.onMouseUp();
+        expect(mapEditorManagerService.onMouseUpMapTile).toHaveBeenCalled();
     });
 });

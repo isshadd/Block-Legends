@@ -17,7 +17,7 @@ import { ItemLimitCounterComponent } from '../item-limit-counter/item-limit-coun
 export class PlaceableEntityContainerComponent {
     constructor(
         public mapEditorManagerService: MapEditorManagerService,
-        public gameMapDataManager: GameMapDataManagerService,
+        public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
     @Input() containerTitle: string;
     @Input() containerItems: PlaceableEntity[];
