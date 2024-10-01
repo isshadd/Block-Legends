@@ -64,7 +64,7 @@ export class GameController {
             if (!validationResult.isValid) {
                 return response.status(HttpStatus.BAD_REQUEST).json({ errors: validationResult.errors });
             }
-            const isTilesValid = await this.gameValidationService.isMapTilesValid(createGameDto, createGameDto.size);
+            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(createGameDto, createGameDto.size);
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
@@ -90,7 +90,7 @@ export class GameController {
         try {
             const existingGame = await this.gameService.getGame(id);
             const updatedGame: Game = { ...existingGame, ...gameDto };
-            const isTilesValid = await this.gameValidationService.isMapTilesValid(updatedGame, existingGame.size);
+            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(updatedGame, existingGame.size);
             if (!isTilesValid) {
                 return response
                     .status(HttpStatus.BAD_REQUEST)
@@ -138,5 +138,4 @@ export class GameController {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
-
 }

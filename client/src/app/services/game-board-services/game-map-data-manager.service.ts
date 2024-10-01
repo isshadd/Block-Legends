@@ -106,12 +106,12 @@ export class GameMapDataManagerService {
     createGameInDb() {
         this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
             next: (game: GameShared) => {
-                // Correctly defining the next handler
                 this.databaseGame = game;
                 this.setLocalStorageVariables(false, this.databaseGame);
             },
-            error: (error: any) => {
-                this.openErrorModal(error.message); // Show the error in a modal
+            error: (errors: any) => {
+                console.log(errors);
+                this.openErrorModal(errors); // Show the error in a modal
             },
         });
     }
@@ -195,7 +195,10 @@ export class GameMapDataManagerService {
         return 6;
     }
 
-    openErrorModal(message: string) {
+    openErrorModal(message: string | string[]) {
+        if (Array.isArray(message)) {
+            message = message.join('<br>');
+        }
         this.dialog.open(ErrorModalComponent, {
             data: { message: message },
         });
