@@ -54,8 +54,6 @@ export class GameServerCommunicationService {
             } else if (operation === 'updateGame') {
                 const err = error as { error: string[] };
                 errorMsgs = err.error || ['Une erreur est survenue'];
-            } else {
-                errorMsgs = ['Une erreur est survenue'];
             }
             return throwError(() => errorMsgs);
         };
