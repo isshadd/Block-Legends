@@ -24,11 +24,11 @@ export class GameServerCommunicationService {
     }
 
     addGame(game: CreateGameSharedDto): Observable<GameShared> {
-        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleError<GameShared>()));
+        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleErrors<GameShared>()));
     }
 
     updateGame(id: string, game: UpdateGameSharedDto): Observable<void> {
-        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleError<void>()));
+        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleErrors<void>()));
     }
 
     deleteGame(id: string): Observable<void> {
