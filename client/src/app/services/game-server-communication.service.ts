@@ -45,13 +45,15 @@ export class GameServerCommunicationService {
         };
     }
 
-    private handleErrors<T>(operation: 'addGame' | 'updateGame' = 'addGame', result?: T) {
-        return (error: any): Observable<T> => {
+    private handleErrors<T>(operation: 'addGame' | 'updateGame' = 'addGame') {
+        return (error: unknown): Observable<T> => {
             let errorMsgs: string[] = [];
             if (operation === 'addGame') {
-                errorMsgs = error.error.errors || ['Une erreur est survenue'];
+                const err = error as { error: { errors: string[] } };
+                errorMsgs = err?.error?.errors || ['Une erreur est survenue'];
             } else if (operation === 'updateGame') {
-                errorMsgs = error.error || ['Une erreur est survenue'];
+                const err = error as { error: string[] };
+                errorMsgs = err.error || ['Une erreur est survenue'];
             } else {
                 errorMsgs = ['Une erreur est survenue'];
             }

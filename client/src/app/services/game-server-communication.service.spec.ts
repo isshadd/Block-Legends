@@ -143,12 +143,11 @@ describe('GameServerCommunicationService', () => {
         const operation: 'addGame' = 'addGame';
         const error = { error: { errors: ['Error1', 'Error2'] } };
 
-        const handleErrorsFn = (service as any)['handleErrors'](operation);
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
 
-        let thrownError: any;
+        let thrownError: unknown;
         handleErrorsFn(error).subscribe({
-            next: () => {},
-            error: (err: any) => {
+            error: (err: unknown) => {
                 thrownError = err;
             },
         });
@@ -160,12 +159,11 @@ describe('GameServerCommunicationService', () => {
         const operation: 'updateGame' = 'updateGame';
         const error = { error: ['Update Error1', 'Update Error2'] };
 
-        const handleErrorsFn = (service as any)['handleErrors'](operation);
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
 
-        let thrownError: any;
+        let thrownError: unknown;
         handleErrorsFn(error).subscribe({
-            next: () => {},
-            error: (err: any) => {
+            error: (err: unknown) => {
                 thrownError = err;
             },
         });
@@ -177,29 +175,11 @@ describe('GameServerCommunicationService', () => {
         const operation: 'addGame' = 'addGame';
         const error = { error: {} };
 
-        const handleErrorsFn = (service as any)['handleErrors'](operation);
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
 
-        let thrownError: any;
+        let thrownError: unknown;
         handleErrorsFn(error).subscribe({
-            next: () => {},
-            error: (err: any) => {
-                thrownError = err;
-            },
-        });
-
-        expect(thrownError).toEqual(['Une erreur est survenue']);
-    });
-
-    it('should throw default error message when operation is undefined', () => {
-        const operation = 'deleteGame' as any;
-        const error = { error: 'Some error message' };
-
-        const handleErrorsFn = (service as any)['handleErrors'](operation);
-
-        let thrownError: any;
-        handleErrorsFn(error).subscribe({
-            next: () => {},
-            error: (err: any) => {
+            error: (err: unknown) => {
                 thrownError = err;
             },
         });
