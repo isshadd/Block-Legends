@@ -59,3 +59,23 @@ select{
 select:hover{
     background-color: darken($primary-dark, 20%);
 }
+
+.life-emoji{
+    width: 30px;
+    height: 30px;
+}
+
+.armour-emoji{
+    width: 40px;
+    height: 40px;
+}
+
+.speed-emoji{
+    width: 40px;
+    height: 40px;
+}
+
+.attack-emoji{
+    width: 40px;
+    height: 40px;
+}
