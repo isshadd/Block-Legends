@@ -11,15 +11,11 @@ import { Injectable } from '@nestjs/common';
 export class GameValidationService {
     constructor(private readonly gameService: GameService) {}
 
-    async getNumberOfSpawnPoints(game: Game | UpdateGameDto): Promise<number> {
-        let existingGame = await this.gameService.getGameByName(game.name);
-        if (!existingGame) {
-            existingGame = game as Game;
-        }
+    async getNumberOfSpawnPoints(game: Game): Promise<number> {
         let count = 0;
-        for (let i = 0; i < existingGame.tiles.length; i++) {
-            for (let j = 0; j < existingGame.tiles[i].length; j++) {
-                if (existingGame.tiles[i][j].item && existingGame.tiles[i][j].item.type == 'Spawn') {
+        for (let i = 0; i < game.tiles.length; i++) {
+            for (let j = 0; j < game.tiles[i].length; j++) {
+                if (game.tiles[i][j].item && game.tiles[i][j].item.type == 'Spawn') {
                     count++;
                 }
             }
@@ -32,12 +28,14 @@ export class GameValidationService {
         const SPAN_MEDIUM_MAP = 4;
         const SPAN_LARGE_MAP = 6;
 
-        let gameToValidate = await this.gameService.getGameByName(game.name);
-        if (!gameToValidate) {
-            gameToValidate = game as Game;
+        let gameToValidate: Game;
+        if (game instanceof UpdateGameDto) {
+            gameToValidate = await this.gameService.getGameByName(game.name);
+        } else {
+            gameToValidate = game;
         }
 
-        const spawnPoints = await this.getNumberOfSpawnPoints(game);
+        const spawnPoints = await this.getNumberOfSpawnPoints(gameToValidate);
         switch (gameToValidate.size) {
             case MapSize.SMALL:
                 return spawnPoints === SPAN_SMALL_MAP;
