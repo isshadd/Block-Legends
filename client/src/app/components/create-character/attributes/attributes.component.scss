@@ -34,11 +34,11 @@ button[disabled] {
 }
 
 .large-emojis option {
-    font-size: 1em; /* Augmentez cette valeur pour rendre les émojis encore plus grands */
+    font-size: 1em;
 }
 .large-emojis {
-    font-size: 1em; /* Augmentez cette valeur pour rendre les émojis encore plus grands */
-    height: auto; /* Permet à la hauteur de s'ajuster automatiquement */
+    font-size: 1em;
+    height: auto;
 }
 
 #description {
@@ -47,15 +47,15 @@ button[disabled] {
     text-align: center;
     color: black;
     padding: 10px;
-    border: 2px solid #000;
+    border: 1px solid #000;
     justify-content: space-around;
 }
 
-select{
+select {
     background-color: darken($primary-dark, 10%);
     color: $primary-light;
 }
 
-select:hover{
+select:hover {
     background-color: darken($primary-dark, 20%);
 }
