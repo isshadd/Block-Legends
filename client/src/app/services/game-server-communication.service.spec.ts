@@ -121,4 +121,89 @@ describe('GameServerCommunicationService', () => {
         expect(req.request.method).toEqual('DELETE');
         req.flush(null);
     });
+
+    it('should return an observable with the given result when called with a value', () => {
+        const expectedResult = { key: 'value' };
+        const result$ = service['handleError'](expectedResult)();
+
+        result$.subscribe((result) => {
+            expect(result).toEqual(expectedResult);
+        });
+    });
+
+    it('should return an observable with undefined when called without a value', () => {
+        const result$ = service['handleError']()();
+
+        result$.subscribe((result) => {
+            expect(result).toBeUndefined();
+        });
+    });
+
+    it('should throw error messages for "addGame" operation with error.errors', () => {
+        const operation: 'addGame' = 'addGame';
+        const error = { error: { errors: ['Error1', 'Error2'] } };
+
+        const handleErrorsFn = (service as any)['handleErrors'](operation);
+
+        let thrownError: any;
+        handleErrorsFn(error).subscribe({
+            next: () => {},
+            error: (err: any) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Error1', 'Error2']);
+    });
+
+    it('should throw error messages for "updateGame" operation with error array', () => {
+        const operation: 'updateGame' = 'updateGame';
+        const error = { error: ['Update Error1', 'Update Error2'] };
+
+        const handleErrorsFn = (service as any)['handleErrors'](operation);
+
+        let thrownError: any;
+        handleErrorsFn(error).subscribe({
+            next: () => {},
+            error: (err: any) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Update Error1', 'Update Error2']);
+    });
+
+    it('should default error message when error structure is unexpected for "addGame"', () => {
+        const operation: 'addGame' = 'addGame';
+        const error = { error: {} };
+
+        const handleErrorsFn = (service as any)['handleErrors'](operation);
+
+        let thrownError: any;
+        handleErrorsFn(error).subscribe({
+            next: () => {},
+            error: (err: any) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Une erreur est survenue']);
+    });
+
+    it('should throw default error message when operation is undefined', () => {
+        const operation = 'deleteGame' as any;
+        const error = { error: 'Some error message' };
+
+        const handleErrorsFn = (service as any)['handleErrors'](operation);
+
+        let thrownError: any;
+        handleErrorsFn(error).subscribe({
+            next: () => {},
+            error: (err: any) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Une erreur est survenue']);
+    });
 });
