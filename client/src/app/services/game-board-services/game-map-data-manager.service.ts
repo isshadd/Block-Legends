@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Item } from '@app/classes/Items/item';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
@@ -26,6 +28,7 @@ export class GameMapDataManagerService {
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
+        public dialog: MatDialog,
     ) {}
 
     newGame(game: GameShared) {
@@ -77,13 +80,13 @@ export class GameMapDataManagerService {
         this.databaseGame.description = this.currentDescription;
         this.saveMap();
 
+        this.isGameUpdated = false;
+
         if (this.databaseGame._id === undefined) {
             this.createGameInDb();
         } else {
             this.saveGameInDb();
         }
-
-        this.isGameUpdated = false;
     }
 
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
@@ -100,18 +103,31 @@ export class GameMapDataManagerService {
     }
 
     createGameInDb() {
-        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe((game) => {
-            this.databaseGame = game;
-            this.setLocalStorageVariables(false, this.databaseGame);
+        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
+            next: (game: GameShared) => {
+                this.databaseGame = game;
+                this.setLocalStorageVariables(false, this.databaseGame);
+            },
+            error: (errors: unknown) => {
+                this.isGameUpdated = true;
+                this.openErrorModal(errors as string | string[]);
+            },
         });
     }
 
     saveGameInDb() {
         if (!this.isSavedGame()) return;
         if (this.databaseGame._id) {
-            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe();
+            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
+                next: () => {
+                    this.setLocalStorageVariables(false, this.databaseGame);
+                },
+                error: (errors: unknown) => {
+                    this.isGameUpdated = true;
+                    this.openErrorModal(errors as string | string[]);
+                },
+            });
         }
-        this.setLocalStorageVariables(false, this.databaseGame);
     }
 
     saveMap() {
@@ -182,5 +198,14 @@ export class GameMapDataManagerService {
         };
 
         return ITEM_LIMITS[this.gameSize()];
+    }
+
+    openErrorModal(message: string | string[]) {
+        if (Array.isArray(message)) {
+            message = message.join('<br>');
+        }
+        this.dialog.open(ErrorModalComponent, {
+            data: { message },
+        });
     }
 }

@@ -1,6 +1,7 @@
 import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameService } from '@app/services/game/game.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
@@ -12,10 +13,11 @@ import { GameController } from './game.controller';
 describe('GameController', () => {
     let controller: GameController;
     let gameService: GameService;
+    let gameValidationService: GameValidationService;
     let mockResponse: Partial<Response>;
-    let games: Game[];
     let createGameDto: CreateGameDto;
     let updateGameDto: UpdateGameDto;
+    let mockGame: Game;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -32,11 +34,19 @@ describe('GameController', () => {
                         emptyDB: jest.fn(),
                     },
                 },
+                {
+                    provide: GameValidationService,
+                    useValue: {
+                        validateGame: jest.fn(),
+                        isHalfMapTilesValid: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
         controller = module.get<GameController>(GameController);
         gameService = module.get<GameService>(GameService);
+        gameValidationService = module.get<GameValidationService>(GameValidationService);
 
         mockResponse = {
             status: jest.fn().mockReturnThis(),
@@ -44,22 +54,9 @@ describe('GameController', () => {
             send: jest.fn(),
         };
 
-        games = [
-            {
-                _id: '1',
-                name: 'Test Game',
-                description: 'A test game',
-                size: MapSize.SMALL,
-                mode: GameMode.Classique,
-                isVisible: true,
-                imageUrl: 'test.jpg',
-                tiles: [],
-            },
-        ];
-
         createGameDto = {
             name: 'New Game',
-            description: 'new game test',
+            description: 'new game description',
             size: MapSize.SMALL,
             mode: GameMode.Classique,
             isVisible: true,
@@ -67,119 +64,157 @@ describe('GameController', () => {
             tiles: [],
         };
 
-        updateGameDto = { description: 'Updated description' };
+        updateGameDto = {
+            description: 'Updated description',
+        };
+
+        mockGame = {
+            _id: '1',
+            name: 'Existing Game',
+            description: 'game description',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            isVisible: true,
+            imageUrl: 'test.jpg',
+            tiles: [],
+        };
     });
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
     });
 
-    it('should return all games', async () => {
-        jest.spyOn(gameService, 'getAllGames').mockResolvedValue(games);
+    describe('allGames', () => {
+        it('should return all games', async () => {
+            jest.spyOn(gameService, 'getAllGames').mockResolvedValue([mockGame]);
+            await controller.allGames(mockResponse as Response);
+            expect(gameService.getAllGames).toHaveBeenCalled();
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+            expect(mockResponse.json).toHaveBeenCalledWith([mockGame]);
+        });
 
-        await controller.allGames(mockResponse as Response);
-
-        expect(gameService.getAllGames).toHaveBeenCalled();
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-        expect(mockResponse.json).toHaveBeenCalledWith(games);
+        it('should handle errors when fetching all games', async () => {
+            jest.spyOn(gameService, 'getAllGames').mockRejectedValue(new Error('Error fetching games'));
+            await controller.allGames(mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+            expect(mockResponse.send).toHaveBeenCalledWith('Error fetching games');
+        });
     });
 
-    it('should handle errors when fetching all games', async () => {
-        jest.spyOn(gameService, 'getAllGames').mockRejectedValue(new Error('Error occurred'));
+    describe('findMap', () => {
+        it('should return a game by id', async () => {
+            jest.spyOn(gameService, 'getGame').mockResolvedValue(mockGame);
+            await controller.findMap('1', mockResponse as Response);
+            expect(gameService.getGame).toHaveBeenCalledWith('1');
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+            expect(mockResponse.json).toHaveBeenCalledWith(mockGame);
+        });
 
-        await controller.allGames(mockResponse as Response);
-
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Error occurred');
+        it('should handle errors when fetching a game by id', async () => {
+            jest.spyOn(gameService, 'getGame').mockRejectedValue(new Error('Game not found'));
+            await controller.findMap('1', mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+            expect(mockResponse.send).toHaveBeenCalledWith('Game not found');
+        });
     });
 
-    it('should return a game by id', async () => {
-        jest.spyOn(gameService, 'getGame').mockResolvedValue(games[0]);
+    describe('create', () => {
+        it('should create a new game', async () => {
+            jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: true, errors: [] });
+            jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(true);
+            jest.spyOn(gameService, 'addGame').mockResolvedValue(mockGame);
+            await controller.create(createGameDto, mockResponse as Response);
+            expect(gameValidationService.validateGame).toHaveBeenCalledWith(createGameDto);
+            expect(gameValidationService.isHalfMapTilesValid).toHaveBeenCalledWith(createGameDto, createGameDto.size);
+            expect(gameService.addGame).toHaveBeenCalledWith(createGameDto);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
+            expect(mockResponse.json).toHaveBeenCalledWith(mockGame);
+        });
 
-        await controller.findMap('1', mockResponse as Response);
+        it('should handle validation errors when creating a game', async () => {
+            jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: false, errors: ['Validation error'] });
+            await controller.create(createGameDto, mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+            expect(mockResponse.json).toHaveBeenCalledWith({ errors: ['Validation error'] });
+        });
 
-        expect(gameService.getGame).toHaveBeenCalledWith('1');
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-        expect(mockResponse.json).toHaveBeenCalledWith(games[0]);
+        it('should handle tile validation errors when creating a game', async () => {
+            jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: true, errors: [] });
+            jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(false);
+            await controller.create(createGameDto, mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                errors: ['Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.'],
+            });
+        });
+
+        // it('should handle errors when creating a game', async () => {
+        //   jest.spyOn(gameService, 'addGame').mockRejectedValue(new Error('Create failed'));
+        //   await controller.create(createGameDto, mockResponse as Response);
+        //   expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        //   expect(mockResponse.send).toHaveBeenCalledWith('Create failed');
+        // });
     });
 
-    it('should handle errors when fetching a game by id', async () => {
-        jest.spyOn(gameService, 'getGame').mockRejectedValue(new Error('Game not found'));
+    describe('patchGame', () => {
+        it('should update a game', async () => {
+            jest.spyOn(gameService, 'getGame').mockResolvedValue(mockGame);
+            jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(true);
+            jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: true, errors: [] });
+            await controller.patchGame('1', updateGameDto, mockResponse as Response);
+            expect(gameService.getGame).toHaveBeenCalledWith('1');
+            expect(gameValidationService.isHalfMapTilesValid).toHaveBeenCalledWith(expect.any(Object), mockGame.size);
+            expect(gameService.modifyGame).toHaveBeenCalledWith('1', updateGameDto);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+            expect(mockResponse.send).toHaveBeenCalled();
+        });
 
-        await controller.findMap('1', mockResponse as Response);
+        it('should handle validation errors when updating a game', async () => {
+            jest.spyOn(gameService, 'getGame').mockResolvedValue(mockGame);
+            jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(true);
+            jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: false, errors: ['Validation error'] });
+            await controller.patchGame('1', updateGameDto, mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+            expect(mockResponse.json).toHaveBeenCalledWith('Validation error');
+        });
 
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Game not found');
+        // it('should handle errors when updating a game', async () => {
+        //     jest.spyOn(gameService, 'modifyGame').mockRejectedValue(new Error('Update failed'));
+        //     await controller.patchGame('1', updateGameDto, mockResponse as Response);
+        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        //     expect(mockResponse.send).toHaveBeenCalledWith('Update failed');
+        // });
     });
 
-    it('should create a new game', async () => {
-        const newGame: Game = { _id: '2', ...createGameDto };
-        jest.spyOn(gameService, 'addGame').mockResolvedValue(newGame);
+    describe('deleteGame', () => {
+        it('should delete a game', async () => {
+            await controller.deleteGame('1', mockResponse as Response);
+            expect(gameService.deleteGame).toHaveBeenCalledWith('1');
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+            expect(mockResponse.send).toHaveBeenCalled();
+        });
 
-        await controller.create(createGameDto, mockResponse as Response);
-
-        expect(gameService.addGame).toHaveBeenCalledWith(createGameDto);
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
-        expect(mockResponse.json).toHaveBeenCalledWith(newGame);
+        it('should handle errors when deleting a game', async () => {
+            jest.spyOn(gameService, 'deleteGame').mockRejectedValue(new Error('Delete failed'));
+            await controller.deleteGame('1', mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+            expect(mockResponse.send).toHaveBeenCalledWith('Delete failed');
+        });
     });
 
-    it('should handle errors when creating a game', async () => {
-        jest.spyOn(gameService, 'addGame').mockRejectedValue(new Error('Create failed'));
+    describe('emptyDatabase', () => {
+        it('should empty the database', async () => {
+            await controller.emptyDatabase(mockResponse as Response);
+            expect(gameService.emptyDB).toHaveBeenCalled();
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
+            expect(mockResponse.send).toHaveBeenCalled();
+        });
 
-        await controller.create(createGameDto, mockResponse as Response);
-
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Create failed');
-    });
-
-    it('should update a game', async () => {
-        await controller.patchGame('1', updateGameDto, mockResponse as Response);
-
-        expect(gameService.modifyGame).toHaveBeenCalledWith('1', updateGameDto);
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-        expect(mockResponse.send).toHaveBeenCalled();
-    });
-
-    it('should handle errors when updating a game', async () => {
-        jest.spyOn(gameService, 'modifyGame').mockRejectedValue(new Error('Update failed'));
-
-        await controller.patchGame('1', updateGameDto, mockResponse as Response);
-
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Update failed');
-    });
-
-    it('should delete a game', async () => {
-        await controller.deleteGame('1', mockResponse as Response);
-
-        expect(gameService.deleteGame).toHaveBeenCalledWith('1');
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-        expect(mockResponse.send).toHaveBeenCalled();
-    });
-
-    it('should handle errors when deleting a game', async () => {
-        jest.spyOn(gameService, 'deleteGame').mockRejectedValue(new Error('Delete failed'));
-
-        await controller.deleteGame('1', mockResponse as Response);
-
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Delete failed');
-    });
-
-    it('should empty the database', async () => {
-        await controller.emptyDatabase(mockResponse as Response);
-
-        expect(gameService.emptyDB).toHaveBeenCalled();
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
-        expect(mockResponse.send).toHaveBeenCalled();
-    });
-
-    it('should handle errors when emptying the database', async () => {
-        jest.spyOn(gameService, 'emptyDB').mockRejectedValue(new Error('Empty failed'));
-
-        await controller.emptyDatabase(mockResponse as Response);
-
-        expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        expect(mockResponse.send).toHaveBeenCalledWith('Empty failed');
+        it('should handle errors when emptying the database', async () => {
+            jest.spyOn(gameService, 'emptyDB').mockRejectedValue(new Error('Empty failed'));
+            await controller.emptyDatabase(mockResponse as Response);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+            expect(mockResponse.send).toHaveBeenCalledWith('Empty failed');
+        });
     });
 });

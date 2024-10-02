@@ -138,4 +138,52 @@ describe('GameServerCommunicationService', () => {
             expect(result).toBeUndefined();
         });
     });
+
+    it('should throw error messages for "addGame" operation with error.errors', () => {
+        const operation: 'addGame' = 'addGame';
+        const error = { error: { errors: ['Error1', 'Error2'] } };
+
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
+
+        let thrownError: unknown;
+        handleErrorsFn(error).subscribe({
+            error: (err: unknown) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Error1', 'Error2']);
+    });
+
+    it('should throw error messages for "updateGame" operation with error array', () => {
+        const operation: 'updateGame' = 'updateGame';
+        const error = { error: ['Update Error1', 'Update Error2'] };
+
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
+
+        let thrownError: unknown;
+        handleErrorsFn(error).subscribe({
+            error: (err: unknown) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Update Error1', 'Update Error2']);
+    });
+
+    it('should default error message when error structure is unexpected for "addGame"', () => {
+        const operation: 'addGame' = 'addGame';
+        const error = { error: {} };
+
+        const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors'](operation);
+
+        let thrownError: unknown;
+        handleErrorsFn(error).subscribe({
+            error: (err: unknown) => {
+                thrownError = err;
+            },
+        });
+
+        expect(thrownError).toEqual(['Une erreur est survenue']);
+    });
 });

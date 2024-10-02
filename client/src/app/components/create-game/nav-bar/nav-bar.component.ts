@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GameMode } from '@common/enums/game-mode';
 
 @Component({
@@ -10,11 +10,10 @@ import { GameMode } from '@common/enums/game-mode';
     styleUrl: './nav-bar.component.scss',
 })
 export class NavBarComponent {
+    @Input() selectedMode: GameMode = GameMode.Classique;
     @Output() selection = new EventEmitter<GameMode>();
 
     gameMode = GameMode;
-
-    selectedMode: GameMode = GameMode.Classique;
 
     selectMode(mode: GameMode): void {
         this.selectedMode = mode;
