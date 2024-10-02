@@ -80,13 +80,13 @@ export class GameMapDataManagerService {
         this.databaseGame.description = this.currentDescription;
         this.saveMap();
 
+        this.isGameUpdated = false;
+
         if (this.databaseGame._id === undefined) {
             this.createGameInDb();
         } else {
             this.saveGameInDb();
         }
-
-        this.isGameUpdated = false;
     }
 
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
@@ -110,6 +110,7 @@ export class GameMapDataManagerService {
             },
             error: (errors: any) => {
                 console.log(errors);
+                this.isGameUpdated = true;
                 this.openErrorModal(errors); // Show the error in a modal
             },
         });
@@ -125,6 +126,7 @@ export class GameMapDataManagerService {
             },
             error: (errors: any) => {
                 console.log(errors);
+                this.isGameUpdated = true;
                 this.openErrorModal(errors); // Show the error in a modal
             },
         });
