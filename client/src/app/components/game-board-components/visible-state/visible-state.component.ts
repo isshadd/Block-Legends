@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 export enum VisibleStateColor {
-    HOVERED_COLOR = 'rgba(255, 255, 255, 0.3)',
-    SELECTED_COLOR = 'rgba(255, 255, 0, 0.3)',
-    VALID_COLOR = 'rgba(50, 255, 50, 0.3)',
-    INVALID_COLOR = 'rgba(255, 50, 50, 0.3)',
-    NOT_SELECTED_COLOR = 'rgba(255, 255, 255, 0)',
-    DISABLED_COLOR = 'rgba(0, 0, 0, 0.5)',
+    HoveredColor = 'rgba(255, 255, 255, 0.3)',
+    SelectedColor = 'rgba(255, 255, 0, 0.3)',
+    ValidColor = 'rgba(50, 255, 50, 0.3)',
+    InvalidColor = 'rgba(255, 50, 50, 0.3)',
+    NotSelectedColor = 'rgba(255, 255, 255, 0)',
+    DisabledColor = 'rgba(0, 0, 0, 0.5)',
 }
 @Component({
     selector: 'app-visible-state',
@@ -20,18 +20,18 @@ export class VisibleStateComponent {
 
     colorSelector() {
         switch (this.placeableEntity.visibleState) {
-            case VisibleState.selected:
-                return VisibleStateColor.SELECTED_COLOR;
-            case VisibleState.hovered:
-                return VisibleStateColor.HOVERED_COLOR;
-            case VisibleState.valid:
-                return VisibleStateColor.VALID_COLOR;
-            case VisibleState.invalid:
-                return VisibleStateColor.INVALID_COLOR;
-            case VisibleState.disabled:
-                return VisibleStateColor.DISABLED_COLOR;
+            case VisibleState.Selected:
+                return VisibleStateColor.SelectedColor;
+            case VisibleState.Hovered:
+                return VisibleStateColor.HoveredColor;
+            case VisibleState.Valid:
+                return VisibleStateColor.ValidColor;
+            case VisibleState.Invalid:
+                return VisibleStateColor.InvalidColor;
+            case VisibleState.Disabled:
+                return VisibleStateColor.DisabledColor;
             default:
-                return VisibleStateColor.NOT_SELECTED_COLOR;
+                return VisibleStateColor.NotSelectedColor;
         }
     }
 }

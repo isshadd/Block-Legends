@@ -29,16 +29,21 @@ describe('JoinGameComponent', () => {
         expect(component.errorMessage).toBe("Le code d'accès est invalide !");
     });
 
-    /*
-    it('should not allow letters in the access code', () => {
-        const event: Partial<KeyboardEvent> = {
-            key: 'a',
-            preventDefault: jasmine.createSpy('preventDefault'),
-        };
+    it('should allow numeric keys', () => {
+        const event = new KeyboardEvent('keydown', { key: '5' });
+        const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-        component.allowOnlyNumbers(event as KeyboardEvent);
+        component.allowOnlyNumbers(event);
 
-        expect(event.preventDefault).toHaveBeenCalled();
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
     });
-    */
+
+    it('should prevent non-numeric keys', () => {
+        const event = new KeyboardEvent('keydown', { key: 'a' });
+        const preventDefaultSpy = spyOn(event, 'preventDefault');
+
+        component.allowOnlyNumbers(event);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+    });
 });

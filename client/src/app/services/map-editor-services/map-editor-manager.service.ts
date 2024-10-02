@@ -18,11 +18,10 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ItemType } from '@common/enums/item-type';
-import { TileType } from '@common/enums/tile-type';
-import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
-import { ItemFactoryService } from '../game-board-services/item-factory.service';
-import { TileFactoryService } from '../game-board-services/tile-factory.service';
 
 class PlaceableEntitySection {
     title: string;
@@ -33,13 +32,19 @@ class PlaceableEntitySection {
     providedIn: 'root',
 })
 export class MapEditorManagerService {
+    placeableEntitiesSections: PlaceableEntitySection[] = [];
+    selectedEntity: PlaceableEntity | null;
+    sideMenuSelectedEntity: null | PlaceableEntity;
+    isDraggingLeft: boolean = false;
+    isDraggingRight: boolean = false;
+    draggedEntity: PlaceableEntity | null;
+    itemLimitCounter: number = 0;
+
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
-
-    placeableEntitiesSections: PlaceableEntitySection[] = [];
 
     init() {
         this.placeableEntitiesSections = [
@@ -55,13 +60,6 @@ export class MapEditorManagerService {
 
         this.resetItemList();
     }
-
-    selectedEntity: PlaceableEntity | null;
-    sideMenuSelectedEntity: null | PlaceableEntity;
-    isDraggingLeft: boolean = false;
-    isDraggingRight: boolean = false;
-    draggedEntity: PlaceableEntity | null;
-    itemLimitCounter: number = 0;
 
     resetItemList() {
         this.itemLimitCounter = 0;
@@ -84,26 +82,43 @@ export class MapEditorManagerService {
         this.setItemLimit();
     }
 
+    getRandomItemItemInMenu(): RandomItem | null {
+        for (const entities of this.placeableEntitiesSections) {
+            for (const item of entities.entities) {
+                if ((item as Item).type === ItemType.Random) return item as RandomItem;
+            }
+        }
+        return null;
+    }
+
+    getSpawnItemInMenu(): Spawn | null {
+        for (const entities of this.placeableEntitiesSections) {
+            for (const item of entities.entities) {
+                if ((item as Item).type === ItemType.Spawn) return item as Spawn;
+            }
+        }
+        return null;
+    }
+
     setItemLimit() {
-        let itemLimit = this.gameMapDataManagerService.itemLimit();
-        if (itemLimit === 2) {
-            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 2;
-            this.itemLimitCounter = 2;
-            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
-        } else if (itemLimit === 4) {
-            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 4;
-            this.itemLimitCounter = 4;
-            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
-        } else {
-            (this.placeableEntitiesSections[1].entities[6] as Item).itemLimit = 6;
-            this.itemLimitCounter = 6;
-            (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+        this.itemLimitCounter = this.gameMapDataManagerService.itemLimit();
+
+        const itemsToUpdate = [this.getRandomItemItemInMenu(), this.getSpawnItemInMenu()];
+        for (const item of itemsToUpdate) {
+            if (item) {
+                item.itemLimit = this.itemLimitCounter;
+            }
         }
     }
-    setItemLimitCounter(number: number) {
-        this.itemLimitCounter += number;
-        (this.placeableEntitiesSections[1].entities[7] as Item).itemLimit = this.itemLimitCounter;
+
+    updateItemLimitCounter(amount: number) {
+        this.itemLimitCounter += amount;
+        const randomItem = this.getRandomItemItemInMenu();
+        if (randomItem) {
+            randomItem.itemLimit = this.itemLimitCounter;
+        }
     }
+
     startDrag(entity: PlaceableEntity) {
         this.draggedEntity = entity;
     }
@@ -131,10 +146,10 @@ export class MapEditorManagerService {
     }
 
     sideMenuEntityFinder(entity: PlaceableEntity) {
-        let foundTile = this.sideMenuTileFinder(entity as Tile) as Tile | null;
+        const foundTile = this.sideMenuTileFinder(entity as Tile) as Tile | null;
         if (foundTile) return foundTile;
 
-        let foundItem = this.sideMenuItemFinder(entity as Item) as Item | null;
+        const foundItem = this.sideMenuItemFinder(entity as Item) as Item | null;
         if (foundItem) return foundItem;
 
         return null;
@@ -142,8 +157,8 @@ export class MapEditorManagerService {
 
     cancelSelectionSideMenu() {
         if (this.sideMenuSelectedEntity) {
-            let foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity)?.visibleState;
-            if (foundEntity) foundEntity = VisibleState.notSelected;
+            const foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity);
+            if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
 
             this.selectedEntity = null;
             this.sideMenuSelectedEntity = null;
@@ -152,68 +167,79 @@ export class MapEditorManagerService {
 
     cancelSelectionMap() {
         if (this.selectedEntity) {
-            let foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity)?.visibleState;
-            if (foundEntity) foundEntity = VisibleState.notSelected;
+            const foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity);
+            if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
 
             this.selectedEntity = null;
         }
     }
 
     makeSelection(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.selected; //selection of the entity
+        entity.visibleState = VisibleState.Selected; // selection of the entity
         this.sideMenuSelectedEntity = entity;
         this.cancelSelectionMap();
     }
 
     onMouseEnter(entity: PlaceableEntity) {
-        if (entity.visibleState === VisibleState.notSelected) entity.visibleState = VisibleState.hovered;
+        if (entity.visibleState === VisibleState.NotSelected) entity.visibleState = VisibleState.Hovered;
     }
 
     onMouseLeave(entity: PlaceableEntity) {
-        if (entity.visibleState !== VisibleState.selected && entity.visibleState !== VisibleState.disabled)
-            entity.visibleState = VisibleState.notSelected;
+        if (entity.visibleState !== VisibleState.Selected && entity.visibleState !== VisibleState.Disabled)
+            entity.visibleState = VisibleState.NotSelected;
     }
 
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
-        let tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
+        const tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         this.gameMapDataManagerService.isGameUpdated = true;
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
-        console.log('tileCopy', tileCopy.description);
-        if ((selectedTile as TerrainTile)?.item) {
-            let foundItem = (selectedTile as TerrainTile).item ? (this.sideMenuItemFinder((selectedTile as TerrainTile).item!) as Item | null) : null;
-            if (this.gameMapDataManagerService.isTerrainTile(selectedTile) && this.gameMapDataManagerService.isTerrainTile(tileCopy)) {
+
+        if (this.gameMapDataManagerService.isTerrainTile(selectedTile) && selectedTile.item) {
+            const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
+            if (this.gameMapDataManagerService.isTerrainTile(tileCopy)) {
                 tileCopy.item = foundItem;
             } else {
                 this.itemRemover(selectedTile);
             }
         }
+
         this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
-        tileCopy.visibleState = VisibleState.notSelected;
+        tileCopy.visibleState = VisibleState.NotSelected;
     }
 
-    itemPlacer(item: Item, selectedTile: Tile) {
-        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile)) return;
+    itemPlacer(item: Item, selectedTile: Tile): void {
+        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile)) {
+            return;
+        }
+
         if (selectedTile.item) {
             this.itemRemover(selectedTile);
         }
-        let foundItem = this.sideMenuItemFinder(item) as Item | null;
-        if (!foundItem) return;
-        if (foundItem.itemLimit >= 1) {
-            foundItem.itemLimit--;
-            if (item.type !== ItemType.Spawn) this.setItemLimitCounter(-1);
-            selectedTile.item = this.itemFactoryService.copyItem(item);
-            this.gameMapDataManagerService.isGameUpdated = true;
-            if (foundItem.itemLimit === 0) {
-                foundItem.visibleState = VisibleState.disabled;
+
+        const foundItem = this.sideMenuItemFinder(item) as Item | null;
+        if (!foundItem || foundItem.itemLimit < 1) {
+            return;
+        }
+
+        foundItem.itemLimit--;
+        if (item.type !== ItemType.Spawn) {
+            this.updateItemLimitCounter(-1);
+        }
+
+        selectedTile.item = this.itemFactoryService.copyItem(item);
+        this.gameMapDataManagerService.isGameUpdated = true;
+
+        if (foundItem.itemLimit === 0) {
+            foundItem.visibleState = VisibleState.Disabled;
+            if (this.sideMenuSelectedEntity === foundItem) {
                 this.sideMenuSelectedEntity = null;
             }
-            if (this.itemLimitCounter === 0) {
-                this.sideMenuItemsDisabler();
-            }
-            if (this.itemLimitCounter > 0) {
-                this.sideMenuItemsEnabler();
-                console.log('itemLimitCounter', this.itemLimitCounter);
-            }
+        }
+
+        if (this.itemLimitCounter === 0) {
+            this.sideMenuItemsDisabler();
+        } else {
+            this.sideMenuItemsEnabler();
         }
     }
 
@@ -222,17 +248,15 @@ export class MapEditorManagerService {
         const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
         if (foundItem) {
             foundItem.itemLimit++;
-            if (foundItem.type !== ItemType.Spawn) this.setItemLimitCounter(1);
-            if (foundItem.itemLimit === 0) {
-                foundItem.visibleState = VisibleState.disabled;
-                this.sideMenuSelectedEntity = null;
+            if (foundItem.type !== ItemType.Spawn) this.updateItemLimitCounter(1);
+            else {
+                foundItem.visibleState = VisibleState.NotSelected;
             }
             if (this.itemLimitCounter === 0) {
                 this.sideMenuItemsDisabler();
             }
             if (this.itemLimitCounter > 0) {
                 this.sideMenuItemsEnabler();
-                console.log('itemLimitCounter', this.itemLimitCounter);
             }
         }
         selectedTile.item = null;
@@ -242,10 +266,8 @@ export class MapEditorManagerService {
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
         if (!this.sideMenuSelectedEntity) return;
-        if (entity.type === (this.sideMenuSelectedEntity as Tile)?.type && entity.type !== TileType.Door && entity.type !== TileType.OpenDoor) return;
         if (this.gameMapDataManagerService.isDoor(entity) && this.gameMapDataManagerService.isDoor(this.sideMenuSelectedEntity as Tile)) {
             if (entity instanceof DoorTile) {
-                console.log('DoorTile');
                 this.tileCopyCreator(new OpenDoor(), entity);
                 return;
             } else if (entity instanceof OpenDoor) {
@@ -256,6 +278,7 @@ export class MapEditorManagerService {
 
         if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
             this.itemPlacer(this.sideMenuSelectedEntity, entity);
+            this.cancelSelectionSideMenu();
         } else if (!this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity)) {
             this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
         }
@@ -297,22 +320,18 @@ export class MapEditorManagerService {
     onMouseUpMapTile() {
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
-
-        if (this.sideMenuSelectedEntity) {
-            this.sideMenuSelectedEntity.visibleState = VisibleState.notSelected;
-            this.sideMenuSelectedEntity = null;
-        }
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
-        if (entity.visibleState === VisibleState.selected) {
-            //already selected
-            entity.visibleState = VisibleState.notSelected;
+        if (entity.visibleState === VisibleState.Selected) {
+            // already selected
+            entity.visibleState = VisibleState.NotSelected;
             this.sideMenuSelectedEntity = null;
             this.cancelSelectionMap();
-        } else if (entity.visibleState === VisibleState.disabled) return; //item limit reached
+        } else if (entity.visibleState === VisibleState.Disabled) return; // item limit reached
         else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
-            //another entity selected
+            // another entity selected
+            this.cancelSelectionSideMenu();
             this.makeSelection(entity);
         } else {
             this.makeSelection(entity);
@@ -328,13 +347,15 @@ export class MapEditorManagerService {
         this.gameMapDataManagerService.currentGrid.forEach((row) => {
             row.forEach((tile) => {
                 if (this.gameMapDataManagerService.isTerrainTile(tile) && tile.item) {
-                    let foundItem = this.sideMenuItemFinder(tile.item) as Item | null;
+                    const foundItem = this.sideMenuItemFinder(tile.item) as Item | null;
 
                     if (foundItem) {
                         foundItem.itemLimit--;
-                        if (foundItem.type !== ItemType.Spawn) this.itemLimitCounter--;
+                        if (foundItem.type !== ItemType.Spawn) {
+                            this.updateItemLimitCounter(-1);
+                        }
                         if (foundItem.itemLimit === 0) {
-                            foundItem.visibleState = VisibleState.disabled;
+                            foundItem.visibleState = VisibleState.Disabled;
                         }
                     }
                     if (this.itemLimitCounter === 0) {
@@ -350,8 +371,8 @@ export class MapEditorManagerService {
 
     sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
-            if (item.visibleState === VisibleState.notSelected && (item as Item).type !== ItemType.Spawn) {
-                item.visibleState = VisibleState.disabled;
+            if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn) {
+                item.visibleState = VisibleState.Disabled;
             }
         }
     }
@@ -359,7 +380,7 @@ export class MapEditorManagerService {
     sideMenuItemsEnabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if ((item as Item).itemLimit > 0) {
-                item.visibleState = VisibleState.notSelected;
+                item.visibleState = VisibleState.NotSelected;
             }
         }
     }

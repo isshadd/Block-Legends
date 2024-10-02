@@ -30,7 +30,7 @@ describe('ListGameComponent', () => {
             ],
         }).compileComponents();
 
-        mockGames = mockGames = [
+        mockGames = [
             {
                 _id: '1',
                 name: 'Game 1',
@@ -69,6 +69,15 @@ describe('ListGameComponent', () => {
     it('should call setGames on initialization', () => {
         fixture.detectChanges();
         expect(administrationService.setGames).toHaveBeenCalled();
+    });
+
+    it('should get the games from the service', () => {
+        expect(component.getGames()).toEqual(administrationService.games);
+    });
+
+    it('should call deleteGame on the service when DeleteGame is called', () => {
+        component.deleteGame(mockGames[0]._id);
+        expect(administrationService.deleteGame).toHaveBeenCalled();
     });
 
     it('should return the list of games from the administration service', () => {

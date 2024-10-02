@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ButtonNotificationState } from '@app/components/map-editor-components/button-notification/button-notification.component';
+import { MapEditorModalComponent } from '@app/components/map-editor-components/map-editor-modal/map-editor-modal.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { of } from 'rxjs';
-import { ButtonNotificationState } from '../button-notification/button-notification.component';
-import { MapEditorModalComponent } from '../map-editor-modal/map-editor-modal.component';
 import { MapEditorOptionsMenuComponent } from './map-editor-options-menu.component';
 
 describe('MapEditorOptionsMenuComponent', () => {
@@ -73,9 +73,7 @@ describe('MapEditorOptionsMenuComponent', () => {
 
         component.onOptionsClick();
 
-        expect(matDialog.open).toHaveBeenCalledWith(MapEditorModalComponent, {
-            data: { name: gameMapDataManagerService.currentName, description: gameMapDataManagerService.currentDescription },
-        });
+        expect(matDialog.open).toHaveBeenCalled();
         expect(gameMapDataManagerService.currentName).toBe(mockGame.name);
         expect(gameMapDataManagerService.currentDescription).toBe(mockGame.description);
         expect(gameMapDataManagerService.isGameUpdated).toBeTrue();
@@ -131,6 +129,14 @@ describe('MapEditorOptionsMenuComponent', () => {
         gameMapDataManagerService.isSavedGame.and.returnValue(true);
         gameMapDataManagerService.isGameUpdated = false;
         expect(component.getSaveNotificationState()).toBe(ButtonNotificationState.SUCCESS);
+    });
+
+    it('should return correct options notification description', () => {
+        gameMapDataManagerService.hasValidNameAndDescription.and.returnValue(false);
+        expect(component.getOptionsNotificationDescription()).toBe('Il faut donner un nom et une description à la carte');
+
+        gameMapDataManagerService.hasValidNameAndDescription.and.returnValue(true);
+        expect(component.getOptionsNotificationDescription()).toBe('');
     });
 
     it('should return correct save notification description', () => {

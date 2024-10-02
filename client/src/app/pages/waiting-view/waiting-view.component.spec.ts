@@ -1,12 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
-import { BASE_STATS } from 'src/app/classes/Characters/player-attributes';
+import { BASE_STATS, PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
 import { WaitingViewComponent } from './waiting-view.component';
 
 class MockRouter {
     navigate = jasmine.createSpy('navigate');
 }
+
+const ACCESS_CODE = 1234;
 
 describe('WaitingViewComponent', () => {
     let component: WaitingViewComponent;
@@ -34,13 +37,17 @@ describe('WaitingViewComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should generate and display the access code on initialization', () => {
+    it('should generate, store and display the access code on initialization', () => {
+        component.storedCode = ACCESS_CODE;
         component.ngOnInit();
         expect(component.accessCode).toBeDefined();
+        expect(component.storedCode).toBe(component.accessCode);
     });
 
     it('should add organizer to the players list if user is organizer', () => {
+        component.players[0] = new PlayerCharacter('', '', new PlayerAttributes());
         expect(component.players.length).toBe(1);
+        mockGameService.setCharacter(new PlayerCharacter('', '', new PlayerAttributes()));
         expect(component.players[0].name).toBe(mockGameService.getCharacter().name);
     });
 

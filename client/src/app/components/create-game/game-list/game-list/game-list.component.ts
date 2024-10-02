@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { GameShared } from '@common/interfaces/game-shared';
 
@@ -21,11 +23,20 @@ export class GameListComponent implements OnInit {
     constructor(
         private modeService: ModeService,
         private router: Router,
+        private administrationService: AdministrationPageManagerService,
+        private gameServerCommunicationService: GameServerCommunicationService,
     ) {}
+
+    getGames(): GameShared[] {
+        return this.administrationService.games;
+    }
 
     ngOnInit(): void {
         this.modeService.selectedMode$.subscribe((mode) => {
             this.selectedMode = mode;
+        });
+        this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
+            this.games = games;
         });
     }
 
@@ -34,14 +45,16 @@ export class GameListComponent implements OnInit {
     }
 
     selectGame(game: GameShared) {
-        if (!game.isVisible) {
-            this.gameStatus = `Le jeu choisi ${game.name} n'est plus visible ou supprimé`;
-            this.selectedGame = null;
-        } else {
-            this.selectedGame = game;
-            this.gameStatus = null;
-            this.router.navigate(['/create-character']);
-        }
+        this.gameServerCommunicationService.getGame(game._id).subscribe((updatedGame: GameShared) => {
+            if (!updatedGame.isVisible) {
+                this.gameStatus = `Le jeu choisi ${updatedGame.name} n'est plus disponible`;
+                this.selectedGame = null;
+            } else {
+                this.selectedGame = updatedGame;
+                this.gameStatus = null;
+                this.router.navigate(['/create-character']);
+            }
+        });
     }
 
     getFilteredGames() {
