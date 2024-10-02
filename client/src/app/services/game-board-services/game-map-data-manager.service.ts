@@ -124,11 +124,12 @@ export class GameMapDataManagerService {
                 // Optionally, show a success message or modal here
                 console.log('Game updated successfully');
             },
-            error: (error: any) => {
-                this.openErrorModal(error.message); // Show the error in a modal
+            error: (errors: any) => {
+                console.log(errors);
+                this.openErrorModal(errors); // Show the error in a modal
             },
         });
-        this.setLocalStorageVariables(false, this.databaseGame);
+        //this.setLocalStorageVariables(false, this.databaseGame);
     }
 
     saveMap() {
