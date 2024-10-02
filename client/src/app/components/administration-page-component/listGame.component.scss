@@ -75,7 +75,11 @@ img:hover ~ .game_info .description {
     color: $primary-light;
     padding: 5px 10px;
     box-shadow: 0 4px 8px black; /* Optional shadow */
-    width: 100px;
+    width: 100%;
+    white-space: normal; // Ensures that the text wraps and preserves whitespace
+    overflow: visible; 
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .action_icons {
