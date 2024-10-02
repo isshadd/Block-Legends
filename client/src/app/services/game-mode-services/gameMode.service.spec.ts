@@ -40,4 +40,10 @@ describe('ModeService', () => {
 
         service.setSelectedMode(newMode);
     });
+
+    it('should return the selected mode when getSelectedMode is called', () => {
+        const newMode = GameMode.CTF;
+        service.setSelectedMode(newMode);
+        expect(service.getSelectedMode()).toBe(newMode);
+    });
 });
