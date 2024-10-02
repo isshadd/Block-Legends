@@ -1,4 +1,5 @@
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+// eslint-disable-next-line
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
@@ -17,8 +18,13 @@ describe('GameServerCommunicationService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [GameServerCommunicationService, provideHttpClientTesting()],
+            // eslint-disable-next-line
+            imports: [HttpClientTestingModule],
+            providers: [GameServerCommunicationService],
         });
+
+        service = TestBed.inject(GameServerCommunicationService);
+        httpTestingController = TestBed.inject(HttpTestingController);
 
         games = [
             {
@@ -44,9 +50,6 @@ describe('GameServerCommunicationService', () => {
         };
 
         updateGameDto = { description: 'Updated description' };
-
-        service = TestBed.inject(GameServerCommunicationService);
-        httpTestingController = TestBed.inject(HttpTestingController);
     });
 
     afterEach(() => {
@@ -58,8 +61,8 @@ describe('GameServerCommunicationService', () => {
     });
 
     it('should fetch all games using GET', () => {
-        service.getGames().subscribe((games) => {
-            expect(games).toEqual(games);
+        service.getGames().subscribe((response) => {
+            expect(response).toEqual(games);
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
@@ -91,43 +94,48 @@ describe('GameServerCommunicationService', () => {
 
     it('should update a game by id using PATCH', () => {
         service.updateGame('1', updateGameDto).subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/1`);
         expect(req.request.method).toEqual('PATCH');
-        req.flush({});
+        req.flush(null);
     });
 
     it('should delete a game by id using DELETE', () => {
         service.deleteGame('1').subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/1`);
         expect(req.request.method).toEqual('DELETE');
-        req.flush({});
+        req.flush(null);
     });
 
     it('should empty the database using DELETE', () => {
         service.emptyDatabase().subscribe((response) => {
-            expect(response).toBeUndefined();
+            expect(response).toBeNull();
         });
 
         const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
         expect(req.request.method).toEqual('DELETE');
-        req.flush({});
+        req.flush(null);
     });
 
-    it('should handle error when fetching all games', () => {
-        games = [];
-        const errorMessage = 'getAllGames failed: 404 error';
+    it('should return an observable with the given result when called with a value', () => {
+        const expectedResult = { key: 'value' };
+        const result$ = service['handleError'](expectedResult)();
 
-        service.getGames().subscribe((games) => {
-            expect(games).toEqual([]);
+        result$.subscribe((result) => {
+            expect(result).toEqual(expectedResult);
         });
+    });
 
-        const req = httpTestingController.expectOne(`${service['baseUrl']}/`);
-        req.flush(errorMessage, { status: 404, statusText: 'Not Found' });
+    it('should return an observable with undefined when called without a value', () => {
+        const result$ = service['handleError']()();
+
+        result$.subscribe((result) => {
+            expect(result).toBeUndefined();
+        });
     });
 });

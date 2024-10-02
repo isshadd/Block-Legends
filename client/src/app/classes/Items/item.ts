@@ -11,8 +11,8 @@ export class Item implements PlaceableEntity {
     description: string;
     imageUrl: string; // minecraftWiki
     coordinates: Vec2 = { x: -1, y: -1 };
-    visibleState: VisibleState = VisibleState.notSelected;
+    visibleState: VisibleState = VisibleState.NotSelected;
     isPlaced: boolean = false;
     itemLimit: number = 1;
-    testItem: string = 'test'; //TODO: remove this
+    testItem: string = 'test'; // TODO: remove this
 }

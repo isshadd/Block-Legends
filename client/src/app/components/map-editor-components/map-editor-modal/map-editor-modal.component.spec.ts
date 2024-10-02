@@ -65,12 +65,12 @@ describe('MapEditorModalComponent', () => {
     });
 
     it('should invalidate form when name exceeds max length', () => {
-        component.infoForm.controls['name'].setValue('a'.repeat(component.NAME_MAX_LENGTH + 1));
+        component.infoForm.controls['name'].setValue('a'.repeat(component.nameMaxLength + 1));
         expect(component.infoForm.controls['name'].valid).toBeFalse();
     });
 
     it('should invalidate form when description exceeds max length', () => {
-        component.infoForm.controls['description'].setValue('a'.repeat(component.DESCRIPTION_MAX_LENGTH + 1));
+        component.infoForm.controls['description'].setValue('a'.repeat(component.descriptionMaxLenght + 1));
         expect(component.infoForm.controls['description'].valid).toBeFalse();
     });
 });

@@ -1,7 +1,8 @@
+/* eslint-disable import/no-deprecated */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
-
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -17,7 +18,7 @@ describe('CreateGameComponent', () => {
         mockNavBarComponent = jasmine.createSpyObj('NavBarComponent', ['selectMode']);
         mockGameListComponent = jasmine.createSpyObj('GameListComponent', ['selectGame']);
         await TestBed.configureTestingModule({
-            imports: [CreateGameComponent],
+            imports: [CreateGameComponent, HttpClientTestingModule],
             providers: [
                 { provide: NavBarComponent, useValue: mockNavBarComponent },
                 { provide: GameListComponent, useValue: mockGameListComponent },
@@ -51,5 +52,12 @@ describe('CreateGameComponent', () => {
         };
         mockGameListComponent.selectGame(game);
         expect(mockGameListComponent.selectGame).toHaveBeenCalledWith(game);
+    });
+
+    it('should select game mode', () => {
+        const mode: GameMode = GameMode.Classique;
+        spyOn(component.modeService, 'setSelectedMode').and.callThrough();
+        component.selectMode(mode);
+        expect(component.modeService.setSelectedMode).toHaveBeenCalledWith(mode);
     });
 });

@@ -1,12 +1,12 @@
 import { Vec2 } from '@common/interfaces/vec2';
 
 export enum VisibleState {
-    notSelected,
-    selected,
-    hovered,
-    valid,
-    invalid,
-    disabled,
+    NotSelected,
+    Selected,
+    Hovered,
+    Valid,
+    Invalid,
+    Disabled,
 }
 export interface PlaceableEntity {
     description: string;

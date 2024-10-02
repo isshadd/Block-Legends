@@ -1,6 +1,6 @@
 <div class="container">
     <div class="header-container">
-        <button (click)="homeButton()" class="home-button" routerLink="/home">🏠</button>
+        <button (click)="homeButton()" id="home-button" class="dark-button" routerLink="/home">Retour</button>
         <h1>Liste des jeux : {{ this.selectedMode }}</h1>
     </div>
     <div>
@@ -13,16 +13,15 @@
                     <div class="game-details">
                         <h2>{{ game.name }}</h2>
                         <p>Taille de la carte: {{ game.size }}</p>
+                        <p>Description: {{ game.description }}</p>
                     </div>
-                    <button (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
+                    <button class="dark-button" (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
                 </div>
             </li>
             }
         </ul>
         } @else(){
-        <ng-template #noGames>
-            <p>Aucun jeu disponible pour le mode sélectionné.</p>
-        </ng-template>
+        <p>Aucun jeu disponible pour le mode sélectionné.</p>
         }
     </div>
     @if(gameStatus){

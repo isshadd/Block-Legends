@@ -17,7 +17,7 @@ import { MapSize } from '@common/enums/map-size';
 export class CreateGameModalComponent {
     selectedSize: MapSize = MapSize.SMALL;
     selectedMode: GameMode = GameMode.Classique;
-    MapSize = MapSize;
+    mapSize = MapSize;
 
     constructor(
         public dialogRef: MatDialogRef<CreateGameModalComponent>,

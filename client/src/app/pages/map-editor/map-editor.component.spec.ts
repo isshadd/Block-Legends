@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-// eslint-disable-next-line max-len
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
@@ -22,27 +21,18 @@ describe('MapEditorComponent', () => {
     let mockGame: GameShared;
 
     beforeEach(async () => {
-        const mapEditorSpy = jasmine.createSpyObj('MapEditorManagerService', ['init', 'onMouseUpMapTile']);
-        const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', [
+        mapEditorManagerService = jasmine.createSpyObj('MapEditorManagerService', ['init', 'onMouseUpMapTile']);
+        gameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', [
             'getLocalStorageIsNewGame',
             'getLocalStorageGameToEdit',
             'newGame',
             'loadGame',
+            'hasValidNameAndDescription',
+            'isSavedGame',
         ]);
-        const gameServerSpy = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
-        const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], { params: of({}) });
-
-        await TestBed.configureTestingModule({
-            imports: [MapEditorComponent],
-            providers: [
-                { provide: MapEditorManagerService, useValue: mapEditorSpy },
-                { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
-                { provide: GameServerCommunicationService, useValue: gameServerSpy },
-                { provide: Router, useValue: routerSpy },
-                { provide: ActivatedRoute, useValue: activatedRouteSpy },
-            ],
-        }).compileComponents();
+        gameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
+        router = jasmine.createSpyObj('Router', ['navigate']);
+        activatedRoute = jasmine.createSpyObj('ActivatedRoute', [], { params: of({}) });
 
         mockGame = {
             _id: 'gameId',
@@ -54,57 +44,94 @@ describe('MapEditorComponent', () => {
             isVisible: true,
             tiles: [],
         };
+    });
+
+    const createComponent = async () => {
+        await TestBed.configureTestingModule({
+            imports: [MapEditorComponent],
+            providers: [
+                { provide: MapEditorManagerService, useValue: mapEditorManagerService },
+                { provide: GameMapDataManagerService, useValue: gameMapDataManagerService },
+                { provide: GameServerCommunicationService, useValue: gameServerCommunicationService },
+                { provide: Router, useValue: router },
+                { provide: ActivatedRoute, useValue: activatedRoute },
+            ],
+        }).compileComponents();
 
         fixture = TestBed.createComponent(MapEditorComponent);
         component = fixture.componentInstance;
         mapEditorManagerService = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
         gameMapDataManagerService = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
+        gameMapDataManagerService.currentGrid = [];
         gameServerCommunicationService = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
         router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
         activatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
-    });
+    };
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy();
-    });
-
-    it('should inject activatedRoute', () => {
-        expect(activatedRoute).toBeTruthy();
-    });
-
-    it('should create a new game if isNewGame is true', () => {
+    it('should create the component', async () => {
         gameMapDataManagerService.getLocalStorageIsNewGame.and.returnValue(true);
         gameMapDataManagerService.getLocalStorageGameToEdit.and.returnValue(mockGame);
 
+        await createComponent();
+        fixture.detectChanges();
+
+        expect(component).toBeTruthy();
+    });
+
+    it('should inject activatedRoute', async () => {
+        await createComponent();
+        fixture.detectChanges();
+
+        expect(activatedRoute).toBeTruthy();
+        expect(component).toBeTruthy();
+    });
+
+    it('should create a new game if isNewGame is true', async () => {
+        gameMapDataManagerService.getLocalStorageIsNewGame.and.returnValue(true);
+        gameMapDataManagerService.getLocalStorageGameToEdit.and.returnValue(mockGame);
+
+        await createComponent();
         fixture.detectChanges();
 
         expect(gameMapDataManagerService.newGame).toHaveBeenCalledWith(mockGame);
         expect(mapEditorManagerService.init).toHaveBeenCalled();
+        expect(component).toBeTruthy();
     });
 
-    it('should load and edit an existing game if isNewGame is false and gameToEdit has _id', () => {
+    it('should load and edit an existing game if isNewGame is false and gameToEdit has _id', async () => {
         gameMapDataManagerService.getLocalStorageIsNewGame.and.returnValue(false);
         gameMapDataManagerService.getLocalStorageGameToEdit.and.returnValue(mockGame);
         gameServerCommunicationService.getGame.and.returnValue(of(mockGame));
 
+        await createComponent();
         fixture.detectChanges();
 
-        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id!);
+        expect(gameServerCommunicationService.getGame).toHaveBeenCalledWith(mockGame._id as string);
         expect(gameMapDataManagerService.loadGame).toHaveBeenCalledWith(mockGame);
         expect(mapEditorManagerService.init).toHaveBeenCalled();
+        expect(component).toBeTruthy();
     });
 
-    it('should navigate to /administration-game if isNewGame is false and gameToEdit does not have _id', () => {
+    it('should navigate to /administration-game if isNewGame is false and gameToEdit does not have _id', async () => {
         gameMapDataManagerService.getLocalStorageIsNewGame.and.returnValue(false);
         gameMapDataManagerService.getLocalStorageGameToEdit.and.returnValue({} as GameShared);
 
+        await createComponent();
         fixture.detectChanges();
 
         expect(router.navigate).toHaveBeenCalledWith(['/administration-game']);
+        expect(component).toBeTruthy();
     });
 
-    it('should call onMouseUpMapTile when onMouseUp is triggered', () => {
+    it('should call onMouseUpMapTile when onMouseUp is triggered', async () => {
+        gameMapDataManagerService.getLocalStorageIsNewGame.and.returnValue(true);
+        gameMapDataManagerService.getLocalStorageGameToEdit.and.returnValue(mockGame);
+
+        await createComponent();
+        fixture.detectChanges();
+
         component.onMouseUp();
         expect(mapEditorManagerService.onMouseUpMapTile).toHaveBeenCalled();
+        expect(component).toBeTruthy();
     });
 });

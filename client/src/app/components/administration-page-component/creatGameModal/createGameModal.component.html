@@ -1,11 +1,11 @@
 <div class="navbar-title">Création d'une nouvelle carte:</div>
-<app-nav-bar (select)="selectMode($event)"></app-nav-bar>
+<app-nav-bar (selection)="selectMode($event)"></app-nav-bar>
 <div class="selection">
     <div class="size_selection">
         <h4>Sélectionnez une taille</h4>
-        <label><input type="radio" name="taille" (click)="selectSize(MapSize.SMALL)" checked /> Petit : 10 x 10</label>
-        <label><input type="radio" name="taille" (click)="selectSize(MapSize.MEDIUM)" /> Moyen: 15 x 15</label>
-        <label><input type="radio" name="taille" (click)="selectSize(MapSize.LARGE)" /> Grand: 20 x 20</label>
+        <label><input type="radio" name="taille" (click)="selectSize(mapSize.SMALL)" checked /> Petit : 10 x 10</label>
+        <label><input type="radio" name="taille" (click)="selectSize(mapSize.MEDIUM)" /> Moyen: 15 x 15</label>
+        <label><input type="radio" name="taille" (click)="selectSize(mapSize.LARGE)" /> Grand: 20 x 20</label>
     </div>
     <div class="buttons">
         <button mat-button class="dark-button" (click)="onNoClick()">Annuler</button>

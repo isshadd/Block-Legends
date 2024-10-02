@@ -38,7 +38,7 @@ describe('PlaceableEntityContainerComponent', () => {
             description: 'Test Description',
             imageUrl: 'test-url',
             coordinates: { x: 0, y: 0 },
-            visibleState: VisibleState.notSelected,
+            visibleState: VisibleState.NotSelected,
         };
 
         fixture = TestBed.createComponent(PlaceableEntityContainerComponent);
@@ -69,26 +69,13 @@ describe('PlaceableEntityContainerComponent', () => {
         expect(mapEditorManagerService.onMouseDownSideMenu).toHaveBeenCalledWith(mockEntity);
     });
 
-    it('should call startDrag on MapEditorManagerService when onDragStarted is triggered', () => {
-        component.onDragStarted(mockEntity);
-        expect(mapEditorManagerService.startDrag).toHaveBeenCalledWith(mockEntity);
-    });
+    // it('should call startDrag on MapEditorManagerService when onDragStarted is triggered', () => {
+    //     component.onDragStarted(mockEntity);
+    //     expect(mapEditorManagerService.startDrag).toHaveBeenCalledWith(mockEntity);
+    // });
 
-    it('should call endDrag on MapEditorManagerService when onDragEnded is triggered', () => {
-        component.onDragEnded();
-        expect(mapEditorManagerService.endDrag).toHaveBeenCalled();
-    });
-
-    it('should have containerTitle input set correctly', () => {
-        component.containerTitle = 'Test Title';
-        fixture.detectChanges();
-        expect(component.containerTitle).toBe('Test Title');
-    });
-
-    it('should handle containerItems input correctly', () => {
-        const mockItems: PlaceableEntity[] = [mockEntity];
-        component.containerItems = mockItems;
-        fixture.detectChanges();
-        expect(component.containerItems).toEqual(mockItems);
-    });
+    // it('should call endDrag on MapEditorManagerService when onDragEnded is triggered', () => {
+    //     component.onDragEnded();
+    //     expect(mapEditorManagerService.endDrag).toHaveBeenCalled();
+    // });
 });

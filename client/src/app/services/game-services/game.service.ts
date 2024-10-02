@@ -6,6 +6,8 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 const MATH_1000 = 1000;
 const MATH_9000 = 9000;
 export const VP_NUMBER = 5;
+const STORAGE_KEY_CHAR = 'currentCharacter';
+const STRORAGE_KEY_CODE = 'accessCode';
 
 @Injectable({
     providedIn: 'root',
@@ -24,6 +26,18 @@ export class GameService {
         this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);
     }
 
+    storeCode(): void {
+        localStorage.setItem(STRORAGE_KEY_CODE, JSON.stringify(this.accessCode));
+    }
+
+    getAccessCodeFromStorage(): number | null {
+        const storedCode = localStorage.getItem(STRORAGE_KEY_CODE);
+        if (storedCode) {
+            return JSON.parse(storedCode);
+        }
+        return null;
+    }
+
     getAccessCode(): number {
         return this.accessCode;
     }
@@ -38,9 +52,34 @@ export class GameService {
 
     setCharacter(character: PlayerCharacter) {
         this.characterSubject.next(character);
+        localStorage.setItem(STORAGE_KEY_CHAR, JSON.stringify(character));
     }
 
     getCharacter(): PlayerCharacter {
         return this.characterSubject.getValue();
+    }
+
+    getStoredCharacter(): PlayerCharacter | null {
+        const storedData = localStorage.getItem(STORAGE_KEY_CHAR);
+        if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            return new PlayerCharacter(
+                parsedData.name,
+                parsedData.avatar,
+                new PlayerAttributes(
+                    parsedData.attributes.attack,
+                    parsedData.attributes.defense,
+                    parsedData.attributes.speed,
+                    parsedData.attributes.life,
+                ),
+            );
+        }
+        return null;
+    }
+
+    clearLocalStorage(): void {
+        localStorage.removeItem(STORAGE_KEY_CHAR);
+        localStorage.removeItem(STRORAGE_KEY_CODE);
+        this.characterSubject.next(new PlayerCharacter('', '', new PlayerAttributes()));
     }
 }

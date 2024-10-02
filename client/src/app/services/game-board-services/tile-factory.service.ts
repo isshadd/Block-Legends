@@ -12,8 +12,6 @@ import { TileType } from '@common/enums/tile-type';
     providedIn: 'root',
 })
 export class TileFactoryService {
-    constructor() {}
-
     createTile(type: TileType): Tile {
         switch (type) {
             case TileType.Grass:

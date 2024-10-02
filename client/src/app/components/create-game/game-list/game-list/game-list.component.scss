@@ -6,16 +6,12 @@
     margin-top: 20px;
 }
 
-.home-button {
-    color: rgb(0, 0, 0);
-    border-radius: 5px;
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
-    border-radius: 5px;
+#home-button {
     padding: 10px;
     cursor: pointer;
     font-size: 1.5em;
     margin-right: 10px;
+    margin-left: 2%;
 }
 
 .home-button:hover {
@@ -25,29 +21,28 @@
 // liste de jeux
 .game-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 20px;
-    list-style-type: none;
+    padding: 0 20px;
 }
 
 .game-item {
     display: flex;
     justify-content: center;
-    height:auto;
+    height: auto;
 }
 
 .game-box {
     display: grid;
-    grid-template-areas: 
-        "image details"
-        "button button";
+    grid-template-areas:
+        'image details'
+        'button button';
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr;
     align-items: start;
-    border: 1px solid #ddd;
+    border: 5px solid #000;
     padding: 10px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+    background-color: #4f5d75;
     width: 100%;
 }
 
@@ -63,6 +58,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    gap: 10px;
 }
 
 .game-details h2 {
@@ -76,18 +72,4 @@
 
 .game-box button {
     grid-area: button;
-    background-color: $primary;
-    color: black;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1em;
-    align-self: flex-end;
-    margin-top: 10px;
-    border-radius: 5px;
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
-}
-
-.game-box button:hover {
-    border-color: black;
 }

@@ -3,11 +3,11 @@
         <label for="name">Nom :</label>
         <input id="name" [(ngModel)]="character.name" name="name" required maxlength="15" />
         <button class="dark-button" type="button" (click)="saveName()">Enregistrer le nom</button>
-        @if(!isNameValid()){
+        @if(!character.isNameValid){
         <div class="error">Le nom n'est pas valide</div>
         }
     </div>
-    @if(savedName && isNameValid()){
+    @if(character.isNameValid){
     <p>Nom enregistré : {{ savedName }}</p>
     }
 </div>

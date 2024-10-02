@@ -10,14 +10,14 @@ import { GameMode } from '@common/enums/game-mode';
     styleUrl: './nav-bar.component.scss',
 })
 export class NavBarComponent {
-    @Output() select = new EventEmitter<GameMode>();
+    @Output() selection = new EventEmitter<GameMode>();
 
-    GameMode = GameMode;
+    gameMode = GameMode;
 
     selectedMode: GameMode = GameMode.Classique;
 
     selectMode(mode: GameMode): void {
         this.selectedMode = mode;
-        this.select.emit(this.selectedMode);
+        this.selection.emit(this.selectedMode);
     }
 }
