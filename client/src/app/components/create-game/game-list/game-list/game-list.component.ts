@@ -45,18 +45,16 @@ export class GameListComponent implements OnInit {
     }
 
     selectGame(game: GameShared) {
-        if (game._id !== undefined) {
-            this.gameServerCommunicationService.getGame(game._id).subscribe((updatedGame: GameShared) => {
-                if (!updatedGame.isVisible) {
-                    this.gameStatus = `Le jeu choisi ${updatedGame.name} n'est plus disponible`;
-                    this.selectedGame = null;
-                } else {
-                    this.selectedGame = updatedGame;
-                    this.gameStatus = null;
-                    this.router.navigate(['/create-character']);
-                }
-            });
-        }
+        this.gameServerCommunicationService.getGame(game._id).subscribe((updatedGame: GameShared) => {
+            if (!updatedGame.isVisible) {
+                this.gameStatus = `Le jeu choisi ${updatedGame.name} n'est plus disponible`;
+                this.selectedGame = null;
+            } else {
+                this.selectedGame = updatedGame;
+                this.gameStatus = null;
+                this.router.navigate(['/create-character']);
+            }
+        });
     }
 
     getFilteredGames() {
