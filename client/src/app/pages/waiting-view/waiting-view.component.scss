@@ -110,7 +110,7 @@ button {
 }
 
 .dark-button[disabled] {
-    background-color: $background;
+    background-color: transparent;
     border: 0px solid transparent;
     cursor: not-allowed;
 }
