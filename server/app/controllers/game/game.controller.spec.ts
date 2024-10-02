@@ -8,10 +8,12 @@ import { HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { GameController } from './game.controller';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 
 describe('GameController', () => {
     let controller: GameController;
     let gameService: GameService;
+    let gameValidationService: GameValidationService;
     let mockResponse: Partial<Response>;
     let games: Game[];
     let createGameDto: CreateGameDto;
@@ -32,6 +34,12 @@ describe('GameController', () => {
                         emptyDB: jest.fn(),
                     },
                 },
+                {
+                    provide: GameValidationService,
+                    useValue: {
+                        validateGame: jest.fn(),
+                    },
+                },
             ],
         }).compile();
 
@@ -46,7 +54,6 @@ describe('GameController', () => {
 
         games = [
             {
-                _id: '1',
                 name: 'Test Game',
                 description: 'A test game',
                 size: MapSize.SMALL,
