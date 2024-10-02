@@ -1,6 +1,7 @@
 import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameService } from '@app/services/game/game.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -9,7 +10,10 @@ import { Response } from 'express';
 @ApiTags('Games')
 @Controller('game')
 export class GameController {
-    constructor(private readonly gameService: GameService) {}
+    constructor(
+        private readonly gameService: GameService,
+        private readonly gameValidationService: GameValidationService,
+    ) {}
 
     @ApiOkResponse({
         description: 'Returns all games',
@@ -56,6 +60,17 @@ export class GameController {
     @Post('/')
     async create(@Body() createGameDto: CreateGameDto, @Res() response: Response) {
         try {
+            const validationResult = await this.gameValidationService.validateGame(createGameDto);
+            if (!validationResult.isValid) {
+                return response.status(HttpStatus.BAD_REQUEST).json({ errors: validationResult.errors });
+            }
+            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(createGameDto, createGameDto.size);
+            if (!isTilesValid) {
+                return response
+                    .status(HttpStatus.BAD_REQUEST)
+                    .json({ errors: ['Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.'] });
+            }
+
             const newGame: Game = await this.gameService.addGame(createGameDto);
             response.status(HttpStatus.CREATED).json(newGame);
         } catch (error) {
@@ -73,6 +88,22 @@ export class GameController {
     @Patch('/:id')
     async patchGame(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
         try {
+            const isOnlyIsVisibleModified = Object.keys(gameDto).length === 1 && 'isVisible' in gameDto;
+
+            if (!isOnlyIsVisibleModified) {
+                const existingGame = await this.gameService.getGame(id);
+                const updatedGame: Game = { ...existingGame, ...gameDto };
+                const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(updatedGame, existingGame.size);
+                if (!isTilesValid) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .json('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                }
+                const validationResult = await this.gameValidationService.validateGame(updatedGame);
+                if (!validationResult.isValid) {
+                    return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+                }
+            }
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {
