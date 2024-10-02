@@ -172,7 +172,10 @@ export class GameValidationService {
     }
 
     async isTileTerrain(tile: Tile) {
-        return tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice;
+        let isTerrain = tile.type === TileType.Grass;
+        isTerrain = isTerrain || tile.type === TileType.Water;
+        isTerrain = isTerrain || tile.type === TileType.Ice;
+        return isTerrain;
     }
 
     async isTileWall(tile: Tile) {
@@ -205,21 +208,30 @@ export class GameValidationService {
     }
 
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
-        const wallLeft = this.isTileWall(game.tiles[i][j - 1]); // Wall to the left
-        const wallRight = this.isTileWall(game.tiles[i][j + 1]); // Wall to the right
-        const terrainAbove = this.isTileTerrain(game.tiles[i - 1][j]); // Terrain above
-        const terrainBelow = this.isTileTerrain(game.tiles[i + 1][j]); // Terrain below
+        // Ensure we're not accessing out of bounds
+        if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
+            return false;
+        }
 
-        // Return true only if all conditions are met
+        const wallLeft = await this.isTileWall(game.tiles[i - 1][j]); // Wall to the left
+        const wallRight = await this.isTileWall(game.tiles[i + 1][j]); // Wall to the right
+        const terrainAbove = await this.isTileTerrain(game.tiles[i][j - 1]); // Terrain above
+        const terrainBelow = await this.isTileTerrain(game.tiles[i][j + 1]); // Terrain below
+
         return wallLeft && wallRight && terrainAbove && terrainBelow;
     }
 
     async isVerticalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
+        // Ensure we're not accessing out of bounds
+        if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
+            return false;
+        }
+
         return (
-            this.isTileWall(game.tiles[i + 1][j]) && // Wall below
-            this.isTileWall(game.tiles[i - 1][j]) && // Wall above
-            this.isTileTerrain(game.tiles[i][j + 1]) && // Terrain on the right
-            this.isTileTerrain(game.tiles[i][j - 1]) // Terrain on the left
+            (await this.isTileWall(game.tiles[i][j + 1])) && // Wall below
+            (await this.isTileWall(game.tiles[i][j - 1])) && // Wall above
+            (await this.isTileTerrain(game.tiles[i + 1][j])) && // Terrain on the right
+            (await this.isTileTerrain(game.tiles[i - 1][j])) // Terrain on the left
         );
     }
 }
