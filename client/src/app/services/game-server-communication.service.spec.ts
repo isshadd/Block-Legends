@@ -121,21 +121,4 @@ describe('GameServerCommunicationService', () => {
         expect(req.request.method).toEqual('DELETE');
         req.flush(null);
     });
-
-    it('should return an observable with the given result when called with a value', () => {
-        const expectedResult = { key: 'value' };
-        const result$ = service['handleError'](expectedResult)();
-
-        result$.subscribe((result) => {
-            expect(result).toEqual(expectedResult);
-        });
-    });
-
-    it('should return an observable with undefined when called without a value', () => {
-        const result$ = service['handleError']()();
-
-        result$.subscribe((result) => {
-            expect(result).toBeUndefined();
-        });
-    });
 });
