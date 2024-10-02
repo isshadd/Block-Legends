@@ -92,11 +92,14 @@ body {
     height: 100%;
     height: 100vh;
     margin: 0;
+    padding: 0;
     background-color: $background;
     background-image: url('/assets/images/background.png');
     background-repeat: repeat-x;
     animation: moveIt 10000s linear infinite;
     background-size: cover;
+    background-position: center;
+    overflow-x: hidden;
 }
 
 .dark-button {
