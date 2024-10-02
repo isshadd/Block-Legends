@@ -9,6 +9,8 @@ class MockRouter {
     navigate = jasmine.createSpy('navigate');
 }
 
+const ACCESS_CODE = 1234;
+
 describe('WaitingViewComponent', () => {
     let component: WaitingViewComponent;
     let fixture: ComponentFixture<WaitingViewComponent>;
@@ -36,6 +38,7 @@ describe('WaitingViewComponent', () => {
     });
 
     it('should generate, store and display the access code on initialization', () => {
+        component.storedCode = ACCESS_CODE;
         component.ngOnInit();
         expect(component.accessCode).toBeDefined();
         expect(component.storedCode).toBe(component.accessCode);
