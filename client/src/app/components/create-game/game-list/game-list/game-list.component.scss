@@ -40,7 +40,7 @@
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr;
     align-items: start;
-    border: 5px solid #000;
+    border: 1px solid #fff;
     padding: 10px;
     background-color: #4f5d75;
     width: 100%;
@@ -54,6 +54,7 @@
 }
 
 .game-details {
+    color: #fff;
     grid-area: details;
     display: flex;
     flex-direction: column;

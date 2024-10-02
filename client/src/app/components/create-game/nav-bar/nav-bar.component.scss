@@ -1,7 +1,7 @@
 @import 'src/_variables.scss';
 
 .navbar-modes {
-    background-color: $primary-dark;
+    background-color: #333;
     display: flex;
     justify-content: center;
     padding-bottom: 10px;
@@ -25,7 +25,7 @@
 .navbar-modes button {
     background-color: #444;
     color: white;
-    border: 5px solid black;
+    border: 1px solid #fff;
     padding: 10px 20px;
     margin: 0 5px;
     cursor: pointer;

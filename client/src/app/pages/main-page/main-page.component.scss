@@ -14,6 +14,19 @@
 .button {
     margin-top: 10px;
     text-align: center;
+    width: 200px;
+    height: 50px;
+    padding: 10px;
+    font-size: 13px;
+    background-color: $primary-dark;
+    color: white;
+    border: 1px solid $primary-light;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: darken($primary-dark, 10%);
 }
 
 .team-name {
@@ -30,6 +43,8 @@
 #logo {
     width: 800px;
     margin-left: 50px;
+    margin-bottom: 0px;
+    margin-top: 100px;
 }
 
 .footer-item {
@@ -37,14 +52,8 @@
 }
 
 .footer-item p :nth-child(even) {
-    color: lighten($primary, 20%);
+    color: $primary-light;
 }
 .footer-item p :nth-child(odd) {
     color: $primary-light;
-}
-
-.server-message {
-    justify-content: center;
-    width: 20%;
-    min-width: min-content;
 }
