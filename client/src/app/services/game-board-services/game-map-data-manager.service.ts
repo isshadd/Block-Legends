@@ -28,7 +28,7 @@ export class GameMapDataManagerService {
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
-        private dialog: MatDialog,
+        public dialog: MatDialog,
     ) {}
 
     newGame(game: GameShared) {
@@ -109,9 +109,8 @@ export class GameMapDataManagerService {
                 this.setLocalStorageVariables(false, this.databaseGame);
             },
             error: (errors: any) => {
-                console.log(errors);
                 this.isGameUpdated = true;
-                this.openErrorModal(errors); // Show the error in a modal
+                this.openErrorModal(errors);
             },
         });
     }
@@ -121,16 +120,12 @@ export class GameMapDataManagerService {
         this.gameServerCommunicationService.updateGame(this.databaseGame._id!, this.databaseGame).subscribe({
             next: () => {
                 this.setLocalStorageVariables(false, this.databaseGame);
-                // Optionally, show a success message or modal here
-                console.log('Game updated successfully');
             },
             error: (errors: any) => {
-                console.log(errors);
                 this.isGameUpdated = true;
-                this.openErrorModal(errors); // Show the error in a modal
+                this.openErrorModal(errors);
             },
         });
-        //this.setLocalStorageVariables(false, this.databaseGame);
     }
 
     saveMap() {
