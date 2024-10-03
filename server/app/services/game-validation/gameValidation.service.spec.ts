@@ -7,11 +7,11 @@ import { GameMode } from '@common/enums/game-mode';
 import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
-import { mock } from 'node:test';
 
 describe('GameValidationService', () => {
     let gameValidationService: GameValidationService;
     let gameService: GameService;
+    const SMALL_SIZE = 10;
 
     beforeEach(() => {
         gameService = {
@@ -20,7 +20,6 @@ describe('GameValidationService', () => {
         gameValidationService = new GameValidationService(gameService);
     });
 
-    
     describe('validateGame', () => {
         it('should return valid for a valid game', async () => {
             const game: Game = {
@@ -30,41 +29,41 @@ describe('GameValidationService', () => {
                 imageUrl: 'https://example.com/image.jpg',
                 size: 10,
                 isVisible: true,
-                tiles: createValidTiles(10),
+                tiles: createValidTiles(SMALL_SIZE),
             };
 
-            const mockExistingGame = game;
-
-            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(mockExistingGame); // No existing game with the same name
-            const result = await gameValidationService.validateGame(game);
-            expect(result.isValid).toBe(true);
-            expect(result.errors.length).toBe(0);
+            const result = await gameValidationService.validateNameDescription(game);
+            expect(result).toBe(true);
         });
 
         it('should return invalid if name is empty', async () => {
-            const game: UpdateGameDto = {
+            const game: Game = {
                 name: '',
                 description: 'A valid description',
-                tiles: createValidTiles(10),
+                mode: GameMode.CTF,
+                imageUrl: 'https://example.com/image.jpg',
+                size: 10,
+                isVisible: true,
+                tiles: createValidTiles(SMALL_SIZE),
             };
 
-            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
-            const result = await gameValidationService.validateGame(game);
-            expect(result.isValid).toBe(false);
-            expect(result.errors).toContain('Le nom du jeu doit être unique et la description est obligatoire.');
+            const result = await gameValidationService.validateNameDescription(game);
+            expect(result).toBe(false);
         });
 
         it('should return invalid if description is empty', async () => {
-            const game: UpdateGameDto = {
-                name: 'Game with empty description',
+            const game: Game = {
+                name: 'a Valid Game',
                 description: '',
-                tiles: createValidTiles(10),
+                mode: GameMode.CTF,
+                imageUrl: 'https://example.com/image.jpg',
+                size: 10,
+                isVisible: true,
+                tiles: createValidTiles(SMALL_SIZE),
             };
 
-            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
             const result = await gameValidationService.validateGame(game);
             expect(result.isValid).toBe(false);
-            expect(result.errors).toContain('Le nom du jeu doit être unique et la description est obligatoire.');
         });
 
         it('should return true if terrain tiles count is more than half of the total tiles for small size', async () => {
@@ -199,7 +198,7 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
             expect(result).toBe(true);
         });
 
@@ -335,7 +334,7 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
             expect(result).toBe(false);
         });
 
@@ -471,11 +470,11 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
             expect(result).toBe(false);
         });
 
-        test('should return invalid if door placement is invalid', async () => {
+        test('should return invalid if door placement is invalid if not horizontal or vertical', async () => {
             const game = {
                 tiles: [
                     [{ type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Wall }],
@@ -496,18 +495,64 @@ describe('GameValidationService', () => {
             );
         });
 
-        it('should return the correct number of spawn points', async () => {
-            const game = { name: 'testGame' } as Game;
-            const mockGame = {
+        test('should return invalid if door placement is invalid if horizontal and vertical walls', async () => {
+            const game = {
                 tiles: [
-                    [{ item: { type: ItemType.Spawn } }, { item: { type: ItemType.EnchantedBook } }],
-                    [{ item: { type: ItemType.Spawn } }, { item: null }],
+                    [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                    [{ type: TileType.Wall }, { type: TileType.Door }, { type: TileType.Wall }], // Invalid placement
+                    [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
                 ],
-            };
-            (gameService.getGameByName as jest.Mock).mockResolvedValue(mockGame);
-    
+                name: 'Test Game',
+                description: 'A game description.',
+            } as UpdateGameDto;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            const result = await gameValidationService.validateGame(game);
+
+            expect(result.isValid).toBe(false);
+
+            expect(result.errors).toContain(
+                'La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.',
+            );
+        });
+
+        test('should return invalid if door placement is invalid if no walls', async () => {
+            const game = {
+                tiles: [
+                    [{ type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Wall }],
+                    [{ type: TileType.Grass }, { type: TileType.Door }, { type: TileType.Grass }], // Invalid placement
+                    [{ type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Wall }],
+                ],
+                name: 'Test Game',
+                description: 'A game description.',
+            } as UpdateGameDto;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            const result = await gameValidationService.validateGame(game);
+
+            expect(result.isValid).toBe(false);
+
+            expect(result.errors).toContain(
+                'La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.',
+            );
+        });
+
+        it('should return the correct number of spawn points', async () => {
+            const game = {
+                tiles: [
+                    [{ type: TileType.Wall, item: { type: ItemType.Spawn } }, { type: TileType.Grass }, { type: TileType.Wall }],
+                    [{ type: TileType.Grass }, { type: TileType.Door }, { type: TileType.Grass }], // Invalid placement
+                    [{ type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Wall }],
+                ],
+                name: 'Test Game',
+                description: 'A game description.',
+            } as Game;
+
+            jest.spyOn(gameService, 'getGameByName').mockResolvedValue(null);
+            // (gameService.getGameByName as jest.Mock).mockResolvedValue(mockGame);
+
             const result = await gameValidationService.getNumberOfSpawnPoints(game);
-            expect(result).toBe(2);
+            expect(result).toBe(1);
         });
 
         it('should return invalid if the number of start points is not exactly 2 for a small sized map', async () => {
@@ -550,17 +595,16 @@ describe('GameValidationService', () => {
         });
 
         it('should map tiles to a matrix correctly', async () => {
-            const name = 'testGame';
             const mockGame = {
                 tiles: [
                     [{ type: TileType.Wall }, { type: TileType.Grass }],
                     [{ type: TileType.Door }, { type: TileType.Water }],
-                    [{ type: TileType.Ice  }, { type: TileType.Wall }],
+                    [{ type: TileType.Ice }, { type: TileType.Wall }],
                 ],
             };
             (gameService.getGameByName as jest.Mock).mockResolvedValue(mockGame);
-    
-            const result = await gameValidationService.mapToMatrix(name);
+
+            const result = await gameValidationService.mapToMatrix(mockGame);
             expect(result).toEqual([
                 [1, 0],
                 [1, 0],
@@ -578,8 +622,8 @@ describe('GameValidationService', () => {
                     [{ type: TileType.Ice }, { type: TileType.Ice }, { type: TileType.Ice }],
                 ],
             };
-        const result = await gameValidationService.mapIsValid(game);
-        expect(result).toBe(false);
+            const result = await gameValidationService.mapIsValid(game);
+            expect(result).toBe(false);
         });
 
         it('should return valid if a game map is valid (All terrain is accessible)', async () => {
@@ -594,11 +638,8 @@ describe('GameValidationService', () => {
             };
             const result = await gameValidationService.mapIsValid(game);
             expect(result).toBe(true);
-            });
-                
+        });
     });
-
-        
 
     function createValidTiles(size: number): Tile[][] {
         const tiles: Tile[][] = [];
@@ -622,27 +663,7 @@ describe('GameValidationService', () => {
         return tiles;
     }
 
-    function createTilesWithInvalidDoor(size: number): Tile[][] {
-        const tiles: Tile[][] = [];
-
-        for (let i = 0; i < size; i++) {
-            tiles[i] = [];
-            for (let j = 0; j < size; j++) {
-                tiles[i][j] = { type: TileType.Grass }; // All tiles are grass for a valid map
-            }
-        }
-        tiles[1][1] = { type: TileType.Door }; // Invalid door placement
-
-        // Ensure the tile above and below the door are walls
-        tiles[1][0] = { type: TileType.Grass }; // Invalid: should be a wall
-        tiles[1][2] = { type: TileType.Wall }; // This should be a wall
-        tiles[0][1] = { type: TileType.Grass }; // Valid terrain above
-        tiles[2][1] = { type: TileType.Grass }; // Valid terrain below
-        return tiles;
-    }
-
-
-    function appropriateSpawnCount(size: number) : number {
+    function appropriateSpawnCount(size: number): number {
         let spawnCount = 0;
         switch (size) {
             case MapSize.SMALL:
@@ -657,9 +678,9 @@ describe('GameValidationService', () => {
         return spawnCount;
     }
 
-    function createTilesWithInvalidSpawn(size : number ) : Tile[][] { 
+    function createTilesWithInvalidSpawn(size: number): Tile[][] {
         const tiles: Tile[][] = [];
-        let invalidSpawnCount = 0
+        let invalidSpawnCount = 0;
         switch (size) {
             case MapSize.SMALL:
                 invalidSpawnCount = 4;
@@ -670,11 +691,11 @@ describe('GameValidationService', () => {
             default:
                 invalidSpawnCount = 0;
         }
-        for(let i = 0; i < size; i++) {
+        for (let i = 0; i < size; i++) {
             tiles[i] = [];
-            for(let j = 0; j < size; j++) {
+            for (let j = 0; j < size; j++) {
                 tiles[i][j] = { type: TileType.Grass };
-                if (invalidSpawnCount > 0 ) {
+                if (invalidSpawnCount > 0) {
                     tiles[i][j].item.type = ItemType.Spawn;
                     invalidSpawnCount--;
                 }

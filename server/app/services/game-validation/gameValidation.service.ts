@@ -91,6 +91,8 @@ export class GameValidationService {
 
         let initX = -1;
         let initY = -1;
+
+        // Find a valid starting point in the map
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0) {
@@ -102,17 +104,23 @@ export class GameValidationService {
             if (initX !== -1) break;
         }
 
-        this.bfs(map, initX, initY, visited);
+        // If no valid starting point is found, return false
+        if (initX === -1 || initY === -1) {
+            return false; // Invalid map
+        }
+
+        await this.bfs(map, initX, initY, visited);
 
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0 && !visited[i][j]) {
-                    return false; // Si une tuile de terrain n'a pas été visitée, la carte est invalide
+                    return false; // Unvisited terrain tile means the map is invalid
                 }
             }
         }
         return true;
     }
+
     async validateGame(game: Game | UpdateGameDto): Promise<{ isValid: boolean; errors: string[] }> {
         const errors: string[] = [];
         console.log('isMapValid');
