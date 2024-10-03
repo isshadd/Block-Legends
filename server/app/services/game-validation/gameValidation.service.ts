@@ -13,9 +13,9 @@ export class GameValidationService {
 
     async getNumberOfSpawnPoints(game: Game): Promise<number> {
         let count = 0;
-        for (let i = 0; i < game.tiles.length; i++) {
-            for (let j = 0; j < game.tiles[i].length; j++) {
-                if (game.tiles[i][j].item && game.tiles[i][j].item.type == 'Spawn') {
+        for (const row of game.tiles) {
+            for (const tile of row) {
+                if (tile.item && tile.item.type === 'Spawn') {
                     count++;
                 }
             }
@@ -123,27 +123,22 @@ export class GameValidationService {
 
     async validateGame(game: Game | UpdateGameDto): Promise<{ isValid: boolean; errors: string[] }> {
         const errors: string[] = [];
-        console.log('isMapValid');
         const isMapValid = await this.mapIsValid(game);
         if (!isMapValid) {
             errors.push('Aucune tuile de terrain ne doit être inaccessible à cause d’un agencement de murs.');
         }
-
-        console.log('isVlaidSpawn');
 
         const isValidSpawn = await this.isValidSizeBySpawnPoints(game);
         if (!isValidSpawn) {
             errors.push('Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)');
         }
         if (game instanceof Game) {
-            console.log('isNameDescriptionValid');
             const isNameDescriptionValid = await this.validateNameDescription(game);
             if (!isNameDescriptionValid) {
                 errors.push('Le nom du jeu doit être unique et la description est obligatoire.');
             }
         }
 
-        console.log('isDoorPlacementValid');
         const isDoorPlacementValid = await this.isDoorPlacementValid(game);
         if (!isDoorPlacementValid) {
             errors.push('La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.');

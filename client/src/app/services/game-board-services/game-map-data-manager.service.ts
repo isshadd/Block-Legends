@@ -108,24 +108,26 @@ export class GameMapDataManagerService {
                 this.databaseGame = game;
                 this.setLocalStorageVariables(false, this.databaseGame);
             },
-            error: (errors: any) => {
+            error: (errors: unknown) => {
                 this.isGameUpdated = true;
-                this.openErrorModal(errors);
+                this.openErrorModal(errors as string | string[]);
             },
         });
     }
 
     saveGameInDb() {
         if (!this.isSavedGame()) return;
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id!, this.databaseGame).subscribe({
-            next: () => {
-                this.setLocalStorageVariables(false, this.databaseGame);
-            },
-            error: (errors: any) => {
-                this.isGameUpdated = true;
-                this.openErrorModal(errors);
-            },
-        });
+        if (this.databaseGame._id) {
+            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
+                next: () => {
+                    this.setLocalStorageVariables(false, this.databaseGame);
+                },
+                error: (errors: unknown) => {
+                    this.isGameUpdated = true;
+                    this.openErrorModal(errors as string | string[]);
+                },
+            });
+        }
     }
 
     saveMap() {
@@ -203,7 +205,7 @@ export class GameMapDataManagerService {
             message = message.join('<br>');
         }
         this.dialog.open(ErrorModalComponent, {
-            data: { message: message },
+            data: { message },
         });
     }
 }

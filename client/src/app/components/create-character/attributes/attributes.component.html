@@ -1,17 +1,17 @@
 <div class="attributes">
     <h3>Attributs :</h3>
     <div class="attribute" id="life" matTooltip="le nombre de points de vie du personnage">
-        <label>VIE :</label>
+        <img class="life-emoji" src="https://cdn3.emoji.gg/emojis/minecraftheart.png"><label>VIE :</label>
         <div name="life">{{ character.attributes.life }}</div>
         <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2 à la vie</button>
     </div>
     <div class="attribute" id="speed" matTooltip="détermine l’ordre des tours et correspond aussi aux points de mouvement par tour">
-        <label>RAPIDITE :</label>
+        <img class="speed-emoji" src="http://benimatic.com/tfwiki/images/c/c0/Iron_Boots.png"><label>RAPIDITE :</label>
         <div name="speed">{{ character.attributes.speed }}</div>
         <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2 à la rapidité</button>
     </div>
     <div class="attribute" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">
-        <label>ATTAQUE :</label>
+        <img class="attack-emoji" src="assets/images/item/diamond-sword.png"><label>ATTAQUE :</label>
         <div name="attack">{{ character.attributes.attack }}</div>
         <select [(ngModel)]="selectedAttackDice" (change)="assignAttackDice($event)" class="large-emojis">
             <option value="dice6">🎲 dé à 6 faces</option>
@@ -19,7 +19,7 @@
         </select>
     </div>
     <div class="attribute" id="defense" matTooltip="représente la capacité à bloquer l’attaque d’un adversaire">
-        <label>DEFENSE :</label>
+        <img class="armour-emoji" src="assets/images/item/chestplate.png"><label>DEFENSE :</label>
         <div name="defense">{{ character.attributes.defense }}</div>
         <select [(ngModel)]="selectedDefenseDice" (change)="assignDefenseDice($event)" class="large-emojis">
             <option value="dice6">🎲 dé à 6 faces</option>

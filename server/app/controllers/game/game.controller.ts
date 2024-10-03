@@ -88,17 +88,21 @@ export class GameController {
     @Patch('/:id')
     async patchGame(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
         try {
-            const existingGame = await this.gameService.getGame(id);
-            const updatedGame: Game = { ...existingGame, ...gameDto };
-            const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(updatedGame, existingGame.size);
-            if (!isTilesValid) {
-                return response
-                    .status(HttpStatus.BAD_REQUEST)
-                    .json('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
-            }
-            const validationResult = await this.gameValidationService.validateGame(updatedGame);
-            if (!validationResult.isValid) {
-                return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+            const isOnlyIsVisibleModified = Object.keys(gameDto).length === 1 && 'isVisible' in gameDto;
+
+            if (!isOnlyIsVisibleModified) {
+                const existingGame = await this.gameService.getGame(id);
+                const updatedGame: Game = { ...existingGame, ...gameDto };
+                const isTilesValid = await this.gameValidationService.isHalfMapTilesValid(updatedGame, existingGame.size);
+                if (!isTilesValid) {
+                    return response
+                        .status(HttpStatus.BAD_REQUEST)
+                        .json('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                }
+                const validationResult = await this.gameValidationService.validateGame(updatedGame);
+                if (!validationResult.isValid) {
+                    return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+                }
             }
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();

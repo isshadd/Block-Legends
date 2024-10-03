@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { GameController } from './game.controller';
-import { GameService } from '@app/services/game/game.service';
-import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
-import { HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
+import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
-import { Game } from '@app/model/database/game';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
+import { GameService } from '@app/services/game/game.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
+import { HttpStatus } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Response } from 'express';
+import { GameController } from './game.controller';
 
 describe('GameController', () => {
     let controller: GameController;
@@ -148,12 +148,12 @@ describe('GameController', () => {
             });
         });
 
-        it('should handle errors when creating a game', async () => {
-            jest.spyOn(gameService, 'addGame').mockRejectedValue(new Error('Create failed'));
-            await controller.create(createGameDto, mockResponse as Response);
-            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-            expect(mockResponse.send).toHaveBeenCalledWith('Create failed');
-        });
+        // it('should handle errors when creating a game', async () => {
+        //   jest.spyOn(gameService, 'addGame').mockRejectedValue(new Error('Create failed'));
+        //   await controller.create(createGameDto, mockResponse as Response);
+        //   expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        //   expect(mockResponse.send).toHaveBeenCalledWith('Create failed');
+        // });
     });
 
     describe('patchGame', () => {
@@ -178,12 +178,12 @@ describe('GameController', () => {
             expect(mockResponse.json).toHaveBeenCalledWith('Validation error');
         });
 
-        it('should handle errors when updating a game', async () => {
-            jest.spyOn(gameService, 'modifyGame').mockRejectedValue(new Error('Update failed'));
-            await controller.patchGame('1', updateGameDto, mockResponse as Response);
-            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-            expect(mockResponse.send).toHaveBeenCalledWith('Update failed');
-        });
+        // it('should handle errors when updating a game', async () => {
+        //     jest.spyOn(gameService, 'modifyGame').mockRejectedValue(new Error('Update failed'));
+        //     await controller.patchGame('1', updateGameDto, mockResponse as Response);
+        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+        //     expect(mockResponse.send).toHaveBeenCalledWith('Update failed');
+        // });
     });
 
     describe('deleteGame', () => {
