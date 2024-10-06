@@ -18,7 +18,7 @@
         @if (gameMapDataManagerService.isTerrainTile(tile)) {
         <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
         }
-        <app-visible-state [placeableEntity]="tile" class="layer-3"></app-visible-state>
+        <app-visible-state [visibleState]="tile.visibleState" class="layer-3"></app-visible-state>
     </div>
     } }
 </div>
