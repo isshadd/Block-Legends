@@ -4,5 +4,11 @@
         <app-placeable-entity-full-menu></app-placeable-entity-full-menu>
     </div>
     <app-map-editor-options-menu></app-map-editor-options-menu>
-    <app-map id="map-container"></app-map>
+    <app-map
+        id="map-container"
+        (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
+        (mapTileMouseMove)="onMapTileMouseMove($event)"
+        (mapTileMouseEnter)="onMapTileMouseEnter($event)"
+        (mapTileMouseLeave)="onMapTileMouseLeave($event)"
+    ></app-map>
 </div>
