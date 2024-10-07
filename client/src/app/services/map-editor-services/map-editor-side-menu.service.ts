@@ -83,6 +83,16 @@ export class MapEditorSideMenuService {
         if (randomItem) {
             randomItem.itemLimit = this.itemLimitCounter;
         }
+
+        if (this.itemLimitCounter === 0) {
+            this.sideMenuItemsDisabler();
+        } else {
+            this.sideMenuItemsEnabler();
+        }
+    }
+
+    getPlaceableEntitiesSections(): PlaceableEntitySection[] {
+        return this.placeableEntitiesSections;
     }
 
     sideMenuTileFinder(tileType: TileType): Tile | null {
