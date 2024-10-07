@@ -119,14 +119,6 @@ export class MapEditorManagerService {
         }
     }
 
-    startDrag(entity: PlaceableEntity) {
-        this.draggedEntity = entity;
-    }
-
-    endDrag() {
-        this.draggedEntity = null;
-    }
-
     sideMenuTileFinder(tile: Tile) {
         for (const searchedTile of this.placeableEntitiesSections[0].entities) {
             if ((searchedTile as Tile).type === tile.type) {

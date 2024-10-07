@@ -35,12 +35,4 @@ export class PlaceableEntityContainerComponent {
     onMouseDown(entity: PlaceableEntity) {
         this.mapEditorManagerService.onMouseDownSideMenu(entity);
     }
-
-    // onDragStarted(entity: PlaceableEntity) {
-    //     this.mapEditorManagerService.startDrag(entity);
-    // }
-
-    // onDragEnded() {
-    //     this.mapEditorManagerService.endDrag();
-    // }
 }
