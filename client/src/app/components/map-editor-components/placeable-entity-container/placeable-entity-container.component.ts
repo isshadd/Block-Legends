@@ -6,7 +6,7 @@ import { VisibleStateComponent } from '@app/components/game-board-components/vis
 import { ItemLimitCounterComponent } from '@app/components/map-editor-components/item-limit-counter/item-limit-counter.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu.service';
 @Component({
     selector: 'app-placeable-entity-container',
     standalone: true,
@@ -20,19 +20,19 @@ export class PlaceableEntityContainerComponent {
     @Input() containerItems: PlaceableEntity[];
 
     constructor(
-        public mapEditorManagerService: MapEditorManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
+        public sideMenuService: MapEditorSideMenuService,
     ) {}
 
     onMouseEnter(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseEnter(entity);
+        this.sideMenuService.onSideMenuMouseEnter(entity);
     }
 
     onMouseLeave(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseLeave(entity);
+        this.sideMenuService.onSideMenuMouseLeave(entity);
     }
 
     onMouseDown(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseDownSideMenu(entity);
+        this.sideMenuService.onSideMenuMouseDown(entity);
     }
 }

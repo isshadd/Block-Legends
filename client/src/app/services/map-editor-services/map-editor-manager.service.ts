@@ -20,14 +20,17 @@ export class MapEditorManagerService {
     sideMenuSelectedEntity: null | PlaceableEntity;
     isDraggingLeft: boolean = false;
     isDraggingRight: boolean = false;
-    draggedEntity: PlaceableEntity | null;
 
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameMapDataManagerService: GameMapDataManagerService,
         public sideMenuService: MapEditorSideMenuService,
-    ) {}
+    ) {
+        this.sideMenuService.signalSideMenuMouseEnter$.subscribe((entity) => this.onMouseEnter(entity));
+        this.sideMenuService.signalSideMenuMouseLeave$.subscribe((entity) => this.onMouseLeave(entity));
+        this.sideMenuService.signalSideMenuMouseDown$.subscribe((entity) => this.onMouseDownSideMenu(entity));
+    }
 
     init() {
         this.sideMenuService.init(this.gameMapDataManagerService.isGameModeCTF(), this.gameMapDataManagerService.itemLimit());

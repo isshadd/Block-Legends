@@ -17,6 +17,7 @@ import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
+import { Subject } from 'rxjs';
 
 class PlaceableEntitySection {
     title: string;
@@ -27,6 +28,15 @@ class PlaceableEntitySection {
     providedIn: 'root',
 })
 export class MapEditorSideMenuService {
+    private signalSideMenuMouseEnter = new Subject<PlaceableEntity>();
+    signalSideMenuMouseEnter$ = this.signalSideMenuMouseEnter.asObservable();
+
+    private signalSideMenuMouseLeave = new Subject<PlaceableEntity>();
+    signalSideMenuMouseLeave$ = this.signalSideMenuMouseLeave.asObservable();
+
+    private signalSideMenuMouseDown = new Subject<PlaceableEntity>();
+    signalSideMenuMouseDown$ = this.signalSideMenuMouseDown.asObservable();
+
     private placeableEntitiesSections: PlaceableEntitySection[] = [];
     private itemLimitCounter: number = 0;
     constructor() {}
@@ -137,5 +147,17 @@ export class MapEditorSideMenuService {
                 item.visibleState = VisibleState.NotSelected;
             }
         }
+    }
+
+    onSideMenuMouseEnter(entity: PlaceableEntity) {
+        this.signalSideMenuMouseEnter.next(entity);
+    }
+
+    onSideMenuMouseLeave(entity: PlaceableEntity) {
+        this.signalSideMenuMouseLeave.next(entity);
+    }
+
+    onSideMenuMouseDown(entity: PlaceableEntity) {
+        this.signalSideMenuMouseDown.next(entity);
     }
 }
