@@ -7,4 +7,8 @@ import { Tile } from './tile';
 })
 export class TerrainTile extends Tile {
     item: Item | null = null;
+
+    isTerrain(): boolean {
+        return true;
+    }
 }

@@ -13,4 +13,6 @@ export interface PlaceableEntity {
     imageUrl: string;
     coordinates: Vec2;
     visibleState: VisibleState;
+
+    isItem(): boolean;
 }

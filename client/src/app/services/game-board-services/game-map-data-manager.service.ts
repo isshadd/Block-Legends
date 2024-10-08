@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Item } from '@app/classes/Items/item';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
-import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
@@ -65,9 +62,9 @@ export class GameMapDataManagerService {
                 this.currentGrid[i].push(newTile);
                 newTile.coordinates = { x: i, y: j };
 
-                if (this.isTerrainTile(newTile)) {
+                if (newTile.isTerrain()) {
                     const itemType = this.databaseGame.tiles[i][j].item?.type;
-                    if (itemType) newTile.item = this.itemFactoryService.createItem(itemType);
+                    if (itemType) (newTile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
                 }
             }
         }
@@ -135,11 +132,11 @@ export class GameMapDataManagerService {
         for (let i = 0; i < this.currentGrid.length; i++) {
             this.databaseGame.tiles.push([]);
             for (const tile of this.currentGrid[i]) {
-                if (this.isTerrainTile(tile)) {
-                    const currentTile: TerrainTile = tile as TerrainTile;
+                if (tile.isTerrain()) {
+                    const currentTile = tile as TerrainTile;
                     this.databaseGame.tiles[i].push({
                         type: currentTile.type,
-                        item: currentTile.item && this.isItem(currentTile.item) ? { type: currentTile.item.type } : null,
+                        item: currentTile.item && currentTile.item.isItem() ? { type: currentTile.item.type } : null,
                     });
                 } else {
                     this.databaseGame.tiles[i].push({ type: tile.type });
@@ -158,18 +155,6 @@ export class GameMapDataManagerService {
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
         this.currentGrid = [];
-    }
-
-    isTerrainTile(tile: Tile): tile is TerrainTile {
-        return (tile as TerrainTile).item !== undefined;
-    }
-
-    isItem(placeableEntity: PlaceableEntity): placeableEntity is Item {
-        return (placeableEntity as Item).testItem !== undefined;
-    }
-
-    isDoor(tile: Tile): boolean {
-        return tile.type === TileType.Door || tile.type === TileType.OpenDoor;
     }
 
     hasValidNameAndDescription(): boolean {

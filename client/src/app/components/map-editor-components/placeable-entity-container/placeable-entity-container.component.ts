@@ -1,6 +1,7 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Item } from '@app/classes/Items/item';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { ItemLimitCounterComponent } from '@app/components/map-editor-components/item-limit-counter/item-limit-counter.component';
@@ -34,5 +35,12 @@ export class PlaceableEntityContainerComponent {
 
     onMouseDown(entity: PlaceableEntity) {
         this.sideMenuService.onSideMenuMouseDown(entity);
+    }
+
+    getItemLimit(entity: PlaceableEntity): number {
+        if (entity.isItem()) {
+            return (entity as Item).itemLimit;
+        }
+        return 0;
     }
 }

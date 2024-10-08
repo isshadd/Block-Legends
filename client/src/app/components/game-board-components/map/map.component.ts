@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Item } from '@app/classes/Items/item';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
@@ -38,5 +40,12 @@ export class MapComponent {
 
     onContextMenu(event: MouseEvent) {
         event.preventDefault();
+    }
+
+    getTerrainItem(tile: Tile): Item | null {
+        if (tile.isTerrain()) {
+            return (tile as TerrainTile).item;
+        }
+        return null;
     }
 }

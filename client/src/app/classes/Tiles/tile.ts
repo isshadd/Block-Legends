@@ -10,6 +10,18 @@ export class Tile implements PlaceableEntity {
     type: TileType;
     description: string;
     imageUrl: string;
-    coordinates: Vec2;
-    visibleState: VisibleState;
+    coordinates: Vec2 = { x: -1, y: -1 };
+    visibleState: VisibleState = VisibleState.NotSelected;
+
+    isItem(): boolean {
+        return false;
+    }
+
+    isTerrain(): boolean {
+        return false;
+    }
+
+    isDoor(): boolean {
+        return false;
+    }
 }

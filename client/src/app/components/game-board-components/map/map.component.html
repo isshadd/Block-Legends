@@ -13,10 +13,10 @@
             (mousemove)="onMouseMove(tile)"
             (mouseleave)="onMouseLeave(tile)"
             (contextmenu)="onContextMenu($event)"
-            [matTooltip]="gameMapDataManagerService.isTerrainTile(tile) ? tile.item?.description : ''"
+            [matTooltip]="tile.isTerrain() ? getTerrainItem(tile)?.description : ''"
         ></app-placeable-entity>
-        @if (gameMapDataManagerService.isTerrainTile(tile)) {
-        <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
+        @if (tile.isTerrain()) {
+        <app-placeable-entity [placeableEntity]="getTerrainItem(tile)" class="layer-2"></app-placeable-entity>
         }
         <app-visible-state [visibleState]="tile.visibleState" class="layer-3"></app-visible-state>
     </div>
