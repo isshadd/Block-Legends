@@ -102,7 +102,7 @@ export class MapEditorManagerService {
         }
 
         foundItem.itemLimit--;
-        if (item.type !== ItemType.Spawn && item.type !== ItemType.Flag) {
+        if (this.isNormalItem(foundItem)) {
             this.sideMenuService.updateItemLimitCounter(-1);
         }
 
@@ -125,7 +125,7 @@ export class MapEditorManagerService {
         const foundItem = this.sideMenuService.sideMenuItemFinder(terrainTile.item.type) as Item | null;
         if (foundItem) {
             foundItem.itemLimit++;
-            if (foundItem.type !== ItemType.Spawn && foundItem.type !== ItemType.Flag) this.sideMenuService.updateItemLimitCounter(1);
+            if (this.isNormalItem(foundItem)) this.sideMenuService.updateItemLimitCounter(1);
             else {
                 foundItem.visibleState = VisibleState.NotSelected;
             }
@@ -150,7 +150,7 @@ export class MapEditorManagerService {
 
                         if (foundItem) {
                             foundItem.itemLimit--;
-                            if (foundItem.type !== ItemType.Spawn && foundItem.type !== ItemType.Flag) {
+                            if (this.isNormalItem(foundItem)) {
                                 this.sideMenuService.updateItemLimitCounter(-1);
                             }
                             if (foundItem.itemLimit === 0) {
@@ -161,5 +161,9 @@ export class MapEditorManagerService {
                 }
             });
         });
+    }
+
+    isNormalItem(item: Item): boolean {
+        return item.type !== ItemType.Spawn && item.type !== ItemType.Flag;
     }
 }
