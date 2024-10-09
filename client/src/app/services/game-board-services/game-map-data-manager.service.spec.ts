@@ -113,7 +113,7 @@ describe('GameMapDataManagerService', () => {
         service.currentDescription = 'Valid Description';
         spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
 
-        service.save();
+        service.saveGame();
 
         expect(gameServerCommunicationServiceSpy.addGame).not.toHaveBeenCalled();
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe('GameMapDataManagerService', () => {
 
         const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
 
-        service.save();
+        service.saveGame();
 
         expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
 
@@ -172,7 +172,7 @@ describe('GameMapDataManagerService', () => {
             return of(void 0);
         });
 
-        service.save();
+        service.saveGame();
         expect(service.isGameUpdated).toBeFalse();
         expect(service.saveGameInDb).toHaveBeenCalled();
     });

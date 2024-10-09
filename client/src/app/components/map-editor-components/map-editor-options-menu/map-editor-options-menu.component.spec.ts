@@ -89,7 +89,7 @@ describe('MapEditorOptionsMenuComponent', () => {
         gameMapDataManagerService.hasValidNameAndDescription.and.returnValue(true);
 
         component.onSaveClick();
-        expect(gameMapDataManagerService.save).toHaveBeenCalled();
+        expect(gameMapDataManagerService.saveGame).toHaveBeenCalled();
     });
 
     it('should open options dialog if name and description are invalid when onSaveClick is called', () => {
@@ -100,7 +100,7 @@ describe('MapEditorOptionsMenuComponent', () => {
         component.onSaveClick();
 
         expect(matDialog.open).toHaveBeenCalled();
-        expect(gameMapDataManagerService.save).not.toHaveBeenCalled();
+        expect(gameMapDataManagerService.saveGame).not.toHaveBeenCalled();
     });
 
     it('should return ALERT state if name and description are invalid in getOptionsNotificationState', () => {

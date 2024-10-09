@@ -32,7 +32,7 @@ export class MapEditorComponent {
         this.gameToEdit = this.gameMapDataManagerService.getLocalStorageGameToEdit();
 
         if (this.isNewGame) {
-            this.gameMapDataManagerService.newGame(this.gameToEdit);
+            this.gameMapDataManagerService.init(this.gameToEdit);
             this.mapEditorManagerService.init();
         } else {
             if (!this.gameToEdit || !this.gameToEdit._id) {
@@ -41,7 +41,7 @@ export class MapEditorComponent {
             }
 
             this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
-                this.gameMapDataManagerService.loadGame(game);
+                this.gameMapDataManagerService.init(game);
                 this.mapEditorManagerService.init();
                 this.mapEditorManagerService.mapItemCheckup();
             });
@@ -63,7 +63,7 @@ export class MapEditorComponent {
     onMapTileMouseMove(tile: Tile) {
         this.mapEditorManagerService.onMouseMoveMapTile(tile);
     }
-    
+
     onMapTileMouseLeave(tile: Tile) {
         this.mapEditorManagerService.onMouseLeave(tile);
     }

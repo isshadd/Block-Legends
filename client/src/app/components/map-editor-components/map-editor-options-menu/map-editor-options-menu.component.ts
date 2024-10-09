@@ -44,6 +44,6 @@ export class MapEditorOptionsMenuComponent {
             this.onOptionsClick();
             return;
         }
-        this.gameMapDataManagerService.save();
+        this.gameMapDataManagerService.saveGame();
     }
 }

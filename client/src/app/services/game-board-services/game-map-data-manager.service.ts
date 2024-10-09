@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -8,6 +9,7 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
+import { TileShared } from '@common/interfaces/tile-shared';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
@@ -16,6 +18,7 @@ import { TileFactoryService } from './tile-factory.service';
 })
 export class GameMapDataManagerService {
     private databaseGame: GameShared;
+    private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
     currentName = '';
     currentDescription = '';
@@ -25,109 +28,78 @@ export class GameMapDataManagerService {
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
         public dialog: MatDialog,
+        private router: Router,
     ) {}
 
-    newGame(game: GameShared) {
+    init(game: GameShared) {
         this.databaseGame = game;
-        this.resetCurrentValues();
-        this.createNewGrid();
+        this.lastSavedGrid = this.databaseGame.tiles;
+        this.resetGame();
     }
 
-    loadGame(game: GameShared) {
-        this.databaseGame = game;
+    resetGame() {
         this.resetCurrentValues();
         this.loadGrid();
     }
 
-    createNewGrid() {
-        this.databaseGame.tiles = [];
-        for (let i = 0; i < this.databaseGame.size; i++) {
-            this.currentGrid.push([]);
-            this.databaseGame.tiles.push([]);
-            for (let j = 0; j < this.databaseGame.size; j++) {
-                const newTile: GrassTile = new GrassTile();
-                this.currentGrid[i].push(newTile);
-                this.databaseGame.tiles[i].push({ type: newTile.type });
-                newTile.coordinates = { x: i, y: j };
-            }
-        }
-    }
-
-    loadGrid() {
-        for (let i = 0; i < this.databaseGame.tiles.length; i++) {
-            this.currentGrid.push([]);
-            for (let j = 0; j < this.databaseGame.tiles[i].length; j++) {
-                const newTile: Tile = this.tileFactoryService.createTile(this.databaseGame.tiles[i][j].type);
-                this.currentGrid[i].push(newTile);
-                newTile.coordinates = { x: i, y: j };
-
-                if (newTile.isTerrain()) {
-                    const itemType = this.databaseGame.tiles[i][j].item?.type;
-                    if (itemType) (newTile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
-                }
-            }
-        }
-    }
-
-    getCurrentGrid(): Tile[][] {
-        return this.currentGrid;
-    }
-
-    save() {
+    saveGame() {
         if (!this.hasValidNameAndDescription()) return;
 
         this.databaseGame.name = this.currentName;
         this.databaseGame.description = this.currentDescription;
         this.saveMap();
 
-        if (this.databaseGame._id === undefined) {
+        if (this.isNewGame()) {
             this.createGameInDb();
         } else {
             this.saveGameInDb();
         }
     }
 
-    setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
-        localStorage.setItem('isNewGame', JSON.stringify(isNewGame));
-        localStorage.setItem('gameToEdit', JSON.stringify(game));
+    private resetCurrentValues() {
+        this.currentName = this.databaseGame.name;
+        this.currentDescription = this.databaseGame.description;
+        this.currentGrid = [];
     }
 
-    getLocalStorageIsNewGame(): boolean {
-        return JSON.parse(localStorage.getItem('isNewGame') || 'false');
-    }
+    private loadGrid() {
+        if (this.isNewGame()) {
+            this.createNewGrid();
+            return;
+        }
 
-    getLocalStorageGameToEdit(): GameShared {
-        return JSON.parse(localStorage.getItem('gameToEdit') || '{}');
-    }
+        for (let i = 0; i < this.lastSavedGrid.length; i++) {
+            this.currentGrid.push([]);
+            for (let j = 0; j < this.lastSavedGrid[i].length; j++) {
+                const newTile: Tile = this.tileFactoryService.createTile(this.lastSavedGrid[i][j].type);
+                this.currentGrid[i].push(newTile);
+                newTile.coordinates = { x: i, y: j };
 
-    createGameInDb() {
-        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
-            next: (game: GameShared) => {
-                this.databaseGame = game;
-                this.setLocalStorageVariables(false, this.databaseGame);
-            },
-            error: (errors: unknown) => {
-                this.openErrorModal(errors as string | string[]);
-            },
-        });
-    }
-
-    saveGameInDb() {
-        if (!this.isSavedGame()) return;
-        if (this.databaseGame._id) {
-            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
-                next: () => {
-                    this.setLocalStorageVariables(false, this.databaseGame);
-                },
-                error: (errors: unknown) => {
-                    this.openErrorModal(errors as string | string[]);
-                },
-            });
+                if (newTile.isTerrain()) {
+                    const itemType = this.lastSavedGrid[i][j].item?.type;
+                    if (itemType) (newTile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
+                }
+            }
         }
     }
 
-    saveMap() {
+    private createNewGrid() {
+        this.lastSavedGrid = [];
+        for (let i = 0; i < this.databaseGame.size; i++) {
+            this.currentGrid.push([]);
+            this.lastSavedGrid.push([]);
+            for (let j = 0; j < this.databaseGame.size; j++) {
+                const newTile: GrassTile = new GrassTile();
+                this.currentGrid[i].push(newTile);
+                this.lastSavedGrid[i].push({ type: newTile.type });
+                newTile.coordinates = { x: i, y: j };
+            }
+        }
+    }
+
+    private saveMap() {
         this.databaseGame.tiles = [];
+
         for (let i = 0; i < this.currentGrid.length; i++) {
             this.databaseGame.tiles.push([]);
             for (const tile of this.currentGrid[i]) {
@@ -144,28 +116,56 @@ export class GameMapDataManagerService {
         }
     }
 
-    resetGame() {
-        this.resetCurrentValues();
-        this.loadGrid();
+    private createGameInDb() {
+        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
+            next: () => {
+                this.router.navigate(['/administration-game']);
+            },
+            error: (errors: unknown) => {
+                this.openErrorModal(errors as string | string[]);
+            },
+        });
     }
 
-    resetCurrentValues() {
-        this.currentName = this.databaseGame.name;
-        this.currentDescription = this.databaseGame.description;
-        this.currentGrid = [];
+    private saveGameInDb() {
+        if (!this.databaseGame._id) return;
+
+        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
+            next: () => {
+                this.router.navigate(['/administration-game']);
+            },
+            error: (errors: unknown) => {
+                this.openErrorModal(errors as string | string[]);
+            },
+        });
+    }
+
+    getCurrentGrid(): Tile[][] {
+        return this.currentGrid;
+    }
+
+    setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
+        localStorage.setItem('isNewGame', JSON.stringify(isNewGame));
+        localStorage.setItem('gameToEdit', JSON.stringify(game));
+    }
+
+    getLocalStorageIsNewGame(): boolean {
+        return JSON.parse(localStorage.getItem('isNewGame') || 'false');
+    }
+
+    getLocalStorageGameToEdit(): GameShared {
+        return JSON.parse(localStorage.getItem('gameToEdit') || '{}');
     }
 
     hasValidNameAndDescription(): boolean {
         return this.currentName !== '' && this.currentDescription !== '';
     }
 
-    isSavedGame(): boolean {
-        if (this.databaseGame === undefined) return false;
-        return this.databaseGame._id !== undefined;
+    isNewGame(): boolean {
+        return this.databaseGame._id === undefined;
     }
 
     isGameModeCTF() {
-        if (this.databaseGame === undefined) return false;
         return this.databaseGame.mode === GameMode.CTF;
     }
 
