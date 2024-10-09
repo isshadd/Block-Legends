@@ -38,7 +38,7 @@ export class MapEditorSideMenuService {
     signalSideMenuMouseDown$ = this.signalSideMenuMouseDown.asObservable();
 
     private placeableEntitiesSections: PlaceableEntitySection[] = [];
-    private itemLimitCounter: number = 0;
+    private totalItemLimitCounter: number = 0;
     constructor() {}
 
     init(isGameModeCTF: boolean, itemLimit: number) {
@@ -77,24 +77,40 @@ export class MapEditorSideMenuService {
     }
 
     setItemLimit(itemLimit: number) {
-        this.itemLimitCounter = itemLimit;
+        this.totalItemLimitCounter = itemLimit;
 
         const itemsToUpdate = [this.sideMenuItemFinder(ItemType.Random), this.sideMenuItemFinder(ItemType.Spawn)];
         for (const item of itemsToUpdate) {
             if (item) {
-                item.itemLimit = this.itemLimitCounter;
+                item.itemLimit = this.totalItemLimitCounter;
             }
         }
     }
 
-    updateItemLimitCounter(amount: number) {
-        this.itemLimitCounter += amount;
-        const randomItem = this.sideMenuItemFinder(ItemType.Random);
-        if (randomItem) {
-            randomItem.itemLimit = this.itemLimitCounter;
+    updateItemLimitCounter(item: Item, amount: number): Item | null {
+        const foundItem = this.sideMenuItemFinder(item.type);
+        if (!foundItem) return null;
+
+        foundItem.itemLimit += amount;
+        if (this.isNormalItem(item)) this.updateTotalItemLimitCounter(amount);
+
+        if (foundItem.itemLimit === 0) {
+            foundItem.visibleState = VisibleState.Disabled;
+        } else {
+            foundItem.visibleState = VisibleState.NotSelected;
         }
 
-        if (this.itemLimitCounter === 0) {
+        return foundItem;
+    }
+
+    updateTotalItemLimitCounter(amount: number) {
+        this.totalItemLimitCounter += amount;
+        const randomItem = this.sideMenuItemFinder(ItemType.Random);
+        if (randomItem) {
+            randomItem.itemLimit = this.totalItemLimitCounter;
+        }
+
+        if (this.totalItemLimitCounter === 0) {
             this.sideMenuItemsDisabler();
         } else {
             this.sideMenuItemsEnabler();
@@ -159,5 +175,9 @@ export class MapEditorSideMenuService {
 
     onSideMenuMouseDown(entity: PlaceableEntity) {
         this.signalSideMenuMouseDown.next(entity);
+    }
+
+    private isNormalItem(item: Item): boolean {
+        return item.type !== ItemType.Spawn && item.type !== ItemType.Flag;
     }
 }

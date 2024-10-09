@@ -6,7 +6,6 @@ import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity'
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
-import { ItemType } from '@common/enums/item-type';
 import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
 import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
@@ -47,17 +46,7 @@ export class MapEditorManagerService {
                     const terrainTile = tile as TerrainTile;
 
                     if (terrainTile.item) {
-                        const foundItem = this.sideMenuService.sideMenuItemFinder(terrainTile.item.type) as Item | null;
-
-                        if (foundItem) {
-                            foundItem.itemLimit--;
-                            if (this.isNormalItem(foundItem)) {
-                                this.sideMenuService.updateItemLimitCounter(-1);
-                            }
-                            if (foundItem.itemLimit === 0) {
-                                foundItem.visibleState = VisibleState.Disabled;
-                            }
-                        }
+                        this.sideMenuService.updateItemLimitCounter(terrainTile.item, -1);
                     }
                 }
             });
@@ -115,29 +104,18 @@ export class MapEditorManagerService {
     }
 
     private itemPlacer(item: Item, selectedTile: Tile): void {
-        if (!selectedTile.isTerrain()) {
-            return;
-        }
+        if (!selectedTile.isTerrain()) return;
         const terrainTile = selectedTile as TerrainTile;
 
         if (terrainTile.item) {
             this.itemRemover(selectedTile);
         }
 
-        const foundItem = this.sideMenuService.sideMenuItemFinder(item.type) as Item | null;
-        if (!foundItem || foundItem.itemLimit < 1) {
-            return;
-        }
-
-        foundItem.itemLimit--;
-        if (this.isNormalItem(foundItem)) {
-            this.sideMenuService.updateItemLimitCounter(-1);
-        }
+        const foundItem = this.sideMenuService.updateItemLimitCounter(item, -1);
 
         terrainTile.item = this.itemFactoryService.copyItem(item);
 
-        if (foundItem.itemLimit === 0) {
-            foundItem.visibleState = VisibleState.Disabled;
+        if (foundItem?.itemLimit === 0) {
             if (this.mouseHandlerService.sideMenuSelectedEntity === foundItem) {
                 this.mouseHandlerService.sideMenuSelectedEntity = null;
             }
@@ -149,18 +127,7 @@ export class MapEditorManagerService {
         const terrainTile = selectedTile as TerrainTile;
         if (!terrainTile.item) return;
 
-        const foundItem = this.sideMenuService.sideMenuItemFinder(terrainTile.item.type) as Item | null;
-        if (foundItem) {
-            foundItem.itemLimit++;
-            if (this.isNormalItem(foundItem)) this.sideMenuService.updateItemLimitCounter(1);
-            else {
-                foundItem.visibleState = VisibleState.NotSelected;
-            }
-        }
+        this.sideMenuService.updateItemLimitCounter(terrainTile.item, 1);
         terrainTile.item = null;
-    }
-
-    private isNormalItem(item: Item): boolean {
-        return item.type !== ItemType.Spawn && item.type !== ItemType.Flag;
     }
 }
