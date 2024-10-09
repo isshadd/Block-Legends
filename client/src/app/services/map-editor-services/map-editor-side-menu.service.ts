@@ -133,7 +133,7 @@ export class MapEditorSideMenuService {
         return null;
     }
 
-    sideMenuItemsDisabler() {
+    private sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn) {
                 item.visibleState = VisibleState.Disabled;
@@ -141,7 +141,7 @@ export class MapEditorSideMenuService {
         }
     }
 
-    sideMenuItemsEnabler() {
+    private sideMenuItemsEnabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if ((item as Item).itemLimit > 0) {
                 item.visibleState = VisibleState.NotSelected;
