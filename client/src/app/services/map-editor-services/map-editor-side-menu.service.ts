@@ -103,7 +103,7 @@ export class MapEditorSideMenuService {
         return foundItem;
     }
 
-    updateTotalItemLimitCounter(amount: number) {
+    private updateTotalItemLimitCounter(amount: number) {
         this.totalItemLimitCounter += amount;
         const randomItem = this.sideMenuItemFinder(ItemType.Random);
         if (randomItem) {
