@@ -15,11 +15,10 @@ import { TileFactoryService } from './tile-factory.service';
     providedIn: 'root',
 })
 export class GameMapDataManagerService {
-    databaseGame: GameShared;
-    currentGrid: Tile[][] = [];
+    private databaseGame: GameShared;
+    private currentGrid: Tile[][] = [];
     currentName = '';
     currentDescription = '';
-    isGameUpdated: boolean = false;
 
     constructor(
         public tileFactoryService: TileFactoryService,
@@ -70,14 +69,16 @@ export class GameMapDataManagerService {
         }
     }
 
+    getCurrentGrid(): Tile[][] {
+        return this.currentGrid;
+    }
+
     save() {
         if (!this.hasValidNameAndDescription()) return;
 
         this.databaseGame.name = this.currentName;
         this.databaseGame.description = this.currentDescription;
         this.saveMap();
-
-        this.isGameUpdated = false;
 
         if (this.databaseGame._id === undefined) {
             this.createGameInDb();
@@ -106,7 +107,6 @@ export class GameMapDataManagerService {
                 this.setLocalStorageVariables(false, this.databaseGame);
             },
             error: (errors: unknown) => {
-                this.isGameUpdated = true;
                 this.openErrorModal(errors as string | string[]);
             },
         });
@@ -120,7 +120,6 @@ export class GameMapDataManagerService {
                     this.setLocalStorageVariables(false, this.databaseGame);
                 },
                 error: (errors: unknown) => {
-                    this.isGameUpdated = true;
                     this.openErrorModal(errors as string | string[]);
                 },
             });
@@ -151,7 +150,6 @@ export class GameMapDataManagerService {
     }
 
     resetCurrentValues() {
-        this.isGameUpdated = false;
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
         this.currentGrid = [];

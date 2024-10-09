@@ -66,7 +66,6 @@ export class MapEditorManagerService {
 
     tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         const tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
-        this.gameMapDataManagerService.isGameUpdated = true;
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
 
         if (selectedTile.isTerrain()) {
@@ -82,7 +81,7 @@ export class MapEditorManagerService {
             }
         }
 
-        this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
+        this.gameMapDataManagerService.getCurrentGrid()[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
         tileCopy.visibleState = VisibleState.NotSelected;
     }
 
@@ -107,7 +106,6 @@ export class MapEditorManagerService {
         }
 
         terrainTile.item = this.itemFactoryService.copyItem(item);
-        this.gameMapDataManagerService.isGameUpdated = true;
 
         if (foundItem.itemLimit === 0) {
             foundItem.visibleState = VisibleState.Disabled;
@@ -131,7 +129,6 @@ export class MapEditorManagerService {
             }
         }
         terrainTile.item = null;
-        this.gameMapDataManagerService.isGameUpdated = true;
     }
 
     itemCheckup() {
@@ -140,7 +137,7 @@ export class MapEditorManagerService {
     }
 
     mapItemCheckup() {
-        this.gameMapDataManagerService.currentGrid.forEach((row) => {
+        this.gameMapDataManagerService.getCurrentGrid().forEach((row) => {
             row.forEach((tile) => {
                 if (tile.isTerrain()) {
                     const terrainTile = tile as TerrainTile;

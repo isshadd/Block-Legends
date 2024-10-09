@@ -1,9 +1,9 @@
 <div
     id="map"
-    [style.--grid-size]="this.gameMapDataManagerService.currentGrid.length"
-    [style.--tile-size]="100 / this.gameMapDataManagerService.currentGrid.length + '%'"
+    [style.--grid-size]="this.gameMapDataManagerService.getCurrentGrid().length"
+    [style.--tile-size]="100 / this.gameMapDataManagerService.getCurrentGrid().length + '%'"
 >
-    @for(row of this.gameMapDataManagerService.currentGrid; track row; let i = $index){ @for(tile of row; track tile; let j = $index){
+    @for(row of this.gameMapDataManagerService.getCurrentGrid(); track row; let i = $index){ @for(tile of row; track tile; let j = $index){
     <div class="tile-container">
         <app-placeable-entity
             [placeableEntity]="tile"
