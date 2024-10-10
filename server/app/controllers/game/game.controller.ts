@@ -89,7 +89,6 @@ export class GameController {
     async patchGame(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
         try {
             const isOnlyIsVisibleModified = Object.keys(gameDto).length === 1 && 'isVisible' in gameDto;
-
             if (!isOnlyIsVisibleModified) {
                 const existingGame = await this.gameService.getGame(id);
                 const updatedGame: Game = { ...existingGame, ...gameDto };

@@ -132,12 +132,18 @@ export class GameValidationService {
         if (!isValidSpawn) {
             errors.push('Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)');
         }
-        if (game instanceof Game) {
-            const isNameDescriptionValid = await this.validateNameDescription(game);
-            if (!isNameDescriptionValid) {
-                errors.push('Le nom du jeu doit être unique et la description est obligatoire.');
-            }
+        //if (game instanceof Game) {
+        const isNameDescriptionValid = await this.validateName(game);
+        if (!isNameDescriptionValid) {
+            errors.push('Le nom du jeu doit être unique et sans espaces.');
         }
+
+        const isDescriptionValid = await this.validateDescription(game);
+        if (!isDescriptionValid) {
+            errors.push('La description du jeu ne doit pas être vide.');
+        }
+
+        //}
 
         const isDoorPlacementValid = await this.isDoorPlacementValid(game);
         if (!isDoorPlacementValid) {
@@ -150,13 +156,22 @@ export class GameValidationService {
         };
     }
 
-    async validateNameDescription(game: Game): Promise<boolean> {
-        const descriptionValid = game.description.length > 0;
+    async validateName(game: Game | UpdateGameDto): Promise<boolean> {
+        const normalizedName = game.name.trim().replace(/\s+/g, ' ');
+        const existingGame = await this.gameService.getGameByName(normalizedName);
+        if (normalizedName.length === 0 || existingGame) {
+            return false;
+        }
+        return true;
+    }
+
+    async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {
+        const description = game.description.trim();
+        const descriptionValid = description.length > 0;
         if (game.name.length === 0) {
             return false;
         }
-        const existingGame = await this.gameService.getGameByName(game.name);
-        return !existingGame && descriptionValid;
+        return descriptionValid;
     }
 
     async isHalfMapTilesValid(game: Game, size: number): Promise<boolean> {

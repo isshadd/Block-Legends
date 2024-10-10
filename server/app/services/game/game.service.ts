@@ -8,7 +8,7 @@ import { Model } from 'mongoose';
 @Injectable()
 export class GameService {
     constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
-
+ç
     async getAllGames(): Promise<Game[]> {
         return await this.gameModel.find({});
     }
@@ -18,7 +18,9 @@ export class GameService {
     }
 
     async getGameByName(name: string): Promise<Game | null> {
-        return await this.gameModel.findOne({ name });
+        const normalizedName = name.trim().replace(/\s+/g, ' ');
+
+        return await this.gameModel.findOne({ name: { $regex: new RegExp('^' + normalizedName + '$', 'i') } });
     }
 
     async addGame(game: CreateGameDto): Promise<Game> {
