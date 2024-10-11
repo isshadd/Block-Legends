@@ -104,7 +104,6 @@ export class MapEditorMouseHandlerService {
     onMapTileMouseUp(entity: Tile) {
         if (this.sideMenuSelectedEntity?.isItem() && entity.isTerrain()) {
             this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
-            this.cancelSelectionSideMenu();
         }
     }
 
@@ -134,7 +133,7 @@ export class MapEditorMouseHandlerService {
     }
 
     makeSelection(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.Selected; // selection of the entity
+        entity.visibleState = VisibleState.Selected;
         this.sideMenuSelectedEntity = entity;
         this.cancelSelectionMap();
 
@@ -161,7 +160,7 @@ export class MapEditorMouseHandlerService {
     }
 
     getDraggedItem(): Item | null {
-        if (this.isDraggingItem) {
+        if (this.isDraggingItem && this.sideMenuSelectedEntity?.isItem()) {
             return this.sideMenuSelectedEntity as Item;
         }
         return null;
