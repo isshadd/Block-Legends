@@ -33,6 +33,7 @@ export class MapEditorMouseHandlerService {
     public sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
+    private isDraggingItem: boolean = false;
 
     constructor() {}
 
@@ -105,13 +106,14 @@ export class MapEditorMouseHandlerService {
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
+        if (entity.visibleState === VisibleState.Disabled) return;
+
         if (entity.visibleState === VisibleState.Selected) {
             // already selected
             entity.visibleState = VisibleState.NotSelected;
             this.sideMenuSelectedEntity = null;
             this.cancelSelectionMap();
-        } else if (entity.visibleState === VisibleState.Disabled) return; // item limit reached
-        else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
+        } else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             // another entity selected
             this.cancelSelectionSideMenu();
             this.makeSelection(entity);
@@ -124,6 +126,10 @@ export class MapEditorMouseHandlerService {
         entity.visibleState = VisibleState.Selected; // selection of the entity
         this.sideMenuSelectedEntity = entity;
         this.cancelSelectionMap();
+
+        if (entity.isItem()) {
+            this.isDraggingItem = true;
+        }
     }
 
     cancelSelectionMap() {
@@ -139,6 +145,14 @@ export class MapEditorMouseHandlerService {
 
             this.selectedEntity = null;
             this.sideMenuSelectedEntity = null;
+            this.isDraggingItem = false;
         }
+    }
+
+    getDraggedItem(): Item | null {
+        if (this.isDraggingItem) {
+            return this.sideMenuSelectedEntity as Item;
+        }
+        return null;
     }
 }

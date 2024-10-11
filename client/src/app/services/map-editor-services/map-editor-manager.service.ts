@@ -77,6 +77,10 @@ export class MapEditorManagerService {
         this.mouseHandlerService.onMouseDownSideMenu(entity);
     }
 
+    getDraggedItem() {
+        return this.mouseHandlerService.getDraggedItem();
+    }
+
     private cancelSelection(sideMenuSelectedEntity: PlaceableEntity) {
         const foundEntity = this.sideMenuService.sideMenuEntityFinder(sideMenuSelectedEntity as PlaceableEntity);
         if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;

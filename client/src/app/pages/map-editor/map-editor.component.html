@@ -1,4 +1,4 @@
-<div id="page-container" (mouseup)="onMouseUp()">
+<div id="page-container" (mouseup)="onMouseUp()" (mousedown)="onMouseDown($event)">
     <div id="side-menu">
         <button class="dark-button" routerLink="/administration-game">Retour</button>
         <app-placeable-entity-full-menu></app-placeable-entity-full-menu>
@@ -11,4 +11,7 @@
         (mapTileMouseEnter)="onMapTileMouseEnter($event)"
         (mapTileMouseLeave)="onMapTileMouseLeave($event)"
     ></app-map>
+    @if(isDragging){
+    <img class="drag-preview" [src]="dragImage" [style.left.px]="mouseX" [style.top.px]="mouseY" />
+    }
 </div>

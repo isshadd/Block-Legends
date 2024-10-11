@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
@@ -21,6 +21,10 @@ import { GameShared } from '@common/interfaces/game-shared';
 export class MapEditorComponent {
     isNewGame: boolean;
     gameToEdit: GameShared;
+    isDragging: boolean = false;
+    dragImage: string = '';
+    mouseX = 0;
+    mouseY = 0;
 
     constructor(
         public mapEditorManagerService: MapEditorManagerService,
@@ -50,6 +54,26 @@ export class MapEditorComponent {
 
     onMouseUp() {
         this.mapEditorManagerService.onMouseUpMapTile();
+        this.isDragging = false;
+    }
+
+    onMouseDown(event: MouseEvent) {
+        const draggedItem = this.mapEditorManagerService.getDraggedItem();
+        if (draggedItem) {
+            this.isDragging = true;
+            this.dragImage = draggedItem.imageUrl;
+            this.updateMousePosition(event);
+        }
+
+        event.preventDefault();
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    updateMousePosition(event: MouseEvent) {
+        if (this.isDragging) {
+            this.mouseX = (event as MouseEvent).clientX;
+            this.mouseY = (event as MouseEvent).clientY;
+        }
     }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
