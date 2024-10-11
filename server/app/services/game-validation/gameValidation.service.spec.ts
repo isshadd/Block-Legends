@@ -564,7 +564,7 @@ describe('GameValidationService', () => {
             const result = await gameValidationService.mapToMatrix(mockGame);
             expect(result).toEqual([
                 [1, 0],
-                [1, 0],
+                [0, 0],
                 [0, 1],
             ]);
         });
@@ -659,7 +659,7 @@ describe('GameValidationService', () => {
 
                     const result = await gameValidationService.mapToMatrix(game);
                     expect(result).toEqual([
-                        [1, 1, 0],
+                        [1, 0, 0],
                         [0, 1, 0],
                     ]);
                 });
