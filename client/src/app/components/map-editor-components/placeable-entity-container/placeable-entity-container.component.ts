@@ -33,7 +33,9 @@ export class PlaceableEntityContainerComponent {
         this.sideMenuService.onSideMenuMouseLeave(entity);
     }
 
-    onMouseDown(entity: PlaceableEntity) {
+    onMouseDown(event: MouseEvent, entity: PlaceableEntity) {
+        if (event.button === 2) return;
+
         this.sideMenuService.onSideMenuMouseDown(entity);
     }
 

@@ -63,6 +63,7 @@ export class MapEditorMouseHandlerService {
             const terrainTile = entity as TerrainTile;
             if (terrainTile.item) {
                 const itemType = terrainTile.item.type;
+                
                 this.signalItemRemover.next(entity);
                 this.signalItemDragged.next(itemType);
                 return;
@@ -144,10 +145,6 @@ export class MapEditorMouseHandlerService {
             this.makeSelection(entity);
         }
     }
-
-    // onMouseUpSideMenu(entity: PlaceableEntity) {
-    //     if()
-    // }
 
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;

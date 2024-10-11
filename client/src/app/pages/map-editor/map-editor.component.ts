@@ -63,6 +63,8 @@ export class MapEditorComponent {
     }
 
     onMouseDown(event: MouseEvent) {
+        if (event.button === 2) return;
+
         const draggedItem = this.mapEditorManagerService.getDraggedItem();
         if (draggedItem) {
             this.isDragging = true;

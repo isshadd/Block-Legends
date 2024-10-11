@@ -8,7 +8,7 @@
             [matTooltip]="item.description"
             (mouseenter)="onMouseEnter(item)"
             (mouseleave)="onMouseLeave(item)"
-            (mousedown)="onMouseDown(item)"
+            (mousedown)="onMouseDown($event, item)"
         >
         </app-placeable-entity>
         <app-visible-state [visibleState]="item.visibleState" class="layer-2"></app-visible-state>
