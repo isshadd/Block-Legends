@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 // eslint-disable-next-line max-len
@@ -81,6 +82,15 @@ export class MapEditorComponent {
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         this.mapEditorManagerService.onMouseDownMapTile(event, tile);
+        if (tile.isTerrain()) {
+            const item = (tile as TerrainTile).item;
+            if (item) {
+                this.isDragging = true;
+                this.dragImage = item.imageUrl;
+                this.onMouseMove(event);
+            }
+        }
+        event.preventDefault();
     }
 
     onMapTileMouseEnter(tile: Tile) {

@@ -29,7 +29,7 @@ export class MapEditorMouseHandlerService {
     private signalCancelSelection = new Subject<PlaceableEntity>();
     signalCancelSelection$ = this.signalCancelSelection.asObservable();
 
-    private selectedEntity: PlaceableEntity | null;
+    private selectedEntity: Tile | null;
     public sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
@@ -55,7 +55,16 @@ export class MapEditorMouseHandlerService {
 
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
+        if (entity.isTerrain()) {
+            if ((entity as TerrainTile).item) {
+                this.sideMenuSelectedEntity = (entity as TerrainTile).item;
+                this.signalItemRemover.next(entity);
+                this.isDraggingItem = true;
+                return;
+            }
+        }
         if (!this.sideMenuSelectedEntity) return;
+
         if (entity.isDoor() && (this.sideMenuSelectedEntity as Tile).isDoor()) {
             if (entity instanceof DoorTile) {
                 this.signalTileCopy.next({ tile: new OpenDoor(), entity });
@@ -117,7 +126,6 @@ export class MapEditorMouseHandlerService {
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
         if (entity.visibleState === VisibleState.Disabled) return;
-
         if (entity.visibleState === VisibleState.Selected) {
             // already selected
             entity.visibleState = VisibleState.NotSelected;
@@ -131,6 +139,10 @@ export class MapEditorMouseHandlerService {
             this.makeSelection(entity);
         }
     }
+
+    // onMouseUpSideMenu(entity: PlaceableEntity) {
+    //     if()
+    // }
 
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;
