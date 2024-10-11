@@ -33,7 +33,6 @@ export class MapEditorMouseHandlerService {
     private signalCancelSelection = new Subject<PlaceableEntity>();
     signalCancelSelection$ = this.signalCancelSelection.asObservable();
 
-    private selectedEntity: Tile | null;
     public sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
@@ -51,25 +50,26 @@ export class MapEditorMouseHandlerService {
 
     onMouseDownMapTile(event: MouseEvent, entity: Tile) {
         if (event.button === MouseButton.Left) {
-            this.leftClickMapTile(entity);
+            this.leftMouseDownMapTile(entity);
         } else if (event.button === MouseButton.Right) {
-            this.rightClickMapTile(event, entity);
+            this.rightMouseDownMapTile(event, entity);
         }
     }
 
-    leftClickMapTile(entity: Tile) {
-        this.isDraggingLeft = true;
+    leftMouseDownMapTile(entity: Tile) {
         if (entity.isTerrain()) {
             const terrainTile = entity as TerrainTile;
             if (terrainTile.item) {
                 const itemType = terrainTile.item.type;
-                
+
                 this.signalItemRemover.next(entity);
                 this.signalItemDragged.next(itemType);
                 return;
             }
         }
+
         if (!this.sideMenuSelectedEntity) return;
+        this.isDraggingLeft = true;
 
         if (entity.isDoor() && (this.sideMenuSelectedEntity as Tile).isDoor()) {
             if (entity instanceof DoorTile) {
@@ -81,16 +81,12 @@ export class MapEditorMouseHandlerService {
             }
         }
 
-        // if (this.sideMenuSelectedEntity.isItem() && entity.isTerrain()) {
-        //     this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
-        //     this.cancelSelectionSideMenu();
-        // } else
         if (!this.sideMenuSelectedEntity.isItem()) {
             this.signalTileCopy.next({ tile: this.sideMenuSelectedEntity as Tile, entity });
         }
     }
 
-    rightClickMapTile(event: MouseEvent, entity: Tile) {
+    rightMouseDownMapTile(event: MouseEvent, entity: Tile) {
         this.isDraggingRight = true;
         event.preventDefault();
         if (entity instanceof GrassTile && !entity.item) return;
@@ -136,7 +132,6 @@ export class MapEditorMouseHandlerService {
             // already selected
             entity.visibleState = VisibleState.NotSelected;
             this.sideMenuSelectedEntity = null;
-            this.cancelSelectionMap();
         } else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
             // another entity selected
             this.cancelSelectionSideMenu();
@@ -149,17 +144,9 @@ export class MapEditorMouseHandlerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;
         this.sideMenuSelectedEntity = entity;
-        this.cancelSelectionMap();
 
         if (entity.isItem()) {
             this.isDraggingItem = true;
-        }
-    }
-
-    cancelSelectionMap() {
-        if (this.selectedEntity) {
-            this.signalCancelSelection.next(this.selectedEntity);
-            this.selectedEntity = null;
         }
     }
 
@@ -167,7 +154,6 @@ export class MapEditorMouseHandlerService {
         if (this.sideMenuSelectedEntity) {
             this.signalCancelSelection.next(this.sideMenuSelectedEntity);
 
-            this.selectedEntity = null;
             this.sideMenuSelectedEntity = null;
             this.isDraggingItem = false;
         }

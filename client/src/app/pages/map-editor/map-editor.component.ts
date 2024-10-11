@@ -63,6 +63,7 @@ export class MapEditorComponent {
     }
 
     onMouseDown(event: MouseEvent) {
+        event.preventDefault();
         if (event.button === 2) return;
 
         const draggedItem = this.mapEditorManagerService.getDraggedItem();
@@ -71,8 +72,6 @@ export class MapEditorComponent {
             this.dragImage = draggedItem.imageUrl;
             this.onMouseMove(event);
         }
-
-        event.preventDefault();
     }
 
     onMouseMove(event: MouseEvent) {
