@@ -8,8 +8,9 @@
             [matTooltip]="item.description"
             (mouseenter)="onMouseEnter(item)"
             (mouseleave)="onMouseLeave(item)"
-            (click)="onMouseDown(item)"
-        ></app-placeable-entity>
+            (mousedown)="onMouseDown($event, item)"
+        >
+        </app-placeable-entity>
         <app-visible-state [visibleState]="item.visibleState" class="layer-2"></app-visible-state>
         @if(item.isItem() && getItemLimit(item) > 0){
         <app-item-limit-counter [currentCount]="getItemLimit(item)"></app-item-limit-counter>
@@ -17,3 +18,6 @@
     </div>
     }
 </div>
+@if(isDragging){
+<img class="drag-preview" [src]="dragImage" [style.left.px]="mouseX" [style.top.px]="mouseY" />
+}

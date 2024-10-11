@@ -1,5 +1,5 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, Input, ViewEncapsulation } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Item } from '@app/classes/Items/item';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
@@ -20,6 +20,11 @@ export class PlaceableEntityContainerComponent {
     @Input() containerTitle: string;
     @Input() containerItems: PlaceableEntity[];
 
+    isDragging: boolean = false;
+    dragImage: string = '';
+    mouseX = 0;
+    mouseY = 0;
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public sideMenuService: MapEditorSideMenuService,
@@ -33,8 +38,30 @@ export class PlaceableEntityContainerComponent {
         this.sideMenuService.onSideMenuMouseLeave(entity);
     }
 
-    onMouseDown(entity: PlaceableEntity) {
+    onMouseDown(event: Event, entity: PlaceableEntity) {
+        if (entity.isItem()) {
+            this.isDragging = true;
+            this.dragImage = entity.imageUrl;
+
+            this.updatePosition(event);
+        }
+
+        event.preventDefault();
+
         this.sideMenuService.onSideMenuMouseDown(entity);
+    }
+
+    @HostListener('document:mouseup')
+    onMouseUp() {
+        this.isDragging = false;
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    updatePosition(event: Event) {
+        if (this.isDragging) {
+            this.mouseX = (event as MouseEvent).clientX;
+            this.mouseY = (event as MouseEvent).clientY;
+        }
     }
 
     getItemLimit(entity: PlaceableEntity): number {
