@@ -30,9 +30,9 @@ export class JoinGameComponent {
     }
 
     allowOnlyNumbers(event: KeyboardEvent) {
-        const charCode = event.keyCode ? event.keyCode : event.which;
-        if (charCode < MIN_CHAR || charCode > MAX_CHAR) {
-            // Seuls les codes ASCII des chiffres sont autorisés
+        const char = event.key;
+        if (char < '0' || char > '9') {
+            // Only ASCII codes for numbers are allowed
             event.preventDefault();
         }
     }

@@ -40,25 +40,30 @@
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 1fr;
     align-items: start;
-    border: 5px solid #000;
+    border: 1px solid #fff;
     padding: 10px;
     background-color: #4f5d75;
     width: 100%;
+    position: relative;
 }
 
 .game-image {
     grid-area: image;
-    width: 100px;
+    width: 100%;
     height: 100px;
-    margin-right: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
 }
 
 .game-details {
+    color: #fff;
     grid-area: details;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding-left: 20px;
     gap: 10px;
+    position: relative;
 }
 
 .game-details h2 {
@@ -73,6 +78,36 @@
 .game-box button {
     grid-area: button;
 }
+.description {
+    opacity: 0;
+    position: absolute;
+    transform: translateX(100%);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    visibility: hidden;
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    font-size: 0.7rem;
+    background-color: darken($primary-dark, 10%);
+    color: $primary-light;
+    padding: 5px 10px;
+    box-shadow: 0 4px 8px black; /* Optional shadow */
+    // width: 100%;
+    white-space: normal; // Ensures that the text wraps and preserves whitespace
+    overflow: visible; 
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+img:hover ~ .game-details .description {
+    opacity: 1; /* Make it visible */
+    visibility: visible; /* Make it visible */
+    transform: translateX(0);
+}
+
 p.no-game{
     text-align: center;
     font-size: 1.5em;

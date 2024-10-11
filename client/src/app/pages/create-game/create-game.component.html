@@ -1,5 +1,5 @@
 <nav class="navbar">
     <div class="navbar-title">Créer une nouvelle partie - Block Legends</div>
-    <app-nav-bar (selection)="selectMode($event)"></app-nav-bar>
+    <app-nav-bar [selectedMode]="getSelectedMode()" (selection)="selectMode($event)"></app-nav-bar>
 </nav>
 <app-game-list></app-game-list>

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { CreateGameSharedDto } from '@common/interfaces/dto/game/create-game-shared.dto';
 import { UpdateGameSharedDto } from '@common/interfaces/dto/game/update-game-shared.dto';
 import { GameShared } from '@common/interfaces/game-shared';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
@@ -24,11 +24,11 @@ export class GameServerCommunicationService {
     }
 
     addGame(game: CreateGameSharedDto): Observable<GameShared> {
-        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleError<GameShared>()));
+        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleErrors<GameShared>('addGame')));
     }
 
     updateGame(id: string, game: UpdateGameSharedDto): Observable<void> {
-        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleError<void>()));
+        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleErrors<void>('updateGame')));
     }
 
     deleteGame(id: string): Observable<void> {
@@ -42,6 +42,20 @@ export class GameServerCommunicationService {
     private handleError<T>(result?: T) {
         return (): Observable<T> => {
             return of(result as T);
+        };
+    }
+
+    private handleErrors<T>(operation: 'addGame' | 'updateGame' = 'addGame') {
+        return (error: unknown): Observable<T> => {
+            let errorMsgs: string[] = [];
+            if (operation === 'addGame') {
+                const err = error as { error: { errors: string[] } };
+                errorMsgs = err?.error?.errors || ['Une erreur est survenue'];
+            } else if (operation === 'updateGame') {
+                const err = error as { error: string[] };
+                errorMsgs = err.error || ['Une erreur est survenue'];
+            }
+            return throwError(() => errorMsgs);
         };
     }
 }

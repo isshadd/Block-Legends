@@ -13,7 +13,7 @@
                     <div class="game-details">
                         <h2>{{ game.name }}</h2>
                         <p>Taille de la carte: {{ game.size }}</p>
-                        <p>Description: {{ game.description }}</p>
+                        <div class="description">Description: {{ game.description }}</div>
                     </div>
                     <button class="dark-button" (click)="selectGame(game)" routerLink="/game-page">Créer une partie de :<br />{{ game.name }}</button>
                 </div>

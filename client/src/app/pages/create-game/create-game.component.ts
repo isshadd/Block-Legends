@@ -18,4 +18,8 @@ export class CreateGameComponent {
     selectMode(mode: GameMode): void {
         this.modeService.setSelectedMode(mode);
     }
+
+    getSelectedMode(): GameMode {
+        return this.modeService.getSelectedMode();
+    }
 }

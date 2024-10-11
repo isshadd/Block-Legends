@@ -15,4 +15,8 @@ export class ModeService {
     setSelectedMode(mode: GameMode): void {
         this.selectedModeSubject.next(mode);
     }
+
+    getSelectedMode(): GameMode {
+        return this.selectedModeSubject.getValue();
+    }
 }

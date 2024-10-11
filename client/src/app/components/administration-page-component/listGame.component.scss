@@ -3,23 +3,22 @@
 li {
     display: flex;
     align-items: center;
-    background-color: $primary;
-    color: black;
+    background-color: $primary-dark;
+    color: $primary-light;
     padding: 20px;
-    margin: 10px 130px;
+    margin: 20px;
     border: 1px solid;
-    border-radius: 20px;
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease;
 }
-
 img {
     width: 130px;
     height: 100px;
     margin-right: 20px;
     transition: transform 0.3s ease;
     flex-shrink: 0;
+    border: $primary-light 1px solid;
     transform-origin: center;
 }
 
@@ -44,13 +43,17 @@ img:hover ~ .game_info .description {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
     font-size: 0.7rem;
 }
+
+.infos p{
+    white-space: nowrap;
+}
+
 .game_info h3 {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     margin-top: 0px;
-    margin-right: 30px;
+    margin-bottom: 5px;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -73,12 +76,15 @@ img:hover ~ .game_info .description {
         opacity 0.3s ease,
         visibility 0.3s ease;
     font-size: 0.7rem;
-    background-color: $primary-dark;
+    background-color: darken($primary-dark, 10%);
     color: $primary-light;
     padding: 5px 10px;
-    border-radius: 8px;
     box-shadow: 0 4px 8px black; /* Optional shadow */
-    width: 100px;
+    width: 100%;
+    white-space: normal; // Ensures that the text wraps and preserves whitespace
+    overflow: visible; 
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .action_icons {
@@ -92,7 +98,7 @@ img:hover ~ .game_info .description {
 
 .action_icons .material-icons {
     font-size: 25px;
-    color: $primary-dark; /* Set the icon color */
+    color: $primary-light; /* Set the icon color */
     cursor: pointer;
     transition:
         color 0.3s ease,

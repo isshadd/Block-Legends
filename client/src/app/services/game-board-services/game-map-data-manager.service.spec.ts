@@ -13,7 +13,7 @@ import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
@@ -224,15 +224,12 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should call addGame with the game having _id: undefined and update local storage with the returned game having _id: new_id', () => {
-        // **Arrange**
-
-        // Initialize databaseGame with _id: undefined to simulate a new game
         const originalGame: GameShared = {
             _id: undefined,
             name: 'New Game',
             description: 'Description',
-            mode: GameMode.CTF, // Assuming 'CTF' corresponds to 'Capture de drapeau'
-            size: MapSize.SMALL, // Assuming size 10 corresponds to SMALL
+            mode: GameMode.CTF,
+            size: MapSize.SMALL,
             tiles: [],
             imageUrl: '',
             isVisible: false,
@@ -257,11 +254,49 @@ describe('GameMapDataManagerService', () => {
         expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
     });
 
+    it('should handle errors with unexpected structure in createGameInDb', () => {
+        const mockError = {
+            error: 'Some unexpected error format',
+        };
+
+        spyOn(service, 'openErrorModal');
+        gameServerCommunicationServiceSpy.addGame.and.returnValue(throwError(mockError));
+
+        service.createGameInDb();
+
+        expect(service.isGameUpdated).toBeTrue();
+    });
+
     it('should not save if the game is not saved', () => {
         service.databaseGame = { ...service.databaseGame, _id: undefined };
         service.saveGameInDb();
 
         expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
+    });
+
+    it('should handle errors with unexpected structure in saveGameInDb', () => {
+        const originalGame: GameShared = {
+            _id: 'testId',
+            name: 'New Game',
+            description: 'Description',
+            mode: GameMode.CTF,
+            size: MapSize.SMALL,
+            tiles: [],
+            imageUrl: '',
+            isVisible: false,
+        };
+        service.databaseGame = originalGame;
+        const mockError = {
+            error: 'Some unexpected error format',
+        };
+
+        spyOn(service, 'openErrorModal');
+        spyOn(service, 'isSavedGame').and.returnValue(true);
+        gameServerCommunicationServiceSpy.updateGame.and.returnValue(throwError(mockError));
+
+        service.saveGameInDb();
+
+        expect(service.isGameUpdated).toBeTrue();
     });
 
     it('should call setLocalStorageVariables with false and the current game when the game is saved', () => {
@@ -619,5 +654,15 @@ describe('GameMapDataManagerService', () => {
 
         service.databaseGame.size = MapSize.LARGE;
         expect(service.itemLimit()).toBe(largeItemLimit);
+    });
+
+    it('should open ErrorModalComponent with concatenated error messages when an array is provided', () => {
+        const messages = ['Error 1', 'Error 2', 'Error 3'];
+
+        spyOn(service.dialog, 'open').and.callThrough();
+
+        service.openErrorModal(messages);
+
+        expect(service.dialog.open).toHaveBeenCalled();
     });
 });
