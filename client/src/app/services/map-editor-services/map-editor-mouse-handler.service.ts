@@ -6,6 +6,7 @@ import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
 
 enum MouseButton {
@@ -25,6 +26,9 @@ export class MapEditorMouseHandlerService {
 
     private signalItemRemover = new Subject<Tile>();
     signalItemRemover$ = this.signalItemRemover.asObservable();
+
+    private signalItemDragged = new Subject<ItemType>();
+    signalItemDragged$ = this.signalItemDragged.asObservable();
 
     private signalCancelSelection = new Subject<PlaceableEntity>();
     signalCancelSelection$ = this.signalCancelSelection.asObservable();
@@ -56,10 +60,11 @@ export class MapEditorMouseHandlerService {
     leftClickMapTile(entity: Tile) {
         this.isDraggingLeft = true;
         if (entity.isTerrain()) {
-            if ((entity as TerrainTile).item) {
-                this.sideMenuSelectedEntity = (entity as TerrainTile).item;
+            const terrainTile = entity as TerrainTile;
+            if (terrainTile.item) {
+                const itemType = terrainTile.item.type;
                 this.signalItemRemover.next(entity);
-                this.isDraggingItem = true;
+                this.signalItemDragged.next(itemType);
                 return;
             }
         }

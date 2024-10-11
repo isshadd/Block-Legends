@@ -6,6 +6,7 @@ import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity'
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { ItemType } from '@common/enums/item-type';
 import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
 import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
@@ -28,6 +29,7 @@ export class MapEditorManagerService {
         this.mouseHandlerService.signalItemPlacer$.subscribe((data) => this.itemPlacer(data.item, data.entity));
         this.mouseHandlerService.signalItemRemover$.subscribe((entity) => this.itemRemover(entity));
         this.mouseHandlerService.signalCancelSelection$.subscribe((entity) => this.cancelSelection(entity));
+        this.mouseHandlerService.signalItemDragged$.subscribe((itemType) => this.onMapItemDragged(itemType));
     }
 
     init() {
@@ -79,6 +81,11 @@ export class MapEditorManagerService {
 
     onMouseDownSideMenu(entity: PlaceableEntity) {
         this.mouseHandlerService.onMouseDownSideMenu(entity);
+    }
+
+    onMapItemDragged(itemType: ItemType) {
+        const foundItem = this.sideMenuService.sideMenuItemFinder(itemType) as Item | null;
+        if (foundItem) this.mouseHandlerService.onMouseDownSideMenu(foundItem);
     }
 
     getDraggedItem() {
