@@ -69,8 +69,12 @@ export class MapEditorManagerService {
         this.mouseHandlerService.onMouseMoveMapTile(entity);
     }
 
-    onMouseUpMapTile() {
-        this.mouseHandlerService.onMouseUpMapTile();
+    onMouseUp() {
+        this.mouseHandlerService.onMouseUp();
+    }
+
+    onMouseUpMapTile(entity: Tile) {
+        this.mouseHandlerService.onMapTileMouseUp(entity);
     }
 
     onMouseDownSideMenu(entity: PlaceableEntity) {

@@ -66,10 +66,11 @@ export class MapEditorMouseHandlerService {
             }
         }
 
-        if (this.sideMenuSelectedEntity.isItem() && entity.isTerrain()) {
-            this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
-            this.cancelSelectionSideMenu();
-        } else if (!this.sideMenuSelectedEntity.isItem()) {
+        // if (this.sideMenuSelectedEntity.isItem() && entity.isTerrain()) {
+        //     this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
+        //     this.cancelSelectionSideMenu();
+        // } else
+        if (!this.sideMenuSelectedEntity.isItem()) {
             this.signalTileCopy.next({ tile: this.sideMenuSelectedEntity as Tile, entity });
         }
     }
@@ -100,7 +101,17 @@ export class MapEditorMouseHandlerService {
         }
     }
 
-    onMouseUpMapTile() {
+    onMapTileMouseUp(entity: Tile) {
+        if (this.sideMenuSelectedEntity?.isItem() && entity.isTerrain()) {
+            this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
+            this.cancelSelectionSideMenu();
+        }
+    }
+
+    onMouseUp() {
+        if (this.isDraggingItem) {
+            this.cancelSelectionSideMenu();
+        }
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
     }

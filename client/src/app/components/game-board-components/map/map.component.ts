@@ -19,6 +19,7 @@ export class MapComponent {
     @Output() mapTileMouseEnter = new EventEmitter<Tile>();
     @Output() mapTileMouseMove = new EventEmitter<Tile>();
     @Output() mapTileMouseLeave = new EventEmitter<Tile>();
+    @Output() mapTileMouseUp = new EventEmitter<Tile>();
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
@@ -36,6 +37,10 @@ export class MapComponent {
 
     onMouseLeave(tile: Tile) {
         this.mapTileMouseLeave.emit(tile);
+    }
+
+    onMouseUp(tile: Tile) {
+        this.mapTileMouseUp.emit(tile);
     }
 
     onContextMenu(event: MouseEvent) {

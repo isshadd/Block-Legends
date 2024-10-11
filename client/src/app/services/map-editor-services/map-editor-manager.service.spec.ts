@@ -495,7 +495,7 @@ describe('MapEditorManagerService', () => {
         service.isDraggingLeft = true;
         service.isDraggingRight = true;
 
-        service.onMouseUpMapTile();
+        service.onMouseUp();
 
         expect(service.isDraggingLeft).toBeFalse();
         expect(service.isDraggingRight).toBeFalse();

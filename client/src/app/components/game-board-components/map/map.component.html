@@ -11,6 +11,7 @@
             (mousedown)="onMouseDown($event, tile)"
             (mouseenter)="onMouseEnter(tile)"
             (mousemove)="onMouseMove(tile)"
+            (mouseup)="onMouseUp(tile)"
             (mouseleave)="onMouseLeave(tile)"
             (contextmenu)="onContextMenu($event)"
             [matTooltip]="tile.isTerrain() ? getTerrainItem(tile)?.description : ''"

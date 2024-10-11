@@ -131,7 +131,7 @@ describe('MapEditorComponent', () => {
         fixture.detectChanges();
 
         component.onMouseUp();
-        expect(mapEditorManagerService.onMouseUpMapTile).toHaveBeenCalled();
+        expect(mapEditorManagerService.onMouseUp).toHaveBeenCalled();
         expect(component).toBeTruthy();
     });
 });
