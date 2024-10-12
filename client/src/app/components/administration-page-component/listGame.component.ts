@@ -1,28 +1,37 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { Tile } from '@app/classes/Tiles/tile';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { MapComponent } from '../game-board-components/map/map.component';
 
 @Component({
     selector: 'app-list-game',
     templateUrl: './listGame.component.html',
     styleUrls: ['./listGame.component.scss'],
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, MapComponent],
     standalone: true,
 })
 export class ListGameComponent {
+    databaseGames: GameShared[] = [];
+    loadedTiles: Tile[][][] = [];
+
     constructor(
         private administrationService: AdministrationPageManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
+        public tileFactoryService: TileFactoryService,
         private router: Router,
     ) {
         this.administrationService.setGames();
+        this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games));
     }
 
-    getGames(): GameShared[] {
-        return this.administrationService.games;
+    getGames(games: GameShared[]): void {
+        this.databaseGames = games;
+        this.loadedTiles = this.databaseGames.map((game) => this.tileFactoryService.loadGridFromJSON(game.tiles));
     }
 
     deleteGame(id: string | null | undefined): void {

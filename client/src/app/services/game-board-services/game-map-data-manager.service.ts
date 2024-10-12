@@ -68,19 +68,7 @@ export class GameMapDataManagerService {
             return;
         }
 
-        for (let i = 0; i < this.lastSavedGrid.length; i++) {
-            this.currentGrid.push([]);
-            for (let j = 0; j < this.lastSavedGrid[i].length; j++) {
-                const newTile: Tile = this.tileFactoryService.createTile(this.lastSavedGrid[i][j].type);
-                this.currentGrid[i].push(newTile);
-                newTile.coordinates = { x: i, y: j };
-
-                if (newTile.isTerrain()) {
-                    const itemType = this.lastSavedGrid[i][j].item?.type;
-                    if (itemType) (newTile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
-                }
-            }
-        }
+        this.currentGrid = this.tileFactoryService.loadGridFromJSON(this.lastSavedGrid);
     }
 
     private createNewGrid() {

@@ -12,21 +12,19 @@ li {
     overflow: hidden;
     transition: transform 0.3s ease;
 }
-img {
-    width: 130px;
-    height: 100px;
+.map-container {
+    width: 300px;
     margin-right: 20px;
     transition: transform 0.3s ease;
     flex-shrink: 0;
-    border: $primary-light 1px solid;
     transform-origin: center;
 }
 
-img:hover {
+.map-container:hover {
     transform: scale(1.2);
 }
 
-img:hover ~ .game_info .description {
+.map-container:hover ~ .game_info .description {
     opacity: 1; /* Make it visible */
     visibility: visible; /* Make it visible */
     transform: translateX(0);
@@ -46,7 +44,7 @@ img:hover ~ .game_info .description {
     font-size: 0.7rem;
 }
 
-.infos p{
+.infos p {
     white-space: nowrap;
 }
 
@@ -82,7 +80,7 @@ img:hover ~ .game_info .description {
     box-shadow: 0 4px 8px black; /* Optional shadow */
     width: 100%;
     white-space: normal; // Ensures that the text wraps and preserves whitespace
-    overflow: visible; 
+    overflow: visible;
     word-wrap: break-word;
     word-break: break-all;
 }

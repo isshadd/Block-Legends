@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AdministrationPageManagerService {
+    private signalGamesSetted = new Subject<GameShared[]>();
+    signalGamesSetted$ = this.signalGamesSetted.asObservable();
+
     games: GameShared[] = [];
 
     constructor(private gameServerCommunicationService: GameServerCommunicationService) {
@@ -15,6 +19,7 @@ export class AdministrationPageManagerService {
     setGames(): void {
         this.gameServerCommunicationService.getGames().subscribe((games: GameShared[]) => {
             this.games = games;
+            this.signalGamesSetted.next(this.games);
         });
     }
 

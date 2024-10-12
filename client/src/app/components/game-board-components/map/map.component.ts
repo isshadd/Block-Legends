@@ -1,11 +1,10 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 
 @Component({
     selector: 'app-map',
@@ -15,13 +14,13 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
     styleUrl: './map.component.scss',
 })
 export class MapComponent {
+    @Input() grid: Tile[][];
+
     @Output() mapTileMouseDown = new EventEmitter<{ event: MouseEvent; tile: Tile }>();
     @Output() mapTileMouseEnter = new EventEmitter<Tile>();
     @Output() mapTileMouseMove = new EventEmitter<Tile>();
     @Output() mapTileMouseLeave = new EventEmitter<Tile>();
     @Output() mapTileMouseUp = new EventEmitter<Tile>();
-
-    constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
     onMouseDown(event: MouseEvent, tile: Tile) {
         this.mapTileMouseDown.emit({ event, tile });
