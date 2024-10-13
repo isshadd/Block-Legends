@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
