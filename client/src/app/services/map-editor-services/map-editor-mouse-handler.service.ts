@@ -7,6 +7,7 @@ import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { ItemType } from '@common/enums/item-type';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 
 enum MouseButton {
@@ -33,10 +34,16 @@ export class MapEditorMouseHandlerService {
     private signalCancelSelection = new Subject<PlaceableEntity>();
     signalCancelSelection$ = this.signalCancelSelection.asObservable();
 
+    private signalItemPlacerWithCoordinates = new Subject<{ item: Item; coordinates: Vec2 }>();
+    signalItemPlacerWithCoordinates$ = this.signalItemPlacerWithCoordinates.asObservable();
+
     public sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
     private isDraggingItem: boolean = false;
+    private lastDraggedItem: Item | null = null;
+    private lastDraggedItemCoordinates: Vec2 | null = null;
+    private isMouseInMap: boolean = false;
 
     constructor() {}
 
@@ -61,6 +68,7 @@ export class MapEditorMouseHandlerService {
             const terrainTile = entity as TerrainTile;
             if (terrainTile.item) {
                 const itemType = terrainTile.item.type;
+                this.lastDraggedItemCoordinates = terrainTile.coordinates;
 
                 this.signalItemRemover.next(entity);
                 this.signalItemDragged.next(itemType);
@@ -115,12 +123,20 @@ export class MapEditorMouseHandlerService {
     onMapTileMouseUp(entity: Tile) {
         if (this.sideMenuSelectedEntity?.isItem() && entity.isTerrain()) {
             this.signalItemPlacer.next({ item: this.sideMenuSelectedEntity as Item, entity });
+        } else if (this.lastDraggedItemCoordinates) {
+            this.signalItemPlacerWithCoordinates.next({
+                item: this.sideMenuSelectedEntity as Item,
+                coordinates: this.lastDraggedItemCoordinates,
+            });
         }
     }
 
     onMouseUp() {
         if (this.isDraggingItem) {
             this.cancelSelectionSideMenu();
+            if (!this.isMouseInMap && this.lastDraggedItem && this.lastDraggedItemCoordinates) {
+                this.signalItemPlacerWithCoordinates.next({ item: this.lastDraggedItem as Item, coordinates: this.lastDraggedItemCoordinates });
+            }
         }
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
@@ -147,6 +163,7 @@ export class MapEditorMouseHandlerService {
 
         if (entity.isItem()) {
             this.isDraggingItem = true;
+            this.lastDraggedItem = entity as Item;
         }
     }
 
@@ -164,5 +181,13 @@ export class MapEditorMouseHandlerService {
             return this.sideMenuSelectedEntity as Item;
         }
         return null;
+    }
+
+    setMouseInMap(isMouseInMap: boolean) {
+        this.isMouseInMap = isMouseInMap;
+    }
+
+    setLastDraggedItemCoordinates(coordinates: Vec2) {
+        this.lastDraggedItemCoordinates = coordinates;
     }
 }

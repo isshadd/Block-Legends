@@ -10,6 +10,7 @@ import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
+import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
@@ -178,5 +179,9 @@ export class GameMapDataManagerService {
         this.dialog.open(ErrorModalComponent, {
             data: { message },
         });
+    }
+
+    getTileAt(coordinates: Vec2): Tile {
+        return this.currentGrid[coordinates.x][coordinates.y];
     }
 }

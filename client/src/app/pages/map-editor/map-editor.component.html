@@ -7,6 +7,8 @@
     <app-map
         id="map-container"
         [grid]="gameMapDataManagerService.getCurrentGrid()"
+        (mapMouseEnter)="onMapMouseEnter()"
+        (mapMouseLeave)="onMapMouseLeave()"
         (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
         (mapTileMouseMove)="onMapTileMouseMove($event)"
         (mapTileMouseEnter)="onMapTileMouseEnter($event)"

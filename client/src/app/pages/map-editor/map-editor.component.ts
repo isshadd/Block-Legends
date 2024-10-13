@@ -52,7 +52,12 @@ export class MapEditorComponent {
             });
         }
     }
-
+    onMapMouseEnter() {
+        this.mapEditorManagerService.onMapMouseEnter();
+    }
+    onMapMouseLeave(){
+        this.mapEditorManagerService.onMapMouseLeave();
+    }
     onMouseUp() {
         this.mapEditorManagerService.onMouseUp();
         this.isDragging = false;

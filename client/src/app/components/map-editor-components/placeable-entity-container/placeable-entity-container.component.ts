@@ -37,6 +37,7 @@ export class PlaceableEntityContainerComponent {
         if (event.button === 2) return;
 
         this.sideMenuService.onSideMenuMouseDown(entity);
+        event.preventDefault();
     }
 
     getItemLimit(entity: PlaceableEntity): number {

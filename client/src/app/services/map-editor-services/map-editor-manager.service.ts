@@ -7,6 +7,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ItemType } from '@common/enums/item-type';
+import { Vec2 } from '@common/interfaces/vec2';
 import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
 import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
@@ -30,6 +31,7 @@ export class MapEditorManagerService {
         this.mouseHandlerService.signalItemRemover$.subscribe((entity) => this.itemRemover(entity));
         this.mouseHandlerService.signalCancelSelection$.subscribe((entity) => this.cancelSelection(entity));
         this.mouseHandlerService.signalItemDragged$.subscribe((itemType) => this.onMapItemDragged(itemType));
+        this.mouseHandlerService.signalItemPlacerWithCoordinates$.subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
     }
 
     init() {
@@ -53,6 +55,17 @@ export class MapEditorManagerService {
                 }
             });
         });
+    }
+
+    onMapMouseEnter() {
+        this.mouseHandlerService.setMouseInMap(true);
+    }
+
+    onMapMouseLeave() {
+        if (this.mouseHandlerService.getDraggedItem()) {
+            console.log(this.mouseHandlerService.getDraggedItem()?.type);
+            this.mouseHandlerService.setMouseInMap(false);
+        }
     }
 
     onMouseEnter(entity: PlaceableEntity) {
@@ -129,12 +142,18 @@ export class MapEditorManagerService {
         const foundItem = this.sideMenuService.updateItemLimitCounter(item, -1);
 
         terrainTile.item = this.itemFactoryService.copyItem(item);
+        terrainTile.item.setCoordinates(selectedTile.coordinates);
 
         if (foundItem?.itemLimit === 0) {
             if (this.mouseHandlerService.sideMenuSelectedEntity === foundItem) {
                 this.mouseHandlerService.sideMenuSelectedEntity = null;
             }
         }
+    }
+
+    private itemPlacerWithCoordinates(item: Item, coordinates: Vec2): void {
+        const selectedTile = this.gameMapDataManagerService.getTileAt(coordinates);
+        this.itemPlacer(item, selectedTile);
     }
 
     private itemRemover(selectedTile: Tile) {

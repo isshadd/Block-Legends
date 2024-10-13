@@ -1,4 +1,10 @@
-<div id="map" [style.--grid-size]="grid.length" [style.--tile-size]="100 / grid.length + '%'">
+<div
+    id="map"
+    [style.--grid-size]="grid.length"
+    [style.--tile-size]="100 / grid.length + '%'"
+    (mouseenter)="onMouseMapEnter()"
+    (mouseleave)="onMouseMapLeave()"
+>
     @for(row of grid; track row; let i = $index){ @for(tile of row; track tile; let j = $index){
     <div class="tile-container">
         <app-placeable-entity

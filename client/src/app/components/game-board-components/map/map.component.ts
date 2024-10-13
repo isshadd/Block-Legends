@@ -16,11 +16,21 @@ import { VisibleStateComponent } from '@app/components/game-board-components/vis
 export class MapComponent {
     @Input() grid: Tile[][];
 
+    @Output() mapMouseEnter = new EventEmitter();
+    @Output() mapMouseLeave = new EventEmitter();
     @Output() mapTileMouseDown = new EventEmitter<{ event: MouseEvent; tile: Tile }>();
     @Output() mapTileMouseEnter = new EventEmitter<Tile>();
     @Output() mapTileMouseMove = new EventEmitter<Tile>();
     @Output() mapTileMouseLeave = new EventEmitter<Tile>();
     @Output() mapTileMouseUp = new EventEmitter<Tile>();
+
+    onMouseMapEnter() {
+        this.mapMouseEnter.emit();
+    }
+
+    onMouseMapLeave() {
+        this.mapMouseLeave.emit();
+    }
 
     onMouseDown(event: MouseEvent, tile: Tile) {
         this.mapTileMouseDown.emit({ event, tile });
