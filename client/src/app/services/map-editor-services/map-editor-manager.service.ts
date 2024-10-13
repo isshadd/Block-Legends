@@ -143,6 +143,7 @@ export class MapEditorManagerService {
 
         terrainTile.item = this.itemFactoryService.copyItem(item);
         terrainTile.item.setCoordinates(selectedTile.coordinates);
+        this.mouseHandlerService.setLastDraggedItemCoordinates(null);
 
         if (foundItem?.itemLimit === 0) {
             if (this.mouseHandlerService.sideMenuSelectedEntity === foundItem) {

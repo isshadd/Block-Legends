@@ -133,6 +133,7 @@ export class MapEditorMouseHandlerService {
 
     onMouseUp() {
         if (this.isDraggingItem) {
+            console.log('dragging item', this.sideMenuSelectedEntity?.description);
             this.cancelSelectionSideMenu();
             if (!this.isMouseInMap && this.lastDraggedItem && this.lastDraggedItemCoordinates) {
                 this.signalItemPlacerWithCoordinates.next({ item: this.lastDraggedItem as Item, coordinates: this.lastDraggedItemCoordinates });
@@ -160,6 +161,7 @@ export class MapEditorMouseHandlerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;
         this.sideMenuSelectedEntity = entity;
+        console.log('make selection', entity.description);
 
         if (entity.isItem()) {
             this.isDraggingItem = true;
@@ -187,7 +189,7 @@ export class MapEditorMouseHandlerService {
         this.isMouseInMap = isMouseInMap;
     }
 
-    setLastDraggedItemCoordinates(coordinates: Vec2) {
+    setLastDraggedItemCoordinates(coordinates: Vec2 | null) {
         this.lastDraggedItemCoordinates = coordinates;
     }
 }
