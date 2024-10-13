@@ -26,6 +26,7 @@ export class ListGameComponent {
         private router: Router,
     ) {
         this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games));
+        this.administrationService.setGames();
     }
 
     private getGames(games: GameShared[]): void {
