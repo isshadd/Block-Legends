@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -8,13 +8,16 @@ import { ItemFactoryService } from '@app/services/game-board-services/item-facto
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ItemType } from '@common/enums/item-type';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Subject, takeUntil } from 'rxjs';
 import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
 import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class MapEditorManagerService {
+export class MapEditorManagerService implements OnDestroy {
+    private destroy$ = new Subject<void>();
+
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
@@ -22,21 +25,30 @@ export class MapEditorManagerService {
         public sideMenuService: MapEditorSideMenuService,
         public mouseHandlerService: MapEditorMouseHandlerService,
     ) {
-        this.sideMenuService.signalSideMenuMouseEnter$.subscribe((entity) => this.onMouseEnter(entity));
-        this.sideMenuService.signalSideMenuMouseLeave$.subscribe((entity) => this.onMouseLeave(entity));
-        this.sideMenuService.signalSideMenuMouseDown$.subscribe((entity) => this.onMouseDownSideMenu(entity));
+        this.sideMenuService.signalSideMenuMouseEnter$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseEnter(entity));
+        this.sideMenuService.signalSideMenuMouseLeave$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseLeave(entity));
+        this.sideMenuService.signalSideMenuMouseDown$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseDownSideMenu(entity));
 
-        this.mouseHandlerService.signalTileCopy$.subscribe((data) => this.tileCopyCreator(data.tile, data.entity));
-        this.mouseHandlerService.signalItemPlacer$.subscribe((data) => this.itemPlacer(data.item, data.entity));
-        this.mouseHandlerService.signalItemRemover$.subscribe((entity) => this.itemRemover(entity));
-        this.mouseHandlerService.signalCancelSelection$.subscribe((entity) => this.cancelSelection(entity));
-        this.mouseHandlerService.signalItemDragged$.subscribe((itemType) => this.onMapItemDragged(itemType));
-        this.mouseHandlerService.signalItemPlacerWithCoordinates$.subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
-        this.mouseHandlerService.signalItemInPlace$.subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates));
+        this.mouseHandlerService.signalTileCopy$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.tileCopyCreator(data.tile, data.entity));
+        this.mouseHandlerService.signalItemPlacer$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.itemPlacer(data.item, data.entity));
+        this.mouseHandlerService.signalItemRemover$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.itemRemover(entity));
+        this.mouseHandlerService.signalCancelSelection$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.cancelSelection(entity));
+        this.mouseHandlerService.signalItemDragged$.pipe(takeUntil(this.destroy$)).subscribe((itemType) => this.onMapItemDragged(itemType));
+        this.mouseHandlerService.signalItemPlacerWithCoordinates$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
+        this.mouseHandlerService.signalItemInPlace$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates));
     }
 
     init() {
         this.sideMenuService.init(this.gameMapDataManagerService.isGameModeCTF(), this.gameMapDataManagerService.itemLimit());
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     itemCheckup() {
