@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -55,9 +55,12 @@ export class MapEditorComponent {
     onMapMouseEnter() {
         this.mapEditorManagerService.onMapMouseEnter();
     }
-    onMapMouseLeave(){
+
+    onMapMouseLeave() {
         this.mapEditorManagerService.onMapMouseLeave();
     }
+
+    @HostListener('document:mouseup')
     onMouseUp() {
         this.mapEditorManagerService.onMouseUp();
         this.isDragging = false;

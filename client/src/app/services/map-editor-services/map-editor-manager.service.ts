@@ -64,7 +64,6 @@ export class MapEditorManagerService {
 
     onMapMouseLeave() {
         if (this.mouseHandlerService.getDraggedItem()) {
-            console.log(this.mouseHandlerService.getDraggedItem()?.type);
             this.mouseHandlerService.setMouseInMap(false);
         }
     }
@@ -159,7 +158,6 @@ export class MapEditorManagerService {
     }
 
     private itemRemover(selectedTile: Tile) {
-        console.log('Item removed');
         if (!selectedTile.isTerrain()) return;
         const terrainTile = selectedTile as TerrainTile;
         if (!terrainTile.item) return;
@@ -173,7 +171,6 @@ export class MapEditorManagerService {
         const foundTile = this.gameMapDataManagerService.getTileAt(coordinates);
         if (foundEntity instanceof Item) {
             this.itemRemover(foundTile as TerrainTile);
-            foundEntity.setCoordinates({ x: -1, y: -1 });
         }
     }
 }
