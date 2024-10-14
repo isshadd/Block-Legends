@@ -32,6 +32,7 @@ export class MapEditorManagerService {
         this.mouseHandlerService.signalCancelSelection$.subscribe((entity) => this.cancelSelection(entity));
         this.mouseHandlerService.signalItemDragged$.subscribe((itemType) => this.onMapItemDragged(itemType));
         this.mouseHandlerService.signalItemPlacerWithCoordinates$.subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
+        this.mouseHandlerService.signalItemInPlace$.subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates));
     }
 
     init() {
@@ -158,11 +159,21 @@ export class MapEditorManagerService {
     }
 
     private itemRemover(selectedTile: Tile) {
+        console.log('Item removed');
         if (!selectedTile.isTerrain()) return;
         const terrainTile = selectedTile as TerrainTile;
         if (!terrainTile.item) return;
 
         this.sideMenuService.updateItemLimitCounter(terrainTile.item, 1);
         terrainTile.item = null;
+    }
+
+    private itemPlacedInSideMenu(item: Item, coordinates: Vec2) {
+        const foundEntity = this.sideMenuService.sideMenuEntityFinder(item);
+        const foundTile = this.gameMapDataManagerService.getTileAt(coordinates);
+        if (foundEntity instanceof Item) {
+            this.itemRemover(foundTile as TerrainTile);
+            foundEntity.setCoordinates({ x: -1, y: -1 });
+        }
     }
 }

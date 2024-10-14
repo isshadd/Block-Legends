@@ -37,6 +37,9 @@ export class MapEditorMouseHandlerService {
     private signalItemPlacerWithCoordinates = new Subject<{ item: Item; coordinates: Vec2 }>();
     signalItemPlacerWithCoordinates$ = this.signalItemPlacerWithCoordinates.asObservable();
 
+    private signalItemInPlace = new Subject<{ item: Item; coordinates: Vec2 }>();
+    signalItemInPlace$ = this.signalItemInPlace.asObservable();
+
     public sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
@@ -44,11 +47,20 @@ export class MapEditorMouseHandlerService {
     private lastDraggedItem: Item | null = null;
     private lastDraggedItemCoordinates: Vec2 | null = null;
     private isMouseInMap: boolean = false;
+    private isItemInPlace: boolean = false;
 
     constructor() {}
 
     onMouseEnter(entity: PlaceableEntity) {
-        if (entity.visibleState === VisibleState.NotSelected) entity.visibleState = VisibleState.Hovered;
+        if (this.isDraggingItem && entity.isItem()) {
+            if (this.getDraggedItem() === entity) {
+                this.isItemInPlace = true;
+            }
+        }
+        if (entity.visibleState === VisibleState.NotSelected) {
+            entity.visibleState = VisibleState.Hovered;
+            this.isItemInPlace = false;
+        }
     }
 
     onMouseLeave(entity: PlaceableEntity) {
@@ -133,11 +145,12 @@ export class MapEditorMouseHandlerService {
 
     onMouseUp() {
         if (this.isDraggingItem) {
-            console.log('dragging item', this.sideMenuSelectedEntity?.description);
-            this.cancelSelectionSideMenu();
-            if (!this.isMouseInMap && this.lastDraggedItem && this.lastDraggedItemCoordinates) {
+            if (this.isItemInPlace) {
+                this.signalItemInPlace.next({ item: this.lastDraggedItem as Item, coordinates: this.lastDraggedItemCoordinates as Vec2 });
+            } else if (this.isItemOutOfMap() && this.lastDraggedItemCoordinates) {
                 this.signalItemPlacerWithCoordinates.next({ item: this.lastDraggedItem as Item, coordinates: this.lastDraggedItemCoordinates });
             }
+            this.cancelSelectionSideMenu();
         }
         this.isDraggingLeft = false;
         this.isDraggingRight = false;
@@ -161,7 +174,6 @@ export class MapEditorMouseHandlerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;
         this.sideMenuSelectedEntity = entity;
-        console.log('make selection', entity);
 
         if (entity.isItem()) {
             this.isDraggingItem = true;
@@ -194,4 +206,9 @@ export class MapEditorMouseHandlerService {
     setLastDraggedItemCoordinates(coordinates: Vec2 | null) {
         this.lastDraggedItemCoordinates = coordinates;
     }
+
+    private isItemOutOfMap(): boolean {
+        return !this.isMouseInMap && this.lastDraggedItem !== null;
+    }
+
 }
