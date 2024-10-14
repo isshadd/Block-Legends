@@ -161,11 +161,13 @@ export class MapEditorMouseHandlerService {
     makeSelection(entity: PlaceableEntity) {
         entity.visibleState = VisibleState.Selected;
         this.sideMenuSelectedEntity = entity;
-        console.log('make selection', entity.description);
+        console.log('make selection', entity);
 
         if (entity.isItem()) {
             this.isDraggingItem = true;
             this.lastDraggedItem = entity as Item;
+        } else {
+            this.isDraggingItem = false;
         }
     }
 
