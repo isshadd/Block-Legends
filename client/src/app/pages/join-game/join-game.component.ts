@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 // import { Router } from '@angular/router';
 /* import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
-import { GameService } from '@app/services/game-services/game.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 
 export const MIN_CHAR = 48;
 export const MAX_CHAR = 57;
@@ -20,12 +20,16 @@ export class JoinGameComponent {
     errorMessage: string | null;
 
     constructor(
-        private gameService: GameService, // private router: Router,
+        //private gameService: GameService, // private router: Router,
+        private webSocketService: WebSocketService,
     ) {}
 
     joinGame(): void {
-        if (!this.accessCode || this.accessCode !== this.gameService.getAccessCode()) {
+        if (!this.accessCode) {
             this.errorMessage = "Le code d'accès est invalide !";
+        } else {
+            this.errorMessage = null;
+            this.webSocketService.joinGame(this.accessCode);
         }
     }
 

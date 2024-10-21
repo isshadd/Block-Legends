@@ -23,7 +23,7 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    { path: 'game', component: GamePageComponent },
+    { path: 'game/:id', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
     { path: 'join-game', component: JoinGameComponent },
     { path: 'administration-game', component: AdministrationGameComponent },
@@ -31,7 +31,7 @@ const routes: Routes = [
     { path: 'create-character', component: CreateCharacterComponent },
     { path: 'waiting-view', component: WaitingViewComponent },
     { path: 'map-editor', component: MapEditorComponent },
-    { path: 'player-create-character', component: PlayerCreateCharacterComponent},
+    { path: 'player-create-character', component: PlayerCreateCharacterComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

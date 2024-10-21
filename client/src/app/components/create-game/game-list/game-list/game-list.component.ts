@@ -48,13 +48,13 @@ export class GameListComponent implements OnInit {
 
     selectGame(game: GameShared) {
         this.gameServerCommunicationService.getGame(game._id).subscribe((updatedGame: GameShared) => {
-            if (!updatedGame || !updatedGame.isVisible ) {
+            if (!updatedGame || !updatedGame.isVisible) {
                 this.gameStatus = `Le jeu choisi ${updatedGame ? updatedGame.name : ''} n'est plus disponible`;
                 this.selectedGame = null;
             } else {
                 this.selectedGame = updatedGame;
                 this.gameStatus = null;
-                this.router.navigate(['/create-character']);
+                this.router.navigate(['/create-character'], { queryParams: { id: this.selectedGame._id } });
             }
         });
     }
@@ -77,5 +77,4 @@ export class GameListComponent implements OnInit {
         // this.router.navigate(['/create-game']);
         window.location.reload();
     }
-
 }

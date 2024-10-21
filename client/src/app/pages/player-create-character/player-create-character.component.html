@@ -8,7 +8,7 @@
         <div id="message">{{ characterStatus }}</div>
         }
         <div class="button-create-character">
-            <button class="dark-button" id="back" type="button" (click)="this.createCharacter.openModal()">Retour à la sélection de jeu</button>
+            <button class="dark-button" id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
             <button class="dark-button" id="create" type="submit">Créer le personnage</button>
         </div>
     </form>
@@ -18,8 +18,8 @@
         [message]="'(La création de votre avatar sera perdue)'"
         [confirmText]="'Oui'"
         [cancelText]="'Non'"
-        (confirm)="this.createCharacter.confirmBack()"
-        (cancel)="this.createCharacter.closeModal()"
+        (confirm)="confirmBack()"
+        (cancel)="closeModal()"
     ></app-modal>
     }
 </div>

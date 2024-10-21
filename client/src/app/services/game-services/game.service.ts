@@ -15,31 +15,23 @@ const STRORAGE_KEY_CODE = 'accessCode';
 export class GameService {
     characters: PlayerCharacter[] = [];
     character$: Observable<PlayerCharacter>;
-    private accessCode: number;
     private characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', '', new PlayerAttributes()));
 
     constructor() {
         this.character$ = this.characterSubject.asObservable();
     }
 
-    generateAccessCode(): void {
-        this.accessCode = Math.floor(MATH_1000 + Math.random() * MATH_9000);
-    }
-
-    storeCode(): void {
-        localStorage.setItem(STRORAGE_KEY_CODE, JSON.stringify(this.accessCode));
-    }
-
-    getAccessCodeFromStorage(): number | null {
-        const storedCode = localStorage.getItem(STRORAGE_KEY_CODE);
-        if (storedCode) {
-            return JSON.parse(storedCode);
-        }
-        return null;
+    storeCode(code: number): void {
+        localStorage.setItem(STRORAGE_KEY_CODE, JSON.stringify(code));
     }
 
     getAccessCode(): number {
-        return this.accessCode;
+        const storedCode = localStorage.getItem(STRORAGE_KEY_CODE);
+        if (storedCode) {
+            return JSON.parse(storedCode) as number;
+        } else {
+            return Math.floor(MATH_1000 + Math.random() * MATH_9000);
+        }
     }
 
     generateVirtualCharacters(): PlayerCharacter[] {
