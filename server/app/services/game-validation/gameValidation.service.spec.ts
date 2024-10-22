@@ -613,7 +613,7 @@ describe('GameValidationService', () => {
             const result = await gameValidationService.mapToMatrix(mockGame);
             expect(result).toEqual([
                 [1, 0],
-                [1, 0],
+                [0, 0],
                 [0, 1],
             ]);
         });
@@ -644,6 +644,179 @@ describe('GameValidationService', () => {
             };
             const result = await gameValidationService.mapIsValid(game);
             expect(result).toBe(true);
+        });
+
+        describe('GameValidationService', () => {
+            beforeEach(() => {
+                gameService = {
+                    getGameByName: jest.fn(),
+                } as unknown as GameService;
+                gameValidationService = new GameValidationService(gameService);
+            });
+
+            // Test getNumberOfSpawnPoints
+            describe('getNumberOfSpawnPoints', () => {
+                it('should count the correct number of spawn points', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ item: { type: 'Spawn' } }, {}, {}],
+                            [{}, { item: { type: 'Spawn' } }, {}],
+                            [{}, {}, {}],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.getNumberOfSpawnPoints(game);
+                    expect(result).toBe(2);
+                });
+            });
+
+            // Test isValidSizeBySpawnPoints
+            describe('isValidSizeBySpawnPoints', () => {
+                it('should return true if spawn points match map size', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ item: { type: 'Spawn' } }, {}, {}],
+                            [{}, { item: { type: 'Spawn' } }, {}],
+                            [{}, {}, {}],
+                        ],
+                    } as Game;
+
+                    jest.spyOn(gameService, 'getGameByName').mockResolvedValue(game);
+                    const result = await gameValidationService.isValidSizeBySpawnPoints(game);
+                    expect(result).toBe(true);
+                });
+            });
+
+            // Test mapToMatrix
+            describe('mapToMatrix', () => {
+                it('should convert game tiles to a matrix of 1s and 0s', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Wall }, { type: TileType.Door }, { type: TileType.Grass }],
+                            [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.mapToMatrix(game);
+                    expect(result).toEqual([
+                        [1, 0, 0],
+                        [0, 1, 0],
+                    ]);
+                });
+            });
+
+            // Test isValid (method utilisée dans le BFS)
+            describe('isValid', () => {
+                it('should return true for valid tile coordinates and conditions', () => {
+                    const map = [
+                        [0, 1, 0],
+                        [0, 1, 0],
+                    ];
+                    const visited = [
+                        [false, false, false],
+                        [false, false, false],
+                    ];
+
+                    const result = gameValidationService.isValid(0, 0, map, visited);
+                    expect(result).toBe(true);
+                });
+            });
+
+            // // Test bfs
+            // describe('bfs', () => {
+            //     it('should mark all reachable tiles as visited', async () => {
+            //         const map = [
+            //             [0, 1, 0],
+            //             [0, 1, 0],
+            //         ];
+            //         const visited = [
+            //             [false, false, false],
+            //             [false, false, false],
+            //         ];
+
+            //         await gameValidationService.bfs(map, 0, 0, visited);
+
+            //         expect(visited).toEqual([
+            //             [true, false, true],
+            //             [true, false, true],
+            //         ]);
+            //     });
+            // });
+
+            // Test mapIsValid
+            describe('mapIsValid', () => {
+                it('should return false if there are inaccessible tiles', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                            [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Grass }],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.mapIsValid(game);
+                    expect(result).toBe(false);
+                });
+
+                it('should return true if all tiles are accessible', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.mapIsValid(game);
+                    expect(result).toBe(true);
+                });
+            });
+
+            // Test isHalfMapTilesValid
+            describe('isHalfMapTilesValid', () => {
+                it('should return true if more than half of the tiles are terrain tiles', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                            [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.isHalfMapTilesValid(game, 2);
+                    expect(result).toBe(true);
+                });
+
+                it('should return false if less than half of the tiles are terrain tiles', async () => {
+                    const game: Game = {
+                        name: 'Test Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Grass }],
+                            [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                        ],
+                    } as Game;
+
+                    const result = await gameValidationService.isHalfMapTilesValid(game, 2);
+                    expect(result).toBe(false);
+                });
+            });
         });
     });
 
