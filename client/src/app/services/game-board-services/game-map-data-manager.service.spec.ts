@@ -137,6 +137,31 @@ describe('GameMapDataManagerService', () => {
             expect(routerSpy.navigate).toHaveBeenCalledWith(['/administration-game']);
         });
 
+        it('should return early if hasValidNameAndDescription returns false', () => {
+            service['databaseGame'] = {
+                _id: '1',
+                name: 'Test Game',
+                description: 'A test game',
+                size: MapSize.SMALL,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+
+            spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
+
+            spyOn(service as any, 'saveMap');
+            spyOn(service as any, 'createGameInDb');
+            spyOn(service as any, 'saveGameInDb');
+
+            service.saveGame();
+
+            expect(service['saveMap']).not.toHaveBeenCalled();
+            expect(service['createGameInDb']).not.toHaveBeenCalled();
+            expect(service['saveGameInDb']).not.toHaveBeenCalled();
+        });
+
         it('should update an existing game in the database', () => {
             service['databaseGame']._id = '1';
             gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
@@ -258,7 +283,7 @@ describe('GameMapDataManagerService', () => {
                 description: 'A test game',
                 size: MapSize.MEDIUM,
                 mode: GameMode.Classique,
-                tiles: [], 
+                tiles: [],
                 isVisible: true,
                 imageUrl: '',
             };
@@ -281,7 +306,7 @@ describe('GameMapDataManagerService', () => {
 
         it('should save terrain tiles without items to databaseGame.tiles', () => {
             const terrainTile = new GrassTile() as TerrainTile;
-            terrainTile.item = null; 
+            terrainTile.item = null;
 
             service['currentGrid'] = [[terrainTile]];
 
@@ -295,12 +320,12 @@ describe('GameMapDataManagerService', () => {
         });
 
         it('should save non-terrain tiles to databaseGame.tiles', () => {
-            const nonTerrainTile = new GrassTile(); 
-            spyOn(nonTerrainTile, 'isTerrain').and.returnValue(false); 
+            const nonTerrainTile = new GrassTile();
+            spyOn(nonTerrainTile, 'isTerrain').and.returnValue(false);
 
-            service['currentGrid'] = [[nonTerrainTile]]; 
+            service['currentGrid'] = [[nonTerrainTile]];
 
-            service['saveMap'](); 
+            service['saveMap']();
 
             expect(service['databaseGame'].tiles.length).toBe(1);
             expect(service['databaseGame'].tiles[0][0]).toEqual({ type: nonTerrainTile.type });
@@ -320,5 +345,260 @@ describe('GameMapDataManagerService', () => {
         expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
             data: { message: errors.join('<br>') },
         });
+    });
+
+    describe('#saveGameInDb', () => {
+        beforeEach(() => {
+            service['databaseGame'] = {
+                _id: '1',
+                name: 'Test Game',
+                description: 'A test game',
+                size: MapSize.SMALL,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+        });
+
+        it('should return early if databaseGame._id is not defined', () => {
+            service['databaseGame']._id = undefined;
+
+            service['saveGameInDb']();
+
+            expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
+        });
+
+        it('should call updateGame and navigate to /administration-game on success', () => {
+            gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0)); // Mock success response
+
+            service['saveGameInDb']();
+
+            expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('1', service['databaseGame']);
+
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/administration-game']);
+        });
+
+        it('should open error modal if updateGame fails', () => {
+            const mockError = ['Update error'];
+            gameServerCommunicationServiceSpy.updateGame.and.returnValue(throwError(() => mockError)); // Mock error
+
+            service['saveGameInDb']();
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
+                data: { message: mockError.join('<br>') },
+            });
+        });
+    });
+
+    it('should return the current grid', () => {
+        const mockGrid = [
+            [new GrassTile(), new GrassTile()],
+            [new GrassTile(), new GrassTile()],
+        ];
+        service['currentGrid'] = mockGrid;
+
+        const result = service.getCurrentGrid();
+
+        expect(result).toBe(mockGrid);
+    });
+
+    it('should store isNewGame and gameToEdit in localStorage', () => {
+        const isNewGame = true;
+        const mockGame: GameShared = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        spyOn(localStorage, 'setItem');
+
+        service.setLocalStorageVariables(isNewGame, mockGame);
+
+        expect(localStorage.setItem).toHaveBeenCalledWith('isNewGame', JSON.stringify(isNewGame));
+        expect(localStorage.setItem).toHaveBeenCalledWith('gameToEdit', JSON.stringify(mockGame));
+    });
+
+    it('should return true when isNewGame is stored as true in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('true');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeTrue();
+    });
+
+    it('should return false when isNewGame is stored as false in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('false');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return false when isNewGame is not set in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return false when isNewGame contains invalid data in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('false');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return the gameToEdit object when it is stored in localStorage', () => {
+        const mockGame = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(mockGame));
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual(mockGame);
+    });
+
+    it('should return an empty object if gameToEdit is not set in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual({} as GameShared);
+    });
+
+    it('should return an empty object if gameToEdit is an invalid JSON string', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('{}');
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual({} as GameShared);
+    });
+
+    it('should return true when the game mode is CTF', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'CTF Game',
+            description: 'A CTF game',
+            size: MapSize.SMALL,
+            mode: GameMode.CTF,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.isGameModeCTF();
+
+        expect(result).toBeTrue();
+    });
+
+    it('should return false when the game mode is not CTF', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Non-CTF Game',
+            description: 'A non-CTF game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.isGameModeCTF();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return the game size from databaseGame', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.gameSize();
+
+        expect(result).toBe(MapSize.SMALL);
+    });
+
+    it('should return the game size when it is set to LARGE', () => {
+        service['databaseGame'] = {
+            _id: '2',
+            name: 'Another Test Game',
+            description: 'Another test game',
+            size: MapSize.LARGE,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.gameSize();
+
+        expect(result).toBe(MapSize.LARGE);
+    });
+    it('should return 2 when the game size is SMALL', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.SMALL);
+
+        const result = service.itemLimit();
+
+        expect(result).toBe(2);
+    });
+
+    it('should return 4 when the game size is MEDIUM', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.MEDIUM);
+
+        const result = service.itemLimit();
+
+        expect(result).toBe(4);
+    });
+
+    it('should return 6 when the game size is LARGE', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.LARGE);
+
+        const result = service.itemLimit();
+
+        expect(result).toBe(6);
+    });
+
+    it('should return the correct tile based on the coordinates', () => {
+        const tile1 = new GrassTile();
+        const tile2 = new GrassTile();
+        const tile3 = new GrassTile();
+        const tile4 = new GrassTile();
+
+        service['currentGrid'] = [
+            [tile1, tile2],
+            [tile3, tile4],
+        ];
+
+        const result1 = service.getTileAt({ x: 0, y: 0 });
+
+        const result2 = service.getTileAt({ x: 1, y: 1 });
+
+        expect(result1).toBe(tile1);
+
+        expect(result2).toBe(tile4);
     });
 });
