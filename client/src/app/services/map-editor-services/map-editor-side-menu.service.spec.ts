@@ -14,7 +14,9 @@ describe('MapEditorSideMenuService', () => {
             providers: [MapEditorSideMenuService],
         });
         service = TestBed.inject(MapEditorSideMenuService);
-        service.init(false, 5);
+
+        const limit = 5;
+        service.init(false, limit);
     });
 
     it('should be created', () => {
@@ -24,47 +26,53 @@ describe('MapEditorSideMenuService', () => {
     it('should initialize placeable entity sections and set item limits', () => {
         spyOn(service, 'resetItemList');
 
-        service.init(true, 5);
+        const limit = 5;
+        service.init(true, limit);
 
         const sections = service.getPlaceableEntitiesSections();
-        expect(sections.length).toBe(2);
+        const length = 2;
+        expect(sections.length).toBe(length);
         expect(sections[0].title).toBe('Tuiles');
         expect(sections[1].title).toBe('Objets');
-        expect(service.resetItemList).toHaveBeenCalledWith(true, 5);
+        expect(service.resetItemList).toHaveBeenCalledWith(true, limit);
     });
 
     it('should add Flag to the item list in CTF mode', () => {
-        service.resetItemList(true, 5);
+        const itemLimit = 5;
+        service.resetItemList(true, itemLimit);
 
         const items = service.getPlaceableEntitiesSections()[1].entities;
         expect(items.some((item) => item instanceof Flag)).toBeTrue();
     });
 
     it('should not add Flag to the item list if not in CTF mode', () => {
-        service.resetItemList(false, 5);
+        const itemLimit = 5;
+        service.resetItemList(false, itemLimit);
 
         const items = service.getPlaceableEntitiesSections()[1].entities;
         expect(items.some((item) => item instanceof Flag)).toBeFalse();
     });
 
     it('should set the item limit for Random and Spawn items', () => {
-        service.resetItemList(false, 5);
+        const itemLimit = 5;
+        service.resetItemList(false, itemLimit);
 
         const randomItem = service.sideMenuItemFinder(ItemType.Random);
         const spawnItem = service.sideMenuItemFinder(ItemType.Spawn);
 
-        expect(randomItem?.itemLimit).toBe(5);
-        expect(spawnItem?.itemLimit).toBe(5);
+        expect(randomItem?.itemLimit).toBe(itemLimit);
+        expect(spawnItem?.itemLimit).toBe(itemLimit);
     });
 
     it('should update the item limits for Random and Spawn items', () => {
-        service.setItemLimit(4);
+        const itemLimit = 4;
+        service.setItemLimit(itemLimit);
 
         const randomItem = service.sideMenuItemFinder(ItemType.Random);
         const spawnItem = service.sideMenuItemFinder(ItemType.Spawn);
 
-        expect(randomItem?.itemLimit).toBe(4);
-        expect(spawnItem?.itemLimit).toBe(4);
+        expect(randomItem?.itemLimit).toBe(itemLimit);
+        expect(spawnItem?.itemLimit).toBe(itemLimit);
     });
 
     it('should return null if the item is not found', () => {
@@ -77,18 +85,24 @@ describe('MapEditorSideMenuService', () => {
 
     it('should update the item limit and set visibleState to Disabled when itemLimit becomes 0', () => {
         const mockItem = service.sideMenuItemFinder(ItemType.Sword);
-        mockItem!.itemLimit = 2;
-        const result = service.updateItemLimitCounter(mockItem!, -2);
-
-        expect(result?.itemLimit).toBe(0);
-        expect(result?.visibleState).toBe(VisibleState.Disabled);
+        const newLimit = -2;
+        if (mockItem) {
+            mockItem.itemLimit = 2;
+            const result = service.updateItemLimitCounter(mockItem, newLimit);
+            expect(result?.itemLimit).toBe(0);
+            expect(result?.visibleState).toBe(VisibleState.Disabled);
+        }
     });
 
     it('should call updateTotalItemLimitCounter if the item is normal', () => {
         const mockItem = service.sideMenuItemFinder(ItemType.Sword);
         spyOn(service, 'updateTotalItemLimitCounter');
 
-        service.updateItemLimitCounter(mockItem!, 1);
+        if (mockItem) {
+            if (mockItem) {
+                service.updateItemLimitCounter(mockItem, 1);
+            }
+        }
 
         expect(service.updateTotalItemLimitCounter).toHaveBeenCalledWith(1);
     });
@@ -97,33 +111,38 @@ describe('MapEditorSideMenuService', () => {
         const mockItem = service.sideMenuItemFinder(ItemType.Spawn);
         spyOn(service, 'updateTotalItemLimitCounter');
 
-        service.updateItemLimitCounter(mockItem!, 1);
+        if (mockItem) {
+            service.updateItemLimitCounter(mockItem, 1);
+        }
 
         expect(service.updateTotalItemLimitCounter).not.toHaveBeenCalled();
     });
 
     it('should set visibleState to NotSelected when itemLimit is greater than 0', () => {
         const mockItem = service.sideMenuItemFinder(ItemType.Sword);
-        mockItem!.itemLimit = 0;
+        if (mockItem) {
+            mockItem.itemLimit = 0;
+            const result = service.updateItemLimitCounter(mockItem, 1);
 
-        const result = service.updateItemLimitCounter(mockItem!, 1);
-
-        expect(result?.itemLimit).toBe(1);
-        expect(result?.visibleState).toBe(VisibleState.NotSelected);
+            expect(result?.itemLimit).toBe(1);
+            expect(result?.visibleState).toBe(VisibleState.NotSelected);
+        }
     });
 
     it('should call sideMenuItemsDisabler when totalItemLimitCounter reaches 0', () => {
-        spyOn(service as any, 'sideMenuItemsDisabler');
+        spyOn(service, 'sideMenuItemsDisabler');
 
-        service.updateTotalItemLimitCounter(-5);
+        const newLimit = -5;
+        service.updateTotalItemLimitCounter(newLimit);
 
         expect(service['sideMenuItemsDisabler']).toHaveBeenCalled();
     });
 
     it('should not call sideMenuItemsDisabler when totalItemLimitCounter is greater than 0', () => {
-        spyOn(service as any, 'sideMenuItemsDisabler');
+        spyOn(service, 'sideMenuItemsDisabler');
 
-        service.updateTotalItemLimitCounter(-4);
+        const newLimit = -4;
+        service.updateTotalItemLimitCounter(newLimit);
 
         expect(service['sideMenuItemsDisabler']).not.toHaveBeenCalled();
     });
@@ -164,11 +183,17 @@ describe('MapEditorSideMenuService', () => {
         const mockItem2 = service.sideMenuItemFinder(ItemType.Random);
         const mockSpawnItem = service.sideMenuItemFinder(ItemType.Spawn);
 
-        mockItem1!.itemLimit = 0;
-        mockItem2!.itemLimit = 0;
+        if (mockItem1) {
+            mockItem1.itemLimit = 0;
+        }
+        if (mockItem2) {
+            mockItem2.itemLimit = 0;
+        }
 
-        mockSpawnItem!.visibleState = VisibleState.NotSelected;
-        mockSpawnItem!.itemLimit = 5;
+        if (mockSpawnItem) {
+            mockSpawnItem.visibleState = VisibleState.NotSelected;
+            mockSpawnItem.itemLimit = 5;
+        }
 
         service['sideMenuItemsDisabler']();
 
@@ -179,7 +204,9 @@ describe('MapEditorSideMenuService', () => {
 
     it('should not disable items that are already Disabled', () => {
         const mockItem = service.sideMenuItemFinder(ItemType.Sword);
-        mockItem!.visibleState = VisibleState.Disabled;
+        if (mockItem) {
+            mockItem.visibleState = VisibleState.Disabled;
+        }
 
         service['sideMenuItemsDisabler']();
 

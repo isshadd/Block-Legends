@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class AdministrationPageManagerService {
-    private signalGamesSetted = new Subject<GameShared[]>();
+    signalGamesSetted = new Subject<GameShared[]>();
     signalGamesSetted$ = this.signalGamesSetted.asObservable();
 
     games: GameShared[] = [];

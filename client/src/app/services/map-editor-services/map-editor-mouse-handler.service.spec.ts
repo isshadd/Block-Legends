@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Item } from '@app/classes/Items/item';
 import { DoorTile } from '@app/classes/Tiles/door-tile';
@@ -80,7 +81,7 @@ describe('MapEditorMouseHandlerService', () => {
 
     it('should call leftMouseDownMapTile when left mouse button is pressed', () => {
         const mockTile = new GrassTile();
-        spyOn(service as any, 'leftMouseDownMapTile');
+        spyOn(service, 'leftMouseDownMapTile');
         const mockEvent = new MouseEvent('mousedown', { button: MouseButton.Left });
 
         service.onMouseDownMapTile(mockEvent, mockTile);
@@ -90,7 +91,7 @@ describe('MapEditorMouseHandlerService', () => {
 
     it('should call rightMouseDownMapTile when right mouse button is pressed', () => {
         const mockTile = new GrassTile();
-        spyOn(service as any, 'rightMouseDownMapTile');
+        spyOn(service, 'rightMouseDownMapTile');
         const mockEvent = new MouseEvent('mousedown', { button: MouseButton.Right });
 
         service.onMouseDownMapTile(mockEvent, mockTile);
@@ -352,7 +353,7 @@ describe('MapEditorMouseHandlerService', () => {
     it('should signal item placement with coordinates if item is out of map and coordinates are set', () => {
         service['isDraggingItem'] = true;
         service['isItemInPlace'] = false;
-        spyOn<any>(service, 'isItemOutOfMap').and.returnValue(true);
+        spyOn(service, 'isItemOutOfMap').and.returnValue(true);
 
         spyOn(service['signalItemPlacerWithCoordinates'], 'next');
         spyOn(service, 'cancelSelectionSideMenu');

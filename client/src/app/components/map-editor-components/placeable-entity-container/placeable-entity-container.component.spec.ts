@@ -75,7 +75,8 @@ describe('PlaceableEntityContainerComponent', () => {
 
     it('should return the item limit if the entity is an Item', () => {
         const item = component.containerItems[1] as Item;
-        expect(component.getItemLimit(item)).toBe(5);
+        const itemLimit = 5;
+        expect(component.getItemLimit(item)).toBe(itemLimit);
     });
 
     it('should return 0 if the entity is not an Item', () => {

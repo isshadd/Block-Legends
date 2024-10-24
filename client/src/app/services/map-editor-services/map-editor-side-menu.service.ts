@@ -28,18 +28,17 @@ class PlaceableEntitySection {
     providedIn: 'root',
 })
 export class MapEditorSideMenuService {
-    private signalSideMenuMouseEnter = new Subject<PlaceableEntity>();
+    signalSideMenuMouseEnter = new Subject<PlaceableEntity>();
     signalSideMenuMouseEnter$ = this.signalSideMenuMouseEnter.asObservable();
 
-    private signalSideMenuMouseLeave = new Subject<PlaceableEntity>();
+    signalSideMenuMouseLeave = new Subject<PlaceableEntity>();
     signalSideMenuMouseLeave$ = this.signalSideMenuMouseLeave.asObservable();
 
-    private signalSideMenuMouseDown = new Subject<PlaceableEntity>();
+    signalSideMenuMouseDown = new Subject<PlaceableEntity>();
     signalSideMenuMouseDown$ = this.signalSideMenuMouseDown.asObservable();
 
     private placeableEntitiesSections: PlaceableEntitySection[] = [];
     private totalItemLimitCounter: number = 0;
-    constructor() {}
 
     init(isGameModeCTF: boolean, itemLimit: number) {
         this.placeableEntitiesSections = [
@@ -149,7 +148,7 @@ export class MapEditorSideMenuService {
         return null;
     }
 
-    private sideMenuItemsDisabler() {
+    sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn) {
                 item.visibleState = VisibleState.Disabled;
@@ -157,7 +156,7 @@ export class MapEditorSideMenuService {
         }
     }
 
-    private sideMenuItemsEnabler() {
+    sideMenuItemsEnabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if ((item as Item).itemLimit > 0) {
                 item.visibleState = VisibleState.NotSelected;
@@ -177,7 +176,7 @@ export class MapEditorSideMenuService {
         this.signalSideMenuMouseDown.next(entity);
     }
 
-    private isNormalItem(item: Item): boolean {
+    isNormalItem(item: Item): boolean {
         return item.type !== ItemType.Spawn && item.type !== ItemType.Flag;
     }
 }

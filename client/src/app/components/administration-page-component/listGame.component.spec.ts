@@ -4,7 +4,8 @@ import { CommonModule } from '@angular/common';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, RouterLink } from '@angular/router';
-import { Tile } from '@app/classes/Tiles/tile'; // Adjust the path as necessary
+import { Tile } from '@app/classes/Tiles/tile';
+import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -15,7 +16,6 @@ import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Subject } from 'rxjs';
-import { MapComponent } from '../game-board-components/map/map.component';
 import { ListGameComponent } from './listGame.component';
 
 describe('ListGameComponent', () => {
@@ -181,7 +181,7 @@ describe('ListGameComponent', () => {
                 return [];
             });
 
-            (component as any).getGames(newGames);
+            component.getGames(newGames);
 
             expect(component.databaseGames).toEqual(newGames);
             expect(component.loadedTiles.length).toBe(newGames.length);

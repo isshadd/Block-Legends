@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@app/classes/Items/chestplate';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
@@ -86,11 +87,13 @@ describe('MapEditorManagerService', () => {
 
     it('should initialize the side menu', () => {
         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
-        gameMapDataManagerServiceSpy.itemLimit.and.returnValue(5);
+
+        const itemLimit = 5;
+        gameMapDataManagerServiceSpy.itemLimit.and.returnValue(itemLimit);
 
         service.init();
 
-        expect(sideMenuServiceSpy.init).toHaveBeenCalledWith(true, 5);
+        expect(sideMenuServiceSpy.init).toHaveBeenCalledWith(true, itemLimit);
     });
 
     it('should complete the destroy$ subject', () => {
@@ -167,27 +170,27 @@ describe('MapEditorManagerService', () => {
         const mockItem = { type: ItemType.Sword } as unknown as Item;
         const mockCoordinates: Vec2 = { x: 2, y: 3 };
 
-        const spyItemPlacerWithCoordinates = spyOn<any>(service, 'itemPlacerWithCoordinates');
+        spyOn(service, 'itemPlacerWithCoordinates');
         (mouseHandlerServiceSpy.signalItemPlacerWithCoordinates$ as Subject<{ item: Item; coordinates: Vec2 }>).next({
             item: mockItem,
             coordinates: mockCoordinates,
         });
 
-        expect(spyItemPlacerWithCoordinates).toHaveBeenCalledWith(mockItem, mockCoordinates);
+        expect(service.itemPlacerWithCoordinates).toHaveBeenCalledWith(mockItem, mockCoordinates);
     });
 
     it('should call itemPlacedInSideMenu with correct arguments when signalItemInPlace$ emits', () => {
         const mockItem = { type: ItemType.Sword } as unknown as Item;
         const mockCoordinates: Vec2 = { x: 2, y: 3 };
 
-        const spyItemPlacedInSideMenu = spyOn(service as any, 'itemPlacedInSideMenu');
+        spyOn(service, 'itemPlacedInSideMenu');
 
         (mouseHandlerServiceSpy.signalItemInPlace$ as Subject<{ item: Item; coordinates: Vec2 }>).next({
             item: mockItem,
             coordinates: mockCoordinates,
         });
 
-        expect(spyItemPlacedInSideMenu).toHaveBeenCalledWith(mockItem, mockCoordinates);
+        expect(service.itemPlacedInSideMenu).toHaveBeenCalledWith(mockItem, mockCoordinates);
     });
 
     it('should call updateItemLimitCounter for terrain tiles with items', () => {
@@ -401,7 +404,7 @@ describe('MapEditorManagerService', () => {
         const mockItem = new DiamondSword();
         mockSelectedTile.item = mockItem;
 
-        const spyItemRemover = spyOn<any>(service, 'itemRemover');
+        spyOn(service, 'itemRemover');
 
         const mockGrid = [[mockSelectedTile]];
 
@@ -410,7 +413,7 @@ describe('MapEditorManagerService', () => {
 
         service['tileCopyCreator'](mockCopiedTile, mockSelectedTile);
 
-        expect(spyItemRemover).toHaveBeenCalledWith(mockSelectedTile);
+        expect(service.itemRemover).toHaveBeenCalledWith(mockSelectedTile);
     });
 
     it('should place an item on a terrain tile and update the item limit', () => {
@@ -436,12 +439,12 @@ describe('MapEditorManagerService', () => {
         mockTile.item = existingItem;
         mockTile.coordinates = { x: 1, y: 1 };
 
-        const spyItemRemover = spyOn<any>(service, 'itemRemover');
+        spyOn(service, 'itemRemover');
         itemFactoryServiceSpy.copyItem.and.returnValue(mockItem);
 
         service['itemPlacer'](mockItem, mockTile);
 
-        expect(spyItemRemover).toHaveBeenCalledWith(mockTile);
+        expect(service.itemRemover).toHaveBeenCalledWith(mockTile);
         expect(itemFactoryServiceSpy.copyItem).toHaveBeenCalledWith(mockItem);
         expect(mockTile.item).toBe(mockItem);
     });
@@ -479,11 +482,11 @@ describe('MapEditorManagerService', () => {
         const mockCoordinates: Vec2 = { x: 1, y: 1 };
 
         gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTile);
-        const spyItemPlacer = spyOn<any>(service, 'itemPlacer');
+        spyOn(service, 'itemPlacer');
         service['itemPlacerWithCoordinates'](mockItem, mockCoordinates);
 
         expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockCoordinates);
-        expect(spyItemPlacer).toHaveBeenCalledWith(mockItem, mockTile);
+        expect(service.itemPlacer).toHaveBeenCalledWith(mockItem, mockTile);
     });
 
     it('should remove the item from a terrain tile and update the item limit', () => {
@@ -522,13 +525,13 @@ describe('MapEditorManagerService', () => {
         sideMenuServiceSpy.sideMenuEntityFinder.and.returnValue(null); // No item found
         gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTerrainTile);
 
-        const spyItemRemover = spyOn<any>(service, 'itemRemover');
+        spyOn(service, 'itemRemover');
 
         service['itemPlacedInSideMenu'](mockItem, mockCoordinates);
 
         expect(sideMenuServiceSpy.sideMenuEntityFinder).toHaveBeenCalledWith(mockItem);
         expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockCoordinates);
-        expect(spyItemRemover).not.toHaveBeenCalled();
+        expect(service.itemRemover).not.toHaveBeenCalled();
     });
 
     it('should call itemRemover if foundEntity is an instance of Item', () => {
@@ -539,10 +542,10 @@ describe('MapEditorManagerService', () => {
         sideMenuServiceSpy.sideMenuEntityFinder.and.returnValue(mockItem);
         gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTerrainTile);
 
-        const spyItemRemover = spyOn<any>(service, 'itemRemover');
+        spyOn(service, 'itemRemover');
 
         service['itemPlacedInSideMenu'](mockItem, mockCoordinates);
 
-        expect(spyItemRemover).toHaveBeenCalledWith(mockTerrainTile);
+        expect(service.itemRemover).toHaveBeenCalledWith(mockTerrainTile);
     });
 });

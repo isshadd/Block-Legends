@@ -52,18 +52,19 @@ export class MapEditorComponent {
             });
         }
     }
+
+    @HostListener('document:mouseup')
+    onMouseUp() {
+        this.mapEditorManagerService.onMouseUp();
+        this.isDragging = false;
+    }
+
     onMapMouseEnter() {
         this.mapEditorManagerService.onMapMouseEnter();
     }
 
     onMapMouseLeave() {
         this.mapEditorManagerService.onMapMouseLeave();
-    }
-
-    @HostListener('document:mouseup')
-    onMouseUp() {
-        this.mapEditorManagerService.onMouseUp();
-        this.isDragging = false;
     }
 
     onMapTileMouseUp(tile: Tile) {

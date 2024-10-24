@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -5,13 +6,13 @@ import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
+import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { of, throwError } from 'rxjs';
-import { GameServerCommunicationService } from '../game-server-communication.service';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
 import { TileFactoryService } from './tile-factory.service';
 
@@ -69,8 +70,8 @@ describe('GameMapDataManagerService', () => {
     });
 
     it('should reset current values and load grid', () => {
-        spyOn(service as any, 'resetCurrentValues');
-        spyOn(service as any, 'loadGrid');
+        spyOn(service, 'resetCurrentValues');
+        spyOn(service, 'loadGrid');
 
         service.resetGame();
 
@@ -130,7 +131,7 @@ describe('GameMapDataManagerService', () => {
                     imageUrl: '',
                 } as GameShared),
             );
-            spyOn(service as any, 'saveMap');
+            spyOn(service, 'saveMap');
             service.saveGame();
 
             expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(service['databaseGame']);
@@ -151,9 +152,9 @@ describe('GameMapDataManagerService', () => {
 
             spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
 
-            spyOn(service as any, 'saveMap');
-            spyOn(service as any, 'createGameInDb');
-            spyOn(service as any, 'saveGameInDb');
+            spyOn(service, 'saveMap');
+            spyOn(service, 'createGameInDb');
+            spyOn(service, 'saveGameInDb');
 
             service.saveGame();
 
@@ -165,7 +166,7 @@ describe('GameMapDataManagerService', () => {
         it('should update an existing game in the database', () => {
             service['databaseGame']._id = '1';
             gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
-            spyOn(service as any, 'saveMap');
+            spyOn(service, 'saveMap');
             service.saveGame();
 
             expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('1', service['databaseGame']);
@@ -196,7 +197,7 @@ describe('GameMapDataManagerService', () => {
             imageUrl: '',
         };
 
-        spyOn(service as any, 'createNewGrid');
+        spyOn(service, 'createNewGrid');
         service['loadGrid']();
 
         expect(service['createNewGrid']).toHaveBeenCalled();
@@ -215,10 +216,10 @@ describe('GameMapDataManagerService', () => {
         };
 
         service['createNewGrid']();
-
-        expect(service['currentGrid'].length).toBe(20);
-        expect(service['currentGrid'][0].length).toBe(20);
-        expect(service['currentGrid'][1].length).toBe(20);
+        const largeMapLenght = 20;
+        expect(service['currentGrid'].length).toBe(largeMapLenght);
+        expect(service['currentGrid'][0].length).toBe(largeMapLenght);
+        expect(service['currentGrid'][1].length).toBe(largeMapLenght);
 
         expect(service['currentGrid'][0][0]).toBeInstanceOf(GrassTile);
         expect(service['currentGrid'][0][1]).toBeInstanceOf(GrassTile);
@@ -571,7 +572,8 @@ describe('GameMapDataManagerService', () => {
 
         const result = service.itemLimit();
 
-        expect(result).toBe(4);
+        const itemLimit = 4;
+        expect(result).toBe(itemLimit);
     });
 
     it('should return 6 when the game size is LARGE', () => {
@@ -579,7 +581,8 @@ describe('GameMapDataManagerService', () => {
 
         const result = service.itemLimit();
 
-        expect(result).toBe(6);
+        const itemLimit = 6;
+        expect(result).toBe(itemLimit);
     });
 
     it('should return the correct tile based on the coordinates', () => {

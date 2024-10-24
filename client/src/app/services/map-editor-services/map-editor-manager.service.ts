@@ -117,12 +117,12 @@ export class MapEditorManagerService implements OnDestroy {
         return this.mouseHandlerService.getDraggedItem();
     }
 
-    private cancelSelection(sideMenuSelectedEntity: PlaceableEntity) {
+    cancelSelection(sideMenuSelectedEntity: PlaceableEntity) {
         const foundEntity = this.sideMenuService.sideMenuEntityFinder(sideMenuSelectedEntity as PlaceableEntity);
         if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
     }
 
-    private tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
+    tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
         const tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
         tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
 
@@ -143,7 +143,7 @@ export class MapEditorManagerService implements OnDestroy {
         tileCopy.visibleState = VisibleState.NotSelected;
     }
 
-    private itemPlacer(item: Item, selectedTile: Tile): void {
+    itemPlacer(item: Item, selectedTile: Tile): void {
         if (!selectedTile.isTerrain()) return;
         const terrainTile = selectedTile as TerrainTile;
 
@@ -164,12 +164,12 @@ export class MapEditorManagerService implements OnDestroy {
         }
     }
 
-    private itemPlacerWithCoordinates(item: Item, coordinates: Vec2): void {
+    itemPlacerWithCoordinates(item: Item, coordinates: Vec2): void {
         const selectedTile = this.gameMapDataManagerService.getTileAt(coordinates);
         this.itemPlacer(item, selectedTile);
     }
 
-    private itemRemover(selectedTile: Tile) {
+    itemRemover(selectedTile: Tile) {
         if (!selectedTile.isTerrain()) return;
         const terrainTile = selectedTile as TerrainTile;
         if (!terrainTile.item) return;
@@ -178,7 +178,7 @@ export class MapEditorManagerService implements OnDestroy {
         terrainTile.item = null;
     }
 
-    private itemPlacedInSideMenu(item: Item, coordinates: Vec2) {
+    itemPlacedInSideMenu(item: Item, coordinates: Vec2) {
         const foundEntity = this.sideMenuService.sideMenuEntityFinder(item);
         const foundTile = this.gameMapDataManagerService.getTileAt(coordinates);
         if (foundEntity instanceof Item) {

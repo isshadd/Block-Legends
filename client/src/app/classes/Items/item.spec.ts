@@ -63,7 +63,8 @@ describe('Item', () => {
     });
 
     it('should allow updating the itemLimit property', () => {
+        const itemLimit = 5;
         item.itemLimit = 5;
-        expect(item.itemLimit).toBe(5);
+        expect(item.itemLimit).toBe(itemLimit);
     });
 });

@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
+import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { GameShared } from '@common/interfaces/game-shared';
-import { MapComponent } from '../game-board-components/map/map.component';
 
 @Component({
     selector: 'app-list-game',
@@ -29,7 +29,7 @@ export class ListGameComponent {
         this.administrationService.setGames();
     }
 
-    private getGames(games: GameShared[]): void {
+    getGames(games: GameShared[]): void {
         this.databaseGames = games;
         this.loadedTiles = this.databaseGames.map((game) => this.tileFactoryService.loadGridFromJSON(game.tiles));
     }

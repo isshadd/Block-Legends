@@ -19,28 +19,28 @@ enum MouseButton {
     providedIn: 'root',
 })
 export class MapEditorMouseHandlerService {
-    private signalTileCopy = new Subject<{ tile: Tile; entity: Tile }>();
+    signalTileCopy = new Subject<{ tile: Tile; entity: Tile }>();
     signalTileCopy$ = this.signalTileCopy.asObservable();
 
-    private signalItemPlacer = new Subject<{ item: Item; entity: Tile }>();
+    signalItemPlacer = new Subject<{ item: Item; entity: Tile }>();
     signalItemPlacer$ = this.signalItemPlacer.asObservable();
 
-    private signalItemRemover = new Subject<Tile>();
+    signalItemRemover = new Subject<Tile>();
     signalItemRemover$ = this.signalItemRemover.asObservable();
 
-    private signalItemDragged = new Subject<ItemType>();
+    signalItemDragged = new Subject<ItemType>();
     signalItemDragged$ = this.signalItemDragged.asObservable();
 
-    private signalCancelSelection = new Subject<PlaceableEntity>();
+    signalCancelSelection = new Subject<PlaceableEntity>();
     signalCancelSelection$ = this.signalCancelSelection.asObservable();
 
-    private signalItemPlacerWithCoordinates = new Subject<{ item: Item; coordinates: Vec2 }>();
+    signalItemPlacerWithCoordinates = new Subject<{ item: Item; coordinates: Vec2 }>();
     signalItemPlacerWithCoordinates$ = this.signalItemPlacerWithCoordinates.asObservable();
 
-    private signalItemInPlace = new Subject<{ item: Item; coordinates: Vec2 }>();
+    signalItemInPlace = new Subject<{ item: Item; coordinates: Vec2 }>();
     signalItemInPlace$ = this.signalItemInPlace.asObservable();
 
-    public sideMenuSelectedEntity: null | PlaceableEntity;
+    sideMenuSelectedEntity: null | PlaceableEntity;
     private isDraggingLeft: boolean = false;
     private isDraggingRight: boolean = false;
     private isDraggingItem: boolean = false;
@@ -48,8 +48,6 @@ export class MapEditorMouseHandlerService {
     private lastDraggedItemCoordinates: Vec2 | null = null;
     private isMouseInMap: boolean = false;
     private isItemInPlace: boolean = false;
-
-    constructor() {}
 
     onMouseEnter(entity: PlaceableEntity) {
         if (this.isDraggingItem && entity.isItem()) {
@@ -207,8 +205,7 @@ export class MapEditorMouseHandlerService {
         this.lastDraggedItemCoordinates = coordinates;
     }
 
-    private isItemOutOfMap(): boolean {
+    isItemOutOfMap(): boolean {
         return !this.isMouseInMap && this.lastDraggedItem !== null;
     }
-
 }

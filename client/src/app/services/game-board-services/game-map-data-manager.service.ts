@@ -18,11 +18,11 @@ import { TileFactoryService } from './tile-factory.service';
     providedIn: 'root',
 })
 export class GameMapDataManagerService {
+    currentName = '';
+    currentDescription = '';
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
-    currentName = '';
-    currentDescription = '';
 
     constructor(
         public tileFactoryService: TileFactoryService,
@@ -57,13 +57,13 @@ export class GameMapDataManagerService {
         }
     }
 
-    private resetCurrentValues() {
+    resetCurrentValues() {
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
         this.currentGrid = [];
     }
 
-    private loadGrid() {
+    loadGrid() {
         if (this.isNewGame()) {
             this.createNewGrid();
             return;
@@ -72,7 +72,7 @@ export class GameMapDataManagerService {
         this.currentGrid = this.tileFactoryService.loadGridFromJSON(this.lastSavedGrid);
     }
 
-    private createNewGrid() {
+    createNewGrid() {
         this.lastSavedGrid = [];
         for (let i = 0; i < this.databaseGame.size; i++) {
             this.currentGrid.push([]);
@@ -86,7 +86,7 @@ export class GameMapDataManagerService {
         }
     }
 
-    private saveMap() {
+    saveMap() {
         this.databaseGame.tiles = [];
 
         for (let i = 0; i < this.currentGrid.length; i++) {
@@ -105,7 +105,7 @@ export class GameMapDataManagerService {
         }
     }
 
-    private createGameInDb() {
+    createGameInDb() {
         this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
             next: () => {
                 this.router.navigate(['/administration-game']);
@@ -116,7 +116,7 @@ export class GameMapDataManagerService {
         });
     }
 
-    private saveGameInDb() {
+    saveGameInDb() {
         if (!this.databaseGame._id) return;
 
         this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
