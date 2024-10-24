@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
+// import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-waiting-view',
@@ -11,68 +12,65 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
     imports: [CommonModule],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WaitingViewComponent implements OnInit {
-    accessCode: number;
-    players: PlayerCharacter[] = [];
-    organizerCharacter: PlayerCharacter;
-    playersCounter = 0;
-    maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
-    isMaxPlayer: boolean;
-    storedCharacter = this.gameService.getStoredCharacter();
+export class WaitingViewComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
+    accessCode$ = this.gameService.accessCode$;
+    players$ = this.webSocketService.players$;
     gameId: string | null;
+    playersCounter = 0;
+    isMaxPlayer = false;
 
     constructor(
-        @Inject(GameService) private gameService: GameService,
+        public gameService: GameService,
         private router: Router,
-        private cdr: ChangeDetectorRef,
         private webSocketService: WebSocketService,
         private route: ActivatedRoute,
     ) {}
 
     ngOnInit(): void {
-        this.accessCode = this.gameService.getAccessCode();
-        this.gameService.storeCode(this.accessCode);
-        this.route.queryParams.subscribe((params) => {
+        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
             this.gameId = params.roomId;
         });
-        this.webSocketService.getPlayers().subscribe((players) => {
-            const filteredPlayers = players.filter((player) => player.name !== this.organizerCharacter?.name);
-            this.players = [...filteredPlayers, this.organizerCharacter]; // Conserver l'organisateur et ajouter les autres
-            this.cdr.detectChanges();
+
+        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+            if (!this.gameId) return;
+
+            if (character.isOrganizer) {
+                this.webSocketService.createGame(this.gameId, character);
+            } else {
+                this.webSocketService.addPlayerToRoom(this.gameId, character);
+            }
         });
-        if (this.storedCharacter) {
-            this.organizerCharacter = this.storedCharacter;
-            this.organizerCharacter.setOrganizer();
-            this.players.push(this.organizerCharacter);
-            this.cdr.detectChanges();
-            this.webSocketService.createGame(this.gameId, this.accessCode, this.organizerCharacter);
-        } else {
-            this.gameService.character$.subscribe((character) => {
-                if (character) {
-                    this.webSocketService.addPlayerToRoom(this.gameId, character);
-                    this.organizerCharacter = character;
-                    this.players.push(this.organizerCharacter);
-                    this.cdr.detectChanges();
-                }
-            });
-        }
-        // this.webSocketService.createGame(this.gameId, this.accessCode, this.organizerCharacter);
-        this.cdr.detectChanges();
     }
 
     addVirtualPlayers(): void {
-        if (this.playersCounter < VP_NUMBER) {
-            this.players.push(this.gameService.generateVirtualCharacters()[this.playersCounter]);
-            this.playersCounter += 1;
-        } else if (this.playersCounter >= VP_NUMBER) {
-            this.maxPlayerMessage = 'Le nombre maximum de joueurs est atteint !';
+        if (this.playersCounter >= VP_NUMBER) {
             this.isMaxPlayer = true;
+            return;
         }
+
+        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter);
+        this.webSocketService.addPlayerToRoom(this.gameId!, virtualPlayer);
+        this.playersCounter++;
     }
 
     playerLeave(): void {
-        this.gameService.clearLocalStorage();
+        this.webSocketService.leaveGame();
         this.router.navigate(['/home']);
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    lockRoom(): void {
+        this.webSocketService.lockRoom();
+    }
+
+    unlockRoom(): void {
+        this.webSocketService.unlockRoom();
     }
 }

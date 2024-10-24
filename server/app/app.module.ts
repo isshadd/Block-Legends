@@ -9,7 +9,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
-import { GameGateway } from './gateways/chat/game.gateway';
+import { GameGateway } from './gateways/gameGateway/game.gateway';
 import { GameValidationService } from './services/game-validation/gameValidation.service';
 
 @Module({

@@ -1,94 +1,105 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { Subject } from 'rxjs';
-import { io } from 'socket.io-client';
+import { GameService } from '@app/services/game-services/game.service';
+import { BehaviorSubject } from 'rxjs';
+import { io, Socket } from 'socket.io-client';
+
+interface GameRoom {
+    roomId: string;
+    accessCode: number;
+    players: PlayerCharacter[];
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class WebSocketService {
-    private socket: any;
-    private playersSubject = new Subject<PlayerCharacter[]>();
+    public socket: Socket;
+    public playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
+    players$ = this.playersSubject.asObservable();
 
-    constructor(private router: Router) {
+    constructor(
+        private router: Router,
+        private gameService: GameService,
+    ) {
         this.socket = io('http://localhost:3000');
-        this.socket.on('updatePlayers', (players: PlayerCharacter[], roomId: string) => {
+        this.setupSocketListeners();
+    }
+
+    private setupSocketListeners() {
+        this.socket.on('connect', () => {
+            const roomId = localStorage.getItem('roomId');
+            if (roomId) {
+                this.socket.emit('getRoomState', roomId);
+            }
+        });
+
+        this.socket.on('roomState', (room: GameRoom) => {
+            console.log('Received room state:', room);
+            this.gameService.setAccessCode(room.accessCode);
+            this.playersSubject.next(room.players);
+        });
+
+        this.socket.on('updatePlayers', (players: PlayerCharacter[]) => {
+            console.log('Received players update:', players);
             this.playersSubject.next(players);
         });
-        this.socket.on('roomCreated', (data: { accessCode: number }) => {
-            console.log('Room created with access code:', data.accessCode);
+
+        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number }) => {
+            if (response.valid) {
+                localStorage.setItem('roomId', response.roomId);
+                this.gameService.setAccessCode(response.accessCode);
+                this.router.navigate(['/player-create-character'], {
+                    queryParams: { roomId: response.roomId },
+                });
+            } else {
+                alert("Code d'accès invalide");
+            }
         });
-        this.socket.on('joinedRoom', (data: { message: string }) => {
-            console.log('Joined room with code:', data.message);
+
+        this.socket.on('roomLocked', () => {
+            alert('La salle a été verrouillée');
         });
-        this.socket.on('roomNotFound', (data: { message: string }) => {
-            console.log('Room not found:', data.message);
+
+        this.socket.on('roomUnlocked', () => {
+            alert('La salle a été déverrouillée');
         });
-        this.socket.on('playerAdded', (data: { message: string }) => {
-            console.log('Player added:', data.message);
-        });
+    }
+
+    createGame(gameId: string, player: PlayerCharacter) {
+        this.socket.emit('createGame', { gameId, playerOrganizer: player });
+        localStorage.setItem('roomId', gameId);
     }
 
     joinGame(accessCode: number) {
-        console.log('Emitting joinGame with access code:', accessCode);
         this.socket.emit('joinGame', accessCode);
-        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string }) => {
-            console.log('Received joinGameResponse:', response);
-            if (response.valid) {
-                // Si le code est valide, redirige
-                this.router.navigate(['/player-create-character'], { queryParams: { roomId: response.roomId } });
-            } else {
-                // Gère le cas où le code n'est pas valide (par exemple, afficher un message d'erreur)
-                console.error("Code d'accès invalide :", response.message);
-                alert("Le code d'accès que vous avez entré est invalide.");
-            }
-        });
     }
 
-    createGame(gameId: string | null, accessCode: number, player: PlayerCharacter) {
-        const serializedPlayer = {
-            name: player.name,
-            avatar: player.avatar,
-            attributes: {
-                attack: player.attributes.attack,
-                defense: player.attributes.defense,
-                life: player.attributes.life,
-                speed: player.attributes.speed,
-            },
-        };
-        this.socket.emit('createGame', { gameId, accessCode, playerOrganizer: serializedPlayer });
-        console.log('Emitting createGame event:', { gameId, accessCode, player: serializedPlayer });
+    addPlayerToRoom(gameId: string, player: PlayerCharacter) {
+        this.socket.emit('addPlayerToRoom', { gameId, player });
     }
 
-    addPlayerToRoom(gameId: string | null, player: PlayerCharacter) {
-        const serializedPlayer = {
-            name: player.name,
-            avatar: player.avatar,
-            attributes: {
-                attack: player.attributes.attack,
-                defense: player.attributes.defense,
-                life: player.attributes.life,
-                speed: player.attributes.speed,
-            },
-        };
-        this.socket.emit('addPlayerToRoom', gameId, serializedPlayer);
-        console.log('Emitting addPlayerToRoom event:', { gameId, player: serializedPlayer });
-    }
-
-    kickPlayer(playerId: string) {
-        this.socket.emit('kickPlayer', playerId);
+    leaveGame() {
+        const roomId = localStorage.getItem('roomId');
+        if (roomId) {
+            this.socket.emit('leaveGame', roomId);
+            localStorage.removeItem('roomId');
+        }
+        this.gameService.clearGame();
     }
 
     lockRoom() {
-        this.socket.emit('lockRoom');
+        const roomId = localStorage.getItem('roomId');
+        if (roomId) {
+            this.socket.emit('lockRoom', roomId);
+        }
     }
 
     unlockRoom() {
-        this.socket.emit('unlockRoom');
-    }
-
-    getPlayers(): Subject<any[]> {
-        return this.playersSubject;
+        const roomId = localStorage.getItem('roomId');
+        if (roomId) {
+            this.socket.emit('unlockRoom', roomId);
+        }
     }
 }
