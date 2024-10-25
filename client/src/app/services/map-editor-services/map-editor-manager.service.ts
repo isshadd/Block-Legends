@@ -1,387 +1,188 @@
-import { Injectable } from '@angular/core';
-import { Chestplate } from '@app/classes/Items/chestplate';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { Elytra } from '@app/classes/Items/elytra';
-import { EnchantedBook } from '@app/classes/Items/enchanted-book';
-import { Flag } from '@app/classes/Items/flag';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Item } from '@app/classes/Items/item';
-import { Potion } from '@app/classes/Items/potion';
-import { RandomItem } from '@app/classes/Items/random-item';
-import { Spawn } from '@app/classes/Items/spawn';
-import { Totem } from '@app/classes/Items/totem';
-import { DoorTile } from '@app/classes/Tiles/door-tile';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { IceTile } from '@app/classes/Tiles/ice-tile';
-import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
-import { WallTile } from '@app/classes/Tiles/wall-tile';
-import { WaterTile } from '@app/classes/Tiles/water-tile';
 import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ItemType } from '@common/enums/item-type';
-
-class PlaceableEntitySection {
-    title: string;
-    entities: PlaceableEntity[];
-}
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subject, takeUntil } from 'rxjs';
+import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
+import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class MapEditorManagerService {
-    placeableEntitiesSections: PlaceableEntitySection[] = [];
-    selectedEntity: PlaceableEntity | null;
-    sideMenuSelectedEntity: null | PlaceableEntity;
-    isDraggingLeft: boolean = false;
-    isDraggingRight: boolean = false;
-    draggedEntity: PlaceableEntity | null;
-    itemLimitCounter: number = 0;
+export class MapEditorManagerService implements OnDestroy {
+    private destroy$ = new Subject<void>();
 
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameMapDataManagerService: GameMapDataManagerService,
-    ) {}
+        public sideMenuService: MapEditorSideMenuService,
+        public mouseHandlerService: MapEditorMouseHandlerService,
+    ) {
+        this.sideMenuService.signalSideMenuMouseEnter$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseEnter(entity));
+        this.sideMenuService.signalSideMenuMouseLeave$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseLeave(entity));
+        this.sideMenuService.signalSideMenuMouseDown$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseDownSideMenu(entity));
+
+        this.mouseHandlerService.signalTileCopy$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.tileCopyCreator(data.tile, data.entity));
+        this.mouseHandlerService.signalItemPlacer$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.itemPlacer(data.item, data.entity));
+        this.mouseHandlerService.signalItemRemover$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.itemRemover(entity));
+        this.mouseHandlerService.signalCancelSelection$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.cancelSelection(entity));
+        this.mouseHandlerService.signalItemDragged$.pipe(takeUntil(this.destroy$)).subscribe((itemType) => this.onMapItemDragged(itemType));
+        this.mouseHandlerService.signalItemPlacerWithCoordinates$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
+        this.mouseHandlerService.signalItemInPlace$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates));
+    }
 
     init() {
-        this.placeableEntitiesSections = [
-            {
-                title: 'Tuiles',
-                entities: [new WaterTile(), new DoorTile(), new IceTile(), new WallTile()],
-            },
-            {
-                title: 'Objets',
-                entities: [],
-            },
-        ];
-
-        this.resetItemList();
+        this.sideMenuService.init(this.gameMapDataManagerService.isGameModeCTF(), this.gameMapDataManagerService.itemLimit());
     }
 
-    resetItemList() {
-        this.itemLimitCounter = 0;
-        this.placeableEntitiesSections[1] = {
-            title: 'Objets',
-            entities: [
-                new DiamondSword(),
-                new Chestplate(),
-                new Elytra(),
-                new EnchantedBook(),
-                new Totem(),
-                new Potion(),
-                new Spawn(),
-                new RandomItem(),
-            ],
-        };
-        if (this.gameMapDataManagerService.isGameModeCTF()) {
-            this.placeableEntitiesSections[1].entities.push(new Flag());
-        }
-        this.setItemLimit();
-    }
-
-    getRandomItemItemInMenu(): RandomItem | null {
-        for (const entities of this.placeableEntitiesSections) {
-            for (const item of entities.entities) {
-                if ((item as Item).type === ItemType.Random) return item as RandomItem;
-            }
-        }
-        return null;
-    }
-
-    getSpawnItemInMenu(): Spawn | null {
-        for (const entities of this.placeableEntitiesSections) {
-            for (const item of entities.entities) {
-                if ((item as Item).type === ItemType.Spawn) return item as Spawn;
-            }
-        }
-        return null;
-    }
-
-    setItemLimit() {
-        this.itemLimitCounter = this.gameMapDataManagerService.itemLimit();
-
-        const itemsToUpdate = [this.getRandomItemItemInMenu(), this.getSpawnItemInMenu()];
-        for (const item of itemsToUpdate) {
-            if (item) {
-                item.itemLimit = this.itemLimitCounter;
-            }
-        }
-    }
-
-    updateItemLimitCounter(amount: number) {
-        this.itemLimitCounter += amount;
-        const randomItem = this.getRandomItemItemInMenu();
-        if (randomItem) {
-            randomItem.itemLimit = this.itemLimitCounter;
-        }
-    }
-
-    startDrag(entity: PlaceableEntity) {
-        this.draggedEntity = entity;
-    }
-
-    endDrag() {
-        this.draggedEntity = null;
-    }
-
-    sideMenuTileFinder(tile: Tile) {
-        for (const searchedTile of this.placeableEntitiesSections[0].entities) {
-            if ((searchedTile as Tile).type === tile.type) {
-                return searchedTile;
-            }
-        }
-        return null;
-    }
-
-    sideMenuItemFinder(item: Item) {
-        for (const searchedItem of this.placeableEntitiesSections[1].entities) {
-            if ((searchedItem as Item).type === item.type) {
-                return searchedItem;
-            }
-        }
-        return null;
-    }
-
-    sideMenuEntityFinder(entity: PlaceableEntity) {
-        const foundTile = this.sideMenuTileFinder(entity as Tile) as Tile | null;
-        if (foundTile) return foundTile;
-
-        const foundItem = this.sideMenuItemFinder(entity as Item) as Item | null;
-        if (foundItem) return foundItem;
-
-        return null;
-    }
-
-    cancelSelectionSideMenu() {
-        if (this.sideMenuSelectedEntity) {
-            const foundEntity = this.sideMenuEntityFinder(this.sideMenuSelectedEntity as PlaceableEntity);
-            if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
-
-            this.selectedEntity = null;
-            this.sideMenuSelectedEntity = null;
-        }
-    }
-
-    cancelSelectionMap() {
-        if (this.selectedEntity) {
-            const foundEntity = this.sideMenuEntityFinder(this.selectedEntity as PlaceableEntity);
-            if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
-
-            this.selectedEntity = null;
-        }
-    }
-
-    makeSelection(entity: PlaceableEntity) {
-        entity.visibleState = VisibleState.Selected; // selection of the entity
-        this.sideMenuSelectedEntity = entity;
-        this.cancelSelectionMap();
-    }
-
-    onMouseEnter(entity: PlaceableEntity) {
-        if (entity.visibleState === VisibleState.NotSelected) entity.visibleState = VisibleState.Hovered;
-    }
-
-    onMouseLeave(entity: PlaceableEntity) {
-        if (entity.visibleState !== VisibleState.Selected && entity.visibleState !== VisibleState.Disabled)
-            entity.visibleState = VisibleState.NotSelected;
-    }
-
-    tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
-        const tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
-        this.gameMapDataManagerService.isGameUpdated = true;
-        tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
-
-        if (this.gameMapDataManagerService.isTerrainTile(selectedTile) && selectedTile.item) {
-            const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
-            if (this.gameMapDataManagerService.isTerrainTile(tileCopy)) {
-                tileCopy.item = foundItem;
-            } else {
-                this.itemRemover(selectedTile);
-            }
-        }
-
-        this.gameMapDataManagerService.currentGrid[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
-        tileCopy.visibleState = VisibleState.NotSelected;
-    }
-
-    itemPlacer(item: Item, selectedTile: Tile): void {
-        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile)) {
-            return;
-        }
-
-        if (selectedTile.item) {
-            this.itemRemover(selectedTile);
-        }
-
-        const foundItem = this.sideMenuItemFinder(item) as Item | null;
-        if (!foundItem || foundItem.itemLimit < 1) {
-            return;
-        }
-
-        foundItem.itemLimit--;
-        if (item.type !== ItemType.Spawn) {
-            this.updateItemLimitCounter(-1);
-        }
-
-        selectedTile.item = this.itemFactoryService.copyItem(item);
-        this.gameMapDataManagerService.isGameUpdated = true;
-
-        if (foundItem.itemLimit === 0) {
-            foundItem.visibleState = VisibleState.Disabled;
-            if (this.sideMenuSelectedEntity === foundItem) {
-                this.sideMenuSelectedEntity = null;
-            }
-        }
-
-        if (this.itemLimitCounter === 0) {
-            this.sideMenuItemsDisabler();
-        } else {
-            this.sideMenuItemsEnabler();
-        }
-    }
-
-    itemRemover(selectedTile: Tile) {
-        if (!this.gameMapDataManagerService.isTerrainTile(selectedTile) || !selectedTile.item) return;
-        const foundItem = this.sideMenuItemFinder(selectedTile.item) as Item | null;
-        if (foundItem) {
-            foundItem.itemLimit++;
-            if (foundItem.type !== ItemType.Spawn) this.updateItemLimitCounter(1);
-            else {
-                foundItem.visibleState = VisibleState.NotSelected;
-            }
-            if (this.itemLimitCounter === 0) {
-                this.sideMenuItemsDisabler();
-            }
-            if (this.itemLimitCounter > 0) {
-                this.sideMenuItemsEnabler();
-            }
-        }
-        selectedTile.item = null;
-        this.gameMapDataManagerService.isGameUpdated = true;
-    }
-
-    leftClickMapTile(entity: Tile) {
-        this.isDraggingLeft = true;
-        if (!this.sideMenuSelectedEntity) return;
-        if (this.gameMapDataManagerService.isDoor(entity) && this.gameMapDataManagerService.isDoor(this.sideMenuSelectedEntity as Tile)) {
-            if (entity instanceof DoorTile) {
-                this.tileCopyCreator(new OpenDoor(), entity);
-                return;
-            } else if (entity instanceof OpenDoor) {
-                this.tileCopyCreator(new DoorTile(), entity);
-                return;
-            }
-        }
-
-        if (this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.gameMapDataManagerService.isTerrainTile(entity)) {
-            this.itemPlacer(this.sideMenuSelectedEntity, entity);
-            this.cancelSelectionSideMenu();
-        } else if (!this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity)) {
-            this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
-        }
-    }
-
-    rightClickMapTile(event: MouseEvent, entity: Tile) {
-        this.isDraggingRight = true;
-        event.preventDefault();
-        if (entity instanceof GrassTile && !entity.item) return;
-
-        if ((entity as TerrainTile)?.item) {
-            this.itemRemover(entity);
-        } else if (!this.gameMapDataManagerService.isTerrainTile(entity) || (this.gameMapDataManagerService.isTerrainTile(entity) && !entity.item)) {
-            this.tileCopyCreator(new GrassTile(), entity);
-        }
-    }
-
-    onMouseDownMapTile(event: MouseEvent, entity: Tile) {
-        if (event.button === 0) {
-            this.leftClickMapTile(entity);
-        } else if (event.button === 2) {
-            this.rightClickMapTile(event, entity);
-        }
-    }
-    onMouseMoveMapTile(entity: Tile) {
-        if (this.sideMenuSelectedEntity && !this.gameMapDataManagerService.isItem(this.sideMenuSelectedEntity) && this.isDraggingLeft) {
-            this.tileCopyCreator(this.sideMenuSelectedEntity as Tile, entity);
-        }
-        if (this.isDraggingRight) {
-            if (this.gameMapDataManagerService.isTerrainTile(entity)) {
-                this.itemRemover(entity);
-            }
-            if (!(entity instanceof GrassTile)) {
-                this.tileCopyCreator(new GrassTile(), entity);
-            }
-        }
-    }
-
-    onMouseUpMapTile() {
-        this.isDraggingLeft = false;
-        this.isDraggingRight = false;
-    }
-
-    onMouseDownSideMenu(entity: PlaceableEntity) {
-        if (entity.visibleState === VisibleState.Selected) {
-            // already selected
-            entity.visibleState = VisibleState.NotSelected;
-            this.sideMenuSelectedEntity = null;
-            this.cancelSelectionMap();
-        } else if (entity.visibleState === VisibleState.Disabled) return; // item limit reached
-        else if (this.sideMenuSelectedEntity && this.sideMenuSelectedEntity !== entity) {
-            // another entity selected
-            this.cancelSelectionSideMenu();
-            this.makeSelection(entity);
-        } else {
-            this.makeSelection(entity);
-        }
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     itemCheckup() {
-        this.resetItemList();
+        this.sideMenuService.resetItemList(this.gameMapDataManagerService.isGameModeCTF(), this.gameMapDataManagerService.itemLimit());
         this.mapItemCheckup();
     }
 
     mapItemCheckup() {
-        this.gameMapDataManagerService.currentGrid.forEach((row) => {
+        this.gameMapDataManagerService.getCurrentGrid().forEach((row) => {
             row.forEach((tile) => {
-                if (this.gameMapDataManagerService.isTerrainTile(tile) && tile.item) {
-                    const foundItem = this.sideMenuItemFinder(tile.item) as Item | null;
+                if (tile.isTerrain()) {
+                    const terrainTile = tile as TerrainTile;
 
-                    if (foundItem) {
-                        foundItem.itemLimit--;
-                        if (foundItem.type !== ItemType.Spawn) {
-                            this.updateItemLimitCounter(-1);
-                        }
-                        if (foundItem.itemLimit === 0) {
-                            foundItem.visibleState = VisibleState.Disabled;
-                        }
-                    }
-                    if (this.itemLimitCounter === 0) {
-                        this.sideMenuItemsDisabler();
-                    }
-                    if (this.itemLimitCounter > 0) {
-                        this.sideMenuItemsEnabler();
+                    if (terrainTile.item) {
+                        this.sideMenuService.updateItemLimitCounter(terrainTile.item, -1);
                     }
                 }
             });
         });
     }
 
-    sideMenuItemsDisabler() {
-        for (const item of this.placeableEntitiesSections[1].entities) {
-            if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn) {
-                item.visibleState = VisibleState.Disabled;
+    onMapMouseEnter() {
+        this.mouseHandlerService.setMouseInMap(true);
+    }
+
+    onMapMouseLeave() {
+        if (this.mouseHandlerService.getDraggedItem()) {
+            this.mouseHandlerService.setMouseInMap(false);
+        }
+    }
+
+    onMouseEnter(entity: PlaceableEntity) {
+        this.mouseHandlerService.onMouseEnter(entity);
+    }
+
+    onMouseLeave(entity: PlaceableEntity) {
+        this.mouseHandlerService.onMouseLeave(entity);
+    }
+
+    onMouseDownMapTile(event: MouseEvent, entity: Tile) {
+        this.mouseHandlerService.onMouseDownMapTile(event, entity);
+    }
+
+    onMouseMoveMapTile(entity: Tile) {
+        this.mouseHandlerService.onMouseMoveMapTile(entity);
+    }
+
+    onMouseUp() {
+        this.mouseHandlerService.onMouseUp();
+    }
+
+    onMouseUpMapTile(entity: Tile) {
+        this.mouseHandlerService.onMapTileMouseUp(entity);
+    }
+
+    onMouseDownSideMenu(entity: PlaceableEntity) {
+        this.mouseHandlerService.onMouseDownSideMenu(entity);
+    }
+
+    onMapItemDragged(itemType: ItemType) {
+        const foundItem = this.sideMenuService.sideMenuItemFinder(itemType) as Item | null;
+        if (foundItem) this.mouseHandlerService.onMouseDownSideMenu(foundItem);
+    }
+
+    getDraggedItem() {
+        return this.mouseHandlerService.getDraggedItem();
+    }
+
+    cancelSelection(sideMenuSelectedEntity: PlaceableEntity) {
+        const foundEntity = this.sideMenuService.sideMenuEntityFinder(sideMenuSelectedEntity as PlaceableEntity);
+        if (foundEntity) foundEntity.visibleState = VisibleState.NotSelected;
+    }
+
+    tileCopyCreator(copiedTile: Tile, selectedTile: Tile) {
+        const tileCopy = this.tileFactoryService.copyFromTile(copiedTile);
+        tileCopy.coordinates = { x: selectedTile.coordinates.x, y: selectedTile.coordinates.y };
+
+        if (selectedTile.isTerrain()) {
+            const terrainTile = selectedTile as TerrainTile;
+
+            if (terrainTile.item) {
+                const foundItem = this.sideMenuService.sideMenuItemFinder(terrainTile.item.type) as Item | null;
+                if (tileCopy.isTerrain()) {
+                    (tileCopy as TerrainTile).item = foundItem;
+                } else {
+                    this.itemRemover(selectedTile);
+                }
+            }
+        }
+
+        this.gameMapDataManagerService.getCurrentGrid()[selectedTile.coordinates.x][selectedTile.coordinates.y] = tileCopy;
+        tileCopy.visibleState = VisibleState.NotSelected;
+    }
+
+    itemPlacer(item: Item, selectedTile: Tile): void {
+        if (!selectedTile.isTerrain()) return;
+        const terrainTile = selectedTile as TerrainTile;
+
+        if (terrainTile.item) {
+            this.itemRemover(selectedTile);
+        }
+
+        const foundItem = this.sideMenuService.updateItemLimitCounter(item, -1);
+
+        terrainTile.item = this.itemFactoryService.copyItem(item);
+        terrainTile.item.setCoordinates(selectedTile.coordinates);
+        this.mouseHandlerService.setLastDraggedItemCoordinates(null);
+
+        if (foundItem?.itemLimit === 0) {
+            if (this.mouseHandlerService.sideMenuSelectedEntity === foundItem) {
+                this.mouseHandlerService.sideMenuSelectedEntity = null;
             }
         }
     }
 
-    sideMenuItemsEnabler() {
-        for (const item of this.placeableEntitiesSections[1].entities) {
-            if ((item as Item).itemLimit > 0) {
-                item.visibleState = VisibleState.NotSelected;
-            }
+    itemPlacerWithCoordinates(item: Item, coordinates: Vec2): void {
+        const selectedTile = this.gameMapDataManagerService.getTileAt(coordinates);
+        this.itemPlacer(item, selectedTile);
+    }
+
+    itemRemover(selectedTile: Tile) {
+        if (!selectedTile.isTerrain()) return;
+        const terrainTile = selectedTile as TerrainTile;
+        if (!terrainTile.item) return;
+
+        this.sideMenuService.updateItemLimitCounter(terrainTile.item, 1);
+        terrainTile.item = null;
+    }
+
+    itemPlacedInSideMenu(item: Item, coordinates: Vec2) {
+        const foundEntity = this.sideMenuService.sideMenuEntityFinder(item);
+        const foundTile = this.gameMapDataManagerService.getTileAt(coordinates);
+        if (foundEntity instanceof Item) {
+            this.itemRemover(foundTile as TerrainTile);
         }
     }
 }

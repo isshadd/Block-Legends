@@ -2,7 +2,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';

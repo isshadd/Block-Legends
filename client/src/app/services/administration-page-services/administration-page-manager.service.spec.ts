@@ -4,7 +4,7 @@ import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { of } from 'rxjs';
-import { AdministrationPageManagerService } from './administration-page-manager.services';
+import { AdministrationPageManagerService } from './administration-page-manager.service';
 
 describe('AdministrationPageManagerService', () => {
     let service: AdministrationPageManagerService;

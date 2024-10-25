@@ -1,44 +1,24 @@
-import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from './map.component';
 
 describe('MapComponent', () => {
     let component: MapComponent;
     let fixture: ComponentFixture<MapComponent>;
-    let mapEditorManagerService: jasmine.SpyObj<MapEditorManagerService>;
-    let gameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
-    let tile: GrassTile;
 
     beforeEach(async () => {
-        const mapEditorSpy = jasmine.createSpyObj('MapEditorManagerService', [
-            'onMouseDownMapTile',
-            'onMouseEnter',
-            'onMouseMoveMapTile',
-            'onMouseLeave',
-            'itemPlacer',
-        ]);
-        const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', ['']);
-
         await TestBed.configureTestingModule({
             imports: [MapComponent],
-            providers: [
-                { provide: MapEditorManagerService, useValue: mapEditorSpy },
-                { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
-                provideHttpClientTesting(),
-            ],
         }).compileComponents();
-
-        mapEditorManagerService = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
-        gameMapDataManagerService = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
-        gameMapDataManagerService.currentGrid = [];
-
-        tile = new GrassTile();
 
         fixture = TestBed.createComponent(MapComponent);
         component = fixture.componentInstance;
+        component.grid = [
+            [{ isTerrain: () => false } as Tile, { isTerrain: () => true } as TerrainTile],
+            [{ isTerrain: () => true, item: new DiamondSword() } as TerrainTile, { isTerrain: () => false } as Tile],
+        ];
         fixture.detectChanges();
     });
 
@@ -46,52 +26,68 @@ describe('MapComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should inject GameMapDataManagerService', () => {
-        expect(gameMapDataManagerService).toBeTruthy();
+    it('should emit mapMouseEnter event on mouse enter', () => {
+        spyOn(component.mapMouseEnter, 'emit');
+        component.onMouseMapEnter();
+        expect(component.mapMouseEnter.emit).toHaveBeenCalled();
     });
 
-    it('should call onMouseDownMapTile when onMouseDown is triggered', () => {
-        const event = new MouseEvent('mousedown');
-
-        component.onMouseDown(event, tile);
-        expect(mapEditorManagerService.onMouseDownMapTile).toHaveBeenCalledWith(event, tile);
+    it('should emit mapMouseLeave event on mouse leave', () => {
+        spyOn(component.mapMouseLeave, 'emit');
+        component.onMouseMapLeave();
+        expect(component.mapMouseLeave.emit).toHaveBeenCalled();
     });
 
-    it('should call onMouseEnter when onMouseEnter is triggered', () => {
-        component.onMouseEnter(tile);
-        expect(mapEditorManagerService.onMouseEnter).toHaveBeenCalledWith(tile);
+    it('should emit mapTileMouseDown event on mouse down with the correct arguments', () => {
+        const mockEvent = new MouseEvent('mousedown');
+        const mockTile = {} as Tile;
+        spyOn(component.mapTileMouseDown, 'emit');
+        component.onMouseDown(mockEvent, mockTile);
+        expect(component.mapTileMouseDown.emit).toHaveBeenCalledWith({ event: mockEvent, tile: mockTile });
     });
 
-    it('should call onMouseMoveMapTile when onMouseMove is triggered', () => {
-        component.onMouseMove(tile);
-        expect(mapEditorManagerService.onMouseMoveMapTile).toHaveBeenCalledWith(tile);
+    it('should emit mapTileMouseEnter event on tile mouse enter', () => {
+        const mockTile = {} as Tile;
+        spyOn(component.mapTileMouseEnter, 'emit');
+        component.onMouseEnter(mockTile);
+        expect(component.mapTileMouseEnter.emit).toHaveBeenCalledWith(mockTile);
     });
 
-    it('should call onMouseLeave when onMouseLeave is triggered', () => {
-        component.onMouseLeave(tile);
-        expect(mapEditorManagerService.onMouseLeave).toHaveBeenCalledWith(tile);
+    it('should emit mapTileMouseMove event on tile mouse move', () => {
+        const mockTile = {} as Tile;
+        spyOn(component.mapTileMouseMove, 'emit');
+        component.onMouseMove(mockTile);
+        expect(component.mapTileMouseMove.emit).toHaveBeenCalledWith(mockTile);
     });
 
-    it('should prevent default action when onContextMenu is triggered', () => {
-        const event = new MouseEvent('contextmenu');
-        spyOn(event, 'preventDefault');
-
-        component.onContextMenu(event);
-        expect(event.preventDefault).toHaveBeenCalled();
+    it('should emit mapTileMouseLeave event on tile mouse leave', () => {
+        const mockTile = {} as Tile;
+        spyOn(component.mapTileMouseLeave, 'emit');
+        component.onMouseLeave(mockTile);
+        expect(component.mapTileMouseLeave.emit).toHaveBeenCalledWith(mockTile);
     });
 
-    // it('should call itemPlacer when onDrop is triggered with a dragged item', () => {
-    //     const draggedItem: DiamondSword = new DiamondSword();
-    //     mapEditorManagerService.draggedEntity = draggedItem;
+    it('should emit mapTileMouseUp event on tile mouse up', () => {
+        const mockTile = {} as Tile;
+        spyOn(component.mapTileMouseUp, 'emit');
+        component.onMouseUp(mockTile);
+        expect(component.mapTileMouseUp.emit).toHaveBeenCalledWith(mockTile);
+    });
 
-    //     component.onDrop(tile);
-    //     expect(mapEditorManagerService.itemPlacer).toHaveBeenCalledWith(draggedItem, tile);
-    // });
+    it('should prevent default context menu action', () => {
+        const mockEvent = new MouseEvent('contextmenu');
+        spyOn(mockEvent, 'preventDefault');
+        component.onContextMenu(mockEvent);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+    });
 
-    // it('should not call itemPlacer when onDrop is triggered with no dragged item', () => {
-    //     mapEditorManagerService.draggedEntity = null;
+    it('should return the item of a TerrainTile', () => {
+        const terrainTile = component.grid[0][1] as TerrainTile;
+        expect(component.getTerrainItem(terrainTile)).toEqual(terrainTile.item);
+    });
 
-    //     component.onDrop(tile);
-    //     expect(mapEditorManagerService.itemPlacer).not.toHaveBeenCalled();
-    // });
+    it('should return null if the tile is not terrain', () => {
+        const tile = component.grid[0][0] as Tile;
+        expect(component.getTerrainItem(tile)).toBeNull();
+    });
 });
