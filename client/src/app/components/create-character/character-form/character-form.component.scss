@@ -1,3 +1,5 @@
+@import 'src/_variables.scss';
+
 .info-char {
     background-color: #4f5d75;
     border: 5px solid #000;
@@ -17,4 +19,15 @@
     input {
         text-align: center;
     }
+}
+
+.error {
+    color: $secondary;
+    font-size: 1.5rem;
+    margin: 10;
+}
+.text-comp {
+    color: $primary-light;
+    font-size: 1.5rem;
+    margin: 10;
 }

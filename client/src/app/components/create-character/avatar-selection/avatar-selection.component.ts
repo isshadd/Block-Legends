@@ -13,18 +13,18 @@ export class AvatarSelectionComponent {
     @Input() character: PlayerCharacter;
 
     avatars = [
-        { name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' },
-        { name: 'Yasuo', imgSrc1: 'assets/images/avatar/Yasuo.webp', imgSrc2: 'assets/images/avatar/Yasuo2.webp' },
-        { name: 'Tryndamere', imgSrc1: 'assets/images/avatar/Tryndamere.webp', imgSrc2: 'assets/images/avatar/Tryndamere2.webp' },
-        { name: 'Jax', imgSrc1: 'assets/images/avatar/Jax.webp', imgSrc2: 'assets/images/avatar/Jax2.webp' },
-        { name: 'Lillia', imgSrc1: 'assets/images/avatar/Lillia.webp', imgSrc2: 'assets/images/avatar/Lillia2.webp' },
-        { name: 'Viego', imgSrc1: 'assets/images/avatar/Viego.webp', imgSrc2: 'assets/images/avatar/Viego2.webp' },
-        { name: 'Master Yi', imgSrc1: 'assets/images/avatar/MasterYi.webp', imgSrc2: 'assets/images/avatar/MasterYi2.webp' },
-        { name: 'Kindred', imgSrc1: 'assets/images/avatar/Kindred.webp', imgSrc2: 'assets/images/avatar/Kindred2.webp' },
-        { name: 'Udyr', imgSrc1: 'assets/images/avatar/Udyr.webp', imgSrc2: 'assets/images/avatar/Udyr2.webp' },
-        { name: 'Sylas', imgSrc1: 'assets/images/avatar/Sylas.webp', imgSrc2: 'assets/images/avatar/Sylas2.webp' },
-        { name: 'Corki', imgSrc1: 'assets/images/avatar/Corki.webp', imgSrc2: 'assets/images/avatar/Corki2.webp' },
-        { name: 'Azir', imgSrc1: 'assets/images/avatar/Azir.webp', imgSrc2: 'assets/images/avatar/Azir2.webp' },
+        { name: 'Steve', imgSrc1: 'assets/images/avatar/Steve_head.png', imgSrc2: 'assets/images/avatar/Steve.png' },
+        { name: 'Arlina', imgSrc1: 'assets/images/avatar/GirlSkin1_head.png', imgSrc2: 'assets/images/avatar/GirlSkin1.png' },
+        { name: 'Alex', imgSrc1: 'assets/images/avatar/Alex_head.png', imgSrc2: 'assets/images/avatar/Alex.png' },
+        { name: 'King', imgSrc1: 'assets/images/avatar/King_head.png', imgSrc2: 'assets/images/avatar/King.png' },
+        { name: 'Cosmic', imgSrc1: 'assets/images/avatar/Cosmic._head.png', imgSrc2: 'assets/images/avatar/Cosmic.png' },
+        { name: 'Sirene', imgSrc1: 'assets/images/avatar/Sirene_head.png', imgSrc2: 'assets/images/avatar/Sirene.png' },
+        { name: 'Zombie', imgSrc1: 'assets/images/avatar/zombie_head.png', imgSrc2: 'assets/images/avatar/zombie.png' },
+        { name: 'Muffin', imgSrc1: 'assets/images/avatar/Muffin_head.png', imgSrc2: 'assets/images/avatar/Muffin.png' },
+        { name: 'Piglin', imgSrc1: 'assets/images/avatar/Piglin_head.png', imgSrc2: 'assets/images/avatar/Piglin.png' },
+        { name: 'Strawberry', imgSrc1: 'assets/images/avatar/StrawberryShortcake_head.png', imgSrc2: 'assets/images/avatar/StrawberryShortcake.png' },
+        { name: 'Knight', imgSrc1: 'assets/images/avatar/Knight_head.png', imgSrc2: 'assets/images/avatar/Knight.png' },
+        { name: 'Finn', imgSrc1: 'assets/images/avatar/finn_head.png', imgSrc2: 'assets/images/avatar/finn.png' },
     ];
 
     selectAvatar(avatar: string) {

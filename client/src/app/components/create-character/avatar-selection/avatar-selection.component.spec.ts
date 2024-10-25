@@ -7,7 +7,7 @@ import { AvatarSelectionComponent } from './avatar-selection.component';
 describe('AvatarSelectionComponent', () => {
     let component: AvatarSelectionComponent;
     let fixture: ComponentFixture<AvatarSelectionComponent>;
-    const avatars = [{ name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' }];
+    const avatars = [{ name: 'Steve', imgSrc1: 'assets/images/avatar/Steve_head.png', imgSrc2: 'assets/images/avatar/Steve.png' }];
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

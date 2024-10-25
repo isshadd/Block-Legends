@@ -13,9 +13,9 @@
             @if(character.avatar){
             <img [src]="getSelectedAvatar()?.imgSrc2" [alt]="getSelectedAvatar()?.name" />
             } @else{
-            <p>Choisissez<br />votre avatar</p>
+            <p class="text">Choisissez<br />votre avatar</p>
             }
-            <p>{{ getSelectedAvatar()?.name }}</p>
+            <p class="text">{{ getSelectedAvatar()?.name }}</p>
         </div>
     </div>
 </div>
