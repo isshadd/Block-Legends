@@ -15,13 +15,13 @@ import { Subject, takeUntil } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     accessCode$ = this.gameService.accessCode$;
+    accessCode: number | null;
     players$ = this.webSocketService.players$;
     gameId: string | null;
     playersCounter = 0;
     isMaxPlayer = false;
-
-    private destroy$ = new Subject<void>();
 
     constructor(
         public gameService: GameService,
@@ -41,7 +41,11 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             if (character.isOrganizer) {
                 this.webSocketService.createGame(this.gameId, character);
             } else {
-                this.webSocketService.addPlayerToRoom(this.gameId, character);
+                this.accessCode$.subscribe((code) => {
+                    this.accessCode = code;
+                    this.changeRoomId(this.accessCode);
+                });
+                this.webSocketService.addPlayerToRoom(this.accessCode as number, character);
             }
         });
     }
@@ -53,18 +57,18 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         }
 
         const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter);
-        if (this.gameId) {
-            this.webSocketService.addPlayerToRoom(this.gameId, virtualPlayer);
-        }
+        this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
         this.playersCounter++;
     }
 
     playerLeave(): void {
+        this.gameService.clearLocalStorage();
         this.webSocketService.leaveGame();
         this.router.navigate(['/home']);
     }
 
     ngOnDestroy(): void {
+        this.gameService.clearLocalStorage();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -79,5 +83,18 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     playGame(): void {
         this.webSocketService.startGame();
+    }
+
+    changeRoomId(newRoomId: number | null): void {
+        if (newRoomId !== null) {
+            this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { roomId: newRoomId },
+                queryParamsHandling: 'merge', // merge pour conserver les autres paramètres de requête
+                replaceUrl: true,
+            });
+        } else {
+            console.log(newRoomId);
+        }
     }
 }

@@ -31,4 +31,9 @@ export class GameService {
         this.accessCodeSubject.next(null);
         this.characterSubject.next(new PlayerCharacter('', '', new PlayerAttributes()));
     }
+
+    clearLocalStorage(): void {
+        localStorage.removeItem('accessCode');
+        localStorage.removeItem('roomId');
+    }
 }
