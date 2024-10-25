@@ -15,12 +15,13 @@ import { Subject, takeUntil } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
-    private destroy$ = new Subject<void>();
     accessCode$ = this.gameService.accessCode$;
     players$ = this.webSocketService.players$;
     gameId: string | null;
     playersCounter = 0;
     isMaxPlayer = false;
+
+    private destroy$ = new Subject<void>();
 
     constructor(
         public gameService: GameService,
@@ -52,7 +53,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         }
 
         const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter);
-        this.webSocketService.addPlayerToRoom(this.gameId!, virtualPlayer);
+        if (this.gameId) {
+            this.webSocketService.addPlayerToRoom(this.gameId, virtualPlayer);
+        }
         this.playersCounter++;
     }
 

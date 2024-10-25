@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
@@ -17,7 +17,7 @@ import { GameService } from '@app/services/game-services/game.service';
     templateUrl: './create-character.component.html',
     styleUrl: './create-character.component.scss',
 })
-export class CreateCharacterComponent {
+export class CreateCharacterComponent implements OnInit {
     character = new PlayerCharacter('', '', new PlayerAttributes());
     gameId: string | null;
 

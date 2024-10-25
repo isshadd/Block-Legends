@@ -28,9 +28,8 @@ export class PlayerCreateCharacterComponent {
     constructor(
         private router: Router,
         private gameService: GameService,
-        private route: ActivatedRoute,
-    ) // private webSocketService: WebSocketService,
-    {}
+        private route: ActivatedRoute, // private webSocketService: WebSocketService,
+    ) {}
 
     createPlayerCharacter() {
         this.route.queryParams.subscribe((params) => {
@@ -62,7 +61,7 @@ export class PlayerCreateCharacterComponent {
             this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
             this.gameService.setCharacter(this.character);
-            //this.webSocketService.addPlayerToRoom(this.gameId, this.character);
+            // this.webSocketService.addPlayerToRoom(this.gameId, this.character);
             this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
         }
     }

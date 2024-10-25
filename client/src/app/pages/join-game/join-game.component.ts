@@ -20,7 +20,7 @@ export class JoinGameComponent {
     errorMessage: string | null;
 
     constructor(
-        //private gameService: GameService, // private router: Router,
+        // private gameService: GameService, // private router: Router,
         private webSocketService: WebSocketService,
     ) {}
 
