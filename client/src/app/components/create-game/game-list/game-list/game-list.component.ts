@@ -66,6 +66,10 @@ export class GameListComponent {
         return this.databaseGames.filter((game) => game.isVisible && game.mode === this.selectedMode && game != null);
     }
 
+    findDatabaseGameIndex(game: GameShared): number {
+        return this.databaseGames.findIndex((dbGame) => dbGame._id === game._id);
+    }
+
     openModal() {
         this.isModalOpen = true;
     }
