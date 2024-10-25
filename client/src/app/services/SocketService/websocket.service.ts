@@ -16,8 +16,8 @@ interface GameRoom {
     providedIn: 'root',
 })
 export class WebSocketService {
-    public socket: Socket;
-    public playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
+    socket: Socket;
+    playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
     players$ = this.playersSubject.asObservable();
     currentRoom: GameRoom;
 
@@ -29,6 +29,56 @@ export class WebSocketService {
         this.setupSocketListeners();
     }
 
+    createGame(gameId: string, player: PlayerCharacter) {
+        this.socket.emit('createGame', { gameId, playerOrganizer: player });
+        this.socket.on('roomState', (room: GameRoom) => {
+            localStorage.setItem('accessCode', room.accessCode.toString());
+            localStorage.setItem('roomId', room.roomId);
+        });
+    }
+
+    joinGame(accessCode: number) {
+        this.socket.emit('joinGame', accessCode);
+    }
+
+    addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
+        this.socket.emit('addPlayerToRoom', { accessCode, player });
+    }
+
+    leaveGame() {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('leaveGame', accessCode);
+            localStorage.removeItem('roomId');
+        }
+        this.gameService.clearGame();
+    }
+
+    lockRoom() {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('lockRoom', accessCode);
+        }
+    }
+
+    startGame() {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('startGame', accessCode);
+        }
+    }
+
+    getRoomInfo() {
+        return this.currentRoom;
+    }
+
+    unlockRoom() {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('unlockRoom', accessCode);
+        }
+    }
+
     private setupSocketListeners() {
         this.socket.on('connect', () => {
             const roomId = localStorage.getItem('roomId');
@@ -38,14 +88,14 @@ export class WebSocketService {
         });
 
         this.socket.on('roomState', (room: GameRoom) => {
-            console.log('Received room state:', room);
+            // console.log('Received room state:', room);
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
         });
 
         this.socket.on('updatePlayers', (players: PlayerCharacter[]) => {
-            console.log('Received players update:', players);
+            // console.log('Received players update:', players);
             this.playersSubject.next(players);
         });
 
@@ -72,55 +122,5 @@ export class WebSocketService {
         this.socket.on('gameStarted', () => {
             this.router.navigate(['/play-page']);
         });
-    }
-
-    createGame(gameId: string, player: PlayerCharacter) {
-        this.socket.emit('createGame', { gameId, playerOrganizer: player });
-        this.socket.on('roomState', (room: GameRoom) => {
-            localStorage.setItem('accessCode', room.accessCode.toString());
-            localStorage.setItem('roomId', room.roomId);
-        });
-    }
-
-    joinGame(accessCode: number) {
-        this.socket.emit('joinGame', accessCode);
-    }
-
-    addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
-        this.socket.emit('addPlayerToRoom', { accessCode, player });
-    }
-
-    leaveGame() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string);
-        if (accessCode) {
-            this.socket.emit('leaveGame', accessCode);
-            localStorage.removeItem('roomId');
-        }
-        this.gameService.clearGame();
-    }
-
-    lockRoom() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string);
-        if (accessCode) {
-            this.socket.emit('lockRoom', accessCode);
-        }
-    }
-
-    startGame() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string);
-        if (accessCode) {
-            this.socket.emit('startGame', accessCode);
-        }
-    }
-
-    getRoomInfo() {
-        return this.currentRoom;
-    }
-
-    unlockRoom() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string);
-        if (accessCode) {
-            this.socket.emit('unlockRoom', accessCode);
-        }
     }
 }
