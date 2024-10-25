@@ -8,6 +8,11 @@
     border: 5px solid #000;
 }
 
+#avatar-label {
+    font-size: 1.5rem;
+    padding-top: 10%;
+}
+
 .text {
     color: $primary-light;
     font-size: 1.5rem;
@@ -32,7 +37,6 @@
     justify-content: center;
     color: $primary-light;
     font-size: 0.5rem;
-
 }
 
 .avatar-item:hover {
