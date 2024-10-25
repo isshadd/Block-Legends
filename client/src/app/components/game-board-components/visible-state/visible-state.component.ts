@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { VisibleState } from '@app/interfaces/placeable-entity';
 export enum VisibleStateColor {
     HoveredColor = 'rgba(255, 255, 255, 0.3)',
     SelectedColor = 'rgba(255, 255, 0, 0.3)',
@@ -16,10 +16,10 @@ export enum VisibleStateColor {
     styleUrl: './visible-state.component.scss',
 })
 export class VisibleStateComponent {
-    @Input() placeableEntity: PlaceableEntity;
+    @Input() visibleState: VisibleState;
 
     colorSelector() {
-        switch (this.placeableEntity.visibleState) {
+        switch (this.visibleState) {
             case VisibleState.Selected:
                 return VisibleStateColor.SelectedColor;
             case VisibleState.Hovered:

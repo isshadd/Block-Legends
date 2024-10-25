@@ -55,7 +55,7 @@ export class GameValidationService {
         } else {
             map = game;
         }
-        const matrix: number[][] = map.tiles.map((row) => row.map((tile) => (tile.type === TileType.Wall || tile.type === TileType.Door ? 1 : 0)));
+        const matrix: number[][] = map.tiles.map((row) => row.map((tile) => (tile.type === TileType.Wall ? 1 : 0)));
         return matrix;
     }
 

@@ -14,5 +14,12 @@ export class Item implements PlaceableEntity {
     visibleState: VisibleState = VisibleState.NotSelected;
     isPlaced: boolean = false;
     itemLimit: number = 1;
-    testItem: string = 'test'; // TODO: remove this
+
+    isItem(): boolean {
+        return true;
+    }
+
+    setCoordinates(coordinates: Vec2) {
+        this.coordinates = coordinates;
+    }
 }

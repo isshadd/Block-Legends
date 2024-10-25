@@ -1,8 +1,21 @@
-<div id="page-container" (mouseup)="onMouseUp()">
+<div id="page-container" (mouseup)="onMouseUp()" (mousedown)="onMouseDown($event)" (mousemove)="onMouseMove($event)">
     <div id="side-menu">
         <button class="dark-button" routerLink="/administration-game">Retour</button>
         <app-placeable-entity-full-menu></app-placeable-entity-full-menu>
     </div>
     <app-map-editor-options-menu></app-map-editor-options-menu>
-    <app-map id="map-container"></app-map>
+    <app-map
+        id="map-container"
+        [grid]="gameMapDataManagerService.getCurrentGrid()"
+        (mapMouseEnter)="onMapMouseEnter()"
+        (mapMouseLeave)="onMapMouseLeave()"
+        (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
+        (mapTileMouseMove)="onMapTileMouseMove($event)"
+        (mapTileMouseEnter)="onMapTileMouseEnter($event)"
+        (mapTileMouseLeave)="onMapTileMouseLeave($event)"
+        (mapTileMouseUp)="onMapTileMouseUp($event)"
+    ></app-map>
+    @if(isDragging){
+    <img class="drag-preview" [src]="dragImage" [style.left.px]="mouseX" [style.top.px]="mouseY" />
+    }
 </div>

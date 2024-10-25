@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideRouter, Routes } from '@angular/router';
+import { Routes, provideRouter, withHashLocation } from '@angular/router';
 import { AdministrationGameComponent } from '@app/pages/administration-game/administration-game.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreateCharacterComponent } from '@app/pages/create-character/create-character.component';
@@ -12,6 +12,7 @@ import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { PlayerCreateCharacterComponent } from '@app/pages/player-create-character/player-create-character.component';
 import { WaitingViewComponent } from '@app/pages/waiting-view/waiting-view.component';
 import { environment } from './environments/environment';
@@ -31,10 +32,11 @@ const routes: Routes = [
     { path: 'create-character', component: CreateCharacterComponent },
     { path: 'waiting-view', component: WaitingViewComponent },
     { path: 'map-editor', component: MapEditorComponent },
+    { path: 'play-page', component: PlayPageComponent },
     { path: 'player-create-character', component: PlayerCreateCharacterComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
 bootstrapApplication(AppComponent, {
-    providers: [provideHttpClient(), provideRouter(routes), provideAnimations()],
+    providers: [provideHttpClient(), provideRouter(routes, withHashLocation()), provideAnimations()],
 });

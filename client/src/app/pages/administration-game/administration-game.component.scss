@@ -1,30 +1,46 @@
 @import 'src/_variables.scss';
 
-.game_list {
-    font-size: 2rem;
-    color: $primary-light;
-    list-style-type: none;
-    padding: 0;
-}
-
-#return-button {
-    margin: 20px;
-}
-
-#title {
-    margin-left: 20px;
-    font-size: 3rem;
-    background-color: $primary-dark;
-    // background-image: linear-gradient(to top, $primary-dark 0%, $primary 100%);
-    background-size: 100%;
-    -webkit-background-clip: text;
-    -moz-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    -moz-text-fill-color: transparent;
-}
-
-.button_container {
+#admin-page {
     display: flex;
-    justify-content: space-between;
-    padding: 20px;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+
+    #admin-header {
+        display: flex;
+        flex-direction: row;
+
+        #return-button {
+            margin: 20px;
+        }
+
+        #title {
+            margin-left: 20px;
+            background-color: $primary-dark;
+            // background-image: linear-gradient(to top, $primary-dark 0%, $primary 100%);
+            background-size: 100%;
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -moz-text-fill-color: transparent;
+        }
+    }
+
+    .game_list {
+        font-size: 2rem;
+        color: $primary-light;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        overflow-y: scroll;
+        scrollbar-width: thin;
+        scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
+        height: auto;
+    }
+
+    .button_container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+    }
 }

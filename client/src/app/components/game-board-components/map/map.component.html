@@ -1,9 +1,11 @@
 <div
     id="map"
-    [style.--grid-size]="this.gameMapDataManagerService.currentGrid.length"
-    [style.--tile-size]="100 / this.gameMapDataManagerService.currentGrid.length + '%'"
+    [style.--grid-size]="grid.length"
+    [style.--tile-size]="100 / grid.length + '%'"
+    (mouseenter)="onMouseMapEnter()"
+    (mouseleave)="onMouseMapLeave()"
 >
-    @for(row of this.gameMapDataManagerService.currentGrid; track row; let i = $index){ @for(tile of row; track tile; let j = $index){
+    @for(row of grid; track row; let i = $index){ @for(tile of row; track tile; let j = $index){
     <div class="tile-container">
         <app-placeable-entity
             [placeableEntity]="tile"
@@ -11,14 +13,15 @@
             (mousedown)="onMouseDown($event, tile)"
             (mouseenter)="onMouseEnter(tile)"
             (mousemove)="onMouseMove(tile)"
+            (mouseup)="onMouseUp(tile)"
             (mouseleave)="onMouseLeave(tile)"
             (contextmenu)="onContextMenu($event)"
-            [matTooltip]="gameMapDataManagerService.isTerrainTile(tile) ? tile.item?.description : ''"
+            [matTooltip]="tile.isTerrain() ? getTerrainItem(tile)?.description : ''"
         ></app-placeable-entity>
-        @if (gameMapDataManagerService.isTerrainTile(tile)) {
-        <app-placeable-entity [placeableEntity]="tile.item" class="layer-2"></app-placeable-entity>
+        @if (tile.isTerrain()) {
+        <app-placeable-entity [placeableEntity]="getTerrainItem(tile)" class="layer-2"></app-placeable-entity>
         }
-        <app-visible-state [placeableEntity]="tile" class="layer-3"></app-visible-state>
+        <app-visible-state [visibleState]="tile.visibleState" class="layer-3"></app-visible-state>
     </div>
     } }
 </div>

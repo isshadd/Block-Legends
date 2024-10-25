@@ -1,668 +1,607 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { Item } from '@app/classes/Items/item';
-import { DoorTile } from '@app/classes/Tiles/door-tile';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { OpenDoor } from '@app/classes/Tiles/open-door';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { WallTile } from '@app/classes/Tiles/wall-tile';
+import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
-import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
+import { TileShared } from '@common/interfaces/tile-shared';
 import { of, throwError } from 'rxjs';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
-import { ItemFactoryService } from './item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
 describe('GameMapDataManagerService', () => {
     let service: GameMapDataManagerService;
     let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
-    let itemFactoryServiceSpy: jasmine.SpyObj<ItemFactoryService>;
     let gameServerCommunicationServiceSpy: jasmine.SpyObj<GameServerCommunicationService>;
+    let dialogSpy: jasmine.SpyObj<MatDialog>;
+    let routerSpy: jasmine.SpyObj<Router>;
 
     beforeEach(() => {
-        const tileSpy = jasmine.createSpyObj('TileFactoryService', ['createTile']);
-        const itemSpy = jasmine.createSpyObj('ItemFactoryService', ['createItem']);
+        const tileFactorySpy = jasmine.createSpyObj('TileFactoryService', ['loadGridFromJSON']);
         const gameServerSpy = jasmine.createSpyObj('GameServerCommunicationService', ['addGame', 'updateGame']);
+        const dialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
+        const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
 
         TestBed.configureTestingModule({
             providers: [
                 GameMapDataManagerService,
-                { provide: TileFactoryService, useValue: tileSpy },
-                { provide: ItemFactoryService, useValue: itemSpy },
+                { provide: TileFactoryService, useValue: tileFactorySpy },
                 { provide: GameServerCommunicationService, useValue: gameServerSpy },
+                { provide: MatDialog, useValue: dialogSpyObj },
+                { provide: Router, useValue: routerSpyObj },
             ],
         });
 
         service = TestBed.inject(GameMapDataManagerService);
         tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
-        itemFactoryServiceSpy = TestBed.inject(ItemFactoryService) as jasmine.SpyObj<ItemFactoryService>;
         gameServerCommunicationServiceSpy = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
-
-        // Clear localStorage before each test
-        localStorage.clear();
+        dialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
+        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     });
 
-    it('should initialize a new game and create a new grid', () => {
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
+
+    it('should initialize the game and load the grid', () => {
         const mockGame: GameShared = {
-            _id: undefined,
-            name: 'New Game',
-            description: 'A brand new game',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        service.newGame(mockGame);
-
-        expect(service.databaseGame).toEqual(mockGame);
-        expect(service.currentName).toBe(mockGame.name);
-        expect(service.currentDescription).toBe(mockGame.description);
-        expect(service.currentGrid.length).toBe(mockGame.size);
-
-        expect(service.databaseGame.tiles.length).toBe(mockGame.size);
-    });
-
-    it('should load an existing game and initialize the grid', () => {
-        const mockGame: GameShared = {
-            _id: '12345',
-            name: 'Loaded Game',
-            description: 'A loaded game',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [
-                [{ type: TileType.Grass }, { type: TileType.Door }],
-                [{ type: TileType.Grass }, { type: TileType.OpenDoor }],
-            ],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        tileFactoryServiceSpy.createTile.and.callFake((type: TileType) => {
-            if (type === TileType.Grass) {
-                return new GrassTile();
-            } else if (type === TileType.Door) {
-                const doorTile = new DoorTile();
-                doorTile.type = type;
-                return doorTile;
-            } else if (type === TileType.OpenDoor) {
-                const openDoorTile = new OpenDoor();
-                openDoorTile.type = type;
-                return openDoorTile;
-            } else {
-                return new GrassTile();
-            }
-        });
-
-        service.loadGame(mockGame);
-
-        expect(service.databaseGame).toEqual(mockGame);
-        expect(service.currentGrid.length).toBe(mockGame.tiles.length);
-        const expectedTileCalls = 4;
-        expect(tileFactoryServiceSpy.createTile).toHaveBeenCalledTimes(expectedTileCalls);
-    });
-
-    it('should not save if name or description is invalid', () => {
-        service.currentName = '';
-        service.currentDescription = 'Valid Description';
-        spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
-
-        service.save();
-
-        expect(gameServerCommunicationServiceSpy.addGame).not.toHaveBeenCalled();
-        expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
-    });
-
-    it('should create a new game in the database if _id is undefined', () => {
-        const originalGame: GameShared = {
-            _id: undefined,
-            name: 'Game to Save',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = originalGame;
-        service.currentName = 'Game to Save';
-        service.currentDescription = 'Description';
-
-        const returnedGame: GameShared = { ...originalGame, _id: 'new_id' };
-        gameServerCommunicationServiceSpy.addGame.and.returnValue(of(returnedGame));
-
-        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
-
-        service.save();
-
-        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
-
-        expect(service.databaseGame._id).toBe('new_id');
-
-        expect(service.isGameUpdated).toBeFalse();
-
-        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
-        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, returnedGame);
-
-        expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
-    });
-
-    it('should update an existing game in the database if _id is defined', () => {
-        service.databaseGame = {
-            _id: 'existing_id',
-            name: 'Existing Game',
-            description: 'Existing Description',
-            mode: GameMode.CTF,
-            size: MapSize.LARGE,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.currentName = 'Updated Game';
-        service.currentDescription = 'Updated Description';
-        spyOn(service, 'hasValidNameAndDescription').and.returnValue(true);
-        spyOn(service, 'saveGameInDb').and.callFake(() => {
-            return of(void 0);
-        });
-
-        service.save();
-        expect(service.isGameUpdated).toBeFalse();
-        expect(service.saveGameInDb).toHaveBeenCalled();
-    });
-
-    it('should set and get local storage variables correctly', () => {
-        const isNewGame = true;
-        const mockGame: GameShared = {
-            _id: '123',
-            name: 'Local Storage Game',
-            description: 'Stored in local storage',
-            mode: GameMode.CTF,
-            size: MapSize.MEDIUM,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        service.setLocalStorageVariables(isNewGame, mockGame);
-
-        expect(localStorage.getItem('isNewGame')).toBe(JSON.stringify(isNewGame));
-        expect(localStorage.getItem('gameToEdit')).toBe(JSON.stringify(mockGame));
-
-        expect(service.getLocalStorageIsNewGame()).toBeTrue();
-        expect(service.getLocalStorageGameToEdit()).toEqual(mockGame);
-    });
-
-    it('should correctly save non-TerrainTile types by pushing { type: tile.type } to databaseGame.tiles', () => {
-        service.databaseGame = {
-            _id: 'test_id',
+            _id: '1',
             name: 'Test Game',
-            description: 'A test game description',
-            mode: GameMode.CTF,
+            description: 'A test game',
             size: MapSize.SMALL,
+            mode: GameMode.Classique,
             tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        const grassTile = new DoorTile();
-        grassTile.type = TileType.Door;
-
-        service.currentGrid = [[grassTile]];
-
-        service.saveMap();
-
-        expect(service.databaseGame.tiles.length).toBe(1);
-        expect(service.databaseGame.tiles[0].length).toBe(1);
-        expect(service.databaseGame.tiles[0][0]).toEqual(jasmine.objectContaining({ type: TileType.Door }));
-    });
-
-    it('should call addGame with the game having _id: undefined and update local storage with the returned game having _id: new_id', () => {
-        const originalGame: GameShared = {
-            _id: undefined,
-            name: 'New Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = originalGame;
-
-        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
-
-        const returnedGame: GameShared = { ...originalGame, _id: 'new_id' };
-        gameServerCommunicationServiceSpy.addGame.and.returnValue(of(returnedGame));
-
-        service.createGameInDb();
-
-        expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(originalGame);
-
-        expect(service.databaseGame).toEqual(returnedGame);
-
-        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
-        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, returnedGame);
-
-        expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(returnedGame));
-    });
-
-    it('should handle errors with unexpected structure in createGameInDb', () => {
-        const mockError = {
-            error: 'Some unexpected error format',
-        };
-
-        spyOn(service, 'openErrorModal');
-        gameServerCommunicationServiceSpy.addGame.and.returnValue(throwError(mockError));
-
-        service.createGameInDb();
-
-        expect(service.isGameUpdated).toBeTrue();
-    });
-
-    it('should not save if the game is not saved', () => {
-        service.databaseGame = { ...service.databaseGame, _id: undefined };
-        service.saveGameInDb();
-
-        expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
-    });
-
-    it('should handle errors with unexpected structure in saveGameInDb', () => {
-        const originalGame: GameShared = {
-            _id: 'testId',
-            name: 'New Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = originalGame;
-        const mockError = {
-            error: 'Some unexpected error format',
-        };
-
-        spyOn(service, 'openErrorModal');
-        spyOn(service, 'isSavedGame').and.returnValue(true);
-        gameServerCommunicationServiceSpy.updateGame.and.returnValue(throwError(mockError));
-
-        service.saveGameInDb();
-
-        expect(service.isGameUpdated).toBeTrue();
-    });
-
-    it('should call setLocalStorageVariables with false and the current game when the game is saved', () => {
-        const mockGame: GameShared = {
-            _id: 'existing_id',
-            name: 'Existing Game',
-            description: 'Existing Description',
-            mode: GameMode.CTF,
-            size: MapSize.LARGE,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = mockGame;
-
-        spyOn(service, 'isSavedGame').and.returnValue(true);
-
-        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
-
-        gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
-
-        service.saveGameInDb();
-
-        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', mockGame);
-
-        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
-        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, mockGame);
-
-        expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(mockGame));
-    });
-
-    it('should return true when isNewGame is set to true in localStorage', () => {
-        localStorage.setItem('isNewGame', 'true');
-        expect(service.getLocalStorageIsNewGame()).toBeTrue();
-    });
-
-    it('should return false when isNewGame is set to false in localStorage', () => {
-        localStorage.setItem('isNewGame', 'false');
-        expect(service.getLocalStorageIsNewGame()).toBeFalse();
-    });
-
-    it('should return false when isNewGame is not set in localStorage', () => {
-        localStorage.removeItem('isNewGame');
-        expect(service.getLocalStorageIsNewGame()).toBeFalse();
-    });
-
-    it('should return the game object when gameToEdit is set in localStorage', () => {
-        const mockGame: GameShared = {
-            _id: 'game_id',
-            name: 'Test Game',
-            description: 'Test Description',
-            mode: GameMode.CTF,
-            size: MapSize.MEDIUM,
-            tiles: [],
-            imageUrl: '',
             isVisible: true,
-        };
-        localStorage.setItem('gameToEdit', JSON.stringify(mockGame));
-        expect(service.getLocalStorageGameToEdit()).toEqual(mockGame);
-    });
-
-    it('should return an empty object when gameToEdit is not set in localStorage', () => {
-        localStorage.removeItem('gameToEdit');
-        expect(service.getLocalStorageGameToEdit()).toEqual({} as GameShared);
-    });
-
-    it('should not call setLocalStorageVariables if the game is not saved', () => {
-        const mockGame: GameShared = {
-            _id: undefined,
-            name: 'Unsaved Game',
-            description: 'Unsaved Description',
-            mode: GameMode.CTF,
-            size: MapSize.MEDIUM,
-            tiles: [],
             imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = mockGame;
-
-        spyOn(service, 'isSavedGame').and.returnValue(false);
-
-        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
-
-        service.saveGameInDb();
-
-        expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
-
-        expect(setLocalStorageSpy).not.toHaveBeenCalled();
-
-        expect(localStorage.getItem('isNewGame')).toBeNull();
-        expect(localStorage.getItem('gameToEdit')).toBeNull();
-    });
-
-    it('should return false when databaseGame is undefined', () => {
-        service.databaseGame = undefined as unknown as GameShared;
-        expect(service.isSavedGame()).toBeFalse();
-    });
-
-    it('should return false when databaseGame is undefined', () => {
-        service.databaseGame = undefined as unknown as GameShared;
-        expect(service.isGameModeCTF()).toBeFalse();
-    });
-
-    it('should update the game in the database if _id is defined', () => {
-        const existingGame: GameShared = {
-            _id: 'existing_id',
-            name: 'Existing Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.MEDIUM,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-        service.databaseGame = existingGame;
-
-        gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
-
-        const setLocalStorageSpy = spyOn(service, 'setLocalStorageVariables').and.callThrough();
-
-        service.saveGameInDb();
-
-        expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('existing_id', existingGame);
-
-        expect(setLocalStorageSpy).toHaveBeenCalledTimes(1);
-        expect(setLocalStorageSpy).toHaveBeenCalledWith(false, existingGame);
-
-        expect(localStorage.getItem('isNewGame')).toBe('false');
-        expect(localStorage.getItem('gameToEdit')).toEqual(JSON.stringify(existingGame));
-
-        expect(service.isGameUpdated).toBeFalse();
-    });
-
-    it('should correctly save the current grid to the database game tiles', () => {
-        service.databaseGame = {
-            _id: 'test_id',
-            name: 'Test Game',
-            description: 'A test game description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
         };
 
-        service.currentGrid = [[new GrassTile()], [new TerrainTile()]];
-
-        const grassTile = service.currentGrid[0][0] as GrassTile;
-        grassTile.type = TileType.Grass;
-
-        const terrainTile = service.currentGrid[1][0] as TerrainTile;
-        terrainTile.type = TileType.Door;
-        terrainTile.item = new Item();
-        terrainTile.item.type = ItemType.Sword;
-        service.saveMap();
-
-        expect(service.databaseGame.tiles.length).toBe(2);
-        expect(service.databaseGame.tiles[0].length).toBe(1);
-        expect(service.databaseGame.tiles[1].length).toBe(1);
-
-        expect(service.databaseGame.tiles[0][0].type).toBe(TileType.Grass);
-        expect(service.databaseGame.tiles[0][0].item).toBeNull();
-
-        expect(service.databaseGame.tiles[1][0].type).toBe(TileType.Door);
-        expect(service.databaseGame.tiles[1][0].item).toBeDefined();
-        expect(service.databaseGame.tiles[1][0].item?.type).toBe(ItemType.Sword);
+        spyOn(service, 'resetGame');
+        service.init(mockGame);
+        expect(service['databaseGame']).toEqual(mockGame);
+        expect(service['lastSavedGrid']).toEqual(mockGame.tiles);
+        expect(service.resetGame).toHaveBeenCalled();
     });
 
-    it('should reset current values and reload the grid', () => {
+    it('should reset current values and load grid', () => {
         spyOn(service, 'resetCurrentValues');
         spyOn(service, 'loadGrid');
 
         service.resetGame();
 
-        expect(service.resetCurrentValues).toHaveBeenCalled();
-        expect(service.loadGrid).toHaveBeenCalled();
+        expect(service['resetCurrentValues']).toHaveBeenCalled();
+        expect(service['loadGrid']).toHaveBeenCalled();
     });
 
-    it('should load correctly', () => {
-        service.databaseGame = {
-            _id: 'test_id',
+    it('should reset currentName, currentDescription, and currentGrid', () => {
+        service['databaseGame'] = {
+            _id: '1',
             name: 'Test Game',
-            description: 'A test game description',
-            mode: GameMode.CTF,
+            description: 'Test Description',
             size: MapSize.SMALL,
-            tiles: [[{ type: TileType.Grass, item: { type: ItemType.Sword } }, { type: TileType.Grass }]],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        spyOn(service, 'isTerrainTile').and.returnValue(true);
-        tileFactoryServiceSpy.createTile.and.returnValue(new GrassTile());
-        itemFactoryServiceSpy.createItem.and.returnValue(new DiamondSword());
-
-        service.loadGrid();
-
-        expect(service.currentGrid.length).toBe(1);
-    });
-
-    it('should correctly identify TerrainTile', () => {
-        const terrainTile = new TerrainTile();
-        terrainTile.item = new Item();
-
-        expect(service.isTerrainTile(terrainTile)).toBeTrue();
-    });
-
-    it('should correctly identify non-TerrainTile', () => {
-        const wallTile = new WallTile();
-
-        expect(service.isTerrainTile(wallTile)).toBeFalse();
-    });
-
-    it('should correctly identify Item', () => {
-        const item = new DiamondSword();
-
-        expect(service.isItem(item)).toBeTrue();
-    });
-
-    it('should return true for Door type', () => {
-        const doorTile = new DoorTile();
-
-        expect(service.isDoor(doorTile)).toBeTrue();
-    });
-
-    it('should return true for OpenDoor type', () => {
-        const openDoorTile = new OpenDoor();
-
-        expect(service.isDoor(openDoorTile)).toBeTrue();
-    });
-
-    it('should return false for other tile types', () => {
-        const grassTile = new GrassTile();
-
-        expect(service.isDoor(grassTile)).toBeFalse();
-    });
-
-    it('should return true when both name and description are valid', () => {
-        service.currentName = 'Valid Name';
-        service.currentDescription = 'Valid Description';
-
-        expect(service.hasValidNameAndDescription()).toBeTrue();
-    });
-
-    it('should return false when name is empty', () => {
-        service.currentName = '';
-        service.currentDescription = 'Valid Description';
-
-        expect(service.hasValidNameAndDescription()).toBeFalse();
-    });
-
-    it('should return false when description is empty', () => {
-        service.currentName = 'Valid Name';
-        service.currentDescription = '';
-
-        expect(service.hasValidNameAndDescription()).toBeFalse();
-    });
-
-    // it('should return false if databaseGame is undefined', () => {
-    //     service.databaseGame = undefined;
-
-    //     expect(service.isSavedGame()).toBeFalse();
-    // });
-
-    it('should return false if _id is undefined', () => {
-        service.databaseGame = {
-            _id: undefined,
-            name: 'Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        expect(service.isSavedGame()).toBeFalse();
-    });
-
-    it('should return true if _id is defined', () => {
-        service.databaseGame = {
-            _id: 'existing_id',
-            name: 'Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        };
-
-        expect(service.isSavedGame()).toBeTrue();
-    });
-
-    it('should return true if game mode is CTF', () => {
-        service.databaseGame = {
-            _id: 'existing_id',
-            name: 'Game',
-            description: 'Description',
-            mode: GameMode.CTF,
-            size: MapSize.SMALL,
-            tiles: [],
-            imageUrl: '',
-            isVisible: false,
-        } as GameShared;
-
-        expect(service.isGameModeCTF()).toBeTrue();
-    });
-
-    it('should return false if game mode is not CTF', () => {
-        service.databaseGame = {
-            _id: 'existing_id',
-            name: 'Game',
-            description: 'Description',
             mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        service.currentName = 'Old Name';
+        service.currentDescription = 'Old Description';
+        service['currentGrid'] = [[new GrassTile()]];
+
+        service['resetCurrentValues']();
+
+        expect(service.currentName).toBe('Test Game');
+        expect(service.currentDescription).toBe('Test Description');
+        expect(service['currentGrid']).toEqual([]);
+    });
+
+    describe('#saveGame', () => {
+        beforeEach(() => {
+            service['databaseGame'] = {
+                _id: undefined,
+                name: 'New Game',
+                description: 'A new game',
+                size: MapSize.SMALL,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+            service.currentName = 'New Game';
+            service.currentDescription = 'A new game';
+        });
+
+        it('should create a new game in the database', () => {
+            gameServerCommunicationServiceSpy.addGame.and.returnValue(
+                of({
+                    _id: '1',
+                    name: 'New Game',
+                    description: 'A new game',
+                    size: MapSize.SMALL,
+                    mode: GameMode.Classique,
+                    tiles: [],
+                    isVisible: true,
+                    imageUrl: '',
+                } as GameShared),
+            );
+            spyOn(service, 'saveMap');
+            service.saveGame();
+
+            expect(gameServerCommunicationServiceSpy.addGame).toHaveBeenCalledWith(service['databaseGame']);
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/administration-game']);
+        });
+
+        it('should return early if hasValidNameAndDescription returns false', () => {
+            service['databaseGame'] = {
+                _id: '1',
+                name: 'Test Game',
+                description: 'A test game',
+                size: MapSize.SMALL,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+
+            spyOn(service, 'hasValidNameAndDescription').and.returnValue(false);
+
+            spyOn(service, 'saveMap');
+            spyOn(service, 'createGameInDb');
+            spyOn(service, 'saveGameInDb');
+
+            service.saveGame();
+
+            expect(service['saveMap']).not.toHaveBeenCalled();
+            expect(service['createGameInDb']).not.toHaveBeenCalled();
+            expect(service['saveGameInDb']).not.toHaveBeenCalled();
+        });
+
+        it('should update an existing game in the database', () => {
+            service['databaseGame']._id = '1';
+            gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0));
+            spyOn(service, 'saveMap');
+            service.saveGame();
+
+            expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('1', service['databaseGame']);
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/administration-game']);
+        });
+
+        it('should show error modal on save error', () => {
+            const mockError = ['Save error'];
+            gameServerCommunicationServiceSpy.addGame.and.returnValue(throwError(() => mockError));
+
+            service.saveGame();
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
+                data: { message: mockError.join('<br>') },
+            });
+        });
+    });
+
+    it('should create a new grid for a new game', () => {
+        service['databaseGame'] = {
+            _id: undefined,
+            name: 'New Game',
+            description: 'A new game',
             size: MapSize.SMALL,
+            mode: GameMode.Classique,
             tiles: [],
+            isVisible: true,
             imageUrl: '',
-            isVisible: false,
-        } as GameShared;
+        };
 
-        expect(service.isGameModeCTF()).toBeFalse();
+        spyOn(service, 'createNewGrid');
+        service['loadGrid']();
+
+        expect(service['createNewGrid']).toHaveBeenCalled();
     });
 
-    // it('should return false if databaseGame is undefined', () => {
-    //     service.databaseGame = undefined;
-
-    //     expect(service.isGameModeCTF()).toBeFalse();
-    // });
-    it('should return correct game size', () => {
-        service.databaseGame = {
-            _id: 'existing_id',
-            name: 'Game',
-            description: 'Description',
-            mode: GameMode.CTF,
+    it('should create a new grid with GrassTiles and set coordinates', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
             size: MapSize.LARGE,
+            mode: GameMode.Classique,
             tiles: [],
+            isVisible: true,
             imageUrl: '',
-            isVisible: false,
-        } as GameShared;
+        };
 
-        expect(service.gameSize()).toBe(MapSize.LARGE);
+        service['createNewGrid']();
+        const largeMapLenght = 20;
+        expect(service['currentGrid'].length).toBe(largeMapLenght);
+        expect(service['currentGrid'][0].length).toBe(largeMapLenght);
+        expect(service['currentGrid'][1].length).toBe(largeMapLenght);
+
+        expect(service['currentGrid'][0][0]).toBeInstanceOf(GrassTile);
+        expect(service['currentGrid'][0][1]).toBeInstanceOf(GrassTile);
+        expect(service['currentGrid'][1][0]).toBeInstanceOf(GrassTile);
+        expect(service['currentGrid'][1][1]).toBeInstanceOf(GrassTile);
+
+        expect(service['currentGrid'][0][0].coordinates).toEqual({ x: 0, y: 0 });
+        expect(service['currentGrid'][0][1].coordinates).toEqual({ x: 0, y: 1 });
+        expect(service['currentGrid'][1][0].coordinates).toEqual({ x: 1, y: 0 });
+        expect(service['currentGrid'][1][1].coordinates).toEqual({ x: 1, y: 1 });
+
+        expect(service['lastSavedGrid'][0][0]).toEqual({ type: TileType.Grass });
+        expect(service['lastSavedGrid'][0][1]).toEqual({ type: TileType.Grass });
+        expect(service['lastSavedGrid'][1][0]).toEqual({ type: TileType.Grass });
+        expect(service['lastSavedGrid'][1][1]).toEqual({ type: TileType.Grass });
     });
 
-    it('should return correct item limit based on game size', () => {
-        const smallItemLimit = 2;
-        const mediumItemLimit = 4;
-        const largeItemLimit = 6;
+    it('should load the last saved grid for an existing game', () => {
+        const mockTiles: TileShared[][] = [[{ type: TileType.Grass }]];
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Existing Game',
+            description: 'A game with saved tiles',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: mockTiles,
+            isVisible: true,
+            imageUrl: '',
+        };
 
-        service.databaseGame = { size: MapSize.SMALL } as GameShared;
-        expect(service.itemLimit()).toBe(smallItemLimit);
+        service['lastSavedGrid'] = mockTiles;
+        tileFactoryServiceSpy.loadGridFromJSON.and.returnValue([[new GrassTile()]]);
+        service['loadGrid']();
 
-        service.databaseGame.size = MapSize.MEDIUM;
-        expect(service.itemLimit()).toBe(mediumItemLimit);
-
-        service.databaseGame.size = MapSize.LARGE;
-        expect(service.itemLimit()).toBe(largeItemLimit);
+        expect(tileFactoryServiceSpy.loadGridFromJSON).toHaveBeenCalledWith(mockTiles);
     });
 
-    it('should open ErrorModalComponent with concatenated error messages when an array is provided', () => {
-        const messages = ['Error 1', 'Error 2', 'Error 3'];
+    it('should save the current grid to the game tiles', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Existing Game',
+            description: 'A game with an empty grid',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+        service['currentGrid'] = [[new GrassTile()]];
 
-        spyOn(service.dialog, 'open').and.callThrough();
+        service['saveMap']();
 
-        service.openErrorModal(messages);
+        expect(service['databaseGame'].tiles.length).toBe(1);
+        expect(service['databaseGame'].tiles[0][0].type).toBe(TileType.Grass);
+    });
 
-        expect(service.dialog.open).toHaveBeenCalled();
+    describe('#saveMap', () => {
+        beforeEach(() => {
+            service['databaseGame'] = {
+                _id: '1',
+                name: 'Test Game',
+                description: 'A test game',
+                size: MapSize.MEDIUM,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+        });
+
+        it('should save terrain tiles with items to databaseGame.tiles', () => {
+            const terrainTile = new GrassTile() as TerrainTile;
+            terrainTile.item = new DiamondSword();
+
+            service['currentGrid'] = [[terrainTile]];
+
+            service['saveMap']();
+
+            expect(service['databaseGame'].tiles.length).toBe(1);
+            expect(service['databaseGame'].tiles[0][0]).toEqual({
+                type: terrainTile.type,
+                item: { type: terrainTile.item.type },
+            });
+        });
+
+        it('should save terrain tiles without items to databaseGame.tiles', () => {
+            const terrainTile = new GrassTile() as TerrainTile;
+            terrainTile.item = null;
+
+            service['currentGrid'] = [[terrainTile]];
+
+            service['saveMap']();
+
+            expect(service['databaseGame'].tiles.length).toBe(1);
+            expect(service['databaseGame'].tiles[0][0]).toEqual({
+                type: terrainTile.type,
+                item: null,
+            });
+        });
+
+        it('should save non-terrain tiles to databaseGame.tiles', () => {
+            const nonTerrainTile = new GrassTile();
+            spyOn(nonTerrainTile, 'isTerrain').and.returnValue(false);
+
+            service['currentGrid'] = [[nonTerrainTile]];
+
+            service['saveMap']();
+
+            expect(service['databaseGame'].tiles.length).toBe(1);
+            expect(service['databaseGame'].tiles[0][0]).toEqual({ type: nonTerrainTile.type });
+        });
+    });
+
+    it('should open an error modal with a string message', () => {
+        service.openErrorModal('An error occurred');
+        expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
+            data: { message: 'An error occurred' },
+        });
+    });
+
+    it('should open an error modal with an array of messages', () => {
+        const errors = ['Error 1', 'Error 2'];
+        service.openErrorModal(errors);
+        expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
+            data: { message: errors.join('<br>') },
+        });
+    });
+
+    describe('#saveGameInDb', () => {
+        beforeEach(() => {
+            service['databaseGame'] = {
+                _id: '1',
+                name: 'Test Game',
+                description: 'A test game',
+                size: MapSize.SMALL,
+                mode: GameMode.Classique,
+                tiles: [],
+                isVisible: true,
+                imageUrl: '',
+            };
+        });
+
+        it('should return early if databaseGame._id is not defined', () => {
+            service['databaseGame']._id = undefined;
+
+            service['saveGameInDb']();
+
+            expect(gameServerCommunicationServiceSpy.updateGame).not.toHaveBeenCalled();
+        });
+
+        it('should call updateGame and navigate to /administration-game on success', () => {
+            gameServerCommunicationServiceSpy.updateGame.and.returnValue(of(void 0)); // Mock success response
+
+            service['saveGameInDb']();
+
+            expect(gameServerCommunicationServiceSpy.updateGame).toHaveBeenCalledWith('1', service['databaseGame']);
+
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/administration-game']);
+        });
+
+        it('should open error modal if updateGame fails', () => {
+            const mockError = ['Update error'];
+            gameServerCommunicationServiceSpy.updateGame.and.returnValue(throwError(() => mockError)); // Mock error
+
+            service['saveGameInDb']();
+
+            expect(dialogSpy.open).toHaveBeenCalledWith(ErrorModalComponent, {
+                data: { message: mockError.join('<br>') },
+            });
+        });
+    });
+
+    it('should return the current grid', () => {
+        const mockGrid = [
+            [new GrassTile(), new GrassTile()],
+            [new GrassTile(), new GrassTile()],
+        ];
+        service['currentGrid'] = mockGrid;
+
+        const result = service.getCurrentGrid();
+
+        expect(result).toBe(mockGrid);
+    });
+
+    it('should store isNewGame and gameToEdit in localStorage', () => {
+        const isNewGame = true;
+        const mockGame: GameShared = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        spyOn(localStorage, 'setItem');
+
+        service.setLocalStorageVariables(isNewGame, mockGame);
+
+        expect(localStorage.setItem).toHaveBeenCalledWith('isNewGame', JSON.stringify(isNewGame));
+        expect(localStorage.setItem).toHaveBeenCalledWith('gameToEdit', JSON.stringify(mockGame));
+    });
+
+    it('should return true when isNewGame is stored as true in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('true');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeTrue();
+    });
+
+    it('should return false when isNewGame is stored as false in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('false');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return false when isNewGame is not set in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return false when isNewGame contains invalid data in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('false');
+
+        const result = service.getLocalStorageIsNewGame();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return the gameToEdit object when it is stored in localStorage', () => {
+        const mockGame = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(mockGame));
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual(mockGame);
+    });
+
+    it('should return an empty object if gameToEdit is not set in localStorage', () => {
+        spyOn(localStorage, 'getItem').and.returnValue(null);
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual({} as GameShared);
+    });
+
+    it('should return an empty object if gameToEdit is an invalid JSON string', () => {
+        spyOn(localStorage, 'getItem').and.returnValue('{}');
+
+        const result = service.getLocalStorageGameToEdit();
+
+        expect(result).toEqual({} as GameShared);
+    });
+
+    it('should return true when the game mode is CTF', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'CTF Game',
+            description: 'A CTF game',
+            size: MapSize.SMALL,
+            mode: GameMode.CTF,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.isGameModeCTF();
+
+        expect(result).toBeTrue();
+    });
+
+    it('should return false when the game mode is not CTF', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Non-CTF Game',
+            description: 'A non-CTF game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.isGameModeCTF();
+
+        expect(result).toBeFalse();
+    });
+
+    it('should return the game size from databaseGame', () => {
+        service['databaseGame'] = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.gameSize();
+
+        expect(result).toBe(MapSize.SMALL);
+    });
+
+    it('should return the game size when it is set to LARGE', () => {
+        service['databaseGame'] = {
+            _id: '2',
+            name: 'Another Test Game',
+            description: 'Another test game',
+            size: MapSize.LARGE,
+            mode: GameMode.Classique,
+            tiles: [],
+            isVisible: true,
+            imageUrl: '',
+        };
+
+        const result = service.gameSize();
+
+        expect(result).toBe(MapSize.LARGE);
+    });
+    it('should return 2 when the game size is SMALL', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.SMALL);
+
+        const result = service.itemLimit();
+
+        expect(result).toBe(2);
+    });
+
+    it('should return 4 when the game size is MEDIUM', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.MEDIUM);
+
+        const result = service.itemLimit();
+
+        const itemLimit = 4;
+        expect(result).toBe(itemLimit);
+    });
+
+    it('should return 6 when the game size is LARGE', () => {
+        spyOn(service, 'gameSize').and.returnValue(MapSize.LARGE);
+
+        const result = service.itemLimit();
+
+        const itemLimit = 6;
+        expect(result).toBe(itemLimit);
+    });
+
+    it('should return the correct tile based on the coordinates', () => {
+        const tile1 = new GrassTile();
+        const tile2 = new GrassTile();
+        const tile3 = new GrassTile();
+        const tile4 = new GrassTile();
+
+        service['currentGrid'] = [
+            [tile1, tile2],
+            [tile3, tile4],
+        ];
+
+        const result1 = service.getTileAt({ x: 0, y: 0 });
+
+        const result2 = service.getTileAt({ x: 1, y: 1 });
+
+        expect(result1).toBe(tile1);
+
+        expect(result2).toBe(tile4);
     });
 });
