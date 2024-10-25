@@ -45,7 +45,7 @@ export class GameServerCommunicationService {
         };
     }
 
-    private handleErrors<T>(operation: 'addGame' | 'updateGame' = 'addGame') {
+    private handleErrors<T>() {
         return (error: unknown): Observable<T> => {
             let errorMsgs: string[] = [];
             const err = error as { error: string[] };

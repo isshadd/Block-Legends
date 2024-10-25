@@ -80,7 +80,7 @@ export class GameValidationService {
         const SPAN_MEDIUM_MAP = 4;
         const SPAN_LARGE_MAP = 6;
 
-        let gameToValidate = await this.assignGameToRightType(game);
+        const gameToValidate = await this.assignGameToRightType(game);
         const spawnPoints = await this.getNumberOfSpawnPoints(gameToValidate);
         switch (gameToValidate.size) {
             case MapSize.SMALL:
@@ -95,7 +95,7 @@ export class GameValidationService {
     }
 
     async mapToMatrix(game: Game | UpdateGameDto): Promise<number[][]> {
-        let map = await this.assignGameToRightType(game);
+        const map = await this.assignGameToRightType(game);
         const matrix: number[][] = map.tiles.map((row) => row.map((tile) => (tile.type === TileType.Wall ? 1 : 0)));
         return matrix;
     }
@@ -182,7 +182,7 @@ export class GameValidationService {
 
     async isHalfMapTilesValid(game: Game | UpdateGameDto): Promise<boolean> {
         let terrainTileCount = 0;
-        let gameToValidate = await this.assignGameToRightType(game);
+        const gameToValidate = await this.assignGameToRightType(game);
         gameToValidate.tiles.forEach((row) => {
             row.forEach((tile) => {
                 if (tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice) {

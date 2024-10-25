@@ -1,10 +1,10 @@
 import { Game, GameDocument } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { GameValidationService } from '../game-validation/gameValidation.service';
 
 @Injectable()
 export class GameService {

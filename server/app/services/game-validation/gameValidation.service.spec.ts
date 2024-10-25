@@ -13,6 +13,9 @@ describe('GameValidationService', () => {
     let gameValidationService: GameValidationService;
     let gameService: GameService;
     const SMALL_SIZE = 10;
+    const SMALL_MAP_SPAWN_COUNT = 2;
+    const MEDIUM_MAP_SPAWN_COUNT = 4;
+    const LARGE_MAP_SPAWN_COUNT = 6;
 
     beforeEach(() => {
         gameService = {
@@ -23,7 +26,6 @@ describe('GameValidationService', () => {
 
     describe('validateGame', () => {
         it('should return valid for a valid game', async () => {
-            const TILE_SIZE = 10;
             const game: Game = {
                 name: 'Valid Game',
                 description: 'A valid description',
@@ -34,7 +36,7 @@ describe('GameValidationService', () => {
                 tiles: createValidTiles(SMALL_SIZE),
             };
 
-            const result = await gameValidationService.validateNameDescription(game);
+            const result = await gameValidationService.validateGame(game);
             expect(result).toBe(true);
         });
 
@@ -49,7 +51,7 @@ describe('GameValidationService', () => {
                 tiles: createValidTiles(SMALL_SIZE),
             };
 
-            const result = await gameValidationService.validateNameDescription(game);
+            const result = await gameValidationService.validateName(game);
             expect(result).toBe(false);
         });
 
@@ -200,7 +202,7 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game);
             expect(result).toBe(true);
         });
 
@@ -336,7 +338,7 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game);
             expect(result).toBe(false);
         });
 
@@ -472,7 +474,7 @@ describe('GameValidationService', () => {
                 isVisible: true,
             } as Game;
 
-            const result = await gameValidationService.isHalfMapTilesValid(game, MapSize.SMALL);
+            const result = await gameValidationService.isHalfMapTilesValid(game);
             expect(result).toBe(false);
         });
 
@@ -726,7 +728,7 @@ describe('GameValidationService', () => {
                         [false, false, false],
                     ];
 
-                    const result = gameValidationService.isValid(0, 0, map, visited);
+                    const result = gameValidationService.isValidForTraversal(0, 0, map, visited);
                     expect(result).toBe(true);
                 });
             });
@@ -798,7 +800,7 @@ describe('GameValidationService', () => {
                         ],
                     } as Game;
 
-                    const result = await gameValidationService.isHalfMapTilesValid(game, 2);
+                    const result = await gameValidationService.isHalfMapTilesValid(game);
                     expect(result).toBe(true);
                 });
 
@@ -813,7 +815,7 @@ describe('GameValidationService', () => {
                         ],
                     } as Game;
 
-                    const result = await gameValidationService.isHalfMapTilesValid(game, 2);
+                    const result = await gameValidationService.isHalfMapTilesValid(game);
                     expect(result).toBe(false);
                 });
             });
@@ -860,29 +862,29 @@ describe('GameValidationService', () => {
         return spawnCount;
     }
 
-    function createTilesWithInvalidSpawn(size: number): Tile[][] {
-        const tiles: Tile[][] = [];
-        let invalidSpawnCount = 0;
-        switch (size) {
-            case MapSize.SMALL:
-                invalidSpawnCount = 4;
-            case MapSize.MEDIUM:
-                invalidSpawnCount = 2;
-            case MapSize.LARGE:
-                invalidSpawnCount = 7;
-            default:
-                invalidSpawnCount = 0;
-        }
-        for (let i = 0; i < size; i++) {
-            tiles[i] = [];
-            for (let j = 0; j < size; j++) {
-                tiles[i][j] = { type: TileType.Grass };
-                if (invalidSpawnCount > 0) {
-                    tiles[i][j].item.type = ItemType.Spawn;
-                    invalidSpawnCount--;
-                }
-            }
-        }
-        return tiles;
-    }
+    // function createTilesWithInvalidSpawn(size: number): Tile[][] {
+    //     const tiles: Tile[][] = [];
+    //     let invalidSpawnCount = 0;
+    //     switch (size) {
+    //         case MapSize.SMALL:
+    //             invalidSpawnCount = 4;
+    //         case MapSize.MEDIUM:
+    //             invalidSpawnCount = 2;
+    //         case MapSize.LARGE:
+    //             invalidSpawnCount = 7;
+    //         default:
+    //             invalidSpawnCount = 0;
+    //     }
+    //     for (let i = 0; i < size; i++) {
+    //         tiles[i] = [];
+    //         for (let j = 0; j < size; j++) {
+    //             tiles[i][j] = { type: TileType.Grass };
+    //             if (invalidSpawnCount > 0) {
+    //                 tiles[i][j].item.type = ItemType.Spawn;
+    //                 invalidSpawnCount--;
+    //             }
+    //         }
+    //     }
+    //     return tiles;
+    // }
 });

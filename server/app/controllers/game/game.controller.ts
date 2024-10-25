@@ -69,7 +69,7 @@ export class GameController {
             response.status(HttpStatus.CREATED).json(newGame);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
-            //this.openModal(error.message);
+            // this.openModal(error.message);
         }
     }
     @ApiOkResponse({
