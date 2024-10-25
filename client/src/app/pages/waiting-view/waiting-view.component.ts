@@ -3,11 +3,12 @@ import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
+import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, ClavardageComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
 })

@@ -3,7 +3,7 @@ import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { Logger } from '@nestjs/common';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { Socket, Server, BroadcastOperator } from 'socket.io';
-import { ChatEvents } from './chat.gateway.events';
+import { ChatEvents } from '@common/enums/chat-events';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 
 describe('ChatGateway', () => {
