@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -24,7 +25,11 @@ export class PlayPageComponent {
         tiles: [],
     };
 
-    constructor(public gameMapDataManagerService: GameMapDataManagerService) {
+    constructor(
+        public gameMapDataManagerService: GameMapDataManagerService,
+        private webSocketService: WebSocketService,
+    ) {
         this.gameMapDataManagerService.init(this.gameToPlay);
+        console.log(this.webSocketService.getRoomInfo());
     }
 }

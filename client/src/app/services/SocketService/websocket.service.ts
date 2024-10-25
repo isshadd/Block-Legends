@@ -18,6 +18,7 @@ export class WebSocketService {
     public socket: Socket;
     public playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
     players$ = this.playersSubject.asObservable();
+    currentRoom: GameRoom;
 
     constructor(
         private router: Router,
@@ -39,6 +40,7 @@ export class WebSocketService {
             console.log('Received room state:', room);
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
+            this.currentRoom = room;
         });
 
         this.socket.on('updatePlayers', (players: PlayerCharacter[]) => {
@@ -94,6 +96,10 @@ export class WebSocketService {
         if (roomId) {
             this.socket.emit('lockRoom', roomId);
         }
+    }
+
+    getRoomInfo() {
+        return this.currentRoom;
     }
 
     unlockRoom() {
