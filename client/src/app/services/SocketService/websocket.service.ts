@@ -4,6 +4,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService } from '@app/services/game-services/game.service';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 interface GameRoom {
     roomId: string;
@@ -24,7 +25,7 @@ export class WebSocketService {
         private router: Router,
         private gameService: GameService,
     ) {
-        this.socket = io('http://localhost:3000');
+        this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }
 
