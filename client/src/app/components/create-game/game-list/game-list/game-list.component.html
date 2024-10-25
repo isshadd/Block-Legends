@@ -9,7 +9,7 @@
             @for(game of getFilteredGames(); track game) {
             <li class="game-item">
                 <div class="game-box">
-                    <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
+                    <app-map class="map-container" [grid]="loadedTiles[getFilteredGames().indexOf(game)]"></app-map>
                     <div class="game-details">
                         <h2>{{ game.name }}</h2>
                         <p>Taille de la carte: {{ game.size }}</p>
@@ -25,11 +25,6 @@
         }
     </div>
     @if(gameStatus){
-    <app-modal-one-option 
-    [title]="'Erreur'" 
-    [message]="gameStatus" 
-    [confirmText]="'Fermer'" 
-    (confirm)="confirmBack()"
-    ></app-modal-one-option>
+    <app-modal-one-option [title]="'Erreur'" [message]="gameStatus" [confirmText]="'Fermer'" (confirm)="confirmBack()"></app-modal-one-option>
     }
 </div>
