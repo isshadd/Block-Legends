@@ -1,13 +1,13 @@
-@for(game of getGames(); track game.name){
+@for(game of databaseGames; track game.name){
 <li [class]="game.isVisible ? 'visible' : 'invisible'">
-    <img [src]="game.imageUrl" />
+    <app-map class="map-container" [grid]="loadedTiles[databaseGames.indexOf(game)]"></app-map>
     <div class="game_info">
         <div class="text_info">
             <h3>{{ game.name }}</h3>
             <div class="infos">
                 <p>Taille: {{ game.size }} x {{ game.size }}</p>
                 <p>Mode: {{ game.mode }}</p>
-                <p>Dernière modification: {{ game.updatedAt | date: 'shortDate' }}</p>
+                <p>Dernière modification: {{ game.updatedAt | date: 'short' }}</p>
             </div>
         </div>
         <div class="description">

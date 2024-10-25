@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { enableProdMode } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { Routes, provideRouter } from '@angular/router';
+import { Routes, provideRouter, withHashLocation } from '@angular/router';
 import { AdministrationGameComponent } from '@app/pages/administration-game/administration-game.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreateCharacterComponent } from '@app/pages/create-character/create-character.component';
@@ -34,5 +34,5 @@ const routes: Routes = [
 ];
 
 bootstrapApplication(AppComponent, {
-    providers: [provideHttpClient(), provideRouter(routes), provideAnimations()],
+    providers: [provideHttpClient(), provideRouter(routes, withHashLocation()), provideAnimations()],
 });

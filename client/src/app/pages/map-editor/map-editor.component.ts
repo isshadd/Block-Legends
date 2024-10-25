@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 // eslint-disable-next-line max-len
 import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
@@ -20,6 +22,10 @@ import { GameShared } from '@common/interfaces/game-shared';
 export class MapEditorComponent {
     isNewGame: boolean;
     gameToEdit: GameShared;
+    isDragging: boolean = false;
+    dragImage: string = '';
+    mouseX = 0;
+    mouseY = 0;
 
     constructor(
         public mapEditorManagerService: MapEditorManagerService,
@@ -31,7 +37,7 @@ export class MapEditorComponent {
         this.gameToEdit = this.gameMapDataManagerService.getLocalStorageGameToEdit();
 
         if (this.isNewGame) {
-            this.gameMapDataManagerService.newGame(this.gameToEdit);
+            this.gameMapDataManagerService.init(this.gameToEdit);
             this.mapEditorManagerService.init();
         } else {
             if (!this.gameToEdit || !this.gameToEdit._id) {
@@ -40,14 +46,72 @@ export class MapEditorComponent {
             }
 
             this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
-                this.gameMapDataManagerService.loadGame(game);
+                this.gameMapDataManagerService.init(game);
                 this.mapEditorManagerService.init();
                 this.mapEditorManagerService.mapItemCheckup();
             });
         }
     }
 
+    @HostListener('document:mouseup')
     onMouseUp() {
-        this.mapEditorManagerService.onMouseUpMapTile();
+        this.mapEditorManagerService.onMouseUp();
+        this.isDragging = false;
+    }
+
+    onMapMouseEnter() {
+        this.mapEditorManagerService.onMapMouseEnter();
+    }
+
+    onMapMouseLeave() {
+        this.mapEditorManagerService.onMapMouseLeave();
+    }
+
+    onMapTileMouseUp(tile: Tile) {
+        this.mapEditorManagerService.onMouseUpMapTile(tile);
+    }
+
+    onMouseDown(event: MouseEvent) {
+        event.preventDefault();
+        if (event.button === 2) return;
+
+        const draggedItem = this.mapEditorManagerService.getDraggedItem();
+        if (draggedItem) {
+            this.isDragging = true;
+            this.dragImage = draggedItem.imageUrl;
+            this.onMouseMove(event);
+        }
+    }
+
+    onMouseMove(event: MouseEvent) {
+        if (this.isDragging) {
+            this.mouseX = (event as MouseEvent).clientX;
+            this.mouseY = (event as MouseEvent).clientY;
+        }
+    }
+
+    onMapTileMouseDown(event: MouseEvent, tile: Tile) {
+        this.mapEditorManagerService.onMouseDownMapTile(event, tile);
+        if (tile.isTerrain()) {
+            const item = (tile as TerrainTile).item;
+            if (item) {
+                this.isDragging = true;
+                this.dragImage = item.imageUrl;
+                this.onMouseMove(event);
+            }
+        }
+        event.preventDefault();
+    }
+
+    onMapTileMouseEnter(tile: Tile) {
+        this.mapEditorManagerService.onMouseEnter(tile);
+    }
+
+    onMapTileMouseMove(tile: Tile) {
+        this.mapEditorManagerService.onMouseMoveMapTile(tile);
+    }
+
+    onMapTileMouseLeave(tile: Tile) {
+        this.mapEditorManagerService.onMouseLeave(tile);
     }
 }

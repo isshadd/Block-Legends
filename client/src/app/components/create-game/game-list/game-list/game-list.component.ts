@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.services';
+import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
