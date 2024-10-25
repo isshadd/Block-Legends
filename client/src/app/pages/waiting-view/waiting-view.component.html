@@ -18,6 +18,7 @@
         <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
         <button class="dark-button" type="button" (click)="lockRoom()">Verouiller la salle</button>
         <button class="dark-button" type="button" (click)="unlockRoom()">Deverouiller la salle</button>
+        <button class="dark-button" type="button" (click)="playGame()">Lancer la partie!</button>
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
