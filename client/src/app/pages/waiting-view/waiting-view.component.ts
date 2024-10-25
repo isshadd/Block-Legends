@@ -75,6 +75,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     playGame(): void {
-        this.router.navigate(['/play-page']);
+        this.webSocketService.startGame();
     }
 }

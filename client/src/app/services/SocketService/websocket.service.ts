@@ -67,6 +67,10 @@ export class WebSocketService {
         this.socket.on('roomUnlocked', () => {
             alert('La salle a été déverrouillée');
         });
+
+        this.socket.on('gameStarted', () => {
+            this.router.navigate(['/play-page']);
+        });
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -95,6 +99,13 @@ export class WebSocketService {
         const roomId = localStorage.getItem('roomId');
         if (roomId) {
             this.socket.emit('lockRoom', roomId);
+        }
+    }
+
+    startGame() {
+        const roomId = localStorage.getItem('roomId');
+        if (roomId) {
+            this.socket.emit('startGame', roomId);
         }
     }
 

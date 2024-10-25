@@ -125,6 +125,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
     }
 
+    @SubscribeMessage('startGame')
+    handleStartGame(client: Socket, roomId: string) {
+        const room = this.rooms.get(roomId);
+        if (room && room.organizer === client.id) {
+            this.server.to(roomId).emit('gameStarted');
+        }
+    }
+
     @SubscribeMessage('lockRoom')
     handleLockRoom(client: Socket, roomId: string) {
         const room = this.rooms.get(roomId);
