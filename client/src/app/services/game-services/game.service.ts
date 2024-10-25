@@ -9,8 +9,8 @@ export const VP_NUMBER = 5;
     providedIn: 'root',
 })
 export class GameService {
-    private accessCodeSubject = new BehaviorSubject<number | null>(null);
-    private characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', '', new PlayerAttributes()));
+    accessCodeSubject = new BehaviorSubject<number | null>(null);
+    characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', '', new PlayerAttributes()));
 
     accessCode$ = this.accessCodeSubject.asObservable();
     character$ = this.characterSubject.asObservable();

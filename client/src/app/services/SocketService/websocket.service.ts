@@ -15,8 +15,8 @@ interface GameRoom {
     providedIn: 'root',
 })
 export class WebSocketService {
-    public socket: Socket;
-    public playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
+    socket: Socket;
+    playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
     players$ = this.playersSubject.asObservable();
     currentRoom: GameRoom;
 
@@ -118,5 +118,46 @@ export class WebSocketService {
         if (roomId) {
             this.socket.emit('unlockRoom', roomId);
         }
+    }
+
+    private setupSocketListeners() {
+        this.socket.on('connect', () => {
+            const roomId = localStorage.getItem('roomId');
+            if (roomId) {
+                this.socket.emit('getRoomState', roomId);
+            }
+        });
+
+        this.socket.on('roomState', (room: GameRoom) => {
+            // console.log('Received room state:', room);
+            this.gameService.setAccessCode(room.accessCode);
+            this.playersSubject.next(room.players);
+            this.currentRoom = room;
+        });
+
+        this.socket.on('updatePlayers', (players: PlayerCharacter[]) => {
+            // console.log('Received players update:', players);
+            this.playersSubject.next(players);
+        });
+
+        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number }) => {
+            if (response.valid) {
+                localStorage.setItem('roomId', response.roomId);
+                this.gameService.setAccessCode(response.accessCode);
+                this.router.navigate(['/player-create-character'], {
+                    queryParams: { roomId: response.roomId },
+                });
+            } else {
+                alert("Code d'accès invalide");
+            }
+        });
+
+        this.socket.on('roomLocked', () => {
+            alert('La salle a été verrouillée');
+        });
+
+        this.socket.on('roomUnlocked', () => {
+            alert('La salle a été déverrouillée');
+        });
     }
 }

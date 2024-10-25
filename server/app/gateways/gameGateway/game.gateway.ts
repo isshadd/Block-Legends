@@ -16,19 +16,8 @@ interface GameRoom {
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
-    public rooms: Map<string, GameRoom> = new Map();
-    public playerRooms: Map<string, string> = new Map();
-
-    handleConnection(client: Socket) {
-        console.log(`Client connected: ${client.id}`);
-    }
-
-    handleDisconnect(client: Socket) {
-        const roomId = this.playerRooms.get(client.id);
-        if (roomId) {
-            this.handlePlayerLeave(client, roomId);
-        }
-    }
+    rooms: Map<string, GameRoom> = new Map();
+    playerRooms: Map<string, string> = new Map();
 
     @SubscribeMessage('getRoomState')
     handleGetRoomState(client: Socket, roomId: string) {
@@ -69,7 +58,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('joinGame')
     handleJoinGame(client: Socket, accessCode: number) {
-        const room = Array.from(this.rooms.values()).find((room) => room.accessCode === accessCode);
+        const room = Array.from(this.rooms.values()).find((r) => r.accessCode === accessCode);
 
         if (!room) {
             client.emit('joinGameResponse', {
@@ -149,7 +138,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
-    public generateAccessCode(): number {
-        return Math.floor(1000 + Math.random() * 9000);
+    handleConnection(/* client: Socket */) {
+        // console.log(`Client connected: ${client.id}`);
+    }
+
+    handleDisconnect(client: Socket) {
+        const roomId = this.playerRooms.get(client.id);
+        if (roomId) {
+            this.handlePlayerLeave(client, roomId);
+        }
+    }
+
+    generateAccessCode(): number {
+        const MIN_ACCESS_CODE = 1000;
+        const MAX_ACCESS_CODE = 9999;
+        return Math.floor(MIN_ACCESS_CODE + Math.random() * (MAX_ACCESS_CODE - MIN_ACCESS_CODE + 1));
     }
 }
