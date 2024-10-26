@@ -13,10 +13,9 @@ export class PlayerCharacter {
     dice: string;
     isNameValid: boolean = false;
     avatar: Avatar;
-    constructor(
-        public name: string,
-        public attributes = new PlayerAttributes(),
-    ) {}
+    attributes = new PlayerAttributes();
+
+    constructor(public name: string) {}
 
     assignAttackDice() {
         this.dice = 'attack';

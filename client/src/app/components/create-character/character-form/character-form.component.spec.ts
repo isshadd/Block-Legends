@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { CharacterFormComponent } from './character-form.component';
 
@@ -16,7 +15,7 @@ describe('CharacterFormComponent', () => {
         fixture = TestBed.createComponent(CharacterFormComponent);
         component = fixture.componentInstance;
 
-        component.character = new PlayerCharacter('Nom du personnage', new PlayerAttributes());
+        component.character = new PlayerCharacter('Nom du personnage');
 
         fixture.detectChanges();
     });
