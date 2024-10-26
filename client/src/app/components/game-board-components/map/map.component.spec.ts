@@ -82,7 +82,7 @@ describe('MapComponent', () => {
     });
 
     it('should return the item of a TerrainTile', () => {
-        let terrainTile = component.grid[1][0] as TerrainTile;
+        const terrainTile = component.grid[1][0] as TerrainTile;
         terrainTile.item = new DiamondSword();
         expect(component.getTerrainItem(terrainTile)).toEqual(terrainTile.item);
     });
@@ -93,7 +93,7 @@ describe('MapComponent', () => {
     });
 
     it('should return the player of a TerrainTile', () => {
-        let terrainTile = component.grid[1][0] as TerrainTile;
+        const terrainTile = component.grid[1][0] as TerrainTile;
         terrainTile.player = new PlayerMapEntity('');
         expect(component.getTerrainPlayer(terrainTile)).toEqual(terrainTile.player);
     });

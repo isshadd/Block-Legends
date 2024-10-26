@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Item } from '@app/classes/Items/item';
-import { PlayerMapEntity } from '../Characters/player-map-entity';
 import { Tile } from './tile';
 
 @Injectable({

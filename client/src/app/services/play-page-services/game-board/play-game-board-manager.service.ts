@@ -19,7 +19,7 @@ export class PlayGameBoardManagerService {
             this.gameMapDataManagerService.init(game);
         });
 
-        console.log(this.webSocketService.getRoomInfo());
+        // console.log(this.webSocketService.getRoomInfo());
     }
 
     getCurrentGrid(): Tile[][] {
