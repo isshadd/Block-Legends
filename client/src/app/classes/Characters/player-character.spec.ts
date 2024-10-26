@@ -5,7 +5,7 @@ describe('PlayerCharacter', () => {
     let component: PlayerCharacter;
 
     beforeEach(() => {
-        component = new PlayerCharacter('Test', '', new PlayerAttributes());
+        component = new PlayerCharacter('Test', new PlayerAttributes());
     });
 
     it('should create', () => {

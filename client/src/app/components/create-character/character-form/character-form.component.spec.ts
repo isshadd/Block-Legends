@@ -16,7 +16,7 @@ describe('CharacterFormComponent', () => {
         fixture = TestBed.createComponent(CharacterFormComponent);
         component = fixture.componentInstance;
 
-        component.character = new PlayerCharacter('Nom du personnage', 'avatar-url', new PlayerAttributes());
+        component.character = new PlayerCharacter('Nom du personnage', new PlayerAttributes());
 
         fixture.detectChanges();
     });
