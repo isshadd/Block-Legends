@@ -1,40 +1,35 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="waiting-view.component.scss" />
-    </head>
-    <body>
-        <div class="waiting-room">
-            <h1>Attente de partie - League of Versions</h1>
-            <h2>Code d'accès : {{ accessCode }}</h2>
+<div class="waiting-room">
+    <h1>Attente de partie - League of Versions</h1>
 
-            <div class="players-list">
-                <h3>Joueurs :</h3>
-                <ul>
-                    @for(player of players; track player) {
-                    <li [ngClass]="{ organizer: player === this.organizerCharacter }">
-                        <span>{{ player.name }}</span>
-                    </li>
-                    }
-                </ul>
-            </div>
-            @if(this.organizerCharacter.isOrganizer) {
-            <div>
-                <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
-            </div>
-            } @if (isMaxPlayer) {
-            <div class="error">{{ maxPlayerMessage }}</div>
+    <h2>Code d'accès : {{ accessCode$ | async }}</h2>
+
+    <div class="players-list">
+        <h3>Joueurs :</h3>
+        <ul>
+            @for(player of players$ | async; track player.name) {
+            <li [ngClass]="{ organizer: player.isOrganizer }">
+                <span>{{ player.name }}</span>
+            </li>
             }
-            <div>
-                <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
-            </div>
+        </ul>
+    </div>
+    @if((this.gameService.character$ | async)?.isOrganizer) {
+    <div class="admin-buttons">
+        <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
+        <button class="dark-button" type="button" (click)="lockRoom()">Verouiller la salle</button>
+        <button class="dark-button" type="button" (click)="unlockRoom()">Deverouiller la salle</button>
+        <button class="dark-button" type="button" (click)="playGame()">Lancer la partie!</button>
+    </div>
+    } @if(isMaxPlayer) {
+    <div class="error">Le nombre maximum de joueurs est atteint !</div>
+    }
 
-            <div class="chat">
-                <h3>Clavardage</h3>
-                <textarea placeholder="Entrez votre message ici..."></textarea>
-            </div>
-        </div>
-    </body>
-</html>
+    <div>
+        <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
+    </div>
+
+    <div class="chat">
+        <h3>Clavardage</h3>
+        <textarea placeholder="Entrez votre message ici..."></textarea>
+    </div>
+</div>

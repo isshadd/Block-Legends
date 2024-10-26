@@ -1,0 +1,25 @@
+<div class="glob">
+    <h1>Création de personnage: JOUEUR</h1>
+    <form (ngSubmit)="createPlayerCharacter()" (keydown.enter)="$event.preventDefault()">
+        <app-character-form [character]="character"></app-character-form>
+        <app-avatar-selection [character]="character"></app-avatar-selection>
+        <app-attributes [character]="character"></app-attributes>
+        @if(characterStatus) {
+        <div id="message">{{ characterStatus }}</div>
+        }
+        <div class="button-create-character">
+            <button class="dark-button" id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
+            <button class="dark-button" id="create" type="submit">Créer le personnage</button>
+        </div>
+    </form>
+    @if(isModalOpen) {
+    <app-modal
+        [title]="'Êtes-vous sûr de vouloir retourner à la sélection de jeu ?'"
+        [message]="'(La création de votre avatar sera perdue)'"
+        [confirmText]="'Oui'"
+        [cancelText]="'Non'"
+        (confirm)="confirmBack()"
+        (cancel)="closeModal()"
+    ></app-modal>
+    }
+</div>
