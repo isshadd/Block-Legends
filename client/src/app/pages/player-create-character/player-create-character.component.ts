@@ -18,7 +18,7 @@ import { GameService } from '@app/services/game-services/game.service';
     styleUrl: './player-create-character.component.scss',
 })
 export class PlayerCreateCharacterComponent {
-    character = new PlayerCharacter('', '', new PlayerAttributes());
+    character = new PlayerCharacter('', new PlayerAttributes());
     gameId: string | null;
 
     isModalOpen = false;

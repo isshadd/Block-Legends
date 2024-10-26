@@ -10,7 +10,7 @@ export const VP_NUMBER = 5;
 })
 export class GameService {
     accessCodeSubject = new BehaviorSubject<number | null>(null);
-    characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', '', new PlayerAttributes()));
+    characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter('', new PlayerAttributes()));
 
     accessCode$ = this.accessCodeSubject.asObservable();
     character$ = this.characterSubject.asObservable();
@@ -24,12 +24,12 @@ export class GameService {
     }
 
     generateVirtualCharacter(index: number): PlayerCharacter {
-        return new PlayerCharacter('Joueur virtuel ' + (index + 1), '', new PlayerAttributes());
+        return new PlayerCharacter('Joueur virtuel ' + (index + 1), new PlayerAttributes());
     }
 
     clearGame(): void {
         this.accessCodeSubject.next(null);
-        this.characterSubject.next(new PlayerCharacter('', '', new PlayerAttributes()));
+        this.characterSubject.next(new PlayerCharacter('', new PlayerAttributes()));
     }
 
     clearLocalStorage(): void {
