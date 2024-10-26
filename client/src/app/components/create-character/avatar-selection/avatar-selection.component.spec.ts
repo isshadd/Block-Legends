@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { AvatarSelectionComponent } from './avatar-selection.component';
@@ -27,7 +26,7 @@ describe('AvatarSelectionComponent', () => {
     });
 
     it('should set the selected avatar on the player character', () => {
-        const mockCharacter = new PlayerCharacter('TestCharacter', new PlayerAttributes());
+        const mockCharacter = new PlayerCharacter('TestCharacter');
         component.character = mockCharacter;
 
         const selectedAvatar = AvatarEnum.Steve;
