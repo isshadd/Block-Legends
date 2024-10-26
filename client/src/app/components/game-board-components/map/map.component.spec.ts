@@ -1,7 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { MapComponent } from './map.component';
 
 describe('MapComponent', () => {
@@ -15,10 +18,7 @@ describe('MapComponent', () => {
 
         fixture = TestBed.createComponent(MapComponent);
         component = fixture.componentInstance;
-        component.grid = [
-            [{ isTerrain: () => false } as Tile, { isTerrain: () => true } as TerrainTile],
-            [{ isTerrain: () => true, item: new DiamondSword() } as TerrainTile, { isTerrain: () => false } as Tile],
-        ];
+        component.grid = [[new WallTile()], [new GrassTile()]];
         fixture.detectChanges();
     });
 
@@ -82,12 +82,24 @@ describe('MapComponent', () => {
     });
 
     it('should return the item of a TerrainTile', () => {
-        const terrainTile = component.grid[0][1] as TerrainTile;
+        let terrainTile = component.grid[1][0] as TerrainTile;
+        terrainTile.item = new DiamondSword();
         expect(component.getTerrainItem(terrainTile)).toEqual(terrainTile.item);
     });
 
-    it('should return null if the tile is not terrain', () => {
-        const tile = component.grid[0][0] as Tile;
+    it('should return null if the tile is not terrain while looking for item', () => {
+        const tile = component.grid[0][0];
         expect(component.getTerrainItem(tile)).toBeNull();
+    });
+
+    it('should return the player of a TerrainTile', () => {
+        let terrainTile = component.grid[1][0] as TerrainTile;
+        terrainTile.player = new PlayerMapEntity('');
+        expect(component.getTerrainPlayer(terrainTile)).toEqual(terrainTile.player);
+    });
+
+    it('should return null if the tile is not terrain while looking for player', () => {
+        const tile = component.grid[0][0] as Tile;
+        expect(component.getTerrainPlayer(tile)).toBeNull();
     });
 });
