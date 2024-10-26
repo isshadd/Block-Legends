@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventEmitter } from 'events';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import { GameGateway } from './game.gateway';
 
-interface GameRoom {
-    id: string;
-    accessCode: number;
-    players: { name: string; socketId: string }[];
-    organizer: string;
-}
+// interface GameRoom {
+//     id: string;
+//     accessCode: number;
+//     players: { name: string; socketId: string }[];
+//     organizer: string;
+// }
 
 const createMockServer = () => {
     const server = new EventEmitter() as unknown as Server;
@@ -19,7 +19,7 @@ const createMockServer = () => {
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
-    let mockServer: Socket;
+    // let mockServer: Socket;
 
     beforeEach(async () => {
         // mockServer = jasmine.createSpyObj<Socket>('Server', ['to', 'emit']);
