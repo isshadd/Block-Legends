@@ -26,5 +26,7 @@ export class PlayPageComponent {
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {
         this.gameMapDataManagerService.init(this.gameToPlay);
+
+        // console.log(this.webSocketService.getRoomInfo());
     }
 }

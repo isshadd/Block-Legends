@@ -118,3 +118,9 @@ button {
 .error {
     color: rgb(182, 16, 16);
 }
+
+.admin-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}

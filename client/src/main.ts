@@ -13,6 +13,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
+import { PlayerCreateCharacterComponent } from '@app/pages/player-create-character/player-create-character.component';
 import { WaitingViewComponent } from '@app/pages/waiting-view/waiting-view.component';
 import { environment } from './environments/environment';
 
@@ -23,7 +24,7 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    { path: 'game', component: GamePageComponent },
+    { path: 'game/:id', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
     { path: 'join-game', component: JoinGameComponent },
     { path: 'administration-game', component: AdministrationGameComponent },
@@ -32,6 +33,7 @@ const routes: Routes = [
     { path: 'waiting-view', component: WaitingViewComponent },
     { path: 'map-editor', component: MapEditorComponent },
     { path: 'play-page', component: PlayPageComponent },
+    { path: 'player-create-character', component: PlayerCreateCharacterComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
@@ -11,13 +11,13 @@ import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 
 @Component({
-    selector: 'app-create-character',
+    selector: 'app-player-create-character',
     standalone: true,
     imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
-    templateUrl: './create-character.component.html',
-    styleUrl: './create-character.component.scss',
+    templateUrl: './player-create-character.component.html',
+    styleUrl: './player-create-character.component.scss',
 })
-export class CreateCharacterComponent implements OnInit {
+export class PlayerCreateCharacterComponent {
     character = new PlayerCharacter('', '', new PlayerAttributes());
     gameId: string | null;
 
@@ -28,16 +28,13 @@ export class CreateCharacterComponent implements OnInit {
     constructor(
         private router: Router,
         private gameService: GameService,
-        private route: ActivatedRoute,
+        private route: ActivatedRoute, // private webSocketService: WebSocketService,
     ) {}
 
-    ngOnInit(): void {
-        this.route.queryParamMap.subscribe((params) => {
-            this.gameId = params.get('id');
+    createPlayerCharacter() {
+        this.route.queryParams.subscribe((params) => {
+            this.gameId = params.roomId;
         });
-    }
-
-    createCharacter() {
         const missingFields: string[] = [];
         const fieldsToCheck = [
             { field: this.character.name, label: 'Nom' },
@@ -63,9 +60,8 @@ export class CreateCharacterComponent implements OnInit {
         } else if (!this.character.isNameValid) {
             this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
-            this.character.name += ' ♔';
-            this.character.setOrganizer();
             this.gameService.setCharacter(this.character);
+            // this.webSocketService.addPlayerToRoom(this.gameId, this.character);
             this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
         }
     }
