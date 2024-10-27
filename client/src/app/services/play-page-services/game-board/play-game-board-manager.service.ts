@@ -37,11 +37,15 @@ export class PlayGameBoardManagerService {
                 const randomTile = availableTiles[randomIndex];
 
                 if (!randomTile.player) {
-                    randomTile.player = player.mapEntity;
+                    randomTile.setPlayer(player.mapEntity);
+                    player.mapEntity.setSpawnCoordinates(randomTile.coordinates);
                     assigned = true;
                     availableTiles.splice(randomIndex, 1);
                 }
             }
+        }
+        for (const tile of availableTiles) {
+            tile.item = null;
         }
     }
 

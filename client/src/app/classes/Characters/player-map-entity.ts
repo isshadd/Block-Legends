@@ -5,6 +5,7 @@ export class PlayerMapEntity implements PlaceableEntity {
     description: string = '';
     imageUrl: string;
     coordinates: Vec2 = { x: -1, y: -1 };
+    spawnCoordinates: Vec2;
     visibleState: VisibleState = VisibleState.NotSelected;
 
     constructor(imageUrl: string) {
@@ -17,5 +18,9 @@ export class PlayerMapEntity implements PlaceableEntity {
 
     setCoordinates(coordinates: Vec2) {
         this.coordinates = coordinates;
+    }
+
+    setSpawnCoordinates(spawnCoordinates: Vec2) {
+        this.spawnCoordinates = spawnCoordinates;
     }
 }
