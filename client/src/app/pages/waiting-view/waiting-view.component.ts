@@ -94,8 +94,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 queryParamsHandling: 'merge', // merge pour conserver les autres paramètres de requête
                 replaceUrl: true,
             });
-        } else {
-            // console.log(newRoomId);
         }
     }
 }
