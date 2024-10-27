@@ -5,7 +5,7 @@
             @for(avatar of avatarList; track avatar) {
             <div class="avatar-item" (click)="selectAvatar(avatar)">
                 <img [src]="avatar.headImage" [alt]="avatar.name" [class.selected]="character.avatar === avatar" />
-                <small>{{ avatar.name }}</small>
+                <small id="avatar-name">{{ avatar.name }}</small>
             </div>
             }
         </div>
