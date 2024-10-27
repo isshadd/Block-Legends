@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -59,6 +60,13 @@ export class MapComponent {
     getTerrainItem(tile: Tile): Item | null {
         if (tile.isTerrain()) {
             return (tile as TerrainTile).item;
+        }
+        return null;
+    }
+
+    getTerrainPlayer(tile: Tile): PlayerMapEntity | null {
+        if (tile.isTerrain()) {
+            return (tile as TerrainTile).player;
         }
         return null;
     }

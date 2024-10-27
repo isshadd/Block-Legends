@@ -1,6 +1,6 @@
 <div class="info-char">
     <div class="name-creation">
-        <label for="name">Nom :</label>
+        <label class="text-comp" for="name">Nom :</label>
         <input id="name" [(ngModel)]="character.name" name="name" required maxlength="15" />
         <button class="dark-button" type="button" (click)="saveName()">Enregistrer le nom</button>
         @if(!character.isNameValid){
@@ -8,6 +8,6 @@
         }
     </div>
     @if(character.isNameValid){
-    <p>Nom enregistré : {{ savedName }}</p>
+    <p class="text-comp">Nom enregistré : {{ savedName }}</p>
     }
 </div>

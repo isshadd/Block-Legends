@@ -15,13 +15,14 @@ import { Subject, takeUntil } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
-    private destroy$ = new Subject<void>();
     accessCode$ = this.gameService.accessCode$;
     accessCode: number | null;
     players$ = this.webSocketService.players$;
     gameId: string | null;
     playersCounter = 0;
     isMaxPlayer = false;
+
+    private destroy$ = new Subject<void>();
 
     constructor(
         public gameService: GameService,
@@ -94,7 +95,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 replaceUrl: true,
             });
         } else {
-            console.log(newRoomId);
+            // console.log(newRoomId);
         }
     }
 }

@@ -1,11 +1,10 @@
-import { PlayerAttributes } from './player-attributes';
 import { BASE_STATS, BONUS, PlayerCharacter } from './player-character';
 
 describe('PlayerCharacter', () => {
     let component: PlayerCharacter;
 
     beforeEach(() => {
-        component = new PlayerCharacter('Test', '', new PlayerAttributes());
+        component = new PlayerCharacter('Test');
     });
 
     it('should create', () => {
@@ -38,5 +37,10 @@ describe('PlayerCharacter', () => {
         component.assignDefenseDice();
         expect(component.isAttackBonusAssigned).toBeTrue();
         expect(component.isDefenseBonusAssigned).toBeTrue();
+    });
+
+    it('should set organizer', () => {
+        component.setOrganizer();
+        expect(component.isOrganizer).toBeTrue();
     });
 });
