@@ -13,4 +13,9 @@ export class TerrainTile extends Tile {
     isTerrain(): boolean {
         return true;
     }
+
+    setPlayer(player: PlayerMapEntity) {
+        this.player = player;
+        player.setCoordinates(this.coordinates);
+    }
 }
