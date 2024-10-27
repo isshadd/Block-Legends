@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-interface GameRoom {
+export interface GameRoom {
     roomId: string;
     accessCode: number;
     players: PlayerCharacter[];

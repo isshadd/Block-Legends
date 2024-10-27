@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
@@ -18,7 +17,7 @@ import { GameService } from '@app/services/game-services/game.service';
     styleUrl: './player-create-character.component.scss',
 })
 export class PlayerCreateCharacterComponent {
-    character = new PlayerCharacter('', '', new PlayerAttributes());
+    character = new PlayerCharacter('');
     gameId: string | null;
 
     isModalOpen = false;

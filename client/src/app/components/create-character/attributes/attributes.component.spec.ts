@@ -15,7 +15,7 @@ describe('AttributesComponent', () => {
         fixture = TestBed.createComponent(AttributesComponent);
         component = fixture.componentInstance;
 
-        component.character = new PlayerCharacter('Test', '', new PlayerAttributes());
+        component.character = new PlayerCharacter('Test');
 
         fixture.detectChanges();
     });
