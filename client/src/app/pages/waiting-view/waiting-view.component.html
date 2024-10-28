@@ -8,7 +8,11 @@
         <ul>
             @for(player of players$ | async; track player.name) {
             <li [ngClass]="{ organizer: player.isOrganizer }">
+                <img [src]="player.avatar.headImage" alt="Avatar" />
                 <span>{{ player.name }}</span>
+                @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {
+                <button class="dark-button" type="button" (click)="kickPlayer(player)">Expulser</button>
+                }
             </li>
             }
         </ul>

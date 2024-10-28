@@ -149,6 +149,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('kickPlayer')
+    handleKickPlayer(client: Socket, player: PlayerCharacter) {
+        const roomId = this.playerRooms.get(client.id);
+        if (!roomId) return;
+
+        const room = this.rooms.get(roomId);
+        if (!room || room.organizer !== client.id) return;
+
+        room.players = room.players.filter((p) => p.socketId !== player.socketId);
+
+        this.server.to(roomId.toString()).emit('roomState', {
+            roomId: room.id,
+            accessCode: room.accessCode,
+            players: room.players,
+        });
+    }
+
     generateAccessCode(): number {
         const MIN_ACCESS_CODE = 1000;
         const MAX_ACCESS_CODE = 9999;

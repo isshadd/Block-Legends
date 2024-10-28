@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-// import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { Subject, takeUntil } from 'rxjs';
+import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-waiting-view',
@@ -80,6 +80,10 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     unlockRoom(): void {
         this.webSocketService.unlockRoom();
+    }
+
+    kickPlayer(player: PlayerCharacter): void {
+        this.webSocketService.kickPlayer(player);
     }
 
     playGame(): void {

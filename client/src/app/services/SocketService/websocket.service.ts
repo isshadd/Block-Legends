@@ -45,6 +45,10 @@ export class WebSocketService {
         this.socket.emit('addPlayerToRoom', { accessCode, player });
     }
 
+    kickPlayer(player: PlayerCharacter) {
+        this.socket.emit('kickPlayer', player);
+    }
+
     leaveGame() {
         const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
         if (accessCode) {
