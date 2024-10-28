@@ -2,6 +2,7 @@
     <h1>Attente de partie - League of Versions</h1>
 
     <h2>Code d'accès : {{ accessCode$ | async }}</h2>
+    @if (isLocked$ | async) { ::: 🔒 Salle verrouillée ::: } @else { ::: 🔓 Salle déverrouillée ::: }
 
     <div class="players-list">
         <h3>Joueurs :</h3>
@@ -22,7 +23,7 @@
         <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
         <button class="dark-button" type="button" (click)="lockRoom()">Verouiller la salle</button>
         <button class="dark-button" type="button" (click)="unlockRoom()">Deverouiller la salle</button>
-        <button class="dark-button" type="button" (click)="playGame()">Lancer la partie!</button>
+        <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
