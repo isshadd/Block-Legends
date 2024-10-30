@@ -10,6 +10,7 @@ export interface GameRoom {
     roomId: string;
     accessCode: number;
     players: PlayerCharacter[];
+    isLocked: boolean;
 }
 
 @Injectable({
@@ -19,6 +20,8 @@ export class WebSocketService {
     socket: Socket;
     playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
     players$ = this.playersSubject.asObservable();
+    isLockedSubject = new BehaviorSubject<boolean>(false);
+    isLocked$ = this.isLockedSubject.asObservable();
     currentRoom: GameRoom;
 
     constructor(
@@ -34,6 +37,7 @@ export class WebSocketService {
         this.socket.on('roomState', (room: GameRoom) => {
             localStorage.setItem('accessCode', room.accessCode.toString());
             localStorage.setItem('roomId', room.roomId);
+            this.isLockedSubject.next(room.isLocked);
         });
     }
 
@@ -45,19 +49,35 @@ export class WebSocketService {
         this.socket.emit('addPlayerToRoom', { accessCode, player });
     }
 
+    kickPlayer(player: PlayerCharacter) {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('kickPlayer', player);
+        }
+    }
+
     leaveGame() {
         const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
         if (accessCode) {
             this.socket.emit('leaveGame', accessCode);
             localStorage.removeItem('roomId');
+            localStorage.removeItem('accessCode');
         }
         this.gameService.clearGame();
+        this.isLockedSubject.next(false);
     }
 
     lockRoom() {
         const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
         if (accessCode) {
             this.socket.emit('lockRoom', accessCode);
+        }
+    }
+
+    unlockRoom() {
+        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+        if (accessCode) {
+            this.socket.emit('unlockRoom', accessCode);
         }
     }
 
@@ -72,55 +92,59 @@ export class WebSocketService {
         return this.currentRoom;
     }
 
-    unlockRoom() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('unlockRoom', accessCode);
-        }
-    }
-
     private setupSocketListeners() {
         this.socket.on('connect', () => {
-            const roomId = localStorage.getItem('roomId');
-            if (roomId) {
-                this.socket.emit('getRoomState', roomId);
+            //const roomId = localStorage.getItem('roomId');
+            const accessCode = localStorage.getItem('accessCode');
+            if (accessCode) {
+                this.socket.emit('getRoomState', parseInt(accessCode, 10));
             }
         });
 
         this.socket.on('roomState', (room: GameRoom) => {
-            // console.log('Received room state:', room);
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
+            this.isLockedSubject.next(room.isLocked);
         });
 
-        this.socket.on('updatePlayers', (players: PlayerCharacter[]) => {
-            // console.log('Received players update:', players);
-            this.playersSubject.next(players);
-        });
-
-        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number }) => {
+        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean }) => {
             if (response.valid) {
                 localStorage.setItem('accessCode', response.accessCode.toString());
                 this.gameService.setAccessCode(response.accessCode);
+                this.isLockedSubject.next(response.isLocked);
                 this.router.navigate(['/player-create-character'], {
                     queryParams: { roomId: response.accessCode },
                 });
             } else {
-                alert("Code d'accès invalide");
+                alert(response.message);
             }
         });
 
-        this.socket.on('roomLocked', () => {
-            alert('La salle a été verrouillée');
+        this.socket.on('roomLocked', (data: { message: string; isLocked: boolean }) => {
+            this.isLockedSubject.next(data.isLocked);
+            alert(data.message);
         });
 
-        this.socket.on('roomUnlocked', () => {
-            alert('La salle a été déverrouillée');
+        this.socket.on('roomUnlocked', (data: { message: string; isLocked: boolean }) => {
+            this.isLockedSubject.next(data.isLocked);
+            alert(data.message);
+        });
+
+        this.socket.on('playerKicked', (data: { message: string }) => {
+            alert(data.message);
+            this.leaveGame();
+            this.router.navigate(['/home']);
         });
 
         this.socket.on('gameStarted', () => {
             this.router.navigate(['/play-page']);
+        });
+
+        this.socket.on('roomClosed', () => {
+            alert("La salle a été fermée par l'organisateur");
+            this.leaveGame();
+            this.router.navigate(['/home']);
         });
     }
 }

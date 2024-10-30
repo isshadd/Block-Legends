@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-// import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { Subject, takeUntil } from 'rxjs';
+import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-waiting-view',
@@ -18,9 +18,11 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode$ = this.gameService.accessCode$;
     accessCode: number | null;
     players$ = this.webSocketService.players$;
+    isLocked$ = this.webSocketService.isLocked$;
     gameId: string | null;
     playersCounter = 0;
     isMaxPlayer = false;
+    isOrganizer = false;
 
     private destroy$ = new Subject<void>();
 
@@ -38,6 +40,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!this.gameId) return;
+
+            this.isOrganizer = character.isOrganizer;
 
             if (character.isOrganizer) {
                 this.webSocketService.createGame(this.gameId, character);
@@ -82,6 +86,12 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         this.webSocketService.unlockRoom();
     }
 
+    kickPlayer(player: PlayerCharacter): void {
+        if (this.isOrganizer) {
+            this.webSocketService.kickPlayer(player);
+        }
+    }
+
     playGame(): void {
         this.webSocketService.startGame();
     }
@@ -91,11 +101,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.router.navigate([], {
                 relativeTo: this.route,
                 queryParams: { roomId: newRoomId },
-                queryParamsHandling: 'merge', // merge pour conserver les autres paramètres de requête
+                queryParamsHandling: 'merge',
                 replaceUrl: true,
             });
-        } else {
-            // console.log(newRoomId);
         }
     }
 }
