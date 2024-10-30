@@ -7,6 +7,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
@@ -133,6 +134,22 @@ export class GameMapDataManagerService {
         return this.currentGrid;
     }
 
+    getTilesWithSpawn(): TerrainTile[] {
+        const tilesWithSpawn: TerrainTile[] = [];
+        for (const row of this.currentGrid) {
+            for (const tile of row) {
+                if (tile.isTerrain() && (tile as TerrainTile).item?.type === ItemType.Spawn) {
+                    tilesWithSpawn.push(tile as TerrainTile);
+                }
+            }
+        }
+        return tilesWithSpawn;
+    }
+
+    getTileAt(coordinates: Vec2): Tile {
+        return this.currentGrid[coordinates.x][coordinates.y];
+    }
+
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {
         localStorage.setItem('isNewGame', JSON.stringify(isNewGame));
         localStorage.setItem('gameToEdit', JSON.stringify(game));
@@ -179,9 +196,5 @@ export class GameMapDataManagerService {
         this.dialog.open(ErrorModalComponent, {
             data: { message },
         });
-    }
-
-    getTileAt(coordinates: Vec2): Tile {
-        return this.currentGrid[coordinates.x][coordinates.y];
     }
 }
