@@ -1,24 +1,12 @@
-
 <div class="chat">
     <h3>Clavardage</h3>
-    <div class="messages-container">
-        <ul class="messages">
-            <li *ngFor="let msg of messages">{{ msg }}</li>
-        </ul>
+    <div class="messages-container" #chatMessages>
+      <ul class="messages">
+        <li *ngFor="let msg of messages" >{{ msg }}</li>
+      </ul>
     </div>
     <input [(ngModel)]="broadcastMessage" (keydown.enter)="broadcastMessageToAll()" type="text"/>
 </div>
 
 
 
-
-
-<!-- <div class="chat">
-    <input type="text" [(ngModel)]="broadcastMessage" (keydown.enter)="testfct()" />
-    <ul>
-        @for(message of serverMessages ; track message){
-        <li>{{ message}} </li>
-    }
-    </ul>
-</div>
- -->

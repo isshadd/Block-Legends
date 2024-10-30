@@ -24,8 +24,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: string) {
-        this.server.emit(ChatEvents.MassMessage, `${socket.id} : ${message}`);
+    broadcastAll(socket: Socket, message: { playerName: string, content: string }) {
+        this.server.emit(ChatEvents.MassMessage, `${message.playerName} : ${message.content}`);
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)
