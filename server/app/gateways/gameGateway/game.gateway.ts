@@ -19,6 +19,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.gameSocketRoomService.handlePlayerDisconnect(client.id);
     }
 
+    updateRoomState(accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (room) {
+            this.server.to(accessCode.toString()).emit('roomState', {
+                roomId: room.id,
+                accessCode: room.accessCode,
+                players: room.players,
+                isLocked: room.isLocked,
+            });
+        }
+    }
+
     @SubscribeMessage('getRoomState')
     handleGetRoomState(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
@@ -41,12 +53,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const newRoom = this.gameSocketRoomService.createGame(gameId, playerOrganizer);
 
         client.join(newRoom.accessCode.toString());
-        this.server.to(newRoom.accessCode.toString()).emit('roomState', {
-            roomId: newRoom.id,
-            accessCode: newRoom.accessCode,
-            players: newRoom.players,
-            isLocked: newRoom.isLocked,
-        });
+        this.updateRoomState(newRoom.accessCode);
     }
 
     @SubscribeMessage('joinGame')
@@ -77,12 +84,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             accessCode: room.accessCode,
             isLocked: room.isLocked,
         });
-        this.server.to(accessCode.toString()).emit('roomState', {
-            roomId: room.id,
-            accessCode: room.accessCode,
-            players: room.players,
-            isLocked: room.isLocked,
-        });
+        this.updateRoomState(accessCode);
     }
 
     @SubscribeMessage('addPlayerToRoom')
@@ -109,12 +111,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
         if (added) {
-            this.server.to(accessCode.toString()).emit('roomState', {
-                roomId: this.gameSocketRoomService.getRoomByAccessCode(accessCode).id,
-                accessCode: accessCode,
-                players: this.gameSocketRoomService.getRoomByAccessCode(accessCode).players,
-                isLocked: this.gameSocketRoomService.getRoomByAccessCode(accessCode).isLocked,
-            });
+            this.updateRoomState(accessCode);
         } else {
             client.emit('error', {
                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
@@ -126,17 +123,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleLockRoom(client: Socket, accessCode: number) {
         const locked = this.gameSocketRoomService.lockRoom(accessCode, client.id);
         if (locked) {
-            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
             this.server.to(accessCode.toString()).emit('roomLocked', {
                 message: 'La salle est maintenant verrouillée',
                 isLocked: true,
             });
-            this.server.to(accessCode.toString()).emit('roomState', {
-                roomId: room.id,
-                accessCode: room.accessCode,
-                players: room.players,
-                isLocked: room.isLocked,
-            });
+            this.updateRoomState(accessCode);
         } else {
             client.emit('error', { message: 'Pas authorisé ou room non trouvé' });
         }
@@ -146,17 +137,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleUnlockRoom(client: Socket, accessCode: number) {
         const unlocked = this.gameSocketRoomService.unlockRoom(accessCode, client.id);
         if (unlocked) {
-            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
             this.server.to(accessCode.toString()).emit('roomUnlocked', {
                 message: 'La salle est maintenant déverrouillée',
                 isLocked: false,
             });
-            this.server.to(accessCode.toString()).emit('roomState', {
-                roomId: room.id,
-                accessCode: room.accessCode,
-                players: room.players,
-                isLocked: room.isLocked,
-            });
+            this.updateRoomState(accessCode);
         } else {
             client.emit('error', { message: 'Pas authorisé ou room non trouvé' });
         }
@@ -173,12 +158,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 message: 'Vous avez été expulsé de la salle',
             });
 
-            this.server.to(accessCode.toString()).emit('roomState', {
-                roomId: this.gameSocketRoomService.getRoomByAccessCode(accessCode).id,
-                accessCode: accessCode,
-                players: this.gameSocketRoomService.getRoomByAccessCode(accessCode).players,
-                isLocked: this.gameSocketRoomService.getRoomByAccessCode(accessCode).isLocked,
-            });
+            this.updateRoomState(accessCode);
 
             const playerSocket = this.server.sockets.sockets.get(player.socketId);
             if (playerSocket) {
@@ -195,12 +175,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (room) {
-            this.server.to(accessCode.toString()).emit('roomState', {
-                roomId: room.id,
-                accessCode: room.accessCode,
-                players: room.players,
-                isLocked: room.isLocked,
-            });
+            this.updateRoomState(accessCode);
         } else {
             this.server.to(accessCode.toString()).emit('roomClosed');
         }
