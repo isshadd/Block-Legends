@@ -13,6 +13,7 @@ import { GameGateway } from './gateways/gameGateway/game.gateway';
 import { PlayGameBoardGateway } from './gateways/playGameBoard/play-game-board.gateway';
 import { GameValidationService } from './services/game-validation/gameValidation.service';
 import { GameSocketRoomService } from './services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameBoardSocketService } from './services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 
 @Module({
     imports: [
@@ -37,6 +38,7 @@ import { GameSocketRoomService } from './services/gateway-services/game-socket-r
         GameGateway,
         GameSocketRoomService,
         PlayGameBoardGateway,
+        PlayGameBoardSocketService,
     ],
 })
 export class AppModule {}

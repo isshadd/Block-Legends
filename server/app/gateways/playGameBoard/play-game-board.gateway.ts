@@ -1,22 +1,24 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ namespace: '/play-game-board', cors: { origin: '*' } })
+@WebSocketGateway({ cors: { origin: '*' } })
 @Injectable()
-export class PlayGameBoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class PlayGameBoardGateway {
     @WebSocketServer() server: Server;
     private readonly logger = new Logger(PlayGameBoardGateway.name);
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameBoardSocketService: PlayGameBoardSocketService,
+    ) {}
 
-    handleConnection(client: Socket) {
-        this.logger.log(`Client connected to /game-board: ${client.id}`);
-    }
-
-    handleDisconnect(client: Socket) {
-        this.logger.log(`Client disconnected from /game-board: ${client.id}`);
-        this.gameSocketRoomService.handlePlayerDisconnect(client.id);
+    @SubscribeMessage('testRoomMessage')
+    testRoomMessage(client: Socket, accessCode: number) {
+        this.server.to(accessCode.toString()).emit('roomMessage', {
+            message: 'Hello from the room!',
+        });
     }
 }

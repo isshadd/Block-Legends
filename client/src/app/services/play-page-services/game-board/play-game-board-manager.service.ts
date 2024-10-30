@@ -4,6 +4,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameRoom, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
 @Injectable({
     providedIn: 'root',
@@ -14,14 +15,13 @@ export class PlayGameBoardManagerService {
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
+        public PlayGameBoardSocketService: PlayGameBoardSocketService,
         public gameServerCommunicationService: GameServerCommunicationService,
     ) {
         gameServerCommunicationService.getGame(this.roomInfo.roomId).subscribe((game) => {
             this.gameMapDataManagerService.init(game);
             this.initCharacters();
         });
-
-        // console.log(this.webSocketService.getRoomInfo());
     }
 
     initCharacters() {
