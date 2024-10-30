@@ -34,10 +34,19 @@ export class JoinGameComponent {
     }
 
     allowOnlyNumbers(event: KeyboardEvent) {
+        const input = event.target as HTMLInputElement;
         const char = event.key;
+
         if (char < '0' || char > '9') {
-            // Only ASCII codes for numbers are allowed
             event.preventDefault();
+            return;
+        }
+
+        const currentValue = input.value;
+        if (currentValue.length >= 4) {
+            if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(char)) {
+                event.preventDefault();
+            }
         }
     }
 }

@@ -109,15 +109,16 @@ export class WebSocketService {
         });
 
         this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean }) => {
-            if (response.valid) {
+            if (!response.valid) {
+                this.router.navigate(['/join-game']);
+                alert(response.message);
+            } else if (response.valid) {
                 localStorage.setItem('accessCode', response.accessCode.toString());
                 this.gameService.setAccessCode(response.accessCode);
                 this.isLockedSubject.next(response.isLocked);
                 this.router.navigate(['/player-create-character'], {
                     queryParams: { roomId: response.accessCode },
                 });
-            } else {
-                alert(response.message);
             }
         });
 
