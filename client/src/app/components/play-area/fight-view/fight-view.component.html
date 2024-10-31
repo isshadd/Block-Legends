@@ -1,0 +1,28 @@
+<div class="fight-container">
+    <div class="fight-header">
+        <div class="opponent-title">Nom D'Adversaire:</div>
+        <div class="fight-info">
+            Santé: 'Valeur de Santé'<br />
+            Défense: 'Valeur de Défense'
+        </div>
+        <div class="fight-view">
+            <!-- Background Image -->
+            <img src="assets/images/view/Minecraft-Forest.png" class="layer-1" alt="Minecraft Forest Background" />
+
+            <!-- Character Image Overlay -->
+            <div class="layer-2">
+                <img id="opponent" src="assets/images/avatar/Steve.png" alt="Character Image" />
+                <img id="player" src="assets/images/avatar/Knight.png" alt="Character Image" />
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question-section">
+            <div class="question-text">Qu'est-ce que tu vas faire?</div>
+            <div class="action-buttons">
+                <button (click)="onAttack()" class="primary">Attaquer</button>
+                <button (click)="onEscape()" class="secondary">Fuir</button>
+            </div>
+        </div>
+    </div>
+</div>
