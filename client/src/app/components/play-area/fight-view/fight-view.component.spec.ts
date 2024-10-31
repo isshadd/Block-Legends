@@ -38,26 +38,21 @@ describe('FightViewComponent', () => {
     it('should emit attack event and apply attack classes when onAttack is called', fakeAsync(() => {
         spyOn(component.attack, 'emit');
 
-        const playerImage = document.createElement('div');
-        playerImage.id = 'player';
-        document.body.appendChild(playerImage);
-
-        const opponentImage = document.createElement('div');
-        opponentImage.id = 'opponent';
-        document.body.appendChild(opponentImage);
+        const playerImage = fixture.debugElement.nativeElement.querySelector('#player');
+        const opponentImage = fixture.debugElement.nativeElement.querySelector('#opponent');
 
         component.onAttack();
+        fixture.detectChanges(); // Trigger change detection to apply the class
 
         expect(component.attack.emit).toHaveBeenCalled();
         expect(playerImage.classList).toContain('attack-player');
         expect(opponentImage.classList).toContain('attack-opponent');
 
-        tick(300);
+        tick(300); // Simulate 300 ms delay
+        fixture.detectChanges(); // Trigger change detection again to remove the class
+
         expect(playerImage.classList).not.toContain('attack-player');
         expect(opponentImage.classList).not.toContain('attack-opponent');
-
-        document.body.removeChild(playerImage);
-        document.body.removeChild(opponentImage);
     }));
 
     it('should emit escape event when onEscape is called', () => {
