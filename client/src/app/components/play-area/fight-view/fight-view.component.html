@@ -1,9 +1,9 @@
 <div class="fight-container">
     <div class="fight-header">
-        <div class="opponent-title">Nom D'Adversaire:</div>
+        <div class="opponent-title">Nom D'Adversaire: {{ opponentCharacter.name }}</div>
         <div class="fight-info">
-            Santé: 'Valeur de Santé'<br />
-            Défense: 'Valeur de Défense'
+            Santé: {{ opponentCharacter.attributes.life }}<br />
+            Défense: {{ opponentCharacter.attributes.defense }}<br />
         </div>
         <div class="fight-view">
             <!-- Background Image -->
@@ -11,8 +11,8 @@
 
             <!-- Character Image Overlay -->
             <div class="layer-2">
-                <img id="opponent" src="assets/images/avatar/Steve.png" alt="Character Image" />
-                <img id="player" src="assets/images/avatar/Knight.png" alt="Character Image" />
+                <img id="opponent" [src]="opponentCharacter.avatar.fullImage"  alt="Character Image" />
+                <img id="player" [src]="playerCharacter.avatar.fullImage"alt="Character Image" />
             </div>
         </div>
 

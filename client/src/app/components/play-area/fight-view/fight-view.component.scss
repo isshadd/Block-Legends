@@ -76,7 +76,6 @@
         align-items: center;
         background-color: darken($primary-dark, 10%);
         padding: 15px;
-        border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 500px;
@@ -88,7 +87,6 @@
             color: $primary-light;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
             background-color: darken($primary-dark, 10%);
             margin-right: 15px;
             text-align: center;
@@ -103,7 +101,6 @@
                 padding: 10px 20px;
                 font-size: 16px;
                 border: none;
-                border-radius: 5px;
                 cursor: pointer;
                 transition: background-color 0.3s ease;
                 color: #fff;
