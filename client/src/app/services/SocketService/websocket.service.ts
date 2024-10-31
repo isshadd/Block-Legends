@@ -109,10 +109,7 @@ export class WebSocketService {
         });
 
         this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean }) => {
-            if (!response.valid) {
-                this.router.navigate(['/join-game']);
-                alert(response.message);
-            } else if (response.valid) {
+            if (response.valid) {
                 localStorage.setItem('accessCode', response.accessCode.toString());
                 this.gameService.setAccessCode(response.accessCode);
                 this.isLockedSubject.next(response.isLocked);
@@ -120,6 +117,22 @@ export class WebSocketService {
                     queryParams: { roomId: response.accessCode },
                 });
             }
+        });
+
+        this.socket.on('joinGameResponseCodeInvalid', (response: { message: string }) => {
+            alert(response.message);
+        });
+
+        this.socket.on('joinGameResponseLockedRoom', (response: { message: string }) => {
+            alert(response.message);
+        });
+
+        this.socket.on('joinGameResponseNoMoreExisting', (response: { message: string }) => {
+            alert(response.message);
+        });
+
+        this.socket.on('joinGameResponseLockedAfterJoin', (response: { message: string }) => {
+            alert(response.message);
         });
 
         this.socket.on('roomLocked', (data: { message: string; isLocked: boolean }) => {
