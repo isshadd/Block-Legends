@@ -30,7 +30,15 @@ export class GameSocketRoomService {
     }
 
     createGame(gameId: string, playerOrganizer: PlayerCharacter): GameRoom {
-        const accessCode = this.generateAccessCode();
+        let accessCode: number;
+        let isUnique = false;
+
+        while (!isUnique) {
+            accessCode = this.generateAccessCode();
+            if (!this.rooms.has(accessCode)) {
+                isUnique = true;
+            }
+        }
         const newRoom: GameRoom = {
             id: gameId,
             accessCode,

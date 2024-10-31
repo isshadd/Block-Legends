@@ -61,16 +61,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
         if (!room) {
-            client.emit('joinGameResponse', {
-                valid: false,
-                message: 'Salle introuvable',
+            client.emit('joinGameResponseCodeInvalid', {
+                message: 'Code invalide',
             });
             return;
         }
 
         if (room.isLocked) {
-            client.emit('joinGameResponse', {
-                valid: false,
+            client.emit('joinGameResponseLockedRoom', {
                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
             });
             return;
@@ -94,26 +92,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
         if (!room) {
-            client.emit('joinGameResponse', {
+            client.emit('joinGameResponseNoMoreExisting', {
                 valid: false,
-                message: 'Salle introuvable',
+                message: `La salle n'existe plus`,
             });
             return;
         }
 
         if (room.isLocked) {
-            client.emit('joinGameResponse', {
+            client.emit('joinGameResponseLockedAfterJoin', {
                 valid: false,
-                message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+                message: 'Cette salle a été verrouillée entre temps',
             });
             return;
         }
 
         const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
         if (added) {
+            client.emit('joinGameResponseCanJoin', {
+                valid: true,
+                message: 'Rejoint avec succès',
+            });
             this.updateRoomState(accessCode);
         } else {
-            client.emit('error', {
+            client.emit('joinGameResponseCanJoin', {
+                valid: false,
                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
             });
         }
