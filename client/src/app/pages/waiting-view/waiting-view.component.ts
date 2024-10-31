@@ -45,12 +45,15 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
             if (character.isOrganizer) {
                 this.webSocketService.createGame(this.gameId, character);
+                this.accessCode$.subscribe((code) => {
+                    this.accessCode = code;
+                    this.changeRoomId(this.accessCode);
+                });
             } else {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                 });
-                this.webSocketService.addPlayerToRoom(this.accessCode as number, character);
             }
         });
     }
