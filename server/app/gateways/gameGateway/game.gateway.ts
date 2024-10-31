@@ -174,10 +174,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('leaveGame')
     handlePlayerLeave(client: Socket, accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        const isOrganizer = room?.organizer === client.id;
+
         this.gameSocketRoomService.removePlayerFromRoom(client.id);
 
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-        if (room) {
+        if (isOrganizer) {
+            this.server.to(accessCode.toString()).emit('organizerLeft', {
+                message: "L'organisateur a quitté la partie",
+            });
+            return;
+        }
+
+        const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (updatedRoom) {
             this.updateRoomState(accessCode);
         } else {
             this.server.to(accessCode.toString()).emit('roomClosed');

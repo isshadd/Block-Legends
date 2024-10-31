@@ -94,7 +94,6 @@ export class WebSocketService {
 
     private setupSocketListeners() {
         this.socket.on('connect', () => {
-            //const roomId = localStorage.getItem('roomId');
             const accessCode = localStorage.getItem('accessCode');
             if (accessCode) {
                 this.socket.emit('getRoomState', parseInt(accessCode, 10));
@@ -157,6 +156,12 @@ export class WebSocketService {
 
         this.socket.on('roomClosed', () => {
             alert("La salle a été fermée par l'organisateur");
+            this.leaveGame();
+            this.router.navigate(['/home']);
+        });
+
+        this.socket.on('organizerLeft', (data: { message: string }) => {
+            alert(data.message);
             this.leaveGame();
             this.router.navigate(['/home']);
         });
