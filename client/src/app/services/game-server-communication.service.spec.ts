@@ -144,9 +144,10 @@ describe('GameServerCommunicationService', () => {
         const error = { error: { errors: ['Error1', 'Error2'] } };
 
         const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors']();
-
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let thrownError: any;
         handleErrorsFn(error).subscribe({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             error: (err: any) => {
                 thrownError = err;
             },
