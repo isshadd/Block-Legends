@@ -15,27 +15,28 @@ export class PlayGameBoardManagerService {
         public webSocketService: WebSocketService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
     ) {
-        this.playGameBoardSocketService.initGameBoard();
-
         this.playGameBoardSocketService.signalInitGameBoard$.subscribe((game) => {
             this.initGameBoard(game);
         });
         this.playGameBoardSocketService.signalInitCharacters$.subscribe((spawnPlaces) => {
             this.initCharacters(spawnPlaces);
         });
+
+        this.playGameBoardSocketService.initGameBoard(webSocketService.currentRoom.accessCode);
     }
 
     initGameBoard(game: GameShared) {
         this.gameMapDataManagerService.init(game);
     }
 
-    initCharacters(spawnPlaces: Map<number, string>) {
+    initCharacters(spawnPlaces: [number, string][]) {
         const tilesWithSpawn = this.gameMapDataManagerService.getTilesWithSpawn();
         const availableTiles = [...tilesWithSpawn];
 
-        for (const place of spawnPlaces) {
-            const player = this.webSocketService.getRoomInfo().players.find((player) => player.name === place[1]);
-            const tile = tilesWithSpawn[place[0]];
+        for (const spawnPlace of spawnPlaces) {
+            const [index, playerName] = spawnPlace;
+            const player = this.webSocketService.getRoomInfo().players.find((player) => player.name === playerName);
+            const tile = tilesWithSpawn[index];
 
             if (player && tile) {
                 player.mapEntity = new PlayerMapEntity(player.avatar.headImage);

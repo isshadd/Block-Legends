@@ -30,7 +30,6 @@ export class PlayGameBoardGateway {
     handleInitGameBoard(client: Socket, accessCode: number) {
         const gameBoardParameters: GameBoardParameters = this.playGameBoardSocketService.getGameBoardParameters(accessCode);
 
-        this.logger.log(`Game board parameters: ${gameBoardParameters}`);
         if (gameBoardParameters) {
             client.emit('gameBoardParameters', gameBoardParameters);
         } else {

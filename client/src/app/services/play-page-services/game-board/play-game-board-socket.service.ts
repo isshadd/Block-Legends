@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 
 export interface GameBoardParameters {
     game: GameShared;
-    spawnPlaces: Map<number, string>;
+    spawnPlaces: [number, string][];
 }
 
 @Injectable({
@@ -16,7 +16,7 @@ export class PlayGameBoardSocketService {
     signalInitGameBoard = new Subject<GameShared>();
     signalInitGameBoard$ = this.signalInitGameBoard.asObservable();
 
-    signalInitCharacters = new Subject<Map<number, string>>();
+    signalInitCharacters = new Subject<[number, string][]>();
     signalInitCharacters$ = this.signalInitCharacters.asObservable();
 
     socket: Socket;
@@ -26,13 +26,13 @@ export class PlayGameBoardSocketService {
         this.setupSocketListeners();
     }
 
-    initGameBoard() {
-        this.socket.emit('initGameBoard');
-        console.log('initGameBoard');
+    initGameBoard(accessCode: number) {
+        this.socket.emit('initGameBoard', accessCode);
     }
 
     private setupSocketListeners() {
         this.socket.on('gameBoardParameters', (gameBoardParameters) => {
+            console.log(gameBoardParameters);
             this.signalInitGameBoard.next(gameBoardParameters.game);
             this.signalInitCharacters.next(gameBoardParameters.spawnPlaces);
         });

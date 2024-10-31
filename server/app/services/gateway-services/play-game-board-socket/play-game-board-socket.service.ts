@@ -7,7 +7,7 @@ import { GameRoom, GameSocketRoomService } from '../game-socket-room/game-socket
 
 export interface GameBoardParameters {
     game: Game;
-    spawnPlaces: Map<number, string>;
+    spawnPlaces: [number, string][];
 }
 
 @Injectable()
@@ -27,7 +27,7 @@ export class PlayGameBoardSocketService {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
         if (!room) {
-            this.logger.error(`Room not found for access code: ${accessCode}`);
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
             return;
         }
 
@@ -38,7 +38,7 @@ export class PlayGameBoardSocketService {
 
     setupSpawnPoints(room: GameRoom, game: Game) {
         let spawnCounter = this.setSpawnCounter(game.size);
-        let spawnPlaces: Map<number, string> = new Map();
+        let spawnPlaces: [number, string][] = [];
         let availableSpawnPoints = spawnCounter;
 
         for (let player of room.players) {
@@ -47,8 +47,8 @@ export class PlayGameBoardSocketService {
             while (!assigned && availableSpawnPoints > 0) {
                 const randomIndex = Math.floor(Math.random() * spawnCounter);
 
-                if (!spawnPlaces.has(randomIndex)) {
-                    spawnPlaces.set(randomIndex, player.name);
+                if (!spawnPlaces.some(([index]) => index === randomIndex)) {
+                    spawnPlaces.push([randomIndex, player.name]);
                     assigned = true;
                     availableSpawnPoints--;
                 }
@@ -56,7 +56,7 @@ export class PlayGameBoardSocketService {
         }
 
         this.gameBoardRooms.set(room.accessCode, { game, spawnPlaces });
-        this.logger.log(`Game board setup done for room: ${room.accessCode}`);
+        this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
         this.signalGameBoardSetupDone.next(room.accessCode);
     }
 
@@ -72,7 +72,6 @@ export class PlayGameBoardSocketService {
     }
 
     getGameBoardParameters(accessCode: number): GameBoardParameters {
-        this.logger.log(`Getting game board parameters for room: ${accessCode}`);
         return this.gameBoardRooms.get(accessCode);
     }
 }
