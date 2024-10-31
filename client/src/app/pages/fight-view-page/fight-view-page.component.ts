@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { FightViewComponent } from '../../components/play-area/fight-view/fight-view.component';
+import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
-    imports: [FightViewComponent],
+    imports: [FightViewComponent, PlayerMapEntityInfoViewComponent],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })
