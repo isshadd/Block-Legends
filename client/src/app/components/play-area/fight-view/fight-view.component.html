@@ -6,17 +6,14 @@
             Défense: {{ opponentCharacter.attributes.defense }}<br />
         </div>
         <div class="fight-view">
-            <!-- Background Image -->
             <img src="assets/images/view/Minecraft-Forest.png" class="layer-1" alt="Minecraft Forest Background" />
 
-            <!-- Character Image Overlay -->
             <div class="layer-2">
                 <img id="opponent" [src]="opponentCharacter.avatar.fullImage"  alt="Character Image" />
                 <img id="player" [src]="playerCharacter.avatar.fullImage"alt="Character Image" />
             </div>
         </div>
 
-        <!-- Question Section -->
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">

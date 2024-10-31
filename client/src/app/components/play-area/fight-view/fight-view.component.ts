@@ -6,7 +6,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     standalone: true,
     imports: [],
     templateUrl: './fight-view.component.html',
-    styleUrl: './fight-view.component.scss',
+    styleUrls: ['./fight-view.component.scss'],
 })
 export class FightViewComponent {
     @Input() playerCharacter: PlayerCharacter;
@@ -17,6 +17,17 @@ export class FightViewComponent {
 
     onAttack() {
         this.attack.emit();
+
+        const playerImage = document.getElementById('player');
+        const opponentImage = document.getElementById('opponent');
+
+        playerImage?.classList.add('attack-player');
+        opponentImage?.classList.add('attack-opponent');
+
+        setTimeout(() => {
+            playerImage?.classList.remove('attack-player');
+            opponentImage?.classList.remove('attack-opponent');
+        }, 300); 
     }
 
     onEscape() {
