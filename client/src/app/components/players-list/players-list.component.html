@@ -1,0 +1,26 @@
+<div class="table-container">
+    <table>
+        <colgroup>
+            <col style="width: 50%" />
+            <!-- Column for Place Name -->
+            <col style="width: 25%" />
+            <col style="width: 25%" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>V</th>
+                <th>D</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (player of players; track player.name) {
+            <tr>
+                <td><img src="assets/images/avatar/Knight_head.png" />{{ player.name }}</td>
+                <td>{{ player.victories }}</td>
+                <td>{{ player.defeats }}</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

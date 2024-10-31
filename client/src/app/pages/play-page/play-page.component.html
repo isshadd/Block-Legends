@@ -1,6 +1,10 @@
 <div id="page-container">
     <div id="side-menu">
         <button class="dark-button" routerLink="/home">Retour</button>
+        <app-player-info></app-player-info>
+        <app-players-list></app-players-list>
     </div>
-    <app-map id="map-container" [grid]="playGameBoardManagerService.getCurrentGrid()"></app-map>
+    <div>
+        <app-map id="map-container" [grid]="playGameBoardManagerService.getCurrentGrid()"></app-map>
+    </div>
 </div>
