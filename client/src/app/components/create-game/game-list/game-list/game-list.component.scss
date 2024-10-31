@@ -26,6 +26,13 @@
     padding: 0 20px;
 }
 
+.map-container {
+    width: 250px;
+    margin-right: 20px;
+    flex-shrink: 0;
+    transform-origin: center;
+}
+
 .game-item {
     display: flex;
     justify-content: center;
@@ -97,18 +104,18 @@
     box-shadow: 0 4px 8px black; /* Optional shadow */
     // width: 100%;
     white-space: normal; // Ensures that the text wraps and preserves whitespace
-    overflow: visible; 
+    overflow: visible;
     word-wrap: break-word;
     word-break: break-all;
 }
 
-img:hover ~ .game-details .description {
+.map-container:hover ~ .game-details .description {
     opacity: 1; /* Make it visible */
     visibility: visible; /* Make it visible */
     transform: translateX(0);
 }
 
-p.no-game{
+p.no-game {
     text-align: center;
     font-size: 1.5em;
     color: rgb(0, 0, 0);

@@ -1,3 +1,4 @@
+import { Avatar } from '@common/enums/avatar-enum';
 import { PlayerAttributes } from './player-attributes';
 
 export const BONUS = 6;
@@ -11,11 +12,10 @@ export class PlayerCharacter {
     isOrganizer: boolean = false;
     dice: string;
     isNameValid: boolean = false;
-    constructor(
-        public name: string,
-        public avatar: string,
-        public attributes = new PlayerAttributes(),
-    ) {}
+    avatar: Avatar;
+    attributes = new PlayerAttributes();
+
+    constructor(public name: string) {}
 
     assignAttackDice() {
         this.dice = 'attack';

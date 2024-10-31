@@ -1,13 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AvatarEnum } from '@common/enums/avatar-enum';
 import { AvatarSelectionComponent } from './avatar-selection.component';
 
 describe('AvatarSelectionComponent', () => {
     let component: AvatarSelectionComponent;
     let fixture: ComponentFixture<AvatarSelectionComponent>;
-    const avatars = [{ name: "Kha'Zix", imgSrc1: 'assets/images/avatar/Khazix.webp', imgSrc2: 'assets/images/avatar/Khazix2.webp' }];
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -16,23 +14,24 @@ describe('AvatarSelectionComponent', () => {
 
         fixture = TestBed.createComponent(AvatarSelectionComponent);
         component = fixture.componentInstance;
-
-        component.character = new PlayerCharacter('Test', '', new PlayerAttributes());
-
-        fixture.detectChanges();
     });
 
-    it('should create', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should select an avatar', () => {
-        component.selectAvatar(avatars[0].imgSrc1);
-        expect(component.character.avatar).toBe(avatars[0].imgSrc1);
+    it('should initialize avatarList with an available avatar', () => {
+        component.setAvatars();
+        expect(component.avatarList).toContain(AvatarEnum.Steve);
     });
 
-    it('should get the selected avatar', () => {
-        component.character.avatar = avatars[0].imgSrc1;
-        expect(component.getSelectedAvatar()).toEqual(avatars[0]);
+    it('should set the selected avatar on the player character', () => {
+        const mockCharacter = new PlayerCharacter('TestCharacter');
+        component.character = mockCharacter;
+
+        const selectedAvatar = AvatarEnum.Steve;
+        component.selectAvatar(selectedAvatar);
+
+        expect(component.character.avatar).toBe(selectedAvatar);
     });
 });

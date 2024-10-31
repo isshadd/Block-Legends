@@ -4,12 +4,11 @@
         <h1>Liste des jeux : {{ this.selectedMode }}</h1>
     </div>
     <div>
-        @if(getFilteredGames().length > 0){
         <ul class="game-list">
             @for(game of getFilteredGames(); track game) {
             <li class="game-item">
                 <div class="game-box">
-                    <img [src]="game.imageUrl" alt="{{ game.name }}" class="game-image" />
+                    <app-map class="map-container" [grid]="loadedTiles[findDatabaseGameIndex(game)]"></app-map>
                     <div class="game-details">
                         <h2>{{ game.name }}</h2>
                         <p>Taille de la carte: {{ game.size }}</p>
@@ -20,11 +19,11 @@
             </li>
             }
         </ul>
-        } @else(){
+        @if(getFilteredGames().length <= 0){
         <p class="no-game">Aucun jeu disponible pour le mode sélectionné.</p>
         }
     </div>
     @if(gameStatus){
-    <div class="alert alert-warning">{{ gameStatus }}</div>
+    <app-modal-one-option [title]="'Erreur'" [message]="gameStatus" [confirmText]="'Fermer'" (confirm)="confirmBack()"></app-modal-one-option>
     }
 </div>

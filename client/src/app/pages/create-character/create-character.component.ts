@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
@@ -17,8 +16,9 @@ import { GameService } from '@app/services/game-services/game.service';
     templateUrl: './create-character.component.html',
     styleUrl: './create-character.component.scss',
 })
-export class CreateCharacterComponent {
-    character = new PlayerCharacter('', '', new PlayerAttributes());
+export class CreateCharacterComponent implements OnInit {
+    character = new PlayerCharacter('');
+    gameId: string | null;
 
     isModalOpen = false;
 
@@ -27,7 +27,14 @@ export class CreateCharacterComponent {
     constructor(
         private router: Router,
         private gameService: GameService,
+        private route: ActivatedRoute,
     ) {}
+
+    ngOnInit(): void {
+        this.route.queryParamMap.subscribe((params) => {
+            this.gameId = params.get('id');
+        });
+    }
 
     createCharacter() {
         const missingFields: string[] = [];
@@ -58,7 +65,7 @@ export class CreateCharacterComponent {
             this.character.name += ' ♔';
             this.character.setOrganizer();
             this.gameService.setCharacter(this.character);
-            this.router.navigate(['/waiting-view']);
+            this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
         }
     }
 
