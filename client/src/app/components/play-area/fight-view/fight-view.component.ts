@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-fight-view',
     standalone: true,
-    imports: [],
+    imports: [CommonModule],
     templateUrl: './fight-view.component.html',
     styleUrls: ['./fight-view.component.scss'],
 })
@@ -27,10 +28,18 @@ export class FightViewComponent {
         setTimeout(() => {
             playerImage?.classList.remove('attack-player');
             opponentImage?.classList.remove('attack-opponent');
-        }, 300); 
+        }, 300);
     }
 
     onEscape() {
         this.escape.emit();
+    }
+
+    get healthArray(): any[] {
+        return new Array(this.opponentCharacter.attributes.life);
+    }
+
+    get defenseArray(): any[] {
+        return new Array(this.opponentCharacter.attributes.defense);
     }
 }

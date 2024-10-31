@@ -11,7 +11,7 @@
 
     .fight-header {
         font-size: 12px;
-        color: $primary-light;
+        color: $secondary;
         margin-bottom: 10px;
     }
 
@@ -19,6 +19,19 @@
         font-size: 10px;
         margin-bottom: 10px;
         margin-left: 10px;
+        color: $primary-light;
+        .icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 2px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        #armor {
+            width: 20px;
+            height: 20px;
+            margin-right: 0px;
+        }
     }
 
     .fight-view {
@@ -93,7 +106,6 @@
                     transform: translateX(0) scale(1);
                 }
             }
-            
 
             @keyframes opponentAttack {
                 0% {
