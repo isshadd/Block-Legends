@@ -10,7 +10,9 @@ import { GameService } from './game.service';
 
 describe('GameService', () => {
     let gameService: GameService;
+    // eslint-disable-next-line no-unused-vars
     let gameValidationService: GameValidationService;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let mockGameModel: any;
 
     const createDto: CreateGameDto = {
@@ -92,7 +94,7 @@ describe('GameService', () => {
     });
 
     it('should throw an error when validation fails during adding a game', async () => {
-        const createDto: CreateGameDto = {
+        const createDtoFail: CreateGameDto = {
             name: 'Test Game',
             description: 'A test game description',
             size: 10,
@@ -108,7 +110,7 @@ describe('GameService', () => {
             errors: ['Name is required', 'Description is too short'],
         });
 
-        await expect(gameService.addGame(createDto)).rejects.toThrow(
+        await expect(gameService.addGame(createDtoFail)).rejects.toThrow(
             'Veuillez corriger les erreurs suivantes avant de pouvoir continuer: Name is required<br>Description is too short',
         );
     });

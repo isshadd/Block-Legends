@@ -346,12 +346,16 @@ function createTilesWithInvalidSpawn(size: number): Tile[][] {
     switch (size) {
         case MapSize.SMALL:
             invalidSpawnCount = SPAWN_MEDIUM;
+        // eslint-disable-next-line no-fallthrough
         case MapSize.MEDIUM:
             invalidSpawnCount = SPAWN_SMALL;
+        // eslint-disable-next-line no-fallthrough
         case MapSize.LARGE:
             invalidSpawnCount = SPAWN_LARGE_INVALID;
+        // eslint-disable-next-line no-fallthrough
         default:
             invalidSpawnCount = 0;
+        // eslint-disable-next-line no-fallthrough
     }
     for (let i = 0; i < size; i++) {
         tiles[i] = [];
