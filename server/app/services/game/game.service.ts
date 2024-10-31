@@ -2,7 +2,7 @@ import { Game, GameDocument } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -11,6 +11,7 @@ export class GameService {
     constructor(
         @InjectModel(Game.name)
         private gameModel: Model<GameDocument>,
+        @Inject(forwardRef(() => GameValidationService))
         private gameValidationService: GameValidationService,
     ) {}
 
@@ -29,10 +30,7 @@ export class GameService {
     }
 
     async addGame(game: CreateGameDto): Promise<Game> {
-        // Convert CreateGameDto to Game (if necessary)
         const gameToValidate = game as Game;
-
-        // Validation des données du jeu
         const validationResult = await this.gameValidationService.validateGame(gameToValidate);
         if (!validationResult.isValid) {
             throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${validationResult.errors.join('<br>')}`);
@@ -46,7 +44,7 @@ export class GameService {
     }
 
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
-        // Validation des données du jeu
+        // Validate the game data
         const validationResult = await this.gameValidationService.validateGame(game);
         if (!validationResult.isValid) {
             throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${validationResult.errors.join('<br>')}`);

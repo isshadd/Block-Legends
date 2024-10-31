@@ -163,6 +163,9 @@ export class GameValidationService {
     }
 
     async validateName(game: Game | UpdateGameDto): Promise<boolean> {
+        if (!game.name || typeof game.name !== 'string') {
+            return false;
+        }
         const normalizedName = game.name.trim();
         const existingGame = await this.gameService.getGameByName(normalizedName);
         if (normalizedName.length === 0 || existingGame || normalizedName.includes(' ')) {
