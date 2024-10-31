@@ -2,6 +2,7 @@ import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
 import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
+import { Subject } from 'rxjs';
 import { GameRoom, GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
 export interface GameBoardParameters {
@@ -13,6 +14,9 @@ export interface GameBoardParameters {
 export class PlayGameBoardSocketService {
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
     private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+
+    signalGameBoardSetupDone = new Subject<number>();
+    signalGameBoardSetupDone$ = this.signalGameBoardSetupDone.asObservable();
 
     constructor(
         private readonly gameService: GameService,
@@ -27,12 +31,9 @@ export class PlayGameBoardSocketService {
             return;
         }
 
-        let game: Game;
         this.gameService.getGame(room.id).then((game) => {
-            game = game;
+            this.setupSpawnPoints(room, game);
         });
-
-        this.setupSpawnPoints(room, game);
     }
 
     setupSpawnPoints(room: GameRoom, game: Game) {
@@ -47,7 +48,7 @@ export class PlayGameBoardSocketService {
                 const randomIndex = Math.floor(Math.random() * spawnCounter);
 
                 if (!spawnPlaces.has(randomIndex)) {
-                    spawnPlaces.set(randomIndex, player.socketId);
+                    spawnPlaces.set(randomIndex, player.name);
                     assigned = true;
                     availableSpawnPoints--;
                 }
@@ -55,6 +56,8 @@ export class PlayGameBoardSocketService {
         }
 
         this.gameBoardRooms.set(room.accessCode, { game, spawnPlaces });
+        this.logger.log(`Game board setup done for room: ${room.accessCode}`);
+        this.signalGameBoardSetupDone.next(room.accessCode);
     }
 
     setSpawnCounter(gameSize: MapSize): number {
@@ -66,5 +69,10 @@ export class PlayGameBoardSocketService {
             case MapSize.LARGE:
                 return 6;
         }
+    }
+
+    getGameBoardParameters(accessCode: number): GameBoardParameters {
+        this.logger.log(`Getting game board parameters for room: ${accessCode}`);
+        return this.gameBoardRooms.get(accessCode);
     }
 }
