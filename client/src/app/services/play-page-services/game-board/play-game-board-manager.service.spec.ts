@@ -22,6 +22,7 @@ describe('PlayGameBoardManagerService', () => {
             roomId: 'room1',
             players: [],
             accessCode: 0,
+            isLocked: false,
         };
 
         webSocketSpy.getRoomInfo.and.returnValue(mockRoomInfo);

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AvatarEnum } from '@common/enums/avatar-enum';
 import { FightViewComponent } from './fight-view.component';
 
 describe('FightViewComponent', () => {
@@ -16,11 +17,13 @@ describe('FightViewComponent', () => {
         fixture = TestBed.createComponent(FightViewComponent);
         component = fixture.componentInstance;
 
-        mockPlayer = new PlayerCharacter('test');
+        mockPlayer = new PlayerCharacter('testPlayer');
         mockPlayer.attributes = { life: 10, defense: 5, speed: 8, attack: 6 };
+        mockPlayer.avatar = AvatarEnum.Steve;
 
-        mockOpponent = new PlayerCharacter('test');
+        mockOpponent = new PlayerCharacter('testOpponent');
         mockOpponent.attributes = { life: 8, defense: 4, speed: 7, attack: 5 };
+        mockOpponent.avatar = AvatarEnum.Alex;
 
         component.playerCharacter = mockPlayer;
         component.opponentCharacter = mockOpponent;
