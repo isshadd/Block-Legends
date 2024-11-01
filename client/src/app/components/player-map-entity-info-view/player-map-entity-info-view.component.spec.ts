@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AvatarEnum } from '@common/enums/avatar-enum';
 import { PlayerMapEntityInfoViewComponent } from './player-map-entity-info-view.component';
 
 const LIFE = 5;
@@ -20,6 +21,7 @@ describe('PlayerMapEntityInfoViewComponent', () => {
         component = fixture.componentInstance;
 
         component.playerCharacter = new PlayerCharacter('TestCharacter');
+        component.playerCharacter.avatar = AvatarEnum.Steve;
         component.playerCharacter.attributes = {
             life: LIFE,
             defense: DEFENSE,
