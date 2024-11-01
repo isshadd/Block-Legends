@@ -2,13 +2,17 @@ import { GameSocketRoomService, PlayerCharacter } from '@app/services/gateway-se
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { PlayGameBoardGateway } from '../playGameBoard/play-game-board.gateway';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
     private readonly logger = new Logger(GameGateway.name);
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameBoardGateway: PlayGameBoardGateway,
+    ) {}
 
     handleConnection(client: Socket) {
         this.logger.log(`Client connecté: ${client.id}`);
@@ -198,7 +202,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     handleStartGame(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (room && room.organizer === client.id) {
-            this.server.to(accessCode.toString()).emit('gameStarted');
+            this.playGameBoardGateway.startRoomGame(accessCode);
         } else {
             client.emit('error', { message: 'Pas authorisé ou room non trouvé' });
         }

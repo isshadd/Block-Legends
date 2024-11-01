@@ -1,0 +1,174 @@
+@import 'src/_variables.scss';
+
+.fight-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: $primary-dark;
+    border: 2px solid darken($primary-dark, 10%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+
+    .fight-header {
+        font-size: 12px;
+        color: $secondary;
+        margin-bottom: 10px;
+    }
+
+    .fight-info {
+        font-size: 10px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+        color: $primary-light;
+        .icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 2px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        #armor {
+            width: 20px;
+            height: 20px;
+            margin-right: 0px;
+        }
+    }
+
+    .fight-view {
+        position: relative;
+        border: 4px solid #333;
+        width: 520px;
+        height: 200px;
+        object-fit: cover;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+
+        /* Background Image Layer */
+        .layer-1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Character Image Layer */
+        .layer-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* Base styling for images */
+            img {
+                width: 100px;
+                height: auto;
+                margin: 20px;
+                transition: transform 0.3s ease;
+            }
+
+            /* Player and Opponent positions */
+            #player {
+                width: 85px;
+                margin-left: 90px;
+            }
+
+            #opponent {
+                width: 70px;
+                margin-right: 90px;
+            }
+
+            /* Attack animations */
+            .attack-player {
+                animation: playerAttack 0.3s ease forwards;
+            }
+
+            .attack-opponent {
+                animation: opponentAttack 0.3s ease forwards;
+            }
+
+            /* Keyframes for attack animations */
+            @keyframes playerAttack {
+                0% {
+                    transform: translateX(0) scale(1);
+                }
+                50% {
+                    transform: translateX(-100px) scale(0.85);
+                }
+                100% {
+                    transform: translateX(0) scale(1);
+                }
+            }
+
+            @keyframes opponentAttack {
+                0% {
+                    transform: translateX(0) scale(1);
+                }
+                50% {
+                    transform: translateX(100px) scale(1.2);
+                }
+                100% {
+                    transform: translateX(0) scale(1);
+                }
+            }
+        }
+    }
+
+    .question-section {
+        display: flex;
+        align-items: center;
+        background-color: darken($primary-dark, 10%);
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+
+        .question-text {
+            flex: 1;
+            font-size: 18px;
+            color: $primary-light;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: darken($primary-dark, 10%);
+            margin-right: 15px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                color: #fff;
+
+                &.primary {
+                    background-color: lighten($secondary, 0%);
+
+                    &:hover {
+                        background-color: darken($primary-light, 20%);
+                    }
+                }
+
+                &.secondary {
+                    background-color: lighten($primary-dark, 20%);
+
+                    &:hover {
+                        background-color: darken($primary-light, 20%);
+                    }
+                }
+            }
+        }
+    }
+}

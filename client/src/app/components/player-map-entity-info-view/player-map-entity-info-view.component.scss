@@ -1,0 +1,33 @@
+@import 'src/_variables.scss';
+
+#info-view {
+    width: 150px;
+    height: 150px;
+    background-color: $primary-dark;
+    border: 2px solid darken($primary-dark, 10%);
+
+    .player-info {
+        color: $primary-light;
+        font-size: 15px;
+        line-height: 20px;
+        margin-bottom: 20px;
+    }
+    .player-info-details {
+        margin-left: 10px;
+        color: $primary-light;
+        font-size: 10px;
+        line-height: 1.5;
+    }
+}
+
+.icon-container {
+    display: inline; /* Ensures no spacing is added by container */
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block; /* Keeps icons in a row */
+    vertical-align: middle;
+    margin: 0; /* Remove any additional spacing */
+}

@@ -1,0 +1,33 @@
+<div class="fight-container">
+    <div class="fight-header">
+        <div class="opponent-title">Nom D'Adversaire: {{ opponentCharacter.name }}</div>
+        <div class="fight-info">
+            Santé:
+            <span *ngFor="let _ of healthArray">
+                <img src="assets/images/heart.png" alt="Heart" class="icon" />
+            </span>
+            <br />
+            Défense:
+            <span *ngFor="let _ of defenseArray">
+                <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
+            </span>
+            <br />
+        </div>
+        <div class="fight-view">
+            <img src="assets/images/view/Minecraft-Forest.png" class="layer-1" alt="Minecraft Forest Background" />
+
+            <div class="layer-2">
+                <img id="opponent" [src]="opponentCharacter.avatar.fullImage" alt="Character Image" />
+                <img id="player" [src]="playerCharacter.avatar.fullImage" alt="Character Image" />
+            </div>
+        </div>
+
+        <div class="question-section">
+            <div class="question-text">Qu'est-ce que tu vas faire?</div>
+            <div class="action-buttons">
+                <button (click)="onAttack()" class="primary">Attaquer</button>
+                <button (click)="onEscape()" class="secondary">Fuir</button>
+            </div>
+        </div>
+    </div>
+</div>

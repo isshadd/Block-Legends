@@ -36,7 +36,7 @@ export class ListGameComponent {
 
     deleteGame(id: string | null | undefined): void {
         if (!id) return;
-        this.administrationService.deleteGame(id);
+        this.getGames(this.administrationService.deleteGame(id));
     }
 
     toggleVisibility(game: GameShared): void {
