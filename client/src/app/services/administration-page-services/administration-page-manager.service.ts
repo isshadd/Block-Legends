@@ -23,13 +23,15 @@ export class AdministrationPageManagerService {
         });
     }
 
-    deleteGame(id: string): void {
+    deleteGame(id: string): GameShared[] {
         this.gameServerCommunicationService.deleteGame(id).subscribe();
         this.games = this.games.filter((elem) => elem._id !== id);
+        return this.games;
     }
 
     toggleVisibility(game: GameShared): void {
         if (!game._id) return;
+        console.log(game);
         game.isVisible = !game.isVisible;
         this.gameServerCommunicationService.updateGame(game._id, { isVisible: game.isVisible }).subscribe();
     }
