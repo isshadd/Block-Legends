@@ -47,7 +47,7 @@ describe('MapEditorModalComponent', () => {
             description: 'New Game Description',
         });
 
-        component.onSaveClick();
+        component.onOkClick();
         expect(matDialogRef.close).toHaveBeenCalledWith({
             name: 'New Game Name',
             description: 'New Game Description',
@@ -60,7 +60,7 @@ describe('MapEditorModalComponent', () => {
             description: 'Valid description',
         });
 
-        component.onSaveClick();
+        component.onOkClick();
         expect(matDialogRef.close).not.toHaveBeenCalled();
     });
 
