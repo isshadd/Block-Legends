@@ -7,6 +7,25 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 16px;
+    background-color: $primary-dark;
+    color: $primary-light;
+    border: none;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: darken($primary-dark, 10%);
+    }
 }
 
 .container {
@@ -59,8 +78,8 @@ body {
             background-color: lighten($primary-dark, 10%);
 
             &::placeholder {
-                color: $secondary; // Set placeholder text color to secondary color
-                opacity: 1; // Ensures the color appears as intended
+                color: $secondary;
+                opacity: 1;
             }
         }
 
