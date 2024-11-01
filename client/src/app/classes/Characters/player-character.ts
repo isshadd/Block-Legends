@@ -1,5 +1,6 @@
 import { Avatar } from '@common/enums/avatar-enum';
 import { PlayerAttributes } from './player-attributes';
+import { PlayerMapEntity } from './player-map-entity';
 
 export const BONUS = 6;
 export const BASE_STATS = 4;
@@ -14,6 +15,7 @@ export class PlayerCharacter {
     isNameValid: boolean = false;
     avatar: Avatar;
     attributes = new PlayerAttributes();
+    mapEntity: PlayerMapEntity;
 
     constructor(public name: string) {}
 

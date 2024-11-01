@@ -2,13 +2,18 @@
     <h1>Attente de partie - League of Versions</h1>
 
     <h2>Code d'accès : {{ accessCode$ | async }}</h2>
+    @if (isLocked$ | async) { ::: 🔒 Salle verrouillée ::: } @else { ::: 🔓 Salle déverrouillée ::: }
 
     <div class="players-list">
         <h3>Joueurs :</h3>
         <ul>
             @for(player of players$ | async; track player.name) {
             <li [ngClass]="{ organizer: player.isOrganizer }">
+                <img [src]="player.avatar.headImage" alt="Avatar" />
                 <span>{{ player.name }}</span>
+                @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {
+                <button class="dark-button" type="button" (click)="kickPlayer(player)">Expulser</button>
+                }
             </li>
             }
         </ul>
@@ -18,7 +23,7 @@
         <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="isMaxPlayer">Ajouter un joueur virtuel</button>
         <button class="dark-button" type="button" (click)="lockRoom()">Verouiller la salle</button>
         <button class="dark-button" type="button" (click)="unlockRoom()">Deverouiller la salle</button>
-        <button class="dark-button" type="button" (click)="playGame()">Lancer la partie!</button>
+        <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
