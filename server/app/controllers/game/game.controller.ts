@@ -89,6 +89,7 @@ export class GameController {
             //         return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
             //     }
             // }
+
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {

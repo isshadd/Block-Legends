@@ -33,7 +33,7 @@ export class GameService {
         const errors: string[] = [];
 
         // Validate the name and add an error message if invalid
-        const isNameValid = await this.gameValidationService.validateName(gameToValidate);
+        const isNameValid = await this.gameValidationService.validateGameName(gameToValidate);
         if (!isNameValid) {
             errors.push('Le nom du jeu doit être unique.');
         }
@@ -58,9 +58,17 @@ export class GameService {
 
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
         // Validate the game data
+        const errors: string[] = [];
+        const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);
+        if (!isNameValid) {
+            errors.push('Le nom du jeu doit être unique.');
+        }
         const validationResult = await this.gameValidationService.validateGame(game);
         if (!validationResult.isValid) {
-            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${validationResult.errors.join('<br>')}`);
+            errors.push(...validationResult.errors);
+        }
+        if (errors.length > 0) {
+            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
         }
 
         const filterQuery = { _id: id };
