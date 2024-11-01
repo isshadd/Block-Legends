@@ -24,11 +24,11 @@ export class GameServerCommunicationService {
     }
 
     addGame(game: CreateGameSharedDto): Observable<GameShared> {
-        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleErrors<GameShared>('addGame')));
+        return this.http.post<GameShared>(`${this.baseUrl}/`, game).pipe(catchError(this.handleErrors<GameShared>()));
     }
 
     updateGame(id: string, game: UpdateGameSharedDto): Observable<void> {
-        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleErrors<void>('updateGame')));
+        return this.http.patch<void>(`${this.baseUrl}/${id}`, game).pipe(catchError(this.handleErrors<void>()));
     }
 
     deleteGame(id: string): Observable<void> {
@@ -45,16 +45,12 @@ export class GameServerCommunicationService {
         };
     }
 
-    private handleErrors<T>(operation: 'addGame' | 'updateGame' = 'addGame') {
+    private handleErrors<T>() {
         return (error: unknown): Observable<T> => {
             let errorMsgs: string[] = [];
-            if (operation === 'addGame') {
-                const err = error as { error: { errors: string[] } };
-                errorMsgs = err?.error?.errors || ['Une erreur est survenue'];
-            } else if (operation === 'updateGame') {
-                const err = error as { error: string[] };
-                errorMsgs = err.error || ['Une erreur est survenue'];
-            }
+            const err = error as { error: string[] };
+            errorMsgs = err.error || ['Une erreur est survenue'];
+
             return throwError(() => errorMsgs);
         };
     }
