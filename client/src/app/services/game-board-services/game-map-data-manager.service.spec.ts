@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
+import { Spawn } from '@app/classes/Items/spawn';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
@@ -603,5 +604,26 @@ describe('GameMapDataManagerService', () => {
         expect(result1).toBe(tile1);
 
         expect(result2).toBe(tile4);
+    });
+
+    it('should return an array of terrain tiles with spawn items', () => {
+        const spawnTile1 = new GrassTile();
+        spawnTile1.item = new Spawn();
+
+        const spawnTile2 = new GrassTile() as TerrainTile;
+        spawnTile2.item = new Spawn();
+
+        const nonSpawnTile = new GrassTile();
+
+        service['currentGrid'] = [
+            [spawnTile1, nonSpawnTile],
+            [nonSpawnTile, spawnTile2],
+        ];
+
+        const result = service.getTilesWithSpawn();
+
+        expect(result).toContain(spawnTile1);
+        expect(result).toContain(spawnTile2);
+        expect(result).not.toContain(nonSpawnTile);
     });
 });
