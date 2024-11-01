@@ -25,15 +25,28 @@ export class GameService {
 
     async getGameByName(name: string): Promise<Game | null> {
         const normalizedName = name.trim().replace(/\s+/g, ' ');
-
         return await this.gameModel.findOne({ name: { $regex: new RegExp('^' + normalizedName + '$', 'i') } });
     }
 
     async addGame(game: CreateGameDto): Promise<Game> {
         const gameToValidate = game as Game;
+        const errors: string[] = [];
+
+        // Validate the name and add an error message if invalid
+        const isNameValid = await this.gameValidationService.validateName(gameToValidate);
+        if (!isNameValid) {
+            errors.push('Le nom du jeu doit être unique.');
+        }
+
+        // Perform the full game validation and add any additional errors
         const validationResult = await this.gameValidationService.validateGame(gameToValidate);
         if (!validationResult.isValid) {
-            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${validationResult.errors.join('<br>')}`);
+            errors.push(...validationResult.errors);
+        }
+
+        // If there are any errors, throw a single error message containing all issues
+        if (errors.length > 0) {
+            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
         }
 
         try {

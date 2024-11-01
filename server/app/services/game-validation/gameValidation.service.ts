@@ -32,11 +32,6 @@ export class GameValidationService {
             errors.push('Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)');
         }
 
-        const isNameDescriptionValid = await this.validateName(game);
-        if (!isNameDescriptionValid) {
-            errors.push('Le nom du jeu doit être unique et sans espaces.');
-        }
-
         const isDescriptionValid = await this.validateDescription(game);
         if (!isDescriptionValid) {
             errors.push('La description du jeu ne doit pas être vide.');
@@ -162,16 +157,16 @@ export class GameValidationService {
         return true;
     }
 
-    async validateName(game: Game | UpdateGameDto): Promise<boolean> {
-        if (!game.name || typeof game.name !== 'string') {
-            return false;
-        }
+    async validateName(game: Game): Promise<boolean> {
         const normalizedName = game.name.trim();
         const existingGame = await this.gameService.getGameByName(normalizedName);
-        if (normalizedName.length === 0 || existingGame || normalizedName.includes(' ')) {
-            return false;
+
+        // Check if no game exists with the same name, or if updating the same game
+        if (!existingGame || (game._id && game._id === existingGame._id)) {
+            return true; // Name is unique
         }
-        return true;
+
+        return false; // Name is not unique
     }
 
     async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {

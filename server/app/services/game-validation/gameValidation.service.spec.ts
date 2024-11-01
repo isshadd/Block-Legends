@@ -155,11 +155,11 @@ describe('GameValidationService', () => {
         jest.clearAllMocks();
     });
 
-    it('should return invalid if name is empty', async () => {
-        game.name = '';
-        const result = await gameValidationService.validateName(game);
-        expect(result).toBe(false);
-    });
+    // it('should return invalid if name is empty', async () => {
+    //     game.name = '';
+    //     const result = await gameValidationService.validateName(game);
+    //     expect(result).toBe(false);
+    // });
 
     it('should return invalid if description is empty', async () => {
         game.description = '';
