@@ -8,6 +8,7 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 
 export const MIN_CHAR = 48;
 export const MAX_CHAR = 57;
+const MAX_VALUE = 4;
 
 @Component({
     selector: 'app-join-game',
@@ -45,7 +46,7 @@ export class JoinGameComponent {
         }
 
         const currentValue = input.value;
-        if (currentValue.length >= 4) {
+        if (currentValue.length >= MAX_VALUE) {
             if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(char)) {
                 event.preventDefault();
             }

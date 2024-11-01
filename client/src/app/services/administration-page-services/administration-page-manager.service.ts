@@ -32,7 +32,6 @@ export class AdministrationPageManagerService {
 
     toggleVisibility(game: GameShared): void {
         if (!game._id) return;
-        console.log(game);
         game.isVisible = !game.isVisible;
         this.gameServerCommunicationService.updateGame(game._id, { isVisible: game.isVisible }).subscribe();
     }

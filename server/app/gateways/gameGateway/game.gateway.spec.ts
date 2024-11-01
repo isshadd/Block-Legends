@@ -1,6 +1,8 @@
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventEmitter } from 'events';
 import { Server } from 'socket.io';
+import { PlayGameBoardGateway } from '../playGameBoard/play-game-board.gateway';
 import { GameGateway } from './game.gateway';
 
 // interface GameRoom {
@@ -19,13 +21,14 @@ const createMockServer = () => {
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
+    let mockPlayGameBoardGateway: PlayGameBoardGateway;
     // let mockServer: Socket;
 
     beforeEach(async () => {
         // mockServer = jasmine.createSpyObj<Socket>('Server', ['to', 'emit']);
 
         const module: TestingModule = await Test.createTestingModule({
-            providers: [GameGateway],
+            providers: [GameGateway, PlayGameBoardGateway, GameSocketRoomService],
         }).compile();
 
         gateway = module.get<GameGateway>(GameGateway);

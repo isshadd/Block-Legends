@@ -1,5 +1,5 @@
-import { PlayerMapEntity } from '../Characters/player-map-entity';
-import { TerrainTile } from './terrain-tile';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 
 describe('TerrainTile', () => {
     let terrainTile: TerrainTile;
