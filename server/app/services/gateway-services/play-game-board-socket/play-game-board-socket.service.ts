@@ -1,9 +1,9 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
+import { GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { GameRoom, GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
 export interface GameBoardParameters {
     game: Game;
@@ -12,11 +12,11 @@ export interface GameBoardParameters {
 
 @Injectable()
 export class PlayGameBoardSocketService {
-    private readonly logger = new Logger(PlayGameBoardSocketService.name);
-    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
-
     signalGameBoardSetupDone = new Subject<number>();
     signalGameBoardSetupDone$ = this.signalGameBoardSetupDone.asObservable();
+
+    private readonly logger = new Logger(PlayGameBoardSocketService.name);
+    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
 
     constructor(
         private readonly gameService: GameService,
@@ -37,11 +37,11 @@ export class PlayGameBoardSocketService {
     }
 
     setupSpawnPoints(room: GameRoom, game: Game) {
-        let spawnCounter = this.setSpawnCounter(game.size);
-        let spawnPlaces: [number, string][] = [];
+        const spawnCounter = this.setSpawnCounter(game.size);
+        const spawnPlaces: [number, string][] = [];
         let availableSpawnPoints = spawnCounter;
 
-        for (let player of room.players) {
+        for (const player of room.players) {
             let assigned = false;
 
             while (!assigned && availableSpawnPoints > 0) {
@@ -61,13 +61,16 @@ export class PlayGameBoardSocketService {
     }
 
     setSpawnCounter(gameSize: MapSize): number {
+        const MIN_PLAYERS = 2;
+        const MED_PLAYERS = 4;
+        const MAX_PLAYERS = 6;
         switch (gameSize) {
             case MapSize.SMALL:
-                return 2;
+                return MIN_PLAYERS;
             case MapSize.MEDIUM:
-                return 4;
+                return MED_PLAYERS;
             case MapSize.LARGE:
-                return 6;
+                return MAX_PLAYERS;
         }
     }
 
