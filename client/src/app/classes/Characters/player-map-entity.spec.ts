@@ -38,4 +38,10 @@ describe('PlayerMapEntity', () => {
         playerMapEntity.setCoordinates(newCoordinates);
         expect(playerMapEntity.coordinates).toEqual(newCoordinates);
     });
+
+    it('should update spawnCoordinates with setSpawnCoordinates()', () => {
+        const newCoordinates: Vec2 = { x: 10, y: 20 };
+        playerMapEntity.setSpawnCoordinates(newCoordinates);
+        expect(playerMapEntity.spawnCoordinates).toEqual(newCoordinates);
+    });
 });

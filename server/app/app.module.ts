@@ -10,7 +10,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GameController } from './controllers/game/game.controller';
 import { GameGateway } from './gateways/gameGateway/game.gateway';
+import { PlayGameBoardGateway } from './gateways/playGameBoard/play-game-board.gateway';
 import { GameValidationService } from './services/game-validation/gameValidation.service';
+import { GameSocketRoomService } from './services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameBoardSocketService } from './services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 
 @Module({
     imports: [
@@ -25,6 +28,17 @@ import { GameValidationService } from './services/game-validation/gameValidation
         MongooseModule.forFeature([{ name: Game.name, schema: gameSchema }]),
     ],
     controllers: [DateController, ExampleController, GameController],
-    providers: [ChatGateway, DateService, ExampleService, Logger, GameService, GameValidationService, GameGateway],
+    providers: [
+        ChatGateway,
+        DateService,
+        ExampleService,
+        Logger,
+        GameService,
+        GameValidationService,
+        GameGateway,
+        GameSocketRoomService,
+        PlayGameBoardGateway,
+        PlayGameBoardSocketService,
+    ],
 })
 export class AppModule {}

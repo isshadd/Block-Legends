@@ -8,6 +8,7 @@ import { AvatarSelectionComponent } from '@app/components/create-character/avata
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 
 @Component({
     selector: 'app-player-create-character',
@@ -27,7 +28,8 @@ export class PlayerCreateCharacterComponent {
     constructor(
         private router: Router,
         private gameService: GameService,
-        private route: ActivatedRoute, // private webSocketService: WebSocketService,
+        private route: ActivatedRoute,
+        private webSocketService: WebSocketService,
     ) {}
 
     createPlayerCharacter() {
@@ -60,8 +62,23 @@ export class PlayerCreateCharacterComponent {
             this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
             this.gameService.setCharacter(this.character);
-            // this.webSocketService.addPlayerToRoom(this.gameId, this.character);
-            this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
+
+            this.webSocketService.socket.on('joinGameResponseNoMoreExisting', () => {
+                this.router.navigate(['join-game']);
+            });
+
+            this.webSocketService.socket.on('joinGameResponseLockedAfterJoin', () => {
+                this.router.navigate(['join-game']);
+            });
+
+            this.webSocketService.socket.on('joinGameResponseCanJoin', (response: { valid: boolean }) => {
+                if (response.valid) {
+                    this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
+                } else {
+                    this.router.navigate(['join-game']);
+                }
+            });
+            this.webSocketService.addPlayerToRoom(parseInt(this.gameId as string, 10), this.character);
         }
     }
 

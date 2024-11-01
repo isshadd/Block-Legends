@@ -7,6 +7,7 @@ import { AdministrationGameComponent } from '@app/pages/administration-game/admi
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreateCharacterComponent } from '@app/pages/create-character/create-character.component';
 import { CreateGameComponent } from '@app/pages/create-game/create-game.component';
+import { FightViewPageComponent } from '@app/pages/fight-view-page/fight-view-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -34,6 +35,7 @@ const routes: Routes = [
     { path: 'map-editor', component: MapEditorComponent },
     { path: 'play-page', component: PlayPageComponent },
     { path: 'player-create-character', component: PlayerCreateCharacterComponent },
+    { path: 'fight-view-page', component: FightViewPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

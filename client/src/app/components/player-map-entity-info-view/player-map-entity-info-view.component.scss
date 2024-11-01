@@ -1,0 +1,55 @@
+@import 'src/_variables.scss';
+
+#info-view {
+    display: flex;
+    align-items: flex-start;
+    background-color: $primary-dark;
+    border: 2px solid darken($primary-dark, 10%);
+    padding: 10px;
+    border-radius: 8px;
+    width: auto;
+    max-width: 200px;
+
+    .info-content {
+        display: flex;
+        flex-direction: column;
+        margin-right: 10px; // Space between text and image
+    }
+
+    .player-info {
+        color: $primary-light;
+        font-size: 20px;
+        line-height: 20px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .player-info-details {
+        color: $primary-light;
+        font-size: 10px;
+        line-height: 1.5;
+
+        .icon-container {
+            display: inline-block;
+            margin-right: 2px;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+    }
+
+    #player-image {
+        width: 40px;
+        height: 100px;
+        margin-left: 10px; // Align to the right
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; // Ensure the image fits within the circle
+        }
+    }
+}
