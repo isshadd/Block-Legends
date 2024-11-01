@@ -144,10 +144,36 @@ export class WebSocketService {
             alert(data.message);
         });
 
-        this.socket.on('playerKicked', (data: { message: string }) => {
-            alert(data.message);
-            this.leaveGame();
-            this.router.navigate(['/home']);
+        this.socket.on('playerKicked', async (data: { message: string; kickedPlayerId: string }) => {
+            if (data.kickedPlayerId === this.socket.id) {
+                await new Promise((resolve) => {
+                    window.alert(data.message);
+                    resolve(true);
+                });
+
+                // Then perform cleanup
+                const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
+                if (accessCode) {
+                    this.socket.emit('leaveGame', accessCode);
+                }
+
+                // Clear all local data
+                localStorage.removeItem('roomId');
+                localStorage.removeItem('accessCode');
+                this.gameService.clearGame();
+                this.isLockedSubject.next(false);
+                this.playersSubject.next([]);
+
+                // Important: Force navigate to home page
+                this.router.navigate(['/home']);
+                // .then(() => {
+                //     // Optional: Refresh the page to ensure clean state
+                //     window.location.reload();
+                // });
+            } else {
+                // If it's not the current user, just update the players list
+                this.socket.emit('getRoomState', parseInt(localStorage.getItem('accessCode') as string, 10));
+            }
         });
 
         this.socket.on('gameStarted', () => {

@@ -18,14 +18,6 @@ export class PlayGameBoardGateway {
         });
     }
 
-    startRoomGame(accessCode: number) {
-        this.playGameBoardSocketService.initRoomGameBoard(accessCode);
-    }
-
-    onGameBoardSetupDone(accessCode: number) {
-        this.server.to(accessCode.toString()).emit('gameStarted');
-    }
-
     @SubscribeMessage('initGameBoard')
     handleInitGameBoard(client: Socket, accessCode: number) {
         const gameBoardParameters: GameBoardParameters = this.playGameBoardSocketService.getGameBoardParameters(accessCode);
@@ -35,5 +27,13 @@ export class PlayGameBoardGateway {
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
         }
+    }
+
+    startRoomGame(accessCode: number) {
+        this.playGameBoardSocketService.initRoomGameBoard(accessCode);
+    }
+
+    onGameBoardSetupDone(accessCode: number) {
+        this.server.to(accessCode.toString()).emit('gameStarted');
     }
 }
