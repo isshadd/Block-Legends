@@ -1,12 +1,13 @@
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Item } from '@app/classes/Items/item';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { ItemLimitCounterComponent } from '@app/components/map-editor-components/item-limit-counter/item-limit-counter.component';
 import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu.service';
 @Component({
     selector: 'app-placeable-entity-container',
     standalone: true,
@@ -20,27 +21,29 @@ export class PlaceableEntityContainerComponent {
     @Input() containerItems: PlaceableEntity[];
 
     constructor(
-        public mapEditorManagerService: MapEditorManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
+        public sideMenuService: MapEditorSideMenuService,
     ) {}
 
     onMouseEnter(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseEnter(entity);
+        this.sideMenuService.onSideMenuMouseEnter(entity);
     }
 
     onMouseLeave(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseLeave(entity);
+        this.sideMenuService.onSideMenuMouseLeave(entity);
     }
 
-    onMouseDown(entity: PlaceableEntity) {
-        this.mapEditorManagerService.onMouseDownSideMenu(entity);
+    onMouseDown(event: MouseEvent, entity: PlaceableEntity) {
+        if (event.button === 2) return;
+
+        this.sideMenuService.onSideMenuMouseDown(entity);
+        event.preventDefault();
     }
 
-    // onDragStarted(entity: PlaceableEntity) {
-    //     this.mapEditorManagerService.startDrag(entity);
-    // }
-
-    // onDragEnded() {
-    //     this.mapEditorManagerService.endDrag();
-    // }
+    getItemLimit(entity: PlaceableEntity): number {
+        if (entity.isItem()) {
+            return (entity as Item).itemLimit;
+        }
+        return 0;
+    }
 }

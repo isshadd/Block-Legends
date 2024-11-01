@@ -72,7 +72,7 @@ $indigo-pink-theme: mat.m2-define-light-theme(
 @font-face {
     font-family: 'Minercraftory';
     // source: https://www.dafont.com/minercraftory.font
-    src: url('/assets/fonts/Minercraftory.ttf') format('truetype');
+    src: url('./assets/fonts/Minercraftory.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -94,7 +94,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: $background;
-    background-image: url('/assets/images/background.png');
+    background-image: url('./assets/images/background.png');
     background-repeat: repeat-x;
     animation: moveIt 10000s linear infinite;
     background-size: cover;

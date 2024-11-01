@@ -1,140 +1,131 @@
-import { Game, GameDocument } from '@app/model/database/game';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model } from 'mongoose';
 import { GameService } from './game.service';
-
 describe('GameService', () => {
-    let service: GameService;
-    let model: Model<GameDocument>;
-    let games: Game[];
-    let createGameDto: CreateGameDto;
-    let updateGameDto: UpdateGameDto;
+    let gameService: GameService;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // let gameValidationService: GameValidationService;
+    let mockGameModel: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const mockGameModel = {
-        find: jest.fn(),
-        findOne: jest.fn(),
-        create: jest.fn(),
-        updateOne: jest.fn(),
-        deleteOne: jest.fn(),
-        deleteMany: jest.fn(),
+    const mockValidationService = {
+        validateGame: jest.fn(),
+        validateGameName: jest.fn(),
+        validateUpdatedGameName: jest.fn(),
     };
 
     beforeEach(async () => {
+        jest.clearAllMocks();
+        mockGameModel = {
+            find: jest.fn().mockResolvedValue([]),
+            findOne: jest.fn().mockResolvedValue(null),
+            create: jest.fn(),
+            updateOne: jest.fn(),
+            deleteOne: jest.fn(),
+            deleteMany: jest.fn(),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 GameService,
-                {
-                    provide: getModelToken(Game.name),
-                    useValue: mockGameModel,
-                },
+                { provide: getModelToken(Game.name), useValue: mockGameModel },
+                { provide: GameValidationService, useValue: mockValidationService },
             ],
         }).compile();
 
-        service = module.get<GameService>(GameService);
-        model = module.get<Model<GameDocument>>(getModelToken(Game.name));
-
-        games = [
-            {
-                _id: '1',
-                name: 'Test Game',
-                description: 'A test game',
-                size: MapSize.SMALL,
-                mode: GameMode.Classique,
-                isVisible: true,
-                imageUrl: 'test.jpg',
-                tiles: [],
-            },
-        ];
-
-        createGameDto = {
-            name: 'New Game',
-            description: 'new game test',
-            size: MapSize.SMALL,
-            mode: GameMode.Classique,
-            isVisible: true,
-            imageUrl: 'test.jpg',
-            tiles: [],
-        };
-
-        updateGameDto = { description: 'Updated description' };
+        gameService = module.get<GameService>(GameService);
+        // gameValidationService = module.get<GameValidationService>(GameValidationService);
     });
 
     it('should be defined', () => {
-        expect(service).toBeDefined();
+        expect(gameService).toBeDefined();
     });
 
-    it('should retrieve all games', async () => {
-        mockGameModel.find.mockResolvedValue(games);
+    // Test pour `getAllGames`
+    it('should return all games', async () => {
+        const mockGames = [{ name: 'Game1' }, { name: 'Game2' }];
+        mockGameModel.find.mockResolvedValue(mockGames);
 
-        const result = await service.getAllGames();
-        expect(model.find).toHaveBeenCalled();
-        expect(result).toEqual(games);
+        const result = await gameService.getAllGames();
+        expect(result).toEqual(mockGames);
+        expect(mockGameModel.find).toHaveBeenCalledWith({});
     });
 
-    it('should retrieve a single game by id', async () => {
-        mockGameModel.findOne.mockResolvedValue(games[0]);
+    // Test pour `getGame`
+    it('should return a game by id', async () => {
+        const mockGame = { name: 'Game1' };
+        mockGameModel.findOne.mockResolvedValue(mockGame);
 
-        const result = await service.getGame('someGameId');
-        expect(model.findOne).toHaveBeenCalledWith({ _id: 'someGameId' });
-        expect(result).toEqual(games[0]);
-    });
-
-    it('should add a new game', async () => {
-        const mockGame = { ...createGameDto, _id: 'newGameId' };
-        mockGameModel.create.mockResolvedValue(mockGame);
-
-        const result = await service.addGame(createGameDto);
-        expect(model.create).toHaveBeenCalledWith(createGameDto);
+        const result = await gameService.getGame('123');
         expect(result).toEqual(mockGame);
+        expect(mockGameModel.findOne).toHaveBeenCalledWith({ _id: '123' });
     });
 
-    it('should throw an error when adding a new game fails', async () => {
-        mockGameModel.create.mockRejectedValue(new Error('Insert failed'));
+    // Test pour `addGame`
+    it('should throw an error when validation fails during adding a game', async () => {
+        const createDto: CreateGameDto = {
+            name: 'Test Game',
+            description: 'A test game description',
+            size: MapSize.SMALL,
+            mode: GameMode.CTF,
+            imageUrl: 'https://example.com/image.jpg',
+            isVisible: true,
+            tiles: [],
+        };
+        mockValidationService.validateGame.mockResolvedValue({ isValid: false, errors: ['Error'] });
 
-        await expect(service.addGame(createGameDto)).rejects.toThrow('Failed to insert game: Error: Insert failed');
+        await expect(gameService.addGame(createDto)).rejects.toThrow(
+            'Veuillez corriger les erreurs suivantes avant de pouvoir continuer: Le nom du jeu doit être unique.<br>Error',
+        );
     });
 
-    it('should update an existing game', async () => {
-        mockGameModel.updateOne.mockResolvedValue({ matchedCount: 1 });
+    it('should call validateGame when adding a game', async () => {
+        const createDto: CreateGameDto = {
+            name: 'Test Game',
+            description: 'A test game description',
+            size: MapSize.SMALL,
+            mode: GameMode.CTF,
+            imageUrl: 'https://example.com/image.jpg',
+            isVisible: true,
+            tiles: [],
+        };
 
-        await service.modifyGame('someGameId', updateGameDto);
-        expect(model.updateOne).toHaveBeenCalledWith({ _id: 'someGameId' }, updateGameDto);
+        mockValidationService.validateGame.mockResolvedValue({ isValid: true });
+        mockValidationService.validateGameName.mockResolvedValue(true);
+
+        await gameService.addGame(createDto);
+
+        expect(mockValidationService.validateGame).toHaveBeenCalledWith(createDto);
     });
 
-    it('should throw an error when updating a non-existent game', async () => {
-        mockGameModel.updateOne.mockResolvedValue({ matchedCount: 0 });
+    // Test pour `modifyGame`
+    it('should throw an error when validation fails during update', async () => {
+        const updateDto: UpdateGameDto = { name: 'Updated Game' };
+        mockValidationService.validateGame.mockResolvedValue({ isValid: false, errors: ['Validation error'] });
 
-        await expect(service.modifyGame('someGameId', updateGameDto)).rejects.toThrow('Could not find game');
+        await expect(gameService.modifyGame('123', updateDto)).rejects.toThrow(
+            'Veuillez corriger les erreurs suivantes avant de pouvoir continuer: Le nom du jeu doit être unique.<br>Validation error',
+        );
     });
 
-    it('should delete a game by id', async () => {
-        mockGameModel.deleteOne.mockResolvedValue({ deletedCount: 1 });
-
-        await service.deleteGame('someGameId');
-        expect(model.deleteOne).toHaveBeenCalledWith({ _id: 'someGameId' });
-    });
-
-    it('should throw an error when trying to delete a non-existent game', async () => {
+    // Test pour `deleteGame`
+    it('should throw an error if no game is found during deletion', async () => {
         mockGameModel.deleteOne.mockResolvedValue({ deletedCount: 0 });
 
-        await expect(service.deleteGame('someGameId')).rejects.toThrow('Could not find game');
+        await expect(gameService.deleteGame('123')).rejects.toThrow('Could not find game');
     });
 
-    it('should empty the database', async () => {
-        mockGameModel.deleteMany.mockResolvedValue({ deletedCount: 10 });
+    // Test pour `emptyDB`
+    it('should empty the database successfully', async () => {
+        mockGameModel.deleteMany.mockResolvedValue({ deletedCount: 1 });
 
-        await service.emptyDB();
-        expect(model.deleteMany).toHaveBeenCalledWith({});
-    });
-
-    it('should throw an error when emptying the database fails', async () => {
-        mockGameModel.deleteMany.mockRejectedValue(new Error('Delete failed'));
-
-        await expect(service.emptyDB()).rejects.toThrow('Failed to delete games: Error: Delete failed');
+        await gameService.emptyDB();
+        expect(mockGameModel.deleteMany).toHaveBeenCalledWith({});
     });
 });

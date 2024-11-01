@@ -1,48 +1,36 @@
-import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Item } from '@app/classes/Items/item';
+import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu.service';
 import { PlaceableEntityContainerComponent } from './placeable-entity-container.component';
 
 describe('PlaceableEntityContainerComponent', () => {
     let component: PlaceableEntityContainerComponent;
     let fixture: ComponentFixture<PlaceableEntityContainerComponent>;
-    let mapEditorManagerService: jasmine.SpyObj<MapEditorManagerService>;
-    let gameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
-    let mockEntity: PlaceableEntity;
+    let sideMenuServiceSpy: jasmine.SpyObj<MapEditorSideMenuService>;
 
     beforeEach(async () => {
-        const mapEditorSpy = jasmine.createSpyObj('MapEditorManagerService', [
-            'onMouseEnter',
-            'onMouseLeave',
-            'onMouseDownSideMenu',
-            'startDrag',
-            'endDrag',
+        const sideMenuServiceSpyObj = jasmine.createSpyObj('MapEditorSideMenuService', [
+            'onSideMenuMouseEnter',
+            'onSideMenuMouseLeave',
+            'onSideMenuMouseDown',
         ]);
-        const gameMapDataSpy = jasmine.createSpyObj('GameMapDataManagerService', ['']);
 
         await TestBed.configureTestingModule({
-            imports: [PlaceableEntityContainerComponent],
+            imports: [NoopAnimationsModule, PlaceableEntityContainerComponent],
             providers: [
-                { provide: MapEditorManagerService, useValue: mapEditorSpy },
-                { provide: GameMapDataManagerService, useValue: gameMapDataSpy },
-                provideHttpClientTesting(),
+                { provide: GameMapDataManagerService, useValue: {} }, // Mocking GameMapDataManagerService
+                { provide: MapEditorSideMenuService, useValue: sideMenuServiceSpyObj }, // Mocking MapEditorSideMenuService
             ],
         }).compileComponents();
 
-        mapEditorManagerService = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
-        gameMapDataManagerService = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
-
-        mockEntity = {
-            description: 'Test Description',
-            imageUrl: 'test-url',
-            coordinates: { x: 0, y: 0 },
-            visibleState: VisibleState.NotSelected,
-        };
-
         fixture = TestBed.createComponent(PlaceableEntityContainerComponent);
         component = fixture.componentInstance;
+        sideMenuServiceSpy = TestBed.inject(MapEditorSideMenuService) as jasmine.SpyObj<MapEditorSideMenuService>;
+
+        component.containerItems = [{ isItem: () => false } as PlaceableEntity, { isItem: () => true, itemLimit: 5 } as Item];
         fixture.detectChanges();
     });
 
@@ -50,32 +38,49 @@ describe('PlaceableEntityContainerComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should inject gameMapDataManagerService', () => {
-        expect(gameMapDataManagerService).toBeTruthy();
+    it('should call onSideMenuMouseEnter on mouse enter', () => {
+        const entity = component.containerItems[0];
+        component.onMouseEnter(entity);
+        expect(sideMenuServiceSpy.onSideMenuMouseEnter).toHaveBeenCalledWith(entity);
     });
 
-    it('should call onMouseEnter on MapEditorManagerService when onMouseEnter is triggered', () => {
-        component.onMouseEnter(mockEntity);
-        expect(mapEditorManagerService.onMouseEnter).toHaveBeenCalledWith(mockEntity);
+    it('should call onSideMenuMouseLeave on mouse leave', () => {
+        const entity = component.containerItems[0];
+        component.onMouseLeave(entity);
+        expect(sideMenuServiceSpy.onSideMenuMouseLeave).toHaveBeenCalledWith(entity);
     });
 
-    it('should call onMouseLeave on MapEditorManagerService when onMouseLeave is triggered', () => {
-        component.onMouseLeave(mockEntity);
-        expect(mapEditorManagerService.onMouseLeave).toHaveBeenCalledWith(mockEntity);
+    it('should call onSideMenuMouseDown on mouse down', () => {
+        const entity = component.containerItems[0];
+        const mockEvent = new MouseEvent('mousedown', { button: 0 });
+        component.onMouseDown(mockEvent, entity);
+        expect(sideMenuServiceSpy.onSideMenuMouseDown).toHaveBeenCalledWith(entity);
     });
 
-    it('should call onMouseDownSideMenu on MapEditorManagerService when onMouseDown is triggered', () => {
-        component.onMouseDown(mockEntity);
-        expect(mapEditorManagerService.onMouseDownSideMenu).toHaveBeenCalledWith(mockEntity);
+    it('should not call onSideMenuMouseDown on right-click (button 2)', () => {
+        const entity = component.containerItems[0];
+        const mockEvent = new MouseEvent('mousedown', { button: 2 });
+        component.onMouseDown(mockEvent, entity);
+        expect(sideMenuServiceSpy.onSideMenuMouseDown).not.toHaveBeenCalled();
     });
 
-    // it('should call startDrag on MapEditorManagerService when onDragStarted is triggered', () => {
-    //     component.onDragStarted(mockEntity);
-    //     expect(mapEditorManagerService.startDrag).toHaveBeenCalledWith(mockEntity);
-    // });
+    it('should prevent default mouse down event behavior', () => {
+        const entity = component.containerItems[0];
+        const mockEvent = new MouseEvent('mousedown', { button: 0 });
+        spyOn(mockEvent, 'preventDefault');
 
-    // it('should call endDrag on MapEditorManagerService when onDragEnded is triggered', () => {
-    //     component.onDragEnded();
-    //     expect(mapEditorManagerService.endDrag).toHaveBeenCalled();
-    // });
+        component.onMouseDown(mockEvent, entity);
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('should return the item limit if the entity is an Item', () => {
+        const item = component.containerItems[1] as Item;
+        const itemLimit = 5;
+        expect(component.getItemLimit(item)).toBe(itemLimit);
+    });
+
+    it('should return 0 if the entity is not an Item', () => {
+        const entity = component.containerItems[0];
+        expect(component.getItemLimit(entity)).toBe(0);
+    });
 });

@@ -1,0 +1,33 @@
+<div id="info-view">
+    <div class="info-content">
+        <div class="player-info">{{ playerCharacter.name }}</div>
+        <div class="player-info-details">
+            Santé:@for(defense of speedArray; track defense){
+            <span class="icon-container">
+                <img src="assets/images/heart.png" alt="Heart" class="icon" />
+            </span>
+            }
+            <br />
+            Défense:@for(defense of speedArray; track defense){
+            <span class="icon-container">
+                <img src="assets/images/armor.png" alt="Armor" class="icon" />
+            </span>
+            }
+            <br />
+            Vitesse: @for(speed of speedArray; track speed){
+            <span class="icon-container">
+                <img src="assets/images/view/boots.png" alt="Speed" class="icon" />
+            </span>
+            }
+            <br />
+            Attaque:@for(speed of speedArray; track speed){
+            <span class="icon-container">
+                <img src="assets/images/view/sword.png" alt="Attack" class="icon" />
+            </span>
+            }
+        </div>
+    </div>
+    <div id="player-image">
+        <img [src]="playerCharacter.avatar.fullImage" alt="Player" />
+    </div>
+</div>

@@ -8,6 +8,17 @@
     border: 5px solid #000;
 }
 
+#avatar-label {
+    font-size: 1.5rem;
+    padding-top: 10%;
+}
+
+.text {
+    color: $primary-light;
+    font-size: 1.5rem;
+    margin: 10;
+}
+
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -20,26 +31,64 @@
     cursor: pointer;
     border: 2px solid transparent;
     padding: 5px;
-    transition: border-color 0.3s;
-    text-align: center;
     justify-content: center;
+    text-align: center;
+    transition: border-color 0.3s;
+    justify-content: center;
+    color: $primary-light;
+    font-size: 0.5rem;
 }
 
 .avatar-item:hover {
-    border-color: #007bff;
+    border-color: $secondary;
+}
+
+.avatar-item {
+    position: relative;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 0px;
+    padding-bottom: 20px;
+    justify-content: center;
+    text-align: center;
+    transition:
+        border-color 0.3s,
+        transform 0.3s,
+        color 0.3s;
+    justify-content: center;
+    color: $primary-light;
+    font-size: 0.5rem;
 }
 
 .avatar-item img {
-    width: 50px;
+    width: 80px;
     height: auto;
     display: block;
+    margin: 0 auto;
+    transition: transform 0.3s;
+}
+
+.avatar-item:hover img {
+    transform: scale(1.2);
+}
+
+.avatar-item:hover #avatar-name {
+    color: $secondary;
+}
+
+#avatar-name {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: $primary-light;
 }
 
 .selected-avatar img {
     width: 150px;
     height: 200px;
     object-fit: contain;
-    border-radius: 10px;
 }
 .selected-avatar {
     display: flex;

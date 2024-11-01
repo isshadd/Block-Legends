@@ -93,50 +93,43 @@ describe('ItemFactoryService', () => {
 
     describe('copyItem', () => {
         it('should create a new item of the same type', () => {
-            const originalItem = service.createItem(ItemType.Elytra);
-            originalItem.coordinates = { x: 10, y: 20 };
-            originalItem.itemLimit = 5;
+            const originalItem = service.createItem(ItemType.Sword);
+            originalItem.setCoordinates({ x: 10, y: 20 }); // Assuming setCoordinates is defined
+            originalItem.itemLimit = 5; // Assuming itemLimit is a property
             const copiedItem = service.copyItem(originalItem);
 
-            expect(copiedItem).toBeInstanceOf(Elytra);
+            expect(copiedItem).toBeInstanceOf(DiamondSword);
             expect(copiedItem.type).toBe(originalItem.type);
         });
 
         it('should return a different instance when copying an item', () => {
-            const originalItem = service.createItem(ItemType.Potion);
+            const originalItem = service.createItem(ItemType.Elytra);
             const copiedItem = service.copyItem(originalItem);
 
             expect(copiedItem).not.toBe(originalItem);
         });
 
-        it('should copy the coordinates correctly', () => {
-            const originalItem = service.createItem(ItemType.Flag);
-            originalItem.coordinates = { x: 5, y: 15 };
-            const copiedItem = service.copyItem(originalItem);
-
-            expect(copiedItem.coordinates).toEqual(originalItem.coordinates);
-            expect(copiedItem.coordinates).not.toBe(originalItem.coordinates);
-        });
-
-        it('should copy the itemLimit correctly', () => {
-            const originalItem = service.createItem(ItemType.Chestplate);
+        it('should copy coordinates and itemLimit correctly', () => {
+            const originalItem = service.createItem(ItemType.Potion);
+            originalItem.setCoordinates({ x: 5, y: 15 });
             originalItem.itemLimit = 3;
             const copiedItem = service.copyItem(originalItem);
 
+            expect(copiedItem.coordinates).toEqual(originalItem.coordinates);
             expect(copiedItem.itemLimit).toBe(originalItem.itemLimit);
         });
 
         it('should handle copying a generic Item', () => {
             const originalItem = service.createItem('Generic' as ItemType);
-            originalItem.coordinates = { x: 0, y: 0 };
+            originalItem.setCoordinates({ x: 0, y: 0 });
             originalItem.itemLimit = 1;
             const copiedItem = service.copyItem(originalItem);
 
             expect(copiedItem).toBeInstanceOf(Item);
-            expect(copiedItem.type).toBeUndefined();
+            expect(copiedItem.type).toBe(originalItem.type);
+            expect(copiedItem).not.toBe(originalItem);
             expect(copiedItem.coordinates).toEqual(originalItem.coordinates);
             expect(copiedItem.itemLimit).toBe(originalItem.itemLimit);
-            expect(copiedItem).not.toBe(originalItem);
         });
     });
 });

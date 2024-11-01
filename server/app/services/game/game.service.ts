@@ -1,13 +1,19 @@
 import { Game, GameDocument } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
-import { Injectable } from '@nestjs/common';
+import { GameValidationService } from '@app/services/game-validation/gameValidation.service';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class GameService {
-    constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
+    constructor(
+        @InjectModel(Game.name)
+        private gameModel: Model<GameDocument>,
+        @Inject(forwardRef(() => GameValidationService))
+        private gameValidationService: GameValidationService,
+    ) {}
 
     async getAllGames(): Promise<Game[]> {
         return await this.gameModel.find({});
@@ -18,10 +24,31 @@ export class GameService {
     }
 
     async getGameByName(name: string): Promise<Game | null> {
-        return await this.gameModel.findOne({ name });
+        const normalizedName = name.trim().replace(/\s+/g, ' ');
+        return await this.gameModel.findOne({ name: { $regex: new RegExp('^' + normalizedName + '$', 'i') } });
     }
 
     async addGame(game: CreateGameDto): Promise<Game> {
+        const gameToValidate = game as Game;
+        const errors: string[] = [];
+
+        // Validate the name and add an error message if invalid
+        const isNameValid = await this.gameValidationService.validateGameName(gameToValidate);
+        if (!isNameValid) {
+            errors.push('Le nom du jeu doit être unique.');
+        }
+
+        // Perform the full game validation and add any additional errors
+        const validationResult = await this.gameValidationService.validateGame(gameToValidate);
+        if (!validationResult.isValid) {
+            errors.push(...validationResult.errors);
+        }
+
+        // If there are any errors, throw a single error message containing all issues
+        if (errors.length > 0) {
+            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
+        }
+
         try {
             return await this.gameModel.create(game);
         } catch (error) {
@@ -30,6 +57,28 @@ export class GameService {
     }
 
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
+        // Validate the game data
+        const isOnlyIsVisibleModified = Object.keys(game).length === 1 && 'isVisible' in game;
+        // if (!isOnlyIsVisibleModified) {
+        //     const validationResult = await this.gameValidationService.validateGame(gameDto);
+        //     if (!validationResult.isValid) {
+        //         return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+        //     }
+        // }
+        const errors: string[] = [];
+        if (!isOnlyIsVisibleModified) {
+            const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);
+            if (!isNameValid) {
+                errors.push('Le nom du jeu doit être unique.');
+            }
+            const validationResult = await this.gameValidationService.validateGame(game);
+            if (!validationResult.isValid) {
+                errors.push(...validationResult.errors);
+            }
+            if (errors.length > 0) {
+                throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
+            }
+        }
         const filterQuery = { _id: id };
         try {
             const res = await this.gameModel.updateOne(filterQuery, game);

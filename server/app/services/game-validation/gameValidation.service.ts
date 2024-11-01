@@ -2,20 +2,57 @@ import { Game } from '@app/model/database/game';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Tile } from '@app/model/schema/tile.schema';
 import { GameService } from '@app/services/game/game.service';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { Directions } from '@common/interfaces/directions';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class GameValidationService {
-    constructor(private readonly gameService: GameService) {}
+    constructor(
+        @Inject(forwardRef(() => GameService))
+        private readonly gameService: GameService,
+    ) {}
+
+    async validateGame(game: Game | UpdateGameDto): Promise<{ isValid: boolean; errors: string[] }> {
+        const errors: string[] = [];
+        const isMapValid = await this.mapIsValid(game);
+        if (!isMapValid) {
+            errors.push('Aucune tuile de terrain ne doit être inaccessible à cause d’un agencement de murs.');
+        }
+
+        const isHalfMapValid = await this.isHalfMapTilesValid(game);
+        if (!isHalfMapValid) {
+            errors.push('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+        }
+
+        const isValidSpawn = await this.isValidSizeBySpawnPoints(game);
+        if (!isValidSpawn) {
+            errors.push('Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)');
+        }
+
+        const isDescriptionValid = await this.validateDescription(game);
+        if (!isDescriptionValid) {
+            errors.push('La description du jeu ne doit pas être vide.');
+        }
+
+        const isDoorPlacementValid = await this.isDoorPlacementValid(game);
+        if (!isDoorPlacementValid) {
+            errors.push('La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.');
+        }
+
+        return {
+            isValid: errors.length === 0,
+            errors,
+        };
+    }
 
     async getNumberOfSpawnPoints(game: Game): Promise<number> {
         let count = 0;
         for (const row of game.tiles) {
             for (const tile of row) {
-                if (tile.item && tile.item.type === 'Spawn') {
+                if (tile.item && tile.item.type === ItemType.Spawn) {
                     count++;
                 }
             }
@@ -23,18 +60,22 @@ export class GameValidationService {
         return count;
     }
 
-    async isValidSizeBySpawnPoints(game: Game | UpdateGameDto): Promise<boolean> {
-        const SPAN_SMALL_MAP = 2;
-        const SPAN_MEDIUM_MAP = 4;
-        const SPAN_LARGE_MAP = 6;
-
+    async assignGameToRightType(game: Game | UpdateGameDto): Promise<Game> {
         let gameToValidate: Game;
         if (game instanceof UpdateGameDto) {
             gameToValidate = await this.gameService.getGameByName(game.name);
         } else {
             gameToValidate = game;
         }
+        return gameToValidate;
+    }
 
+    async isValidSizeBySpawnPoints(game: Game | UpdateGameDto): Promise<boolean> {
+        const SPAN_SMALL_MAP = 2;
+        const SPAN_MEDIUM_MAP = 4;
+        const SPAN_LARGE_MAP = 6;
+
+        const gameToValidate = await this.assignGameToRightType(game);
         const spawnPoints = await this.getNumberOfSpawnPoints(gameToValidate);
         switch (gameToValidate.size) {
             case MapSize.SMALL:
@@ -49,17 +90,12 @@ export class GameValidationService {
     }
 
     async mapToMatrix(game: Game | UpdateGameDto): Promise<number[][]> {
-        let map: Game;
-        if (game instanceof UpdateGameDto) {
-            map = await this.gameService.getGameByName(game.name);
-        } else {
-            map = game;
-        }
+        const map = await this.assignGameToRightType(game);
         const matrix: number[][] = map.tiles.map((row) => row.map((tile) => (tile.type === TileType.Wall ? 1 : 0)));
         return matrix;
     }
 
-    isValid(x: number, y: number, map: number[][], visited: boolean[][]): boolean {
+    isValidForTraversal(x: number, y: number, map: number[][], visited: boolean[][]): boolean {
         const n = map.length;
         const m = map[0].length;
         return x >= 0 && x < n && y >= 0 && y < m && map[x][y] === 0 && !visited[x][y];
@@ -75,7 +111,7 @@ export class GameValidationService {
             for (const [dx, dy] of Directions) {
                 const nx = x + dx;
                 const ny = y + dy;
-                if (this.isValid(nx, ny, map, visited)) {
+                if (this.isValidForTraversal(nx, ny, map, visited)) {
                     visited[nx][ny] = true;
                     queue.push([nx, ny]);
                 }
@@ -91,6 +127,8 @@ export class GameValidationService {
 
         let initX = -1;
         let initY = -1;
+
+        // Find a valid starting point in the map
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0) {
@@ -102,59 +140,63 @@ export class GameValidationService {
             if (initX !== -1) break;
         }
 
-        this.bfs(map, initX, initY, visited);
+        // If no valid starting point is found, return false
+        if (initX === -1 || initY === -1) {
+            return false; // Invalid map
+        }
+
+        await this.bfs(map, initX, initY, visited);
 
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0 && !visited[i][j]) {
-                    return false; // Si une tuile de terrain n'a pas été visitée, la carte est invalide
+                    return false; // Unvisited terrain tile means the map is invalid
                 }
             }
         }
         return true;
     }
-    async validateGame(game: Game | UpdateGameDto): Promise<{ isValid: boolean; errors: string[] }> {
-        const errors: string[] = [];
-        const isMapValid = await this.mapIsValid(game);
-        if (!isMapValid) {
-            errors.push('Aucune tuile de terrain ne doit être inaccessible à cause d’un agencement de murs.');
+
+    async validateGameName(game: Game): Promise<boolean> {
+        const normalizedName = game.name.trim();
+        const existingGame = await this.gameService.getGameByName(normalizedName);
+
+        // Check if no game exists with the same name, or if updating the same game
+        if (!existingGame || (game._id && game._id === existingGame._id)) {
+            return true; // Name is unique
         }
 
-        const isValidSpawn = await this.isValidSizeBySpawnPoints(game);
-        if (!isValidSpawn) {
-            errors.push('Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)');
+        return false; // Name is not unique
+    }
+    async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
+        const normalizedName = game.name.trim();
+        const foundGame = await this.gameService.getGameByName(normalizedName);
+        // console.log('found game id', JSON.stringify(foundGame._id));
+        // console.log('Found game', foundGame);
+        // console.log('Game id', id);
+        // console.log('foundGame._id ', foundGame._id);
+        // console.log('foundGame._id === id', foundGame._id === id);
+        if (foundGame) {
+            const valid = JSON.stringify(foundGame._id) === JSON.stringify(id);
+            return valid;
+        } else {
+            return !foundGame;
         }
-        if (game instanceof Game) {
-            const isNameDescriptionValid = await this.validateNameDescription(game);
-            if (!isNameDescriptionValid) {
-                errors.push('Le nom du jeu doit être unique et la description est obligatoire.');
-            }
-        }
-
-        const isDoorPlacementValid = await this.isDoorPlacementValid(game);
-        if (!isDoorPlacementValid) {
-            errors.push('La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.');
-        }
-
-        return {
-            isValid: errors.length === 0,
-            errors,
-        };
     }
 
-    async validateNameDescription(game: Game): Promise<boolean> {
-        const descriptionValid = game.description.length > 0;
+    async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {
+        const description = game.description.trim();
+        const descriptionValid = description.length > 0;
         if (game.name.length === 0) {
             return false;
         }
-        const existingGame = await this.gameService.getGameByName(game.name);
-        return !existingGame && descriptionValid;
+        return descriptionValid;
     }
 
-    async isHalfMapTilesValid(game: Game, size: number): Promise<boolean> {
+    async isHalfMapTilesValid(game: Game | UpdateGameDto): Promise<boolean> {
         let terrainTileCount = 0;
-
-        game.tiles.forEach((row) => {
+        const gameToValidate = await this.assignGameToRightType(game);
+        gameToValidate.tiles.forEach((row) => {
             row.forEach((tile) => {
                 if (tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice) {
                     terrainTileCount++;
@@ -162,7 +204,7 @@ export class GameValidationService {
             });
         });
 
-        const totalTiles = size * size;
+        const totalTiles = gameToValidate.size * gameToValidate.size;
         return terrainTileCount > totalTiles / 2;
     }
 
@@ -185,21 +227,19 @@ export class GameValidationService {
                 if (tile.type === TileType.Door) {
                     // Check if the door is not on the edges of the grid
                     if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
-                        return false; // Door is on the edge, which is invalid
+                        return false;
                     }
 
                     const horizontalCondition = await this.isHorizontalAxeDoorValid(game, i, j);
                     const verticalCondition = await this.isVerticalAxeDoorValid(game, i, j);
-
-                    // If both conditions are false, the door placement is invalid
                     if (!horizontalCondition && !verticalCondition) {
-                        return false; // Invalid placement found
+                        return false;
                     }
                 }
             }
         }
 
-        return true; // Return true if all doors have valid placements
+        return true;
     }
 
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {

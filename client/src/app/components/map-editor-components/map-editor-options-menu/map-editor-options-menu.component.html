@@ -1,15 +1,13 @@
 <div id="options-menu">
     <div class="button-container">
-        <button class="dark-button" [matTooltip]="getOptionsNotificationDescription()" (click)="onOptionsClick()">
-            <mat-icon>more_vert</mat-icon>
+        <button class="dark-button" (click)="onOptionsClick()">
+            <mat-icon>edit</mat-icon>
         </button>
-        <app-button-notification [state]="getOptionsNotificationState()"></app-button-notification>
     </div>
     <div class="button-container">
         <button class="dark-button" (click)="onResetClick()"><mat-icon>refresh</mat-icon></button>
     </div>
     <div class="button-container">
-        <button class="dark-button" [matTooltip]="getSaveNotificationDescription()" (click)="onSaveClick()"><mat-icon>save</mat-icon></button>
-        <app-button-notification [state]="getSaveNotificationState()"></app-button-notification>
+        <button class="dark-button" (click)="onSaveClick()"><mat-icon>save</mat-icon></button>
     </div>
 </div>
