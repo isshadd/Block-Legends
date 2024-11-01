@@ -11,7 +11,7 @@ import { PlayGameBoardSocketService } from './play-game-board-socket.service';
     providedIn: 'root',
 })
 export class PlayGameBoardManagerService implements OnDestroy {
-    private destroy$ = new Subject<void>();
+    destroy$ = new Subject<void>();
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -38,7 +38,7 @@ export class PlayGameBoardManagerService implements OnDestroy {
 
         for (const spawnPlace of spawnPlaces) {
             const [index, playerName] = spawnPlace;
-            const player = this.webSocketService.getRoomInfo().players.find((player) => player.name === playerName);
+            const player = this.webSocketService.getRoomInfo().players.find((p) => p.name === playerName);
             const tile = tilesWithSpawn[index];
 
             if (player && tile) {

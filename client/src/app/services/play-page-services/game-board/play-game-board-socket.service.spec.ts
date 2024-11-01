@@ -3,14 +3,14 @@ import { TestBed } from '@angular/core/testing';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
 describe('PlayGameBoardSocketService', () => {
-  let service: PlayGameBoardSocketService;
+    let service: PlayGameBoardSocketService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(PlayGameBoardSocketService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(PlayGameBoardSocketService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 });

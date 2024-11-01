@@ -2,6 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntityInfoViewComponent } from './player-map-entity-info-view.component';
 
+const LIFE = 5;
+const DEFENSE = 3;
+const SPEED = 4;
+const ATTACK = 6;
+
 describe('PlayerMapEntityInfoViewComponent', () => {
     let component: PlayerMapEntityInfoViewComponent;
     let fixture: ComponentFixture<PlayerMapEntityInfoViewComponent>;
@@ -16,10 +21,10 @@ describe('PlayerMapEntityInfoViewComponent', () => {
 
         component.playerCharacter = new PlayerCharacter('TestCharacter');
         component.playerCharacter.attributes = {
-            life: 5,
-            defense: 3,
-            speed: 4,
-            attack: 6,
+            life: LIFE,
+            defense: DEFENSE,
+            speed: SPEED,
+            attack: ATTACK,
         };
         fixture.detectChanges();
     });
@@ -29,18 +34,18 @@ describe('PlayerMapEntityInfoViewComponent', () => {
     });
 
     it('should return an array of the correct length for healthArray', () => {
-        expect(component.healthArray.length).toBe(5);
+        expect(component.healthArray.length).toBe(LIFE);
     });
 
     it('should return an array of the correct length for defenseArray', () => {
-        expect(component.defenseArray.length).toBe(3);
+        expect(component.defenseArray.length).toBe(DEFENSE);
     });
 
     it('should return an array of the correct length for speedArray', () => {
-        expect(component.speedArray.length).toBe(4);
+        expect(component.speedArray.length).toBe(SPEED);
     });
 
     it('should return an array of the correct length for attackArray', () => {
-        expect(component.attackArray.length).toBe(6);
+        expect(component.attackArray.length).toBe(ATTACK);
     });
 });

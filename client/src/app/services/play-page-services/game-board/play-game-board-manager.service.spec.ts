@@ -13,14 +13,16 @@ import { Subject } from 'rxjs';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
+const ACCESS_CODE = 1234;
+
 describe('PlayGameBoardManagerService', () => {
     let service: PlayGameBoardManagerService;
     let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let playGameBoardSocketServiceSpy: jasmine.SpyObj<PlayGameBoardSocketService>;
 
-    let signalInitGameBoard$ = new Subject<GameShared>();
-    let signalInitCharacters$ = new Subject<[number, string][]>();
+    const signalInitGameBoard$ = new Subject<GameShared>();
+    const signalInitCharacters$ = new Subject<[number, string][]>();
 
     const mockGameData: GameShared = {
         name: 'tset',
@@ -35,7 +37,7 @@ describe('PlayGameBoardManagerService', () => {
     const mockRoomInfo: GameRoom = {
         roomId: 'room1',
         players: [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')],
-        accessCode: 1234,
+        accessCode: ACCESS_CODE,
         isLocked: false,
     };
     mockRoomInfo.players[0].avatar = AvatarEnum.Alex;
@@ -84,7 +86,7 @@ describe('PlayGameBoardManagerService', () => {
 
     it('should call initGameBoard on PlayGameBoardSocketService with current room access code upon initialization', () => {
         expect(webSocketServiceSpy.getRoomInfo).toHaveBeenCalled();
-        expect(playGameBoardSocketServiceSpy.initGameBoard).toHaveBeenCalledWith(1234);
+        expect(playGameBoardSocketServiceSpy.initGameBoard).toHaveBeenCalledWith(ACCESS_CODE);
     });
 
     it('should subscribe to signalInitGameBoard$ and signalInitCharacters$ on initialization', () => {
@@ -136,12 +138,12 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     it('should properly unsubscribe from observables upon destruction', () => {
-        spyOn((service as any).destroy$, 'next').and.callThrough();
-        spyOn((service as any).destroy$, 'complete').and.callThrough();
+        spyOn((service as PlayGameBoardManagerService).destroy$, 'next').and.callThrough();
+        spyOn((service as PlayGameBoardManagerService).destroy$, 'complete').and.callThrough();
 
         service.ngOnDestroy();
 
-        expect((service as any).destroy$.next).toHaveBeenCalled();
-        expect((service as any).destroy$.complete).toHaveBeenCalled();
+        expect((service as PlayGameBoardManagerService).destroy$.next).toHaveBeenCalled();
+        expect((service as PlayGameBoardManagerService).destroy$.complete).toHaveBeenCalled();
     });
 });

@@ -32,7 +32,6 @@ export class PlayGameBoardSocketService {
 
     private setupSocketListeners() {
         this.socket.on('gameBoardParameters', (gameBoardParameters) => {
-            console.log(gameBoardParameters);
             this.signalInitGameBoard.next(gameBoardParameters.game);
             this.signalInitCharacters.next(gameBoardParameters.spawnPlaces);
         });
