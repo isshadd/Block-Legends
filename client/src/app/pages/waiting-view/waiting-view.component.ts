@@ -56,6 +56,12 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 });
             }
         });
+
+        this.webSocketService.socket.on('organizerLeft', (data: { message: string }) => {
+            if (!this.isOrganizer) {
+                this.playerLeave();
+            }
+        });
     }
 
     addVirtualPlayers(): void {
@@ -71,7 +77,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     playerLeave(): void {
         this.webSocketService.leaveGame();
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home']).then(() => {
+            alert('Le créateur de la partie a quitté');
+        });
     }
 
     ngOnDestroy(): void {

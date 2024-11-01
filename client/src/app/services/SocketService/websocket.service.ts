@@ -165,7 +165,9 @@ export class WebSocketService {
                 this.playersSubject.next([]);
 
                 // Important: Force navigate to home page
-                this.router.navigate(['/home']);
+                this.router.navigate(['/home']).then(() => {
+                    alert('Vous avez été expulsé de la salle');
+                });
                 // .then(() => {
                 //     // Optional: Refresh the page to ensure clean state
                 //     window.location.reload();
@@ -182,12 +184,6 @@ export class WebSocketService {
 
         this.socket.on('roomClosed', () => {
             alert("La salle a été fermée par l'organisateur");
-            this.leaveGame();
-            this.router.navigate(['/home']);
-        });
-
-        this.socket.on('organizerLeft', (data: { message: string }) => {
-            alert(data.message);
             this.leaveGame();
             this.router.navigate(['/home']);
         });
