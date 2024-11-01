@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
@@ -7,11 +8,11 @@ import { MapSize } from '@common/enums/map-size';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameService } from './game.service';
-
 describe('GameService', () => {
     let gameService: GameService;
-    let gameValidationService: GameValidationService;
-    let mockGameModel: any;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // let gameValidationService: GameValidationService;
+    let mockGameModel: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const mockValidationService = {
         validateGame: jest.fn(),
@@ -39,7 +40,7 @@ describe('GameService', () => {
         }).compile();
 
         gameService = module.get<GameService>(GameService);
-        gameValidationService = module.get<GameValidationService>(GameValidationService);
+        // gameValidationService = module.get<GameValidationService>(GameValidationService);
     });
 
     it('should be defined', () => {
@@ -82,6 +83,25 @@ describe('GameService', () => {
         await expect(gameService.addGame(createDto)).rejects.toThrow(
             'Veuillez corriger les erreurs suivantes avant de pouvoir continuer: Le nom du jeu doit être unique.<br>Error',
         );
+    });
+
+    it('should call validateGame when adding a game', async () => {
+        const createDto: CreateGameDto = {
+            name: 'Test Game',
+            description: 'A test game description',
+            size: MapSize.SMALL,
+            mode: GameMode.CTF,
+            imageUrl: 'https://example.com/image.jpg',
+            isVisible: true,
+            tiles: [],
+        };
+
+        mockValidationService.validateGame.mockResolvedValue({ isValid: true });
+        mockValidationService.validateGameName.mockResolvedValue(true);
+
+        await gameService.addGame(createDto);
+
+        expect(mockValidationService.validateGame).toHaveBeenCalledWith(createDto);
     });
 
     // Test pour `modifyGame`

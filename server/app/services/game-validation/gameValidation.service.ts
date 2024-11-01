@@ -16,12 +16,6 @@ export class GameValidationService {
     ) {}
 
     async validateGame(game: Game | UpdateGameDto): Promise<{ isValid: boolean; errors: string[] }> {
-        if (game instanceof UpdateGameDto) {
-            const foundGame = await this.gameService.getGameByName(game.name);
-            if (foundGame.isVisible !== game.isVisible) {
-                return { isValid: true, errors: [] };
-            }
-        }
         const errors: string[] = [];
         const isMapValid = await this.mapIsValid(game);
         if (!isMapValid) {
@@ -177,9 +171,17 @@ export class GameValidationService {
     async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
         const normalizedName = game.name.trim();
         const foundGame = await this.gameService.getGameByName(normalizedName);
-        return !foundGame || foundGame._id === id;
-        // Si aucun autre jeu n'a le même nom, ou si le nom est inchangé, la validation réussit
-        // return existingGameWithName.name === normalizedName;
+        // console.log('found game id', JSON.stringify(foundGame._id));
+        // console.log('Found game', foundGame);
+        // console.log('Game id', id);
+        // console.log('foundGame._id ', foundGame._id);
+        // console.log('foundGame._id === id', foundGame._id === id);
+        if (foundGame) {
+            const valid = JSON.stringify(foundGame._id) === JSON.stringify(id);
+            return valid;
+        } else {
+            return !foundGame;
+        }
     }
 
     async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {

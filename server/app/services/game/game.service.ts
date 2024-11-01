@@ -58,19 +58,27 @@ export class GameService {
 
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
         // Validate the game data
+        const isOnlyIsVisibleModified = Object.keys(game).length === 1 && 'isVisible' in game;
+        // if (!isOnlyIsVisibleModified) {
+        //     const validationResult = await this.gameValidationService.validateGame(gameDto);
+        //     if (!validationResult.isValid) {
+        //         return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+        //     }
+        // }
         const errors: string[] = [];
-        const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);
-        if (!isNameValid) {
-            errors.push('Le nom du jeu doit être unique.');
+        if (!isOnlyIsVisibleModified) {
+            const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);
+            if (!isNameValid) {
+                errors.push('Le nom du jeu doit être unique.');
+            }
+            const validationResult = await this.gameValidationService.validateGame(game);
+            if (!validationResult.isValid) {
+                errors.push(...validationResult.errors);
+            }
+            if (errors.length > 0) {
+                throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
+            }
         }
-        const validationResult = await this.gameValidationService.validateGame(game);
-        if (!validationResult.isValid) {
-            errors.push(...validationResult.errors);
-        }
-        if (errors.length > 0) {
-            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
-        }
-
         const filterQuery = { _id: id };
         try {
             const res = await this.gameModel.updateOne(filterQuery, game);
