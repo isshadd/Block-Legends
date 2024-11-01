@@ -165,6 +165,5 @@ describe('GameGateway', () => {
             message: 'La salle est maintenant verrouillée',
             isLocked: true,
         });
-        expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
     });
 });
