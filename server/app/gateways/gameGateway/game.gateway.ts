@@ -38,7 +38,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.join(newRoom.accessCode.toString());
         this.updateRoomState(newRoom.accessCode);
     }
-    
+
     @SubscribeMessage('joinGame')
     handleJoinGame(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
@@ -67,7 +67,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
         this.updateRoomState(accessCode);
     }
-
 
     @SubscribeMessage('addPlayerToRoom')
     handleAddPlayerToRoom(client: Socket, payload: { accessCode: number; player: PlayerCharacter }) {
