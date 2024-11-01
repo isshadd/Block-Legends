@@ -24,8 +24,10 @@ export class AdministrationPageManagerService {
     }
 
     deleteGame(id: string): void {
-        this.gameServerCommunicationService.deleteGame(id).subscribe();
-        this.games = this.games.filter((elem) => elem._id !== id);
+        this.gameServerCommunicationService.deleteGame(id).subscribe(() => {
+            this.games = this.games.filter((elem) => elem._id !== id);
+            this.signalGamesSetted.next(this.games);
+        });
     }
 
     toggleVisibility(game: GameShared): void {

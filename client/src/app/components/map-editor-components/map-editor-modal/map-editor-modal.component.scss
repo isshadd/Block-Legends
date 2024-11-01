@@ -25,6 +25,15 @@
                 color: $primary-light;
                 font-size: 50%;
             }
+
+            input,
+            textarea {
+                color: darken($primary-dark, 30); // Set input and textarea text color
+            }
+
+            textarea {
+                resize: none; // Disable resizing for the textarea
+            }
         }
     }
 
@@ -36,5 +45,20 @@
 
     .dark-button:disabled {
         background-color: darken($primary-light, 50%);
+    }
+
+    #button-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #saveButton {
+        margin-right: 10px;
+        background-color: darken($secondary, 10%);
+        
+        &:hover {
+            background-color: lighten($secondary, 10%);
+        }
     }
 }

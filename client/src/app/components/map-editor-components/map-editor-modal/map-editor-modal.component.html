@@ -24,7 +24,11 @@
         </form>
     </div>
     <div mat-dialog-actions id="modal-options">
-        <button class="dark-button" (click)="onSaveClick()" [disabled]="!infoForm.valid">Ok</button>
+        <div id="button-container">
+            <button class="dark-button" id="saveButton" (click)="onSaveClick()">Sauvegarder</button>
+            <button class="dark-button" id="okButton" (click)="onOkClick()" [disabled]="!infoForm.valid">Ok</button>
+        </div>
+
         <button class="dark-button" (click)="onCloseClick()">Retour</button>
     </div>
 </div>

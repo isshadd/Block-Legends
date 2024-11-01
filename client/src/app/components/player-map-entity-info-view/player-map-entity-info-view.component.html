@@ -1,0 +1,25 @@
+<div id="info-view">
+    <div class="player-info">Nom de joueur: {{ playerCharacter.name }}</div>
+    <div class="player-info-details">
+        Santé:
+        <span *ngFor="let _ of healthArray" class="icon-container">
+            <img src="assets/images/heart.png" alt="Heart" class="icon" />
+        </span>
+        <br />
+        Défense:
+        <span *ngFor="let _ of defenseArray" class="icon-container">
+            <img id="armor" src="assets/images/armor.png" alt="Armor" class="icon" />
+        </span>
+        <br />
+        Vitesse:
+        <span *ngFor="let _ of speedArray" class="icon-container">
+            <img src="assets/images/view/boots.png" alt="Speed" class="icon" />
+        </span>
+        <br />
+        Attaque:
+        <span *ngFor="let _ of attackArray" class="icon-container">
+            <img src="assets/images/view/sword.png" alt="Attack" class="icon" />
+        </span>
+        <br />
+    </div>
+</div>
