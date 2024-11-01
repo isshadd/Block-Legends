@@ -1,4 +1,5 @@
 @import 'src/_variables.scss';
+
 #page-container {
     display: flex;
     flex-direction: row;
@@ -22,9 +23,29 @@
         }
     }
 
-    #map-container {
+    #map-wrapper {
+        position: relative; // Allows absolute positioning of the info panel
         display: flex;
         flex-grow: 1;
         justify-content: center;
+    }
+
+    #map-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+    }
+
+    #info-panel {
+        position: absolute;
+        top: 20px; // Position near the top of the map
+        right: 20px; // Align to the right edge of the map
+        width: 200px;
+        padding: 10px;
+        background-color: $primary-dark;
+        border: 2px solid darken($primary-dark, 10%);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        z-index: 10; // Ensure it appears on top of the map
     }
 }

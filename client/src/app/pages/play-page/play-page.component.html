@@ -5,7 +5,20 @@
         <app-player-info></app-player-info>
         <app-players-list></app-players-list>
     </div>
-    <div>
-        <app-map id="map-container" [grid]="playGameBoardManagerService.getCurrentGrid()"></app-map>
+
+    <div id="map-wrapper">
+        <app-map
+            id="map-container"
+            [grid]="playGameBoardManagerService.getCurrentGrid()"
+            (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
+        ></app-map>
+
+        <!-- Info component positioned on top of the map -->
+        @if(this.selectedPlayerCharacter){
+        <app-player-map-entity-info-view [playerCharacter]="selectedPlayerCharacter!" (close)="closePlayerInfoPanel()" id="info-panel">
+        </app-player-map-entity-info-view>
+        } @if(this.selectedTile){
+        <app-map-tile-info id="info-panel" [tile]="selectedTile" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        }
     </div>
 </div>
