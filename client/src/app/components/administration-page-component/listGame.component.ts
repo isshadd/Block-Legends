@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router, RouterLink } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
+import { DeleteConfirmationComponent } from '@app/components/administration-page-component/delete-conformation/delete-conformation.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -24,6 +26,7 @@ export class ListGameComponent {
         public gameMapDataManagerService: GameMapDataManagerService,
         public tileFactoryService: TileFactoryService,
         private router: Router,
+        private dialog: MatDialog,
     ) {
         this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games));
         this.administrationService.setGames();
@@ -37,6 +40,13 @@ export class ListGameComponent {
     deleteGame(id: string | null | undefined): void {
         if (!id) return;
         this.administrationService.deleteGame(id);
+        this.openDeleteConfirmation();
+    }
+
+    openDeleteConfirmation(): void {
+        this.dialog.open(DeleteConfirmationComponent, {
+            width: '300px',
+        });
     }
 
     toggleVisibility(game: GameShared): void {
