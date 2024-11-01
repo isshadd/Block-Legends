@@ -82,13 +82,6 @@ export class GameController {
     @Patch('/:id')
     async patchGame(@Param('id') id: string, @Body() gameDto: UpdateGameDto, @Res() response: Response) {
         try {
-            // const isOnlyIsVisibleModified = Object.keys(gameDto).length === 1 && 'isVisible' in gameDto;
-            // if (!isOnlyIsVisibleModified) {
-            //     const validationResult = await this.gameValidationService.validateGame(gameDto);
-            //     if (!validationResult.isValid) {
-            //         return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
-            //     }
-            // }
             await this.gameService.modifyGame(id, gameDto);
             response.status(HttpStatus.OK).send();
         } catch (error) {

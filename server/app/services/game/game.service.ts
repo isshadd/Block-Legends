@@ -33,7 +33,7 @@ export class GameService {
         const errors: string[] = [];
 
         // Validate the name and add an error message if invalid
-        const isNameValid = await this.gameValidationService.validateName(gameToValidate);
+        const isNameValid = await this.gameValidationService.validateGameName(gameToValidate);
         if (!isNameValid) {
             errors.push('Le nom du jeu doit être unique.');
         }
@@ -58,11 +58,27 @@ export class GameService {
 
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
         // Validate the game data
-        const validationResult = await this.gameValidationService.validateGame(game);
-        if (!validationResult.isValid) {
-            throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${validationResult.errors.join('<br>')}`);
+        const isOnlyIsVisibleModified = Object.keys(game).length === 1 && 'isVisible' in game;
+        // if (!isOnlyIsVisibleModified) {
+        //     const validationResult = await this.gameValidationService.validateGame(gameDto);
+        //     if (!validationResult.isValid) {
+        //         return response.status(HttpStatus.BAD_REQUEST).json(validationResult.errors.join('\n'));
+        //     }
+        // }
+        const errors: string[] = [];
+        if (!isOnlyIsVisibleModified) {
+            const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);
+            if (!isNameValid) {
+                errors.push('Le nom du jeu doit être unique.');
+            }
+            const validationResult = await this.gameValidationService.validateGame(game);
+            if (!validationResult.isValid) {
+                errors.push(...validationResult.errors);
+            }
+            if (errors.length > 0) {
+                throw new Error(`Veuillez corriger les erreurs suivantes avant de pouvoir continuer: ${errors.join('<br>')}`);
+            }
         }
-
         const filterQuery = { _id: id };
         try {
             const res = await this.gameModel.updateOne(filterQuery, game);
