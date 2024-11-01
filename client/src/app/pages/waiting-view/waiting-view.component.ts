@@ -54,9 +54,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                 });
-                this.webSocketService.socket.on('organizerLeft', (data: { message: string }) => {
-                    alert(data.message);
-                });
             }
         });
     }
