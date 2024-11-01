@@ -19,10 +19,13 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode: number | null;
     players$ = this.webSocketService.players$;
     isLocked$ = this.webSocketService.isLocked$;
+    maxPlayers$ = this.webSocketService.maxPlayers$;
     gameId: string | null;
+    size: number;
     playersCounter = 0;
     isMaxPlayer = false;
     isOrganizer = false;
+    maxPlayers: number = 0;
 
     private destroy$ = new Subject<void>();
 
@@ -57,11 +60,21 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             }
         });
 
+        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+            this.playersCounter = players.length;
+        });
+
+        this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
+            this.maxPlayers = max;
+        });
+
         this.webSocketService.socket.on('organizerLeft', (data: { message: string }) => {
             if (!this.isOrganizer) {
                 this.playerLeave();
             }
         });
+
+        console.log(this.accessCode);
     }
 
     addVirtualPlayers(): void {
