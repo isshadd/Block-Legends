@@ -1,8 +1,8 @@
+import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
-import { PlayGameBoardGateway } from '../playGameBoard/play-game-board.gateway';
 import { GameGateway } from './game.gateway';
 
 const mockGameSocketRoomService: Partial<GameSocketRoomService> = {
@@ -47,7 +47,7 @@ describe('GameGateway', () => {
             sockets: {
                 sockets: new Map<string, Socket>(),
             },
-        } as any as Server;
+        } as unknown as Server;
         server = gateway.server;
     });
 
@@ -61,7 +61,7 @@ describe('GameGateway', () => {
             emit: jest.fn(),
             join: jest.fn(),
             leave: jest.fn(),
-        } as any as Socket;
+        } as unknown as Socket;
     };
 
     describe('handleGetRoomState', () => {
@@ -100,5 +100,71 @@ describe('GameGateway', () => {
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
         });
+    });
+
+    describe('handleStartGame', () => {
+        it('should start the game if the client is the organizer', () => {
+            const client = createMockSocket('client19');
+            const accessCode = 1515;
+            const mockRoom: GameRoom = {
+                id: '12',
+                accessCode,
+                players: [],
+                isLocked: false,
+                organizer: 'client19',
+            };
+
+            (gameSocketRoomService.getRoomByAccessCode as jest.Mock).mockReturnValue(mockRoom);
+
+            gateway.handleStartGame(client, accessCode);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(playGameBoardGateway.startRoomGame).toHaveBeenCalledWith(accessCode);
+        });
+
+        it('should emit error if the client is not the organizer', () => {
+            const client = createMockSocket('client20');
+            const accessCode = 1616;
+            const mockRoom: GameRoom = {
+                id: '13',
+                accessCode,
+                players: [],
+                isLocked: false,
+                organizer: 'client21',
+            };
+
+            (gameSocketRoomService.getRoomByAccessCode as jest.Mock).mockReturnValue(mockRoom);
+
+            gateway.handleStartGame(client, accessCode);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(playGameBoardGateway.startRoomGame).not.toHaveBeenCalled();
+            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
+        });
+    });
+
+    it('should lock the room and emit roomLocked to the room', () => {
+        const client = createMockSocket('client10');
+        const accessCode = 7777;
+        const mockRoom: GameRoom = {
+            id: '7',
+            accessCode,
+            players: [],
+            isLocked: false,
+            organizer: 'client10',
+        };
+
+        (gameSocketRoomService.lockRoom as jest.Mock).mockReturnValue(true);
+        (gameSocketRoomService.getRoomByAccessCode as jest.Mock).mockReturnValue(mockRoom);
+
+        gateway.handleLockRoom(client, accessCode);
+
+        expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(accessCode, client.id);
+        expect(server.to).toHaveBeenCalledWith(accessCode.toString());
+        expect(server.emit).toHaveBeenCalledWith('roomLocked', {
+            message: 'La salle est maintenant verrouillée',
+            isLocked: true,
+        });
+        expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
     });
 });

@@ -1,6 +1,6 @@
 import { GameService } from '@app/services/game/game.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
 describe('PlayGameBoardSocketService', () => {
