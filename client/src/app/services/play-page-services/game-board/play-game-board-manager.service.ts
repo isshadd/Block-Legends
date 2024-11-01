@@ -1,4 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -6,7 +7,6 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 import { GameShared } from '@common/interfaces/game-shared';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Injectable({
     providedIn: 'root',
@@ -65,5 +65,9 @@ export class PlayGameBoardManagerService implements OnDestroy {
 
     findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.mapEntity === playerMapEntity) || null;
+    }
+
+    findPlayerFromName(name: string): PlayerCharacter | null {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
     }
 }
