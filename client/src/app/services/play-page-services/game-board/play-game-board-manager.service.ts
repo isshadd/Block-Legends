@@ -1,28 +1,31 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Subject, takeUntil } from 'rxjs';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class PlayGameBoardManagerService {
+export class PlayGameBoardManagerService implements OnDestroy {
+    private destroy$ = new Subject<void>();
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
     ) {
-        this.playGameBoardSocketService.signalInitGameBoard$.subscribe((game) => {
+        this.playGameBoardSocketService.signalInitGameBoard$.pipe(takeUntil(this.destroy$)).subscribe((game) => {
             this.initGameBoard(game);
         });
-        this.playGameBoardSocketService.signalInitCharacters$.subscribe((spawnPlaces) => {
+        this.playGameBoardSocketService.signalInitCharacters$.pipe(takeUntil(this.destroy$)).subscribe((spawnPlaces) => {
             this.initCharacters(spawnPlaces);
         });
 
-        this.playGameBoardSocketService.initGameBoard(webSocketService.currentRoom.accessCode);
+        this.playGameBoardSocketService.initGameBoard(webSocketService.getRoomInfo().accessCode);
     }
 
     initGameBoard(game: GameShared) {
@@ -48,6 +51,11 @@ export class PlayGameBoardManagerService {
         for (const tile of availableTiles) {
             tile.item = null;
         }
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     getCurrentGrid(): Tile[][] {
