@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
+const DELAY = 300;
+
 @Component({
     selector: 'app-fight-view',
     standalone: true,
@@ -16,6 +18,14 @@ export class FightViewComponent {
     @Output() attack = new EventEmitter<void>();
     @Output() escape = new EventEmitter<void>();
 
+    get healthArray(): unknown[] {
+        return new Array(this.opponentCharacter.attributes.life);
+    }
+
+    get defenseArray(): unknown[] {
+        return new Array(this.opponentCharacter.attributes.defense);
+    }
+
     onAttack() {
         this.attack.emit();
 
@@ -28,18 +38,10 @@ export class FightViewComponent {
         setTimeout(() => {
             playerImage?.classList.remove('attack-player');
             opponentImage?.classList.remove('attack-opponent');
-        }, 300);
+        }, DELAY);
     }
 
     onEscape() {
         this.escape.emit();
-    }
-
-    get healthArray(): any[] {
-        return new Array(this.opponentCharacter.attributes.life);
-    }
-
-    get defenseArray(): any[] {
-        return new Array(this.opponentCharacter.attributes.defense);
     }
 }

@@ -3,6 +3,18 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { FightViewComponent } from './fight-view.component';
 
+const DELAY = 300;
+const ATTACK_ARRAY = 8;
+const DEFENSE_ARRAY = 4;
+const LIFE1 = 10;
+const DEFENSE1 = 5;
+const SPEED1 = 8;
+const ATTACK1 = 6;
+const LIFE2 = 8;
+const DEFENSE2 = 4;
+const SPEED2 = 7;
+const ATTACK2 = 5;
+
 describe('FightViewComponent', () => {
     let component: FightViewComponent;
     let fixture: ComponentFixture<FightViewComponent>;
@@ -18,11 +30,11 @@ describe('FightViewComponent', () => {
         component = fixture.componentInstance;
 
         mockPlayer = new PlayerCharacter('testPlayer');
-        mockPlayer.attributes = { life: 10, defense: 5, speed: 8, attack: 6 };
+        mockPlayer.attributes = { life: LIFE1, defense: DEFENSE1, speed: SPEED1, attack: ATTACK1 };
         mockPlayer.avatar = AvatarEnum.Steve;
 
         mockOpponent = new PlayerCharacter('testOpponent');
-        mockOpponent.attributes = { life: 8, defense: 4, speed: 7, attack: 5 };
+        mockOpponent.attributes = { life: LIFE2, defense: DEFENSE2, speed: SPEED2, attack: ATTACK2 };
         mockOpponent.avatar = AvatarEnum.Alex;
 
         component.playerCharacter = mockPlayer;
@@ -48,7 +60,7 @@ describe('FightViewComponent', () => {
         expect(playerImage.classList).toContain('attack-player');
         expect(opponentImage.classList).toContain('attack-opponent');
 
-        tick(300); // Simulate 300 ms delay
+        tick(DELAY); // Simulate 300 ms delay
         fixture.detectChanges(); // Trigger change detection again to remove the class
 
         expect(playerImage.classList).not.toContain('attack-player');
@@ -64,10 +76,10 @@ describe('FightViewComponent', () => {
     });
 
     it('should return an array of the correct length for healthArray', () => {
-        expect(component.healthArray.length).toBe(8);
+        expect(component.healthArray.length).toBe(ATTACK_ARRAY);
     });
 
     it('should return an array of the correct length for defenseArray', () => {
-        expect(component.defenseArray.length).toBe(4);
+        expect(component.defenseArray.length).toBe(DEFENSE_ARRAY);
     });
 });
