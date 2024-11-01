@@ -38,6 +38,36 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.join(newRoom.accessCode.toString());
         this.updateRoomState(newRoom.accessCode);
     }
+    
+    @SubscribeMessage('joinGame')
+    handleJoinGame(client: Socket, accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (!room) {
+            client.emit('joinGameResponseCodeInvalid', {
+                message: 'Code invalide',
+            });
+            return;
+        }
+
+        if (room.isLocked) {
+            client.emit('joinGameResponseLockedRoom', {
+                message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+            });
+            return;
+        }
+
+        client.join(accessCode.toString());
+        client.emit('joinGameResponse', {
+            valid: true,
+            message: 'Rejoint avec succès',
+            roomId: room.id,
+            accessCode: room.accessCode,
+            isLocked: room.isLocked,
+        });
+        this.updateRoomState(accessCode);
+    }
+
 
     @SubscribeMessage('addPlayerToRoom')
     handleAddPlayerToRoom(client: Socket, payload: { accessCode: number; player: PlayerCharacter }) {
