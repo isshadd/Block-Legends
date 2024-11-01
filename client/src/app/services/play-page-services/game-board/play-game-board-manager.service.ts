@@ -6,6 +6,7 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 import { GameShared } from '@common/interfaces/game-shared';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Injectable({
     providedIn: 'root',
@@ -60,5 +61,9 @@ export class PlayGameBoardManagerService implements OnDestroy {
 
     getCurrentGrid(): Tile[][] {
         return this.gameMapDataManagerService.getCurrentGrid();
+    }
+
+    findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.mapEntity === playerMapEntity) || null;
     }
 }
