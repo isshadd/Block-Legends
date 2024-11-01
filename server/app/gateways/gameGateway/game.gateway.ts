@@ -23,6 +23,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 accessCode: room.accessCode,
                 players: room.players,
                 isLocked: room.isLocked,
+                maxPlayers: room.maxPlayers,
             });
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
@@ -97,6 +98,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 message: 'Rejoint avec succès',
             });
             this.updateRoomState(accessCode);
+
+            const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+            if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {
+                const locked = this.gameSocketRoomService.lockRoom(accessCode, updatedRoom.organizer);
+                if (locked) {
+                    this.server.to(accessCode.toString()).emit('roomLocked', {
+                        message: 'La salle est verrouillée car le nombre maximal de joueurs a été atteint.',
+                        isLocked: true,
+                    });
+                }
+            }
         } else {
             client.emit('joinGameResponseCanJoin', {
                 valid: false,
@@ -150,6 +162,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (updatedRoom) {
             this.updateRoomState(accessCode);
+            if (updatedRoom.isLocked && updatedRoom.players.length < updatedRoom.maxPlayers) {
+                const unlocked = this.gameSocketRoomService.unlockRoom(accessCode, updatedRoom.organizer);
+                if (unlocked) {
+                    this.server.to(accessCode.toString()).emit('roomUnlocked', {
+                        message: 'La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.',
+                        isLocked: false,
+                    });
+                }
+            }
         } else {
             this.server.to(accessCode.toString()).emit('roomClosed');
         }
@@ -172,7 +193,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const kicked = this.gameSocketRoomService.kickPlayer(accessCode, player.socketId, client.id);
         if (kicked) {
-            // Emit to the entire room, but include the kicked player's ID
             this.server.to(accessCode.toString()).emit('playerKicked', {
                 message: 'Vous avez été expulsé de la salle',
                 kickedPlayerId: player.socketId,
@@ -184,9 +204,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             this.updateRoomState(accessCode);
+            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+            if (room && room.isLocked && room.players.length < room.maxPlayers) {
+                const unlocked = this.gameSocketRoomService.unlockRoom(accessCode, room.organizer);
+                if (unlocked) {
+                    this.server.to(accessCode.toString()).emit('roomUnlocked', {
+                        message: 'La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.',
+                        isLocked: false,
+                    });
+                }
+            }
         } else {
             client.emit('error', { message: 'Pas authorisé ou joueur pas trouvé' });
         }
+    }
+
+    @SubscribeMessage('getGameParameters')
+    sendGameParameters(accessCode: number) {
+        const gameBoardParameters = this.gameSocketRoomService.getGameBoardParameters(accessCode);
+
+        if (!gameBoardParameters) {
+            this.server.to(accessCode.toString()).emit('error', { message: 'Room pas trouvé' });
+            return;
+        }
+
+        this.server.to(accessCode.toString()).emit('gameParameters', { gameBoardParameters });
     }
 
     handleConnection(client: Socket) {

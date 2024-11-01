@@ -157,7 +157,7 @@ export class GameValidationService {
         return true;
     }
 
-    async validateName(game: Game): Promise<boolean> {
+    async validateGameName(game: Game): Promise<boolean> {
         const normalizedName = game.name.trim();
         const existingGame = await this.gameService.getGameByName(normalizedName);
 
@@ -167,6 +167,21 @@ export class GameValidationService {
         }
 
         return false; // Name is not unique
+    }
+    async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
+        const normalizedName = game.name.trim();
+        const foundGame = await this.gameService.getGameByName(normalizedName);
+        // console.log('found game id', JSON.stringify(foundGame._id));
+        // console.log('Found game', foundGame);
+        // console.log('Game id', id);
+        // console.log('foundGame._id ', foundGame._id);
+        // console.log('foundGame._id === id', foundGame._id === id);
+        if (foundGame) {
+            const valid = JSON.stringify(foundGame._id) === JSON.stringify(id);
+            return valid;
+        } else {
+            return !foundGame;
+        }
     }
 
     async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {
