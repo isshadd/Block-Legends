@@ -4,11 +4,6 @@ import { Subject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
-export interface GameBoardParameters {
-    game: GameShared;
-    spawnPlaces: [number, string][];
-}
-
 @Injectable({
     providedIn: 'root',
 })
