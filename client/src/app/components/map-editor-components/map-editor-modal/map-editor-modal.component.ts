@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 
 @Component({
     selector: 'app-map-editor-modal',
@@ -20,7 +19,6 @@ export class MapEditorModalComponent {
     constructor(
         public dialogRef: MatDialogRef<MapEditorModalComponent>,
         private formBuilder: FormBuilder,
-        public gameMapDataManagerService: GameMapDataManagerService,
         @Inject(MAT_DIALOG_DATA) public data: { name: string; description: string },
     ) {
         this.infoForm = this.formBuilder.group({
@@ -35,12 +33,11 @@ export class MapEditorModalComponent {
 
     onOkClick(): void {
         if (this.infoForm.valid) {
-            this.dialogRef.close(this.infoForm.value);
+            this.dialogRef.close({ ...this.infoForm.value, isSavedPressed: false });
         }
     }
 
     onSaveClick(): void {
-        this.gameMapDataManagerService.saveGame();
-        this.dialogRef.close(this.infoForm.value);
+        this.dialogRef.close({ ...this.infoForm.value, isSavedPressed: true });
     }
 }

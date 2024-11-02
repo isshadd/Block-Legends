@@ -11,6 +11,7 @@ export class PlayerCharacter {
     isAttackBonusAssigned: boolean = true;
     isDefenseBonusAssigned: boolean = true;
     isOrganizer: boolean = false;
+    socketId: string;
     dice: string;
     isNameValid: boolean = false;
     avatar: Avatar;

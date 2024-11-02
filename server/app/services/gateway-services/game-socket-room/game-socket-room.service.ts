@@ -3,14 +3,23 @@ import { GameService } from '@app/services/game/game.service';
 import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
 
+export class PlayerAttributes {
+    life: number;
+    speed: number;
+    attack: number;
+    defense: number;
+}
+
 export interface PlayerCharacter {
     name: string;
     socketId: string;
+    attributes: PlayerAttributes;
 }
 
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
+    turnOrder: string[];
 }
 
 export interface GameRoom {
@@ -77,7 +86,7 @@ export class GameSocketRoomService {
     }
 
     setupGameBoardRoom(accessCode: number, game: Game) {
-        this.gameBoardRooms.set(accessCode, { game, spawnPlaces: [] });
+        this.gameBoardRooms.set(accessCode, { game, spawnPlaces: [], turnOrder: [] });
         let room = this.rooms.get(accessCode);
         room.maxPlayers = this.setSpawnCounter(game.size);
         this.rooms.set(accessCode, room);

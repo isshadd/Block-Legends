@@ -2,5 +2,27 @@
     <div id="side-menu">
         <button class="dark-button" routerLink="/home">Retour</button>
     </div>
-    <app-map id="map-container" [grid]="playGameBoardManagerService.getCurrentGrid()"></app-map>
+
+    <div id="map-wrapper">
+        <app-map
+            id="map-container"
+            [grid]="playGameBoardManagerService.getCurrentGrid()"
+            (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
+        ></app-map>
+
+        @if(this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter){
+        <app-player-map-entity-info-view
+            [playerCharacter]="this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
+            (close)="closePlayerInfoPanel()"
+            id="info-panel"
+        >
+        </app-player-map-entity-info-view>
+        } @if(this.playPageMouseHandlerService.rightSelectedTile){
+        <app-map-tile-info
+            id="info-panel"
+            [tile]="this.playPageMouseHandlerService.rightSelectedTile"
+            (close)="closeTileInfoPanel()"
+        ></app-map-tile-info>
+        }
+    </div>
 </div>
