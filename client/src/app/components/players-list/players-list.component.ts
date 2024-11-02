@@ -12,11 +12,5 @@ export class PlayersListComponent {
         { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
         { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
         { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
     ];
 }
