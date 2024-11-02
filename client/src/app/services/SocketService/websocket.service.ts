@@ -36,9 +36,7 @@ export class WebSocketService {
     constructor(
         private router: Router,
         private gameService: GameService,
-    ) {}
-
-    init() {
+    ) {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }

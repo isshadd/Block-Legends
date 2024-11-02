@@ -32,7 +32,6 @@ export class JoinGameComponent {
             this.errorMessage = "Le code d'accès est invalide !";
         } else {
             this.errorMessage = null;
-            this.webSocketService.init();
             this.webSocketService.joinGame(this.accessCode);
         }
     }
