@@ -29,11 +29,15 @@
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
-    }
-
+    } @if((this.gameService.character$ | async)?.isOrganizer) {
     <div>
         <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
     </div>
+    } @else {
+    <div>
+        <button class="dark-button" type="button" (click)="playerNonOrgLeave()">Quitter la partie</button>
+    </div>
+    }
 
     <div class="chat">
         <h3>Clavardage</h3>

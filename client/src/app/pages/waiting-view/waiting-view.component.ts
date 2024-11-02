@@ -95,6 +95,14 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
+    playerNonOrgLeave(): void {
+        this.webSocketService.leaveGame();
+        this.router.navigate(['/home']).then(() => {
+            alert('Vous avez quitté la partie');
+            location.reload();
+        });
+    }
+
     ngOnDestroy(): void {
         this.gameService.clearLocalStorage();
         this.destroy$.next();
