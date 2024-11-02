@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, Renderer2 } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -12,6 +12,17 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 export class PlayerMapEntityInfoViewComponent {
     @Input() playerCharacter: PlayerCharacter;
     @Output() close = new EventEmitter<void>();
+    @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
+    @Input() showButton: boolean = true;
+
+    constructor(
+        private el: ElementRef,
+        private renderer: Renderer2,
+    ) {}
+
+    ngOnInit(): void {
+        this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+    }
 
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);

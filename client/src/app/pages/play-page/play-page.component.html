@@ -1,11 +1,14 @@
 <div id="page-container">
     <div id="side-menu">
         <button class="dark-button" routerLink="/home">Retour</button>
-        <app-player-map-entity-info-view [playerCharacter]="mainPlayer"></app-player-map-entity-info-view>
-        <app-player-info></app-player-info>
+        <app-player-map-entity-info-view
+            [scale]="1.25"
+            [showButton]="false"
+            [playerCharacter]="mainPlayer!"
+            (close)="closePlayerInfoPanel()"
+        ></app-player-map-entity-info-view>
         <app-players-list></app-players-list>
     </div>
-
     <div id="map-wrapper">
         <app-map
             id="map-container"
@@ -13,12 +16,33 @@
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
         ></app-map>
 
+        <app-timer [seconds]="300" [isBattle]="false"></app-timer>
+
         <!-- Info component positioned on top of the map -->
-        @if(this.selectedPlayerCharacter){
-        <app-player-map-entity-info-view [playerCharacter]="selectedPlayerCharacter!" (close)="closePlayerInfoPanel()" id="info-panel">
-        </app-player-map-entity-info-view>
-        } @if(this.selectedTile){
-        <app-map-tile-info id="info-panel" [tile]="selectedTile" (close)="closeTileInfoPanel()"></app-map-tile-info>
-        }
+        <ng-container *ngIf="selectedPlayerCharacter">
+            <app-player-map-entity-info-view
+                [playerCharacter]="selectedPlayerCharacter!"
+                (close)="closePlayerInfoPanel()"
+                id="info-panel"
+            ></app-player-map-entity-info-view>
+        </ng-container>
+
+        <ng-container *ngIf="selectedTile">
+            <app-map-tile-info id="info-panel" [tile]="selectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        </ng-container>
+
+        <div class="action-container">
+            <div class="containers">
+                <app-placeable-entity-container [isItemContainer]="false"></app-placeable-entity-container>
+                <app-placeable-entity-container [isItemContainer]="false"></app-placeable-entity-container>
+            </div>
+
+            <!-- Buttons aligned to the right of the containers -->
+            <div class="button-container">
+                <button class="action-button">Action</button>
+                <button class="action-button">Abandon</button>
+                <button class="action-button" onclick="endTurn()">Fin de tour</button>
+            </div>
+        </div>
     </div>
 </div>
