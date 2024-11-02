@@ -10,6 +10,9 @@ import { GameShared } from '@common/interfaces/game-shared';
     providedIn: 'root',
 })
 export class PlayGameBoardManagerService {
+    currentTime: number = 0;
+    isBattleOn: boolean = false;
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
