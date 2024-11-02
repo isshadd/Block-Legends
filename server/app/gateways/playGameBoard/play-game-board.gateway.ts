@@ -17,7 +17,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('initGameBoard')
     handleInitGameBoard(client: Socket, accessCode: number) {
-        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.getGameBoardParameters(accessCode);
+        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
 
         if (gameBoardParameters) {
             client.emit('initGameBoardParameters', gameBoardParameters);

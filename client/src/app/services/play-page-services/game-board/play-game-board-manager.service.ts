@@ -21,9 +21,6 @@ export class PlayGameBoardManagerService {
     init(gameBoardParameters: GameBoardParameters) {
         this.initGameBoard(gameBoardParameters.game);
         this.initCharacters(gameBoardParameters.spawnPlaces);
-        // for (const player of gameBoardParameters.turnOrder) {
-        //     console.log(this.webSocketService.getRoomInfo().players.find((p) => p.socketId === player));
-        // }
     }
 
     initGameBoard(game: GameShared) {

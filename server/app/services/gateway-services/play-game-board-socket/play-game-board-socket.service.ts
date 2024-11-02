@@ -10,7 +10,7 @@ export class PlayGameBoardSocketService {
 
     initRoomGameBoard(accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-        const gameBoardRoom = this.gameSocketRoomService.getGameBoardParameters(accessCode);
+        const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
 
         if (!room) {
             this.logger.error(`Room pas trouve pour code: ${accessCode}`);
@@ -20,7 +20,7 @@ export class PlayGameBoardSocketService {
         const spawnPlaces: [number, string][] = this.setupSpawnPoints(room, gameBoardRoom.game);
         const turnOrder: string[] = this.setupTurnOrder(room);
 
-        this.gameSocketRoomService.setGameBoardParameters(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
+        this.gameSocketRoomService.gameBoardRooms.set(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
         this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 

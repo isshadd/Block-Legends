@@ -16,6 +16,11 @@ export interface PlayerCharacter {
     attributes: PlayerAttributes;
 }
 
+export interface GameTimer {
+    time: number;
+    isPaused: boolean;
+}
+
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
@@ -36,7 +41,8 @@ export class GameSocketRoomService {
     private readonly logger = new Logger(GameSocketRoomService.name);
     private rooms: Map<number, GameRoom> = new Map();
     private playerRooms: Map<string, number> = new Map();
-    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+    gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+    gameTimerRooms: Map<number, GameTimer> = new Map();
 
     constructor(private readonly gameService: GameService) {}
 
@@ -62,14 +68,6 @@ export class GameSocketRoomService {
             accessCode = Math.floor(MIN_ACCESS_CODE + Math.random() * (MAX_ACCESS_CODE - MIN_ACCESS_CODE + 1));
         } while (this.rooms.has(accessCode));
         return accessCode;
-    }
-
-    getGameBoardParameters(accessCode: number): GameBoardParameters {
-        return this.gameBoardRooms.get(accessCode);
-    }
-
-    setGameBoardParameters(accessCode: number, gameBoardParameters: GameBoardParameters): void {
-        this.gameBoardRooms.set(accessCode, gameBoardParameters);
     }
 
     initRoomGameBoard(accessCode: number) {
@@ -113,6 +111,7 @@ export class GameSocketRoomService {
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
+        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true });
         this.logger.log(`
             Jeu crée avec ID: ${gameId},
             code d'acces: ${accessCode},
