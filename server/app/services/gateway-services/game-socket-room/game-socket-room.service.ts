@@ -103,12 +103,14 @@ export class GameSocketRoomService {
         };
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
-        this.initRoomGameBoard(accessCode);
+
         this.logger.log(`
             Jeu crée avec ID: ${gameId},
             code d'acces: ${accessCode},
             nb de joueurs max: ${newRoom.maxPlayers}
             `);
+        this.initRoomGameBoard(accessCode);
+        this.logger.log(`maxPlayers mis à jour à ${newRoom.maxPlayers} pour la salle ${accessCode}`);
         return newRoom;
     }
 

@@ -22,7 +22,9 @@
     <div class="admin-buttons">
         <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
         <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
-        <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false">Deverouiller la salle</button>
+        <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false || playersCounter === maxPlayers">
+            Deverouiller la salle
+        </button>
         <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
     </div>
     } @if(isMaxPlayer) {
