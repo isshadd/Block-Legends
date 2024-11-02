@@ -3,7 +3,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameShared } from '@common/interfaces/game-shared';
 
 @Injectable({
@@ -15,6 +15,14 @@ export class PlayGameBoardManagerService {
         public webSocketService: WebSocketService,
     ) {}
 
+    init(gameBoardParameters: GameBoardParameters) {
+        this.initGameBoard(gameBoardParameters.game);
+        this.initCharacters(gameBoardParameters.spawnPlaces);
+        // for (const player of gameBoardParameters.turnOrder) {
+        //     console.log(this.webSocketService.getRoomInfo().players.find((p) => p.socketId === player));
+        // }
+    }
+
     initGameBoard(game: GameShared) {
         this.gameMapDataManagerService.init(game);
     }
@@ -24,8 +32,8 @@ export class PlayGameBoardManagerService {
         const availableTiles = [...tilesWithSpawn];
 
         for (const spawnPlace of spawnPlaces) {
-            const [index, playerName] = spawnPlace;
-            const player = this.webSocketService.getRoomInfo().players.find((p) => p.name === playerName);
+            const [index, playerSocketId] = spawnPlace;
+            const player = this.webSocketService.getRoomInfo().players.find((p) => p.socketId === playerSocketId);
             const tile = tilesWithSpawn[index];
 
             if (player && tile) {

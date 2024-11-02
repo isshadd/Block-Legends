@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Socket } from 'socket.io-client';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
@@ -25,9 +25,8 @@ export class PlayGameBoardSocketService {
     }
 
     private setupSocketListeners() {
-        this.socket.on('gameBoardParameters', (gameBoardParameters) => {
-            this.playGameBoardManagerService.initGameBoard(gameBoardParameters.game);
-            this.playGameBoardManagerService.initCharacters(gameBoardParameters.spawnPlaces);
+        this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
+            this.playGameBoardManagerService.init(gameBoardParameters);
         });
     }
 }

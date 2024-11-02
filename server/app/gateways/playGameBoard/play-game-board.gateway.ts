@@ -20,7 +20,7 @@ export class PlayGameBoardGateway {
         const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.getGameBoardParameters(accessCode);
 
         if (gameBoardParameters) {
-            client.emit('gameBoardParameters', gameBoardParameters);
+            client.emit('initGameBoardParameters', gameBoardParameters);
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
         }

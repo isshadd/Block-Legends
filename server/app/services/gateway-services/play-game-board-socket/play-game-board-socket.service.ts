@@ -17,11 +17,14 @@ export class PlayGameBoardSocketService {
             return;
         }
 
-        this.setupSpawnPoints(room, gameBoardRoom.game);
+        const spawnPlaces: [number, string][] = this.setupSpawnPoints(room, gameBoardRoom.game);
+        const turnOrder: string[] = this.setupTurnOrder(room);
+
+        this.gameSocketRoomService.setGameBoardParameters(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
         this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 
-    setupSpawnPoints(room: GameRoom, game: Game) {
+    setupSpawnPoints(room: GameRoom, game: Game): [number, string][] {
         const spawnCounter = this.gameSocketRoomService.setSpawnCounter(game.size);
         const spawnPlaces: [number, string][] = [];
         let availableSpawnPoints = spawnCounter;
@@ -33,13 +36,38 @@ export class PlayGameBoardSocketService {
                 const randomIndex = Math.floor(Math.random() * spawnCounter);
 
                 if (!spawnPlaces.some(([index]) => index === randomIndex)) {
-                    spawnPlaces.push([randomIndex, player.name]);
+                    spawnPlaces.push([randomIndex, player.socketId]);
                     assigned = true;
                     availableSpawnPoints--;
                 }
             }
         }
 
-        this.gameSocketRoomService.setGameBoardParameters(room.accessCode, { game, spawnPlaces });
+        return spawnPlaces;
+    }
+
+    setupTurnOrder(room: GameRoom): string[] {
+        const playersWithSpeed = room.players.map((player) => ({
+            socketId: player.socketId,
+            speed: player.attributes.speed,
+        }));
+
+        playersWithSpeed.sort((a, b) => b.speed - a.speed);
+
+        const turnOrder: string[] = [];
+        let i = 0;
+
+        while (i < playersWithSpeed.length) {
+            const sameSpeedPlayers = playersWithSpeed.filter((p) => p.speed === playersWithSpeed[i].speed);
+            const shuffledSameSpeedPlayers = sameSpeedPlayers.sort(() => Math.random() - 0.5);
+
+            for (const player of shuffledSameSpeedPlayers) {
+                turnOrder.push(player.socketId);
+            }
+
+            i += sameSpeedPlayers.length;
+        }
+
+        return turnOrder;
     }
 }

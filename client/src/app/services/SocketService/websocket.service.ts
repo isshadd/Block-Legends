@@ -18,6 +18,7 @@ export interface GameRoom {
 export interface GameBoardParameters {
     game: GameShared;
     spawnPlaces: [number, string][];
+    turnOrder: string[];
 }
 
 @Injectable({
