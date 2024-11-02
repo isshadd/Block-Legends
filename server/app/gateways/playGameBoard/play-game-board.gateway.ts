@@ -13,11 +13,7 @@ export class PlayGameBoardGateway {
     constructor(
         private readonly playGameBoardSocketService: PlayGameBoardSocketService,
         private readonly gameSocketRoomService: GameSocketRoomService,
-    ) {
-        this.playGameBoardSocketService.signalGameBoardSetupDone$.subscribe((accessCode) => {
-            this.onGameBoardSetupDone(accessCode);
-        });
-    }
+    ) {}
 
     @SubscribeMessage('initGameBoard')
     handleInitGameBoard(client: Socket, accessCode: number) {
@@ -32,9 +28,6 @@ export class PlayGameBoardGateway {
 
     startRoomGame(accessCode: number) {
         this.playGameBoardSocketService.initRoomGameBoard(accessCode);
-    }
-
-    onGameBoardSetupDone(accessCode: number) {
         this.server.to(accessCode.toString()).emit('gameStarted');
     }
 }

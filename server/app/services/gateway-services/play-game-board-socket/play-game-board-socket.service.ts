@@ -1,13 +1,9 @@
 import { Game } from '@app/model/database/game';
 import { GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { Subject } from 'rxjs';
 
 @Injectable()
 export class PlayGameBoardSocketService {
-    signalGameBoardSetupDone = new Subject<number>();
-    signalGameBoardSetupDone$ = this.signalGameBoardSetupDone.asObservable();
-
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
 
     constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
@@ -22,6 +18,7 @@ export class PlayGameBoardSocketService {
         }
 
         this.setupSpawnPoints(room, gameBoardRoom.game);
+        this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 
     setupSpawnPoints(room: GameRoom, game: Game) {
@@ -44,7 +41,5 @@ export class PlayGameBoardSocketService {
         }
 
         this.gameSocketRoomService.setGameBoardParameters(room.accessCode, { game, spawnPlaces });
-        this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
-        this.signalGameBoardSetupDone.next(room.accessCode);
     }
 }

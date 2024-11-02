@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { MapTileInfoComponent } from '../../components/map-tile-info/map-tile-info.component';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
@@ -18,8 +19,9 @@ export class PlayPageComponent {
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
+        public playGameBoardSocketService: PlayGameBoardSocketService,
     ) {
-        this.playGameBoardManagerService.init();
+        this.playGameBoardSocketService.init();
     }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
