@@ -10,11 +10,19 @@
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
         ></app-map>
 
-        @if(this.selectedPlayerCharacter){
-        <app-player-map-entity-info-view [playerCharacter]="selectedPlayerCharacter!" (close)="closePlayerInfoPanel()" id="info-panel">
+        @if(this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter){
+        <app-player-map-entity-info-view
+            [playerCharacter]="this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
+            (close)="closePlayerInfoPanel()"
+            id="info-panel"
+        >
         </app-player-map-entity-info-view>
-        } @if(this.selectedTile){
-        <app-map-tile-info id="info-panel" [tile]="selectedTile" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        } @if(this.playPageMouseHandlerService.rightSelectedTile){
+        <app-map-tile-info
+            id="info-panel"
+            [tile]="this.playPageMouseHandlerService.rightSelectedTile"
+            (close)="closeTileInfoPanel()"
+        ></app-map-tile-info>
         }
     </div>
 </div>
