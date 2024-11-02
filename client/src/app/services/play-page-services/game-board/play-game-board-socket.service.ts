@@ -1,29 +1,23 @@
 import { Injectable } from '@angular/core';
-import { GameShared } from '@common/interfaces/game-shared';
-import { Subject } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
-
-export interface GameBoardParameters {
-    game: GameShared;
-    spawnPlaces: [number, string][];
-}
+import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Socket } from 'socket.io-client';
+import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayGameBoardSocketService {
-    signalInitGameBoard = new Subject<GameShared>();
-    signalInitGameBoard$ = this.signalInitGameBoard.asObservable();
-
-    signalInitCharacters = new Subject<[number, string][]>();
-    signalInitCharacters$ = this.signalInitCharacters.asObservable();
-
     socket: Socket;
 
-    constructor() {
-        this.socket = io(environment.socketIoUrl);
+    constructor(
+        public webSocketService: WebSocketService,
+        public playGameBoardManagerService: PlayGameBoardManagerService,
+    ) {}
+
+    init() {
+        this.socket = this.webSocketService.socket;
         this.setupSocketListeners();
+        this.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
     }
 
     initGameBoard(accessCode: number) {
@@ -31,9 +25,8 @@ export class PlayGameBoardSocketService {
     }
 
     private setupSocketListeners() {
-        this.socket.on('gameBoardParameters', (gameBoardParameters) => {
-            this.signalInitGameBoard.next(gameBoardParameters.game);
-            this.signalInitCharacters.next(gameBoardParameters.spawnPlaces);
+        this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
+            this.playGameBoardManagerService.init(gameBoardParameters);
         });
     }
 }

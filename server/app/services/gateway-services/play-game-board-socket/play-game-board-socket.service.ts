@@ -1,43 +1,31 @@
 import { Game } from '@app/model/database/game';
-import { GameService } from '@app/services/game/game.service';
 import { GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
-import { Subject } from 'rxjs';
-
-export interface GameBoardParameters {
-    game: Game;
-    spawnPlaces: [number, string][];
-}
 
 @Injectable()
 export class PlayGameBoardSocketService {
-    signalGameBoardSetupDone = new Subject<number>();
-    signalGameBoardSetupDone$ = this.signalGameBoardSetupDone.asObservable();
-
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
-    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
 
-    constructor(
-        private readonly gameService: GameService,
-        private readonly gameSocketRoomService: GameSocketRoomService,
-    ) {}
+    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
 
     initRoomGameBoard(accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        const gameBoardRoom = this.gameSocketRoomService.getGameBoardParameters(accessCode);
 
         if (!room) {
             this.logger.error(`Room pas trouve pour code: ${accessCode}`);
             return;
         }
 
-        this.gameService.getGame(room.id).then((game) => {
-            this.setupSpawnPoints(room, game);
-        });
+        const spawnPlaces: [number, string][] = this.setupSpawnPoints(room, gameBoardRoom.game);
+        const turnOrder: string[] = this.setupTurnOrder(room);
+
+        this.gameSocketRoomService.setGameBoardParameters(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
+        this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 
-    setupSpawnPoints(room: GameRoom, game: Game) {
-        const spawnCounter = this.setSpawnCounter(game.size);
+    setupSpawnPoints(room: GameRoom, game: Game): [number, string][] {
+        const spawnCounter = this.gameSocketRoomService.setSpawnCounter(game.size);
         const spawnPlaces: [number, string][] = [];
         let availableSpawnPoints = spawnCounter;
 
@@ -48,33 +36,38 @@ export class PlayGameBoardSocketService {
                 const randomIndex = Math.floor(Math.random() * spawnCounter);
 
                 if (!spawnPlaces.some(([index]) => index === randomIndex)) {
-                    spawnPlaces.push([randomIndex, player.name]);
+                    spawnPlaces.push([randomIndex, player.socketId]);
                     assigned = true;
                     availableSpawnPoints--;
                 }
             }
         }
 
-        this.gameBoardRooms.set(room.accessCode, { game, spawnPlaces });
-        this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
-        this.signalGameBoardSetupDone.next(room.accessCode);
+        return spawnPlaces;
     }
 
-    setSpawnCounter(gameSize: MapSize): number {
-        const MIN_PLAYERS = 2;
-        const MED_PLAYERS = 4;
-        const MAX_PLAYERS = 6;
-        switch (gameSize) {
-            case MapSize.SMALL:
-                return MIN_PLAYERS;
-            case MapSize.MEDIUM:
-                return MED_PLAYERS;
-            case MapSize.LARGE:
-                return MAX_PLAYERS;
+    setupTurnOrder(room: GameRoom): string[] {
+        const playersWithSpeed = room.players.map((player) => ({
+            socketId: player.socketId,
+            speed: player.attributes.speed,
+        }));
+
+        playersWithSpeed.sort((a, b) => b.speed - a.speed);
+
+        const turnOrder: string[] = [];
+        let i = 0;
+
+        while (i < playersWithSpeed.length) {
+            const sameSpeedPlayers = playersWithSpeed.filter((p) => p.speed === playersWithSpeed[i].speed);
+            const shuffledSameSpeedPlayers = sameSpeedPlayers.sort(() => Math.random() - 0.5);
+
+            for (const player of shuffledSameSpeedPlayers) {
+                turnOrder.push(player.socketId);
+            }
+
+            i += sameSpeedPlayers.length;
         }
-    }
 
-    getGameBoardParameters(accessCode: number): GameBoardParameters {
-        return this.gameBoardRooms.get(accessCode);
+        return turnOrder;
     }
 }

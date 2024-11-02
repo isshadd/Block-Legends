@@ -1,8 +1,25 @@
+import { Game } from '@app/model/database/game';
+import { GameService } from '@app/services/game/game.service';
+import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
+
+export class PlayerAttributes {
+    life: number;
+    speed: number;
+    attack: number;
+    defense: number;
+}
 
 export interface PlayerCharacter {
     name: string;
     socketId: string;
+    attributes: PlayerAttributes;
+}
+
+export interface GameBoardParameters {
+    game: Game;
+    spawnPlaces: [number, string][];
+    turnOrder: string[];
 }
 
 export interface GameRoom {
@@ -11,6 +28,7 @@ export interface GameRoom {
     players: PlayerCharacter[];
     organizer: string;
     isLocked: boolean;
+    maxPlayers: number;
 }
 
 @Injectable()
@@ -18,6 +36,23 @@ export class GameSocketRoomService {
     private readonly logger = new Logger(GameSocketRoomService.name);
     private rooms: Map<number, GameRoom> = new Map();
     private playerRooms: Map<string, number> = new Map();
+    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+
+    constructor(private readonly gameService: GameService) {}
+
+    setSpawnCounter(gameSize: MapSize): number {
+        const MIN_PLAYERS = 2;
+        const MED_PLAYERS = 4;
+        const MAX_PLAYERS = 6;
+        switch (gameSize) {
+            case MapSize.SMALL:
+                return MIN_PLAYERS;
+            case MapSize.MEDIUM:
+                return MED_PLAYERS;
+            case MapSize.LARGE:
+                return MAX_PLAYERS;
+        }
+    }
 
     generateAccessCode(): number {
         const MIN_ACCESS_CODE = 1000;
@@ -27,6 +62,34 @@ export class GameSocketRoomService {
             accessCode = Math.floor(MIN_ACCESS_CODE + Math.random() * (MAX_ACCESS_CODE - MIN_ACCESS_CODE + 1));
         } while (this.rooms.has(accessCode));
         return accessCode;
+    }
+
+    getGameBoardParameters(accessCode: number): GameBoardParameters {
+        return this.gameBoardRooms.get(accessCode);
+    }
+
+    setGameBoardParameters(accessCode: number, gameBoardParameters: GameBoardParameters): void {
+        this.gameBoardRooms.set(accessCode, gameBoardParameters);
+    }
+
+    initRoomGameBoard(accessCode: number) {
+        const room = this.rooms.get(accessCode);
+
+        if (!room) {
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
+            return;
+        }
+
+        this.gameService.getGame(room.id).then((game) => {
+            this.setupGameBoardRoom(room.accessCode, game);
+        });
+    }
+
+    setupGameBoardRoom(accessCode: number, game: Game) {
+        this.gameBoardRooms.set(accessCode, { game, spawnPlaces: [], turnOrder: [] });
+        let room = this.rooms.get(accessCode);
+        room.maxPlayers = this.setSpawnCounter(game.size);
+        this.rooms.set(accessCode, room);
     }
 
     createGame(gameId: string, playerOrganizer: PlayerCharacter): GameRoom {
@@ -45,10 +108,16 @@ export class GameSocketRoomService {
             players: [playerOrganizer],
             organizer: playerOrganizer.socketId,
             isLocked: false,
+            maxPlayers: 0,
         };
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
-        this.logger.log(`Jeu crée avec ID: ${gameId} et code d'acces: ${accessCode}`);
+        this.initRoomGameBoard(accessCode);
+        this.logger.log(`
+            Jeu crée avec ID: ${gameId},
+            code d'acces: ${accessCode},
+            nb de joueurs max: ${newRoom.maxPlayers}
+            `);
         return newRoom;
     }
 
@@ -107,7 +176,7 @@ export class GameSocketRoomService {
 
     unlockRoom(accessCode: number, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId) {
+        if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
             this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
             return true;

@@ -18,26 +18,17 @@
 
         <app-timer [seconds]="300" [isBattle]="false"></app-timer>
 
-        <!-- Info component positioned on top of the map -->
-        <ng-container *ngIf="selectedPlayerCharacter">
-            <app-player-map-entity-info-view
-                [playerCharacter]="selectedPlayerCharacter!"
-                (close)="closePlayerInfoPanel()"
-                id="info-panel"
-            ></app-player-map-entity-info-view>
-        </ng-container>
-
-        <ng-container *ngIf="selectedTile">
-            <app-map-tile-info id="info-panel" [tile]="selectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
-        </ng-container>
+        @if(playPageMouseHandlerService.rightClickSelectedPlayerCharacter) {
+        <app-player-map-entity-info-view
+            [playerCharacter]="playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
+            (close)="closePlayerInfoPanel()"
+            id="info-panel"
+        ></app-player-map-entity-info-view>
+        } @if (playPageMouseHandlerService.rightSelectedTile) {
+        <app-map-tile-info id="info-panel" [tile]="playPageMouseHandlerService.rightSelectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        }
 
         <div class="action-container">
-            <div class="containers">
-                <app-placeable-entity-container [isItemContainer]="false"></app-placeable-entity-container>
-                <app-placeable-entity-container [isItemContainer]="false"></app-placeable-entity-container>
-            </div>
-
-            <!-- Buttons aligned to the right of the containers -->
             <div class="button-container">
                 <button class="action-button">Action</button>
                 <button class="action-button">Abandon</button>

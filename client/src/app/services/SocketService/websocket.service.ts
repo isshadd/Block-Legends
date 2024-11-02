@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService } from '@app/services/game-services/game.service';
+import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -11,6 +12,13 @@ export interface GameRoom {
     accessCode: number;
     players: PlayerCharacter[];
     isLocked: boolean;
+    maxPlayers: number;
+}
+
+export interface GameBoardParameters {
+    game: GameShared;
+    spawnPlaces: [number, string][];
+    turnOrder: string[];
 }
 
 @Injectable({
@@ -22,6 +30,8 @@ export class WebSocketService {
     players$ = this.playersSubject.asObservable();
     isLockedSubject = new BehaviorSubject<boolean>(false);
     isLocked$ = this.isLockedSubject.asObservable();
+    maxPlayersSubject = new BehaviorSubject<number>(0);
+    maxPlayers$ = this.maxPlayersSubject.asObservable();
     currentRoom: GameRoom;
 
     constructor(
@@ -112,6 +122,7 @@ export class WebSocketService {
                 localStorage.setItem('accessCode', response.accessCode.toString());
                 this.gameService.setAccessCode(response.accessCode);
                 this.isLockedSubject.next(response.isLocked);
+                this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
                 this.router.navigate(['/player-create-character'], {
                     queryParams: { roomId: response.accessCode },
                 });
@@ -136,6 +147,7 @@ export class WebSocketService {
 
         this.socket.on('roomLocked', (data: { message: string; isLocked: boolean }) => {
             this.isLockedSubject.next(data.isLocked);
+            this.maxPlayersSubject.next(this.maxPlayersSubject.value);
             alert(data.message);
         });
 
@@ -165,7 +177,9 @@ export class WebSocketService {
                 this.playersSubject.next([]);
 
                 // Important: Force navigate to home page
-                this.router.navigate(['/home']);
+                this.router.navigate(['/home']).then(() => {
+                    alert('Vous avez été expulsé de la salle');
+                });
                 // .then(() => {
                 //     // Optional: Refresh the page to ensure clean state
                 //     window.location.reload();
@@ -186,10 +200,8 @@ export class WebSocketService {
             this.router.navigate(['/home']);
         });
 
-        this.socket.on('organizerLeft', (data: { message: string }) => {
-            alert(data.message);
-            this.leaveGame();
-            this.router.navigate(['/home']);
+        this.socket.on('error', (message: string) => {
+            alert(message);
         });
     }
 }

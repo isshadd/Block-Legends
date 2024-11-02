@@ -1,32 +1,26 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameShared } from '@common/interfaces/game-shared';
-import { Subject, takeUntil } from 'rxjs';
-import { PlayGameBoardSocketService } from './play-game-board-socket.service';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Injectable({
     providedIn: 'root',
 })
-export class PlayGameBoardManagerService implements OnDestroy {
-    destroy$ = new Subject<void>();
-
+export class PlayGameBoardManagerService {
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
-        public playGameBoardSocketService: PlayGameBoardSocketService,
-    ) {
-        this.playGameBoardSocketService.signalInitGameBoard$.pipe(takeUntil(this.destroy$)).subscribe((game) => {
-            this.initGameBoard(game);
-        });
-        this.playGameBoardSocketService.signalInitCharacters$.pipe(takeUntil(this.destroy$)).subscribe((spawnPlaces) => {
-            this.initCharacters(spawnPlaces);
-        });
+    ) {}
 
-        this.playGameBoardSocketService.initGameBoard(webSocketService.getRoomInfo().accessCode);
+    init(gameBoardParameters: GameBoardParameters) {
+        this.initGameBoard(gameBoardParameters.game);
+        this.initCharacters(gameBoardParameters.spawnPlaces);
+        // for (const player of gameBoardParameters.turnOrder) {
+        //     console.log(this.webSocketService.getRoomInfo().players.find((p) => p.socketId === player));
+        // }
     }
 
     initGameBoard(game: GameShared) {
@@ -38,8 +32,8 @@ export class PlayGameBoardManagerService implements OnDestroy {
         const availableTiles = [...tilesWithSpawn];
 
         for (const spawnPlace of spawnPlaces) {
-            const [index, playerName] = spawnPlace;
-            const player = this.webSocketService.getRoomInfo().players.find((p) => p.name === playerName);
+            const [index, playerSocketId] = spawnPlace;
+            const player = this.webSocketService.getRoomInfo().players.find((p) => p.socketId === playerSocketId);
             const tile = tilesWithSpawn[index];
 
             if (player && tile) {
@@ -54,16 +48,15 @@ export class PlayGameBoardManagerService implements OnDestroy {
         }
     }
 
-    ngOnDestroy() {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
-
     getCurrentGrid(): Tile[][] {
         return this.gameMapDataManagerService.getCurrentGrid();
     }
 
     findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.mapEntity === playerMapEntity) || null;
+    }
+
+    findPlayerFromName(name: string): PlayerCharacter | null {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
     }
 }

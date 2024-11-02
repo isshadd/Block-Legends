@@ -19,7 +19,6 @@ import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-
 export class PlaceableEntityContainerComponent {
     @Input() containerTitle: string;
     @Input() containerItems: PlaceableEntity[];
-    @Input() isItemContainer: boolean;
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
