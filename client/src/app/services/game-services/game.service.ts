@@ -14,12 +14,19 @@ export class GameService {
     accessCode$ = this.accessCodeSubject.asObservable();
     character$ = this.characterSubject.asObservable();
 
+    private currentPlayerSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter(''));
+    currentPlayer$ = this.currentPlayerSubject.asObservable();
+
     setAccessCode(code: number) {
         this.accessCodeSubject.next(code);
     }
 
     setCharacter(character: PlayerCharacter) {
         this.characterSubject.next(character);
+    }
+
+    setCurrentPlayer(player: PlayerCharacter) {
+        this.currentPlayerSubject.next(player);
     }
 
     generateVirtualCharacter(index: number): PlayerCharacter {
