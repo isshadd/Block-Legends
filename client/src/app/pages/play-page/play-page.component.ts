@@ -18,7 +18,9 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
 export class PlayPageComponent {
     selectedPlayerCharacter: PlayerCharacter | null = null;
     selectedTile: Tile | null = null;
-    constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {}
+    constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
+        this.playGameBoardManagerService.init();
+    }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         if (event.button == 2) {

@@ -18,7 +18,10 @@ export class PlayGameBoardManagerService implements OnDestroy {
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
-    ) {
+    ) {}
+
+    init() {
+        this.playGameBoardSocketService.init(this.webSocketService.socket);
         this.playGameBoardSocketService.signalInitGameBoard$.pipe(takeUntil(this.destroy$)).subscribe((game) => {
             this.initGameBoard(game);
         });
@@ -26,7 +29,7 @@ export class PlayGameBoardManagerService implements OnDestroy {
             this.initCharacters(spawnPlaces);
         });
 
-        this.playGameBoardSocketService.initGameBoard(webSocketService.getRoomInfo().accessCode);
+        this.playGameBoardSocketService.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
     }
 
     initGameBoard(game: GameShared) {

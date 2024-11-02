@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Subject } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
+import { Socket } from 'socket.io-client';
 
 @Injectable({
     providedIn: 'root',
@@ -16,8 +15,8 @@ export class PlayGameBoardSocketService {
 
     socket: Socket;
 
-    constructor() {
-        this.socket = io(environment.socketIoUrl);
+    init(socket: Socket) {
+        this.socket = socket;
         this.setupSocketListeners();
     }
 
