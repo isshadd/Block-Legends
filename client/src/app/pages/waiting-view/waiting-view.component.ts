@@ -74,8 +74,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.playerLeave();
             }
         });
-
-        console.log(this.accessCode);
     }
 
     addVirtualPlayers(): void {
@@ -92,7 +90,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     playerLeave(): void {
         this.webSocketService.leaveGame();
         this.router.navigate(['/home']).then(() => {
-            alert('Le créateur de la partie a quitté');
+            location.reload();
         });
     }
 

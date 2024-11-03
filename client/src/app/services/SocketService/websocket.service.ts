@@ -144,24 +144,18 @@ export class WebSocketService {
                     resolve(true);
                 });
 
-                // Then perform cleanup
                 if (this.currentRoom.accessCode) {
                     this.socket.emit('leaveGame', this.currentRoom.accessCode);
                 }
-
-                // Clear all local data
                 this.gameService.clearGame();
                 this.isLockedSubject.next(false);
                 this.playersSubject.next([]);
-
-                // Important: Force navigate to home page
                 this.router.navigate(['/home']).then(() => {
-                    alert('Vous avez été expulsé de la salle');
+                    alert('Vous avez été expulsé de la salle, redirection en cours...');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 });
-                // .then(() => {
-                //     // Optional: Refresh the page to ensure clean state
-                //     window.location.reload();
-                // });
             }
         });
 
@@ -177,9 +171,14 @@ export class WebSocketService {
         });
 
         this.socket.on('roomClosed', () => {
-            alert("La salle a été fermée par l'organisateur");
-            this.leaveGame();
-            this.router.navigate(['/home']);
+            this.currentRoom.players.forEach((player) => {
+                if (!player.isOrganizer) {
+                    this.leaveGame();
+                    this.router.navigate(['/home']).then(() => {
+                        location.reload();
+                    });
+                }
+            });
         });
 
         this.socket.on('error', (message: string) => {
