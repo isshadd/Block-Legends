@@ -17,7 +17,11 @@
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
         ></app-map>
 
-        <app-timer [seconds]="300" [isBattle]="false"></app-timer>
+        <app-timer
+            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [seconds]="playGameBoardManagerService.currentTime"
+            [isBattle]="playGameBoardManagerService.isBattleOn"
+        ></app-timer>
 
         @if(playPageMouseHandlerService.rightClickSelectedPlayerCharacter) {
         <app-player-map-entity-info-view

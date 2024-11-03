@@ -10,6 +10,12 @@ import { GameShared } from '@common/interfaces/game-shared';
     providedIn: 'root',
 })
 export class PlayGameBoardManagerService {
+    currentTime: number = 0;
+    isBattleOn: boolean = false;
+    currentPlayerIdTurn: string = '';
+    isUserTurn: boolean = false;
+    turnOrder: string[];
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
@@ -18,9 +24,7 @@ export class PlayGameBoardManagerService {
     init(gameBoardParameters: GameBoardParameters) {
         this.initGameBoard(gameBoardParameters.game);
         this.initCharacters(gameBoardParameters.spawnPlaces);
-        // for (const player of gameBoardParameters.turnOrder) {
-        //     console.log(this.webSocketService.getRoomInfo().players.find((p) => p.socketId === player));
-        // }
+        this.turnOrder = gameBoardParameters.turnOrder;
     }
 
     initGameBoard(game: GameShared) {
@@ -58,5 +62,9 @@ export class PlayGameBoardManagerService {
 
     findPlayerFromName(name: string): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
+    }
+
+    getCurrentPlayerTurnName(): string {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === this.currentPlayerIdTurn)?.name || '';
     }
 }

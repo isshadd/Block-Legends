@@ -8,6 +8,7 @@ import { MapComponent } from '@app/components/game-board-components/map/map.comp
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
+import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { TimerComponent } from '@app/components/timer/timer.component';

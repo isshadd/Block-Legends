@@ -16,6 +16,17 @@ export interface PlayerCharacter {
     attributes: PlayerAttributes;
 }
 
+export enum GameTimerState {
+    ACTIVE_TURN,
+    PREPARING_TURN,
+}
+
+export interface GameTimer {
+    time: number;
+    isPaused: boolean;
+    state: GameTimerState;
+}
+
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
@@ -29,6 +40,7 @@ export interface GameRoom {
     organizer: string;
     isLocked: boolean;
     maxPlayers: number;
+    currentPlayerTurn: string;
 }
 
 @Injectable()
@@ -36,7 +48,8 @@ export class GameSocketRoomService {
     private readonly logger = new Logger(GameSocketRoomService.name);
     private rooms: Map<number, GameRoom> = new Map();
     private playerRooms: Map<string, number> = new Map();
-    private gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+    gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+    gameTimerRooms: Map<number, GameTimer> = new Map();
 
     constructor(private readonly gameService: GameService) {}
 
@@ -64,14 +77,6 @@ export class GameSocketRoomService {
         return accessCode;
     }
 
-    getGameBoardParameters(accessCode: number): GameBoardParameters {
-        return this.gameBoardRooms.get(accessCode);
-    }
-
-    setGameBoardParameters(accessCode: number, gameBoardParameters: GameBoardParameters): void {
-        this.gameBoardRooms.set(accessCode, gameBoardParameters);
-    }
-
     initRoomGameBoard(accessCode: number) {
         const room = this.rooms.get(accessCode);
 
@@ -92,6 +97,14 @@ export class GameSocketRoomService {
         this.rooms.set(accessCode, room);
     }
 
+    setCurrentPlayerTurn(accessCode: number, socketId: string) {
+        const room = this.rooms.get(accessCode);
+        if (room) {
+            room.currentPlayerTurn = socketId;
+            this.rooms.set(accessCode, room);
+        }
+    }
+
     createGame(gameId: string, playerOrganizer: PlayerCharacter): GameRoom {
         let accessCode: number;
         let isUnique = false;
@@ -109,10 +122,12 @@ export class GameSocketRoomService {
             organizer: playerOrganizer.socketId,
             isLocked: false,
             maxPlayers: 0,
+            currentPlayerTurn: playerOrganizer.socketId,
         };
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
+        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PREPARING_TURN });
         this.logger.log(`
             Jeu crée avec ID: ${gameId},
             code d'acces: ${accessCode},
@@ -148,13 +163,17 @@ export class GameSocketRoomService {
         const accessCode = this.playerRooms.get(socketId);
         if (accessCode) {
             const room = this.rooms.get(accessCode);
+            const gameBoardRoom = this.gameBoardRooms.get(accessCode);
             if (room) {
                 room.players = room.players.filter((player) => player.socketId !== socketId);
+                gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
                 this.playerRooms.delete(socketId);
                 this.logger.log(`Joueur ${socketId} enlevé du room ${accessCode}`);
 
                 if (room.players.length === 0) {
                     this.rooms.delete(accessCode);
+                    this.gameBoardRooms.delete(accessCode);
+                    this.gameTimerRooms.delete(accessCode);
                     this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
@@ -186,13 +205,17 @@ export class GameSocketRoomService {
 
     kickPlayer(accessCode: number, playerSocketId: string, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
+        const gameBoardRoom = this.gameBoardRooms.get(accessCode);
         if (room && room.organizer === clientId) {
             room.players = room.players.filter((p) => p.socketId !== playerSocketId);
+            gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== clientId);
             this.playerRooms.delete(playerSocketId);
             this.logger.log(`Joueur ${playerSocketId} expulsé du room ${accessCode} par organisateur ${clientId}`);
 
             if (room.players.length === 0) {
                 this.rooms.delete(accessCode);
+                this.gameBoardRooms.delete(accessCode);
+                this.gameTimerRooms.delete(accessCode);
                 this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
             }
 

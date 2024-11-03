@@ -28,5 +28,19 @@ export class PlayGameBoardSocketService {
         this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);
         });
+
+        this.socket.on('setTime', (time: number) => {
+            this.playGameBoardManagerService.currentTime = time;
+        });
+
+        this.socket.on('endTurn', () => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = '';
+            this.playGameBoardManagerService.isUserTurn = false;
+        });
+
+        this.socket.on('startTurn', (playerIdTurn: string) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+        });
     }
 }
