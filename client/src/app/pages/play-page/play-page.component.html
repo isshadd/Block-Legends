@@ -1,8 +1,14 @@
 <div id="page-container">
     <div id="side-menu">
-        <button class="dark-button" routerLink="/home">Retour</button>
+        <button class="dark-button" (click)="leaveGame()">Sortir</button>
+        <app-player-map-entity-info-view
+            [scale]="1.25"
+            [showButton]="false"
+            [playerCharacter]="mainPlayer!"
+            (close)="closePlayerInfoPanel()"
+        ></app-player-map-entity-info-view>
+        <app-players-list></app-players-list>
     </div>
-
     <div id="map-wrapper">
         <app-map
             id="map-container"
@@ -10,19 +16,28 @@
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
         ></app-map>
 
-        @if(this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter){
+        <app-timer
+            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [seconds]="playGameBoardManagerService.currentTime"
+            [isBattle]="playGameBoardManagerService.isBattleOn"
+        ></app-timer>
+
+        @if(playPageMouseHandlerService.rightClickSelectedPlayerCharacter) {
         <app-player-map-entity-info-view
-            [playerCharacter]="this.playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
+            [playerCharacter]="playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
             (close)="closePlayerInfoPanel()"
             id="info-panel"
-        >
-        </app-player-map-entity-info-view>
-        } @if(this.playPageMouseHandlerService.rightSelectedTile){
-        <app-map-tile-info
-            id="info-panel"
-            [tile]="this.playPageMouseHandlerService.rightSelectedTile"
-            (close)="closeTileInfoPanel()"
-        ></app-map-tile-info>
+        ></app-player-map-entity-info-view>
+        } @if (playPageMouseHandlerService.rightSelectedTile) {
+        <app-map-tile-info id="info-panel" [tile]="playPageMouseHandlerService.rightSelectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
         }
+
+        <div class="action-container">
+            <div class="button-container">
+                <button class="action-button">Action</button>
+                <button class="action-button">Abandon</button>
+                <button class="action-button" (click)="endTurn()">Fin de tour</button>
+            </div>
+        </div>
     </div>
 </div>

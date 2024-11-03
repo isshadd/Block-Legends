@@ -223,7 +223,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('getGameParameters')
     sendGameParameters(accessCode: number) {
-        const gameBoardParameters = this.gameSocketRoomService.getGameBoardParameters(accessCode);
+        const gameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
 
         if (!gameBoardParameters) {
             this.server.to(accessCode.toString()).emit('error', { message: 'Room pas trouvé' });

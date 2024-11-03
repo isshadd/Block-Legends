@@ -1,5 +1,7 @@
-<div id="info-view">
-    <button class="close-button" (click)="closePanel()">×</button>
+<div id="info-view" [ngStyle]="{ transform: 'scale(' + scale + ')' }">
+    <div *ngIf="showButton">
+        <button class="close-button" (click)="closePanel()">×</button>
+    </div>
     <div class="info-content">
         <div class="player-info">{{ playerCharacter.name }}</div>
         <div class="player-info-details">

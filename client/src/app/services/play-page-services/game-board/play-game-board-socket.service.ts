@@ -20,13 +20,41 @@ export class PlayGameBoardSocketService {
         this.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
     }
 
-    initGameBoard(accessCode: number) {
+    initGameBoard(accessCode: number): void {
         this.socket.emit('initGameBoard', accessCode);
     }
 
-    private setupSocketListeners() {
+    endTurn(): void {
+        if (this.playGameBoardManagerService.isUserTurn) {
+            this.socket.emit('userEndTurn', this.webSocketService.getRoomInfo().accessCode);
+        }
+    }
+
+    leaveGame(): void {
+        this.socket.disconnect();
+    }
+
+    private setupSocketListeners(): void {
         this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);
+        });
+
+        this.socket.on('setTime', (time: number) => {
+            this.playGameBoardManagerService.currentTime = time;
+        });
+
+        this.socket.on('endTurn', () => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = '';
+            this.playGameBoardManagerService.isUserTurn = false;
+        });
+
+        this.socket.on('startTurn', (playerIdTurn: string) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+        });
+
+        this.socket.on('gameBoardPlayerLeft', (playerId: string) => {
+            this.playGameBoardManagerService.removePlayerFromMap(playerId);
         });
     }
 }
