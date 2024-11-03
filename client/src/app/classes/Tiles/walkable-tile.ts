@@ -3,6 +3,7 @@ import { Tile } from './tile';
 
 export class WalkableTile extends Tile {
     player: PlayerMapEntity | null = null;
+    moveCost: number = 1;
 
     isWalkable(): boolean {
         return true;
