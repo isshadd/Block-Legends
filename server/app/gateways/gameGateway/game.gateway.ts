@@ -7,7 +7,7 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
-    private readonly logger = new Logger(GameGateway.name);
+    private logger = new Logger(GameGateway.name);
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
