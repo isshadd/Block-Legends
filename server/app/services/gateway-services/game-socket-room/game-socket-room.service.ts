@@ -133,6 +133,8 @@ export class GameSocketRoomService {
             code d'acces: ${accessCode},
             nb de joueurs max: ${newRoom.maxPlayers}
             `);
+        this.initRoomGameBoard(accessCode);
+        this.logger.log(`maxPlayers mis à jour à ${newRoom.maxPlayers} pour la salle ${accessCode}`);
         return newRoom;
     }
 

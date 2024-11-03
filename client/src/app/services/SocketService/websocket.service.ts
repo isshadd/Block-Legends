@@ -191,6 +191,15 @@ export class WebSocketService {
             }
         });
 
+        this.socket.on('playerLeft', () => {
+            localStorage.removeItem('roomId');
+            localStorage.removeItem('accessCode');
+            this.gameService.clearGame();
+            this.isLockedSubject.next(false);
+            this.playersSubject.next([]);
+            this.socket.disconnect();
+        });
+
         this.socket.on('gameStarted', () => {
             this.router.navigate(['/play-page']);
         });

@@ -22,16 +22,22 @@
     <div class="admin-buttons">
         <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
         <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
-        <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false">Deverouiller la salle</button>
+        <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false || playersCounter === maxPlayers">
+            Deverouiller la salle
+        </button>
         <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
-    }
-
+    } @if((this.gameService.character$ | async)?.isOrganizer) {
     <div>
         <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
     </div>
+    } @else {
+    <div>
+        <button class="dark-button" type="button" (click)="playerNonOrgLeave()">Quitter la partie</button>
+    </div>
+    }
 
     <div class="chat">
         <h3>Clavardage</h3>

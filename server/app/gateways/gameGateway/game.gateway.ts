@@ -157,6 +157,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 message: "L'organisateur a quitté la partie",
             });
             return;
+        } else {
+            client.emit('playerLeft');
         }
 
         const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
