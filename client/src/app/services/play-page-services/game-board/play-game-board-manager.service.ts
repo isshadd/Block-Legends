@@ -12,6 +12,8 @@ import { GameShared } from '@common/interfaces/game-shared';
 export class PlayGameBoardManagerService {
     currentTime: number = 0;
     isBattleOn: boolean = false;
+    currentPlayerIdTurn: string = '';
+    isUserTurn: boolean = false;
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -58,5 +60,9 @@ export class PlayGameBoardManagerService {
 
     findPlayerFromName(name: string): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
+    }
+
+    getCurrentPlayerTurnName(): string {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === this.currentPlayerIdTurn)?.name || '';
     }
 }

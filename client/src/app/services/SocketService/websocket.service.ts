@@ -13,6 +13,7 @@ export interface GameRoom {
     players: PlayerCharacter[];
     isLocked: boolean;
     maxPlayers: number;
+    currentPlayerTurn: string;
 }
 
 export interface GameBoardParameters {
