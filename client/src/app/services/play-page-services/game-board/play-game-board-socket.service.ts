@@ -44,6 +44,9 @@ export class PlayGameBoardSocketService {
         });
 
         this.socket.on('endTurn', () => {
+            if (this.playGameBoardManagerService.isUserTurn) {
+                this.playGameBoardManagerService.endTurn();
+            }
             this.playGameBoardManagerService.currentPlayerIdTurn = '';
             this.playGameBoardManagerService.isUserTurn = false;
         });

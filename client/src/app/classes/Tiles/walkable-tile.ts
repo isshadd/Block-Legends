@@ -9,6 +9,10 @@ export class WalkableTile extends Tile {
         return true;
     }
 
+    hasPlayer(): boolean {
+        return !!this.player;
+    }
+
     setPlayer(player: PlayerMapEntity) {
         this.player = player;
         player.setCoordinates(this.coordinates);

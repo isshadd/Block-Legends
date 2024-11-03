@@ -3,6 +3,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -16,6 +17,7 @@ export class PlayGameBoardManagerService {
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
     userCurrentMovePoints: number = 0;
+    userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
 
     constructor(
@@ -64,10 +66,36 @@ export class PlayGameBoardManagerService {
         this.userCurrentMovePoints = userPlayerCharacter.attributes.speed;
 
         this.setPossibleMoves(userPlayerCharacter);
+        this.showPossibleMoves();
     }
 
     setPossibleMoves(playerCharacter: PlayerCharacter) {
-        this.gameMapDataManagerService.getPossibleMovementTiles(playerCharacter.mapEntity.coordinates, this.userCurrentMovePoints);
+        this.userCurrentPossibleMoves = this.gameMapDataManagerService.getPossibleMovementTiles(
+            playerCharacter.mapEntity.coordinates,
+            this.userCurrentMovePoints,
+        );
+    }
+
+    showPossibleMoves() {
+        this.userCurrentPossibleMoves.forEach((path, tile) => {
+            tile.visibleState = VisibleState.Valid;
+        });
+    }
+
+    endTurn() {
+        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+
+        if (!this.isUserTurn || !userPlayerCharacter) {
+            return;
+        }
+
+        this.hidePossibleMoves();
+    }
+
+    hidePossibleMoves() {
+        this.userCurrentPossibleMoves.forEach((path, tile) => {
+            tile.visibleState = VisibleState.NotSelected;
+        });
     }
 
     removePlayerFromMap(playerId: string) {

@@ -51,6 +51,10 @@ export class Pathfinder {
                 }
                 const walkableTile = neighbor as WalkableTile;
 
+                if (walkableTile.hasPlayer()) {
+                    return;
+                }
+
                 const newCost = currentNode.cost + walkableTile.moveCost;
                 if (newCost > this.movementPoints) {
                     return;
