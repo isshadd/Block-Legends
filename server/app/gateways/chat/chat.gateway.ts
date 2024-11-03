@@ -16,7 +16,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, word: string) {
         socket.emit(ChatEvents.WordValidated, word?.length > WORD_MIN_LENGTH);
-    }
+    }           
 
     @SubscribeMessage(ChatEvents.ValidateACK)
     validateWithAck(_: Socket, word: string) {
@@ -24,8 +24,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: { playerName: string, content: string }) {
-        this.server.emit(ChatEvents.MassMessage, `${message.playerName} : ${message.content}`);
+    broadcastAll(socket: Socket, message: {time: Date, sender: string, content: string }) {
+        this.server.emit(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`);
     }
 
     @SubscribeMessage(ChatEvents.JoinRoom)

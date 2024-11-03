@@ -1,12 +1,11 @@
 <div class="chat">
-    <h3>Clavardage</h3>
-    <div class="messages-container" #chatMessages>
-      <ul class="messages">
-        <li *ngFor="let msg of messages" >{{ msg }}</li>
-      </ul>
-    </div>
-    <input [(ngModel)]="broadcastMessage" (keydown.enter)="broadcastMessageToAll()" type="text"/>
+  <h3>Clavardage</h3>
+  <div class="messages-container" #chatMessages>
+    <ul class="messages">
+      <li *ngFor="let msg of messages; trackBy: trackByIndex">{{ msg }}</li>
+    </ul>
+  </div>
+  <input [(ngModel)]="messageToSend" (keydown.enter)="sendMessage()" type="text" placeholder="Écrivez votre message..."/>
 </div>
-
 
 

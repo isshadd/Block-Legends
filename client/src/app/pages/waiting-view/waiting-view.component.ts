@@ -1,19 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+//import { ChangeDetectionStrategy } from '@angular/core';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
     imports: [CommonModule, ClavardageComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    //changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode$ = this.gameService.accessCode$;
@@ -32,9 +33,12 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         private router: Router,
         private webSocketService: WebSocketService,
         private route: ActivatedRoute,
+        private socketStateService: SocketStateService,
     ) {}
 
     ngOnInit(): void {
+        this.socketStateService.setActiveSocket(this.webSocketService);
+
         this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
             this.gameId = params.roomId;
         });
@@ -77,6 +81,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.gameService.clearLocalStorage();
+        this.socketStateService.clearSocket();
         this.destroy$.next();
         this.destroy$.complete();
     }
