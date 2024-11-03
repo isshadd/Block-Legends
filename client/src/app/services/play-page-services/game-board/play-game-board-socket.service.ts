@@ -20,11 +20,17 @@ export class PlayGameBoardSocketService {
         this.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
     }
 
-    initGameBoard(accessCode: number) {
+    initGameBoard(accessCode: number): void {
         this.socket.emit('initGameBoard', accessCode);
     }
 
-    private setupSocketListeners() {
+    endTurn(): void {
+        if (this.playGameBoardManagerService.isUserTurn) {
+            this.socket.emit('userEndTurn', this.webSocketService.getRoomInfo().accessCode);
+        }
+    }
+
+    private setupSocketListeners(): void {
         this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);
         });

@@ -55,7 +55,6 @@ export class PlayPageComponent {
     }
 
     endTurn(): void {
-        this.router.navigate(['/administration-game']);
-        return;
+        this.playGameBoardSocketService.endTurn();
     }
 }

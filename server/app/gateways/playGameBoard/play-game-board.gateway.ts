@@ -22,6 +22,9 @@ export class PlayGameBoardGateway {
         this.playGameBoardTimeService.signalRoomTimeOut$.subscribe((accessCode) => {
             this.handleTimeOut(accessCode);
         });
+        this.gameSocketRoomService.signalPlayerLeftRoom$.subscribe(({ accessCode, playerSocketId }) => {
+            this.handlePlayerLeftRoom(playerSocketId);
+        });
     }
 
     @SubscribeMessage('initGameBoard')
@@ -36,6 +39,24 @@ export class PlayGameBoardGateway {
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
         }
+    }
+
+    @SubscribeMessage('userEndTurn')
+    handleUserEndTurn(client: Socket, accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+
+        if (!room) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ACTIVE_TURN) {
+            this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
+            return;
+        }
+
+        this.handleTimeOut(accessCode);
     }
 
     startRoomGame(accessCode: number) {
@@ -78,6 +99,32 @@ export class PlayGameBoardGateway {
                 this.playGameBoardTimeService.setTimerActiveTurn(accessCode);
                 this.updateRoomTime(accessCode);
                 break;
+        }
+    }
+
+    handlePlayerLeftRoom(socketId: string) {
+        const accessCode = this.gameSocketRoomService.playerRooms.get(socketId);
+
+        if (accessCode) {
+            const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+            if (gameBoardRoom) {
+                if (room.currentPlayerTurn === socketId) {
+                    switch (this.gameSocketRoomService.gameTimerRooms.get(accessCode).state) {
+                        case GameTimerState.ACTIVE_TURN:
+                            this.handleTimeOut(accessCode);
+                            break;
+
+                        case GameTimerState.PREPARING_TURN:
+                            this.playGameBoardSocketService.changeTurn(accessCode);
+                            this.handleTimeOut(accessCode);
+                    }
+                }
+
+                gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
+                gameBoardRoom.turnOrder = gameBoardRoom.turnOrder.filter((id) => id !== socketId);
+            }
         }
     }
 }
