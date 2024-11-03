@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
+import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
@@ -24,6 +25,7 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
     imports: [
         MapComponent,
         RouterModule,
+        ClavardageComponent,
         InfosGameComponent,
         PlayerMapEntityInfoViewComponent,
         PlayerInfoComponent,
