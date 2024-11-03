@@ -18,4 +18,12 @@ export class TerrainTile extends Tile {
         this.player = player;
         player.setCoordinates(this.coordinates);
     }
+
+    removePlayer() {
+        this.player = null;
+    }
+
+    removeItem() {
+        this.item = null;
+    }
 }

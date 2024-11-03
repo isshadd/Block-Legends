@@ -123,6 +123,8 @@ export class PlayGameBoardGateway {
 
                 gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
                 gameBoardRoom.turnOrder = gameBoardRoom.turnOrder.filter((id) => id !== socketId);
+
+                this.server.to(accessCode.toString()).emit('gameBoardPlayerLeft', socketId);
             }
         }
     }

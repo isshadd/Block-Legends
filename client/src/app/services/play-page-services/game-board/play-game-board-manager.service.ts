@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
@@ -52,6 +53,20 @@ export class PlayGameBoardManagerService {
         }
     }
 
+    removePlayerFromMap(playerId: string) {
+        const playerCharacter = this.findPlayerFromSocketId(playerId);
+
+        if (playerCharacter) {
+            const playerMapEntity = playerCharacter.mapEntity;
+
+            const tile: TerrainTile = this.gameMapDataManagerService.getTileAt(playerMapEntity.coordinates) as TerrainTile;
+            tile.removePlayer();
+
+            const spawnTile: TerrainTile = this.gameMapDataManagerService.getTileAt(playerMapEntity.spawnCoordinates) as TerrainTile;
+            spawnTile.removeItem();
+        }
+    }
+
     getCurrentGrid(): Tile[][] {
         return this.gameMapDataManagerService.getCurrentGrid();
     }
@@ -62,6 +77,10 @@ export class PlayGameBoardManagerService {
 
     findPlayerFromName(name: string): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
+    }
+
+    findPlayerFromSocketId(socketId: string): PlayerCharacter | null {
+        return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === socketId) || null;
     }
 
     getCurrentPlayerTurnName(): string {

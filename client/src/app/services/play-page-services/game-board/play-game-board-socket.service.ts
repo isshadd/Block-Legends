@@ -31,7 +31,7 @@ export class PlayGameBoardSocketService {
     }
 
     leaveGame(): void {
-        this.webSocketService.leaveGame();
+        this.socket.disconnect();
     }
 
     private setupSocketListeners(): void {
@@ -51,6 +51,10 @@ export class PlayGameBoardSocketService {
         this.socket.on('startTurn', (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+        });
+
+        this.socket.on('gameBoardPlayerLeft', (playerId: string) => {
+            this.playGameBoardManagerService.removePlayerFromMap(playerId);
         });
     }
 }
