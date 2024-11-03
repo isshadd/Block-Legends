@@ -13,6 +13,7 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
+import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
 
 @Injectable({
@@ -146,7 +147,10 @@ export class GameMapDataManagerService {
         return tilesWithSpawn;
     }
 
-    getPossibleMovementTiles(coordinates: Vec2, movePoints: number) {}
+    getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
+        const pathfinder = new Pathfinder(this, movePoints);
+        return pathfinder.findAllReachableTiles(coordinates);
+    }
 
     getTileAt(coordinates: Vec2): Tile | null {
         if (coordinates.x < 0 || coordinates.x >= this.currentGrid.length || coordinates.y < 0 || coordinates.y >= this.currentGrid.length)
