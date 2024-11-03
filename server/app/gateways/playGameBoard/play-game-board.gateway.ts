@@ -1,4 +1,4 @@
-import { GameBoardParameters, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameBoardParameters, GameSocketRoomService, GameTimerState } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
 import { Injectable, Logger } from '@nestjs/common';
@@ -30,6 +30,8 @@ export class PlayGameBoardGateway {
 
         if (gameBoardParameters) {
             client.emit('initGameBoardParameters', gameBoardParameters);
+            this.playGameBoardTimeService.setTimerPreparingTurn(accessCode);
+            this.handleTimePassed(accessCode);
             this.playGameBoardTimeService.resumeTimer(accessCode);
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
@@ -46,9 +48,19 @@ export class PlayGameBoardGateway {
     }
 
     handleTimeOut(accessCode: number) {
-        const turnLength = 30;
-        this.gameSocketRoomService.gameTimerRooms.get(accessCode).time = turnLength;
-        this.handleTimePassed(accessCode);
-        this.server.to(accessCode.toString()).emit('timeOut');
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+
+        switch (gameTimer.state) {
+            case GameTimerState.ACTIVE_TURN:
+                this.playGameBoardTimeService.setTimerPreparingTurn(accessCode);
+                this.handleTimePassed(accessCode);
+                break;
+            case GameTimerState.PREPARING_TURN:
+                this.playGameBoardTimeService.setTimerActiveTurn(accessCode);
+                this.handleTimePassed(accessCode);
+                break;
+            case GameTimerState.WAITING_BATTLE:
+                break;
+        }
     }
 }

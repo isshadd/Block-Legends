@@ -16,9 +16,16 @@ export interface PlayerCharacter {
     attributes: PlayerAttributes;
 }
 
+export enum GameTimerState {
+    ACTIVE_TURN,
+    PREPARING_TURN,
+    WAITING_BATTLE,
+}
+
 export interface GameTimer {
     time: number;
     isPaused: boolean;
+    state: GameTimerState;
 }
 
 export interface GameBoardParameters {
@@ -111,7 +118,7 @@ export class GameSocketRoomService {
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
-        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true });
+        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PREPARING_TURN });
         this.logger.log(`
             Jeu crée avec ID: ${gameId},
             code d'acces: ${accessCode},

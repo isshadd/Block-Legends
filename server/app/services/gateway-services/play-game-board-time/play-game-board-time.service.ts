@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
+import { GameSocketRoomService, GameTimerState } from '../game-socket-room/game-socket-room.service';
 
 @Injectable()
 export class PlayGameBoardTimeService {
+    readonly PREPARING_TURN_TIME = 3;
+    readonly ACTIVE_TURN_TIME = 30;
+
     signalRoomTimeOut = new Subject<number>();
     signalRoomTimeOut$ = this.signalRoomTimeOut.asObservable();
 
@@ -31,6 +34,18 @@ export class PlayGameBoardTimeService {
                 }
             }
         });
+    }
+
+    setTimerPreparingTurn(accessCode: number): void {
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        gameTimer.state = GameTimerState.PREPARING_TURN;
+        gameTimer.time = this.PREPARING_TURN_TIME;
+    }
+
+    setTimerActiveTurn(accessCode: number): void {
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        gameTimer.state = GameTimerState.ACTIVE_TURN;
+        gameTimer.time = this.ACTIVE_TURN_TIME;
     }
 
     pauseTimer(accessCode: number): void {
