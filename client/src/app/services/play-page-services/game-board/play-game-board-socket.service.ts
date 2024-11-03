@@ -51,6 +51,9 @@ export class PlayGameBoardSocketService {
         this.socket.on('startTurn', (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+            if (this.playGameBoardManagerService.isUserTurn) {
+                this.playGameBoardManagerService.startTurn();
+            }
         });
 
         this.socket.on('gameBoardPlayerLeft', (playerId: string) => {

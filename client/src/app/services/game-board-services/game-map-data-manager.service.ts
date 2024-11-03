@@ -146,8 +146,31 @@ export class GameMapDataManagerService {
         return tilesWithSpawn;
     }
 
-    getTileAt(coordinates: Vec2): Tile {
+    getPossibleMovementTiles(coordinates: Vec2, movePoints: number) {}
+
+    getTileAt(coordinates: Vec2): Tile | null {
+        if (coordinates.x < 0 || coordinates.x >= this.currentGrid.length || coordinates.y < 0 || coordinates.y >= this.currentGrid.length)
+            return null;
         return this.currentGrid[coordinates.x][coordinates.y];
+    }
+
+    getNeighbours(tile: Tile): Tile[] {
+        const neighbours: Tile[] = [];
+        const directions: Vec2[] = [
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: -1 },
+        ];
+
+        directions.forEach((direction) => {
+            const neighbour = this.getTileAt({ x: tile.coordinates.x + direction.x, y: tile.coordinates.y + direction.y });
+            if (neighbour) {
+                neighbours.push(neighbour);
+            }
+        });
+
+        return neighbours;
     }
 
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {

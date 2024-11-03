@@ -15,6 +15,7 @@ export class PlayGameBoardManagerService {
     isBattleOn: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
+    userCurrentMovePoints: number = 0;
     turnOrder: string[];
 
     constructor(
@@ -53,6 +54,22 @@ export class PlayGameBoardManagerService {
         }
     }
 
+    startTurn() {
+        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+
+        if (!this.isUserTurn || !userPlayerCharacter) {
+            return;
+        }
+
+        this.userCurrentMovePoints = userPlayerCharacter.attributes.speed;
+
+        this.setPossibleMoves(userPlayerCharacter);
+    }
+
+    setPossibleMoves(playerCharacter: PlayerCharacter) {
+        this.gameMapDataManagerService.getPossibleMovementTiles(playerCharacter.mapEntity.coordinates, this.userCurrentMovePoints);
+    }
+
     removePlayerFromMap(playerId: string) {
         const playerCharacter = this.findPlayerFromSocketId(playerId);
 
@@ -79,7 +96,10 @@ export class PlayGameBoardManagerService {
         return this.webSocketService.getRoomInfo().players.find((player) => player.name === name) || null;
     }
 
-    findPlayerFromSocketId(socketId: string): PlayerCharacter | null {
+    findPlayerFromSocketId(socketId: string | undefined): PlayerCharacter | null {
+        if (!socketId) {
+            return null;
+        }
         return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === socketId) || null;
     }
 
