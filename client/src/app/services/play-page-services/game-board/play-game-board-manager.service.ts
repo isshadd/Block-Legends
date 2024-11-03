@@ -14,6 +14,7 @@ export class PlayGameBoardManagerService {
     isBattleOn: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
+    turnOrder: string[];
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -23,6 +24,7 @@ export class PlayGameBoardManagerService {
     init(gameBoardParameters: GameBoardParameters) {
         this.initGameBoard(gameBoardParameters.game);
         this.initCharacters(gameBoardParameters.spawnPlaces);
+        this.turnOrder = gameBoardParameters.turnOrder;
     }
 
     initGameBoard(game: GameShared) {
