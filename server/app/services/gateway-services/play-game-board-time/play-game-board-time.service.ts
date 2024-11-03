@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { Subject } from 'rxjs';
 import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
 @Injectable()
 export class PlayGameBoardTimeService {
+    signalRoomTimeOut = new Subject<number>();
+    signalRoomTimeOut$ = this.signalRoomTimeOut.asObservable();
+
+    signalRoomTimePassed = new Subject<number>();
+    signalRoomTimePassed$ = this.signalRoomTimePassed.asObservable();
+
     constructor(private readonly gameSocketRoomService: GameSocketRoomService) {
         this.startTimer();
     }
@@ -14,15 +21,25 @@ export class PlayGameBoardTimeService {
     }
 
     secondPassed(): void {
-        // this.gameSocketRoomService.rooms.forEach((room) => {
-        //     const gameTimer = this.gameSocketRoomService.getGameTimer(room.accessCode);
-        //     if (gameTimer && !gameTimer.isPaused) {
-        //         gameTimer.time--;
-        //         this.gameSocketRoomService.setGameTimer(room.accessCode, gameTimer);
-        //         if (gameTimer.time === 0) {
-        //             this.gameSocketRoomService.setGameTimer(room.accessCode, { time: 0, isPaused: true });
-        //         }
-        //     }
-        // });
+        this.gameSocketRoomService.gameTimerRooms.forEach((gameTimer, accessCode) => {
+            if (!gameTimer.isPaused) {
+                if (gameTimer.time > 0) {
+                    gameTimer.time--;
+                    this.signalRoomTimePassed.next(accessCode);
+                } else {
+                    this.signalRoomTimeOut.next(accessCode);
+                }
+            }
+        });
+    }
+
+    pauseTimer(accessCode: number): void {
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        gameTimer.isPaused = true;
+    }
+
+    resumeTimer(accessCode: number): void {
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        gameTimer.isPaused = false;
     }
 }

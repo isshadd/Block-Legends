@@ -28,5 +28,9 @@ export class PlayGameBoardSocketService {
         this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);
         });
+
+        this.socket.on('setTime', (time: number) => {
+            this.playGameBoardManagerService.currentTime = time;
+        });
     }
 }

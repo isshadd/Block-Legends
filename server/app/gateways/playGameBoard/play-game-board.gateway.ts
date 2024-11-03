@@ -1,5 +1,6 @@
 import { GameBoardParameters, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
+import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -12,8 +13,16 @@ export class PlayGameBoardGateway {
 
     constructor(
         private readonly playGameBoardSocketService: PlayGameBoardSocketService,
+        private readonly playGameBoardTimeService: PlayGameBoardTimeService,
         private readonly gameSocketRoomService: GameSocketRoomService,
-    ) {}
+    ) {
+        this.playGameBoardTimeService.signalRoomTimePassed$.subscribe((accessCode) => {
+            this.handleTimePassed(accessCode);
+        });
+        this.playGameBoardTimeService.signalRoomTimeOut$.subscribe((accessCode) => {
+            this.handleTimeOut(accessCode);
+        });
+    }
 
     @SubscribeMessage('initGameBoard')
     handleInitGameBoard(client: Socket, accessCode: number) {
@@ -21,6 +30,7 @@ export class PlayGameBoardGateway {
 
         if (gameBoardParameters) {
             client.emit('initGameBoardParameters', gameBoardParameters);
+            this.playGameBoardTimeService.resumeTimer(accessCode);
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
         }
@@ -29,5 +39,16 @@ export class PlayGameBoardGateway {
     startRoomGame(accessCode: number) {
         this.playGameBoardSocketService.initRoomGameBoard(accessCode);
         this.server.to(accessCode.toString()).emit('gameStarted');
+    }
+
+    handleTimePassed(accessCode: number) {
+        this.server.to(accessCode.toString()).emit('setTime', this.gameSocketRoomService.gameTimerRooms.get(accessCode).time);
+    }
+
+    handleTimeOut(accessCode: number) {
+        const turnLength = 30;
+        this.gameSocketRoomService.gameTimerRooms.get(accessCode).time = turnLength;
+        this.handleTimePassed(accessCode);
+        this.server.to(accessCode.toString()).emit('timeOut');
     }
 }
