@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, Output, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -14,14 +14,19 @@ export class PlayerMapEntityInfoViewComponent {
     @Output() close = new EventEmitter<void>();
     @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
     @Input() showButton: boolean = true;
-
-    constructor(
-        private el: ElementRef,
-        private renderer: Renderer2,
-    ) {}
+    attackDice: string;
+    defenseDice: string;
+    constructor() {} //private renderer: Renderer2, //private el: ElementRef,
 
     ngOnInit(): void {
-        this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+        //this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+        if (this.playerCharacter.dice === 'attack') {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D4)';
+        } else {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D6)';
+        }
     }
 
     get healthArray() {

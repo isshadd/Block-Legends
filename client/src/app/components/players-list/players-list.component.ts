@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
     selector: 'app-players-list',
@@ -8,15 +9,5 @@ import { Component } from '@angular/core';
     styleUrl: './players-list.component.scss',
 })
 export class PlayersListComponent {
-    players = [
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-    ];
+    @Input() players: PlayerCharacter[] = [];
 }

@@ -98,6 +98,11 @@ export class WebSocketService {
         }
     }
 
+    // Ajouté par Nihal
+    getTotalPlayers(): PlayerCharacter[] {
+        return this.playersSubject.value;
+    }
+
     getRoomInfo() {
         return this.currentRoom;
     }

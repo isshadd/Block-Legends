@@ -10,7 +10,7 @@
                 <img src="assets/images/heart.png" alt="Heart" class="icon" />
             </span>
             <br />
-            Défense:
+            Défense {{ defenseDice }}:
             <span *ngFor="let _ of defenseArray" class="icon-container">
                 <img src="assets/images/armor.png" alt="Armor" class="icon" />
             </span>
@@ -20,10 +20,14 @@
                 <img src="assets/images/view/boots.png" alt="Speed" class="icon" />
             </span>
             <br />
-            Attaque:
+            Attaque {{ attackDice }}:
             <span *ngFor="let _ of attackArray" class="icon-container">
                 <img src="assets/images/view/sword.png" alt="Attack" class="icon" />
             </span>
+            <br />
+            Points restants: 4
+            <br />
+            actions restantes: 2
         </div>
     </div>
     <div id="player-image">

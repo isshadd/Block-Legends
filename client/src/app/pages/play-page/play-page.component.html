@@ -1,13 +1,13 @@
 <div id="page-container">
     <div id="side-menu">
+        <app-infos-game [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
+        <app-player-map-entity-info-view [showButton]="false" [playerCharacter]="currentPlayer!"></app-player-map-entity-info-view>
+        <app-players-list [players]="players"></app-players-list>
+        <div class="chat">
+            <h3>Clavardage</h3>
+            <textarea placeholder="Entrez votre message ici..."></textarea>
+        </div>
         <button class="dark-button" routerLink="/home">Retour</button>
-        <app-player-map-entity-info-view
-            [scale]="1.25"
-            [showButton]="false"
-            [playerCharacter]="mainPlayer!"
-            (close)="closePlayerInfoPanel()"
-        ></app-player-map-entity-info-view>
-        <app-players-list></app-players-list>
     </div>
     <div id="map-wrapper">
         <app-map
@@ -29,6 +29,8 @@
         }
 
         <div class="action-container">
+            <app-container></app-container>
+
             <div class="button-container">
                 <button class="action-button">Action</button>
                 <button class="action-button">Abandon</button>
