@@ -57,4 +57,9 @@ export class PlayPageComponent {
     endTurn(): void {
         this.playGameBoardSocketService.endTurn();
     }
+
+    leaveGame(): void {
+        this.playGameBoardSocketService.leaveGame();
+        this.router.navigate(['/home']);
+    }
 }

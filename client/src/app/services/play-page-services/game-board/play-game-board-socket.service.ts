@@ -30,6 +30,10 @@ export class PlayGameBoardSocketService {
         }
     }
 
+    leaveGame(): void {
+        this.webSocketService.leaveGame();
+    }
+
     private setupSocketListeners(): void {
         this.socket.on('initGameBoardParameters', (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);

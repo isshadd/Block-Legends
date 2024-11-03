@@ -1,6 +1,6 @@
 <div id="page-container">
     <div id="side-menu">
-        <button class="dark-button" routerLink="/home">Retour</button>
+        <button class="dark-button" (click)="leaveGame()">Sortir</button>
         <app-player-map-entity-info-view
             [scale]="1.25"
             [showButton]="false"

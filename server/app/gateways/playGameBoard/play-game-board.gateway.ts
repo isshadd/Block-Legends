@@ -118,7 +118,6 @@ export class PlayGameBoardGateway {
 
                         case GameTimerState.PREPARING_TURN:
                             this.playGameBoardSocketService.changeTurn(accessCode);
-                            this.handleTimeOut(accessCode);
                     }
                 }
 

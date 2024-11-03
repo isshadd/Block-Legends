@@ -104,7 +104,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.gameService.clearLocalStorage();
         this.destroy$.next();
         this.destroy$.complete();
     }
