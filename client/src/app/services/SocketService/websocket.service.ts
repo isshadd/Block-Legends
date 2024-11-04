@@ -37,7 +37,7 @@ export class WebSocketService {
 
     constructor(
         private router: Router,
-        private gameService: GameService,
+        public gameService: GameService,
     ) {}
 
     init() {
@@ -151,10 +151,7 @@ export class WebSocketService {
                 this.isLockedSubject.next(false);
                 this.playersSubject.next([]);
                 this.router.navigate(['/home']).then(() => {
-                    alert('Vous avez été expulsé de la salle, redirection en cours...');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                    alert('Vous avez été expulsé de la salle');
                 });
             }
         });
@@ -174,9 +171,7 @@ export class WebSocketService {
             this.currentRoom.players.forEach((player) => {
                 if (!player.isOrganizer) {
                     this.leaveGame();
-                    this.router.navigate(['/home']).then(() => {
-                        location.reload();
-                    });
+                    this.router.navigate(['/home']);
                 }
             });
         });
