@@ -25,6 +25,9 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserFinishedMoving$.subscribe(() => {
             this.socket.emit('userFinishedMoving', this.webSocketService.getRoomInfo().accessCode);
         });
+        this.playGameBoardManagerService.signalUserGotTurnEnded$.subscribe(() => {
+            this.endTurn();
+        });
     }
 
     init() {

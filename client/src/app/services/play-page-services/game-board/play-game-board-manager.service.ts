@@ -7,6 +7,7 @@ import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
@@ -23,6 +24,9 @@ export class PlayGameBoardManagerService {
 
     signalUserFinishedMoving = new Subject<void>();
     signalUserFinishedMoving$ = this.signalUserFinishedMoving.asObservable();
+
+    signalUserGotTurnEnded = new Subject<void>();
+    signalUserGotTurnEnded$ = this.signalUserGotTurnEnded.asObservable();
 
     currentTime: number = 0;
     isBattleOn: boolean = false;
@@ -108,6 +112,7 @@ export class PlayGameBoardManagerService {
             return;
         }
 
+        this.userCurrentMovePoints = 0;
         this.hidePossibleMoves();
     }
 
@@ -133,6 +138,8 @@ export class PlayGameBoardManagerService {
             this.signalUserStartedMoving.next();
 
             let lastTile: WalkableTile | null = null;
+            let didPlayerTripped = false;
+
             for (const tile of path) {
                 if (lastTile) {
                     this.userCurrentMovePoints -= (tile as WalkableTile).moveCost;
@@ -141,12 +148,24 @@ export class PlayGameBoardManagerService {
                         toTile: tile.coordinates,
                     });
                     await this.waitInterval(movingTimeInterval);
+
+                    if (tile.type === TileType.Ice) {
+                        if (Math.random() < 0.1) {
+                            didPlayerTripped = true;
+                            break;
+                        }
+                    }
                 }
 
                 lastTile = tile as WalkableTile;
             }
 
             this.signalUserFinishedMoving.next();
+
+            if (didPlayerTripped) {
+                this.signalUserGotTurnEnded.next();
+                return;
+            }
 
             this.setupPossibleMoves(userPlayerCharacter);
         }
