@@ -91,11 +91,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return;
         }
 
-        const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
+        const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player, player.name);
         if (added) {
             client.emit('joinGameResponseCanJoin', {
                 valid: true,
                 message: 'Rejoint avec succès',
+                playerName: player.name,
             });
             this.updateRoomState(accessCode);
 

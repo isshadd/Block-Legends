@@ -62,7 +62,7 @@ export class CreateCharacterComponent implements OnInit {
         } else if (!this.character.isNameValid) {
             this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
-            this.character.name += ' ♔';
+            // this.character.name += ' ♔';
             this.character.setOrganizer();
             this.gameService.setCharacter(this.character);
             this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
