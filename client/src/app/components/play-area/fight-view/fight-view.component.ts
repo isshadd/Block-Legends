@@ -61,7 +61,24 @@ export class FightViewComponent {
         }, DELAY);
     }
 
-    onEscape() {
+    onEscape(): void {
         this.escape.emit();
+        this.onPlayerEscape();
+    }
+
+    onPlayerEscape(): void {
+        const playerImage = document.getElementById('player');
+        playerImage?.classList.add('escape-player');
+        setTimeout(() => {
+            playerImage?.classList.remove('escape-player');
+        }, DELAY);
+    }
+
+    onOpponentEscape(): void {
+        const opponentImage = document.getElementById('opponent');
+        opponentImage?.classList.add('escape-opponent');
+        setTimeout(() => {
+            opponentImage?.classList.remove('escape-opponent');
+        }, DELAY);
     }
 }

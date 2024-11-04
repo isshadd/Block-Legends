@@ -78,6 +78,10 @@
                 &.hit {
                     animation: playerHit 0.5s ease forwards;
                 }
+
+                &.escape-player {
+                    animation: playerEscape 0.5s ease forwards;
+                }
             }
 
             #opponent {
@@ -86,6 +90,10 @@
 
                 &.hit {
                     animation: playerHit 0.5s ease forwards;
+                }
+
+                &.escape-opponent {
+                    animation: opponentEscape 0.5s ease forwards;
                 }
             }
 
@@ -139,6 +147,42 @@
                 }
                 100% {
                     filter: none;
+                }
+            }
+
+            @keyframes playerEscape {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(160px) scale(0.8);
+                }
+                100% {
+                    transform: none;
+                }
+            }
+
+            @keyframes opponentEscape {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(-160px) scale(0.8);
+                }
+                100% {
+                    transform: none;
+                }
+            }
+
+            @keyframes opponentAttack {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(-100px);
+                }
+                100% {
+                    transform: none;
                 }
             }
         }
