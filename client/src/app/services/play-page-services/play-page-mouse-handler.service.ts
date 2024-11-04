@@ -19,7 +19,11 @@ export class PlayPageMouseHandlerService {
 
     lastTilePath: Tile[] = [];
 
-    constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {}
+    constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
+        playGameBoardManagerService.signalUserStartedMoving$.subscribe(() => {
+            this.clearUI();
+        });
+    }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         if (event.button === MouseButton.Left) {
@@ -79,6 +83,10 @@ export class PlayPageMouseHandlerService {
     }
 
     endTurn(): void {
+        this.clearUI();
+    }
+
+    clearUI(): void {
         this.lastTilePath = [];
     }
 

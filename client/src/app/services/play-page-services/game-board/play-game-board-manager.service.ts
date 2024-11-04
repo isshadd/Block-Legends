@@ -77,6 +77,13 @@ export class PlayGameBoardManagerService {
 
         this.userCurrentMovePoints = userPlayerCharacter.attributes.speed;
 
+        this.setupPossibleMoves(userPlayerCharacter);
+    }
+
+    setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
+        if (this.userCurrentMovePoints <= 0) {
+            return;
+        }
         this.setPossibleMoves(userPlayerCharacter);
         this.showPossibleMoves();
     }
@@ -119,6 +126,7 @@ export class PlayGameBoardManagerService {
         }
 
         const path = this.userCurrentPossibleMoves.get(tile);
+        this.hidePossibleMoves();
         const movingTimeInterval = 150;
 
         if (path) {
@@ -127,6 +135,7 @@ export class PlayGameBoardManagerService {
             let lastTile: WalkableTile | null = null;
             for (const tile of path) {
                 if (lastTile) {
+                    this.userCurrentMovePoints -= (tile as WalkableTile).moveCost;
                     this.signalUserMoved.next({
                         fromTile: lastTile.coordinates,
                         toTile: tile.coordinates,
@@ -138,6 +147,8 @@ export class PlayGameBoardManagerService {
             }
 
             this.signalUserFinishedMoving.next();
+
+            this.setupPossibleMoves(userPlayerCharacter);
         }
     }
 
