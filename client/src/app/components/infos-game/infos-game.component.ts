@@ -11,5 +11,5 @@ import { Tile } from '@app/classes/Tiles/tile';
 export class InfosGameComponent {
     @Input() game: Tile[][];
     @Input() nbrPlayers: number;
-    @Input() currentPlayer: number;
+    @Input() currentPlayer: string;
 }

@@ -11,7 +11,7 @@ import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-inf
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
-import { TimerComponent } from '@app/components/timer/timer.component';
+import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
@@ -25,6 +25,7 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
     standalone: true,
     imports: [
         MapComponent,
+        TabContainerComponent,
         RouterModule,
         ClavardageComponent,
         InfosGameComponent,

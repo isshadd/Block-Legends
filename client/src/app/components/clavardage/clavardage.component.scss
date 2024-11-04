@@ -3,7 +3,7 @@
 .chat {
     width: 40vw;
     max-width: 40vw;
-    //display: inline-block;
+    margin-top: 5px;
     background-color: $primary-dark;
     border: 5px solid #000;
     padding: 10px;
@@ -20,7 +20,7 @@
         background-color: $background;
         resize: none;
         box-sizing: border-box;
-    }   
+    }
 }
 
 .messages-container {
@@ -34,8 +34,7 @@
     background-color: $background;
     resize: none;
     box-sizing: border-box;
-    word-wrap : break-word;
-    
+    word-wrap: break-word;
 }
 
 .messages {
