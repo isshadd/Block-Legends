@@ -3,6 +3,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
+import { Subject, takeUntil } from 'rxjs';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 
 enum MouseButton {
@@ -14,15 +15,22 @@ enum MouseButton {
     providedIn: 'root',
 })
 export class PlayPageMouseHandlerService {
+    private destroy$ = new Subject<void>();
+
     rightClickSelectedPlayerCharacter: PlayerCharacter | null = null;
     rightSelectedTile: Tile | null = null;
 
     lastTilePath: Tile[] = [];
 
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
-        playGameBoardManagerService.signalUserStartedMoving$.subscribe(() => {
+        playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.clearUI();
         });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {

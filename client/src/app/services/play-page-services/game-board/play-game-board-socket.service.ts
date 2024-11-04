@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
@@ -9,6 +10,8 @@ import { PlayGameBoardManagerService } from './play-game-board-manager.service';
     providedIn: 'root',
 })
 export class PlayGameBoardSocketService {
+    private destroy$ = new Subject<void>();
+
     socket: Socket;
 
     constructor(
@@ -16,18 +19,23 @@ export class PlayGameBoardSocketService {
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
     ) {
-        this.playGameBoardManagerService.signalUserMoved$.subscribe((data) => {
+        this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
-        this.playGameBoardManagerService.signalUserStartedMoving$.subscribe(() => {
+        this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit('userStartedMoving', this.webSocketService.getRoomInfo().accessCode);
         });
-        this.playGameBoardManagerService.signalUserFinishedMoving$.subscribe(() => {
+        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit('userFinishedMoving', this.webSocketService.getRoomInfo().accessCode);
         });
-        this.playGameBoardManagerService.signalUserGotTurnEnded$.subscribe(() => {
+        this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.endTurn();
         });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     init() {
