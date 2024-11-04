@@ -52,6 +52,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.isOrganizer = character.isOrganizer;
 
             if (character.isOrganizer) {
+                this.webSocketService.init();
                 this.webSocketService.createGame(this.gameId, character);
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
@@ -102,9 +103,15 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
+    playerNonOrgLeave(): void {
+        this.webSocketService.leaveGame();
+        this.router.navigate(['/home']).then(() => {
+            alert('Vous avez quitté la partie');
+            location.reload();
+        });
+    }
+
     ngOnDestroy(): void {
-        this.gameService.clearLocalStorage();
-        this.socketStateService.clearSocket();
         this.destroy$.next();
         this.destroy$.complete();
     }

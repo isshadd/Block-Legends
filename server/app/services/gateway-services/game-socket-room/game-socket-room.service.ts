@@ -2,6 +2,7 @@ import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
 import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
+import { Subject } from 'rxjs';
 
 export class PlayerAttributes {
     life: number;
@@ -47,9 +48,12 @@ export interface GameRoom {
 export class GameSocketRoomService {
     private readonly logger = new Logger(GameSocketRoomService.name);
     private rooms: Map<number, GameRoom> = new Map();
-    private playerRooms: Map<string, number> = new Map();
+    playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
+
+    signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
+    signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
 
     constructor(private readonly gameService: GameService) {}
 
@@ -133,6 +137,8 @@ export class GameSocketRoomService {
             code d'acces: ${accessCode},
             nb de joueurs max: ${newRoom.maxPlayers}
             `);
+        this.initRoomGameBoard(accessCode);
+        this.logger.log(`maxPlayers mis à jour à ${newRoom.maxPlayers} pour la salle ${accessCode}`);
         return newRoom;
     }
 
@@ -163,10 +169,11 @@ export class GameSocketRoomService {
         const accessCode = this.playerRooms.get(socketId);
         if (accessCode) {
             const room = this.rooms.get(accessCode);
-            const gameBoardRoom = this.gameBoardRooms.get(accessCode);
+
             if (room) {
+                this.signalPlayerLeftRoom.next({ accessCode, playerSocketId: socketId });
+
                 room.players = room.players.filter((player) => player.socketId !== socketId);
-                gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
                 this.playerRooms.delete(socketId);
                 this.logger.log(`Joueur ${socketId} enlevé du room ${accessCode}`);
 
@@ -174,6 +181,7 @@ export class GameSocketRoomService {
                     this.rooms.delete(accessCode);
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
+
                     this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
@@ -205,20 +213,8 @@ export class GameSocketRoomService {
 
     kickPlayer(accessCode: number, playerSocketId: string, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        const gameBoardRoom = this.gameBoardRooms.get(accessCode);
         if (room && room.organizer === clientId) {
-            room.players = room.players.filter((p) => p.socketId !== playerSocketId);
-            gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== clientId);
-            this.playerRooms.delete(playerSocketId);
-            this.logger.log(`Joueur ${playerSocketId} expulsé du room ${accessCode} par organisateur ${clientId}`);
-
-            if (room.players.length === 0) {
-                this.rooms.delete(accessCode);
-                this.gameBoardRooms.delete(accessCode);
-                this.gameTimerRooms.delete(accessCode);
-                this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
-            }
-
+            this.removePlayerFromRoom(playerSocketId);
             return true;
         }
         return false;

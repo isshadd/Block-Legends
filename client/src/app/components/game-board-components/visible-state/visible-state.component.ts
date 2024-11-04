@@ -7,6 +7,7 @@ export enum VisibleStateColor {
     InvalidColor = 'rgba(255, 50, 50, 0.3)',
     NotSelectedColor = 'rgba(255, 255, 255, 0)',
     DisabledColor = 'rgba(0, 0, 0, 0.5)',
+    ActionColor = 'rgba(255, 165, 0, 0.3)',
 }
 @Component({
     selector: 'app-visible-state',
@@ -30,6 +31,8 @@ export class VisibleStateComponent {
                 return VisibleStateColor.InvalidColor;
             case VisibleState.Disabled:
                 return VisibleStateColor.DisabledColor;
+            case VisibleState.Action:
+                return VisibleStateColor.ActionColor;
             default:
                 return VisibleStateColor.NotSelectedColor;
         }

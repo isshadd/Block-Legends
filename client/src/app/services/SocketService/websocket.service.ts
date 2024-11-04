@@ -39,8 +39,9 @@ export class WebSocketService {
     constructor(
         private router: Router,
         private gameService: GameService,
-        private chatService: ChatService,
-    ) {
+    ) {}
+
+    init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }
@@ -51,11 +52,6 @@ export class WebSocketService {
 
     createGame(gameId: string, player: PlayerCharacter) {
         this.socket.emit('createGame', { gameId, playerOrganizer: player });
-        this.socket.on('roomState', (room: GameRoom) => {
-            localStorage.setItem('accessCode', room.accessCode.toString());
-            localStorage.setItem('roomId', room.roomId);
-            this.isLockedSubject.next(room.isLocked);
-        });
     }
 
     joinGame(accessCode: number) {
@@ -67,41 +63,32 @@ export class WebSocketService {
     }
 
     kickPlayer(player: PlayerCharacter) {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('kickPlayer', player);
-        }
+        this.socket.emit('kickPlayer', player);
     }
 
     leaveGame() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('leaveGame', accessCode);
-            localStorage.removeItem('roomId');
-            localStorage.removeItem('accessCode');
+        if (this.currentRoom.accessCode) {
+            this.socket.emit('leaveGame', this.currentRoom.accessCode);
         }
         this.gameService.clearGame();
         this.isLockedSubject.next(false);
     }
 
     lockRoom() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('lockRoom', accessCode);
+        if (this.currentRoom.accessCode) {
+            this.socket.emit('lockRoom', this.currentRoom.accessCode);
         }
     }
 
     unlockRoom() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('unlockRoom', accessCode);
+        if (this.currentRoom.accessCode) {
+            this.socket.emit('unlockRoom', this.currentRoom.accessCode);
         }
     }
 
     startGame() {
-        const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-        if (accessCode) {
-            this.socket.emit('startGame', accessCode);
+        if (this.currentRoom.accessCode) {
+            this.socket.emit('startGame', this.currentRoom.accessCode);
         }
     }
 
@@ -115,13 +102,6 @@ export class WebSocketService {
     }
 
     private setupSocketListeners() {
-        this.socket.on('connect', () => {
-            const accessCode = localStorage.getItem('accessCode');
-            if (accessCode) {
-                this.socket.emit('getRoomState', parseInt(accessCode, 10));
-            }
-        });
-
         this.socket.on('roomState', (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
@@ -131,7 +111,6 @@ export class WebSocketService {
 
         this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean }) => {
             if (response.valid) {
-                localStorage.setItem('accessCode', response.accessCode.toString());
                 this.gameService.setAccessCode(response.accessCode);
                 this.isLockedSubject.next(response.isLocked);
                 this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
@@ -176,14 +155,11 @@ export class WebSocketService {
                 });
 
                 // Then perform cleanup
-                const accessCode = parseInt(localStorage.getItem('accessCode') as string, 10);
-                if (accessCode) {
-                    this.socket.emit('leaveGame', accessCode);
+                if (this.currentRoom.accessCode) {
+                    this.socket.emit('leaveGame', this.currentRoom.accessCode);
                 }
 
                 // Clear all local data
-                localStorage.removeItem('roomId');
-                localStorage.removeItem('accessCode');
                 this.gameService.clearGame();
                 this.isLockedSubject.next(false);
                 this.playersSubject.next([]);
@@ -196,10 +172,14 @@ export class WebSocketService {
                 //     // Optional: Refresh the page to ensure clean state
                 //     window.location.reload();
                 // });
-            } else {
-                // If it's not the current user, just update the players list
-                this.socket.emit('getRoomState', parseInt(localStorage.getItem('accessCode') as string, 10));
             }
+        });
+
+        this.socket.on('playerLeft', () => {
+            this.gameService.clearGame();
+            this.isLockedSubject.next(false);
+            this.playersSubject.next([]);
+            this.socket.disconnect();
         });
 
         this.socket.on('gameStarted', () => {

@@ -57,28 +57,41 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private webSocketService: WebSocketService,
         private gameService: GameService,
     ) {
-        //this.players = [new PlayerCharacter('sam'), new PlayerCharacter('bob'), new PlayerCharacter('joe')];
+        this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
+            this.onPlayGameBoardManagerInit();
+        });
+
         this.playGameBoardSocketService.init();
         this.mainPlayer.avatar = AvatarEnum.Alex;
     }
 
+    onPlayGameBoardManagerInit() {
+        // do something
+    }
+
     ngOnInit(): void {
-        this.players = this.webSocketService.getTotalPlayers();
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
+        this.players = this.webSocketService.getTotalPlayers();
             this.currentPlayer = player;
-            if (this.currentPlayer) {
                 console.log('Joueur actuel:', this.currentPlayer);
+            if (this.currentPlayer) {
             }
         });
     }
-
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
-
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         this.playPageMouseHandlerService.onMapTileMouseDown(event, tile);
+    }
+
+    onMapTileMouseEnter(tile: Tile) {
+        this.playPageMouseHandlerService.onMapTileMouseEnter(tile);
+    }
+
+    onMapTileMouseLeave(tile: Tile) {
+        this.playPageMouseHandlerService.onMapTileMouseLeave(tile);
     }
 
     closePlayerInfoPanel(): void {
@@ -89,8 +102,16 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.playPageMouseHandlerService.discardRightSelectedTile();
     }
 
+    toggleAction(): void {
+        this.playPageMouseHandlerService.toggleAction();
+    }
+
     endTurn(): void {
-        this.router.navigate(['/administration-game']);
-        return;
+        this.playGameBoardSocketService.endTurn();
+    }
+
+    leaveGame(): void {
+        this.playGameBoardSocketService.leaveGame();
+        this.router.navigate(['/home']);
     }
 }

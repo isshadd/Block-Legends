@@ -13,6 +13,7 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
+import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
 
 @Injectable({
@@ -146,8 +147,38 @@ export class GameMapDataManagerService {
         return tilesWithSpawn;
     }
 
-    getTileAt(coordinates: Vec2): Tile {
+    getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
+        const pathfinder = new Pathfinder(this, movePoints);
+        return pathfinder.findAllReachableTiles(coordinates);
+    }
+
+    getTileAt(coordinates: Vec2): Tile | null {
+        if (coordinates.x < 0 || coordinates.x >= this.currentGrid.length || coordinates.y < 0 || coordinates.y >= this.currentGrid.length)
+            return null;
         return this.currentGrid[coordinates.x][coordinates.y];
+    }
+
+    setTileAt(coordinates: Vec2, tile: Tile) {
+        this.currentGrid[coordinates.x][coordinates.y] = tile;
+    }
+
+    getNeighbours(tile: Tile): Tile[] {
+        const neighbours: Tile[] = [];
+        const directions: Vec2[] = [
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: -1 },
+        ];
+
+        directions.forEach((direction) => {
+            const neighbour = this.getTileAt({ x: tile.coordinates.x + direction.x, y: tile.coordinates.y + direction.y });
+            if (neighbour) {
+                neighbours.push(neighbour);
+            }
+        });
+
+        return neighbours;
     }
 
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {

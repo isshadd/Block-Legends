@@ -7,6 +7,7 @@ export enum VisibleState {
     Valid,
     Invalid,
     Disabled,
+    Action,
 }
 export interface PlaceableEntity {
     description: string;
