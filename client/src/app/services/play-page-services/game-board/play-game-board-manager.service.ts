@@ -17,6 +17,9 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class PlayGameBoardManagerService {
+    signalManagerFinishedInit = new Subject<void>();
+    signalManagerFinishedInit$ = this.signalManagerFinishedInit.asObservable();
+
     signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
@@ -54,6 +57,7 @@ export class PlayGameBoardManagerService {
         this.initGameBoard(gameBoardParameters.game);
         this.initCharacters(gameBoardParameters.spawnPlaces);
         this.turnOrder = gameBoardParameters.turnOrder;
+        this.signalManagerFinishedInit.next();
     }
 
     initGameBoard(game: GameShared) {

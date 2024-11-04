@@ -38,8 +38,16 @@ export class PlayPageComponent {
         public playGameBoardSocketService: PlayGameBoardSocketService,
         public router: Router,
     ) {
+        this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
+            this.onPlayGameBoardManagerInit();
+        });
+
         this.playGameBoardSocketService.init();
         this.mainPlayer.avatar = AvatarEnum.Alex;
+    }
+
+    onPlayGameBoardManagerInit() {
+        // do something
     }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
