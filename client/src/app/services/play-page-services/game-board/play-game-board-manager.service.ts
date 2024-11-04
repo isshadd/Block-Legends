@@ -28,11 +28,18 @@ export class PlayGameBoardManagerService {
     signalUserGotTurnEnded = new Subject<void>();
     signalUserGotTurnEnded$ = this.signalUserGotTurnEnded.asObservable();
 
+    signalUserDidDoorAction = new Subject<void>();
+    signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
+
+    signalUserDidBattleAction = new Subject<void>();
+    signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
+
     currentTime: number = 0;
     isBattleOn: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
     userCurrentMovePoints: number = 0;
+    userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
 
@@ -80,6 +87,7 @@ export class PlayGameBoardManagerService {
         }
 
         this.userCurrentMovePoints = userPlayerCharacter.attributes.speed;
+        this.userCurrentActionPoints = 1;
 
         this.setupPossibleMoves(userPlayerCharacter);
     }
@@ -166,6 +174,7 @@ export class PlayGameBoardManagerService {
             return;
         }
 
+        this.checkIfPLayerDidEverything();
         this.setupPossibleMoves(userPlayerCharacter);
     }
 
@@ -185,6 +194,35 @@ export class PlayGameBoardManagerService {
 
     async waitInterval(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    handlePlayerAction(tile: Tile) {
+        if (!this.isUserTurn || this.userCurrentActionPoints <= 0) {
+            return;
+        }
+
+        if (tile instanceof WalkableTile && tile.hasPlayer()) {
+            this.signalUserDidBattleAction.next();
+            this.userCurrentActionPoints -= 1;
+            this.checkIfPLayerDidEverything();
+            return;
+        }
+
+        if (tile.isDoor()) {
+            this.signalUserDidDoorAction.next();
+            this.userCurrentActionPoints -= 1;
+            this.checkIfPLayerDidEverything();
+            return;
+        }
+    }
+
+    checkIfPLayerDidEverything() {
+        if (this.userCurrentMovePoints <= 0) {
+            const currentPlayerTile = this.getCurrentPlayerTile();
+            if (this.userCurrentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
+                this.signalUserGotTurnEnded.next();
+            }
+        }
     }
 
     removePlayerFromMap(playerId: string) {

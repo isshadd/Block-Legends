@@ -78,7 +78,12 @@ export class PlayPageMouseHandlerService {
     }
 
     handleLeftClick(tile: Tile) {
-        this.playGameBoardManagerService.moveUserPlayer(tile);
+        if (this.actionTiles.includes(tile)) {
+            this.toggleAction();
+            this.playGameBoardManagerService.handlePlayerAction(tile);
+        } else {
+            this.playGameBoardManagerService.moveUserPlayer(tile);
+        }
     }
 
     handleRightClick(tile: Tile) {
@@ -97,6 +102,10 @@ export class PlayPageMouseHandlerService {
     toggleAction(): void {
         if (this.playGameBoardManagerService.isUserTurn) {
             this.isActionOpen = !this.isActionOpen;
+
+            if (this.playGameBoardManagerService.userCurrentActionPoints <= 0) {
+                this.isActionOpen = false;
+            }
 
             if (this.isActionOpen) {
                 const userTile = this.playGameBoardManagerService.getCurrentPlayerTile();
