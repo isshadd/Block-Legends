@@ -5,6 +5,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
+import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
@@ -26,6 +27,7 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
         MapTileInfoComponent,
         PlaceableEntityContainerComponent,
         TimerComponent,
+        FightViewComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
