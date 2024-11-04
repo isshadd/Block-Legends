@@ -28,16 +28,36 @@ export class FightViewComponent {
 
     onAttack() {
         this.attack.emit();
+        this.onPlayerAttack();
+    }
 
+    onPlayerAttack() {
         const playerImage = document.getElementById('player');
         const opponentImage = document.getElementById('opponent');
 
         playerImage?.classList.add('attack-player');
-        opponentImage?.classList.add('attack-opponent');
-
         setTimeout(() => {
             playerImage?.classList.remove('attack-player');
+        }, DELAY);
+
+        opponentImage?.classList.add('hit');
+        setTimeout(() => {
+            opponentImage?.classList.remove('hit');
+        }, DELAY);
+    }
+
+    onOpponentAttack() {
+        const opponentImage = document.getElementById('opponent');
+        const playerImage = document.getElementById('player');
+
+        opponentImage?.classList.add('attack-opponent');
+        setTimeout(() => {
             opponentImage?.classList.remove('attack-opponent');
+        }, DELAY);
+
+        playerImage?.classList.add('hit');
+        setTimeout(() => {
+            playerImage?.classList.remove('hit');
         }, DELAY);
     }
 
