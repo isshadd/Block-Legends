@@ -21,6 +21,8 @@ export class PlayPageMouseHandlerService {
     rightSelectedTile: Tile | null = null;
 
     lastTilePath: Tile[] = [];
+    actionTiles: Tile[] = [];
+    isActionOpen: boolean = false;
 
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
         playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -41,17 +43,17 @@ export class PlayPageMouseHandlerService {
         }
     }
 
-    onMapTileMouseUp(tile: Tile) {}
-
     onMapTileMouseEnter(tile: Tile) {
         const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
         if (possibleTileMove) {
             for (const tile of possibleTileMove) {
-                tile.visibleState = VisibleState.Selected;
+                if (!this.actionTiles.includes(tile)) {
+                    tile.visibleState = VisibleState.Selected;
+                }
             }
             this.lastTilePath = possibleTileMove;
-        } else {
+        } else if (!this.actionTiles.includes(tile)) {
             tile.visibleState = VisibleState.Hovered;
         }
     }
@@ -59,10 +61,12 @@ export class PlayPageMouseHandlerService {
     onMapTileMouseLeave(tile: Tile) {
         if (this.lastTilePath.length) {
             for (const tile of this.lastTilePath) {
-                tile.visibleState = VisibleState.Valid;
+                if (!this.actionTiles.includes(tile)) {
+                    tile.visibleState = VisibleState.Valid;
+                }
             }
             this.lastTilePath = [];
-        } else {
+        } else if (!this.actionTiles.includes(tile)) {
             const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
             if (possibleTileMove) {
@@ -90,12 +94,45 @@ export class PlayPageMouseHandlerService {
         }
     }
 
+    toggleAction(): void {
+        if (this.playGameBoardManagerService.isUserTurn) {
+            this.isActionOpen = !this.isActionOpen;
+
+            if (this.isActionOpen) {
+                const userTile = this.playGameBoardManagerService.getCurrentPlayerTile();
+                if (!userTile) return;
+
+                this.actionTiles = this.playGameBoardManagerService.getAdjacentActionTiles(userTile);
+                for (const tile of this.actionTiles) {
+                    tile.visibleState = VisibleState.Action;
+                }
+            } else {
+                for (const tile of this.actionTiles) {
+                    const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
+
+                    if (possibleTileMove) {
+                        tile.visibleState = VisibleState.Valid;
+                    } else {
+                        tile.visibleState = VisibleState.NotSelected;
+                    }
+                }
+                this.actionTiles = [];
+            }
+        }
+    }
+
     endTurn(): void {
         this.clearUI();
     }
 
     clearUI(): void {
+        for (const tile of this.actionTiles) {
+            tile.visibleState = VisibleState.NotSelected;
+        }
+
+        this.actionTiles = [];
         this.lastTilePath = [];
+        this.isActionOpen = false;
     }
 
     discardRightClickSelecterPlayer(): void {

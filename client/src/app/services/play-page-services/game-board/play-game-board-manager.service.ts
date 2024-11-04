@@ -125,50 +125,48 @@ export class PlayGameBoardManagerService {
 
     async moveUserPlayer(tile: Tile) {
         const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const path = this.userCurrentPossibleMoves.get(tile);
 
-        if (!this.isUserTurn || !userPlayerCharacter) {
+        if (!this.isUserTurn || !userPlayerCharacter || !path) {
             return;
         }
 
-        const path = this.userCurrentPossibleMoves.get(tile);
         this.hidePossibleMoves();
         const movingTimeInterval = 150;
 
-        if (path) {
-            this.signalUserStartedMoving.next();
+        this.signalUserStartedMoving.next();
 
-            let lastTile: WalkableTile | null = null;
-            let didPlayerTripped = false;
+        let lastTile: WalkableTile | null = null;
+        let didPlayerTripped = false;
 
-            for (const tile of path) {
-                if (lastTile) {
-                    this.userCurrentMovePoints -= (tile as WalkableTile).moveCost;
-                    this.signalUserMoved.next({
-                        fromTile: lastTile.coordinates,
-                        toTile: tile.coordinates,
-                    });
-                    await this.waitInterval(movingTimeInterval);
+        for (const tile of path) {
+            if (lastTile) {
+                this.userCurrentMovePoints -= (tile as WalkableTile).moveCost;
+                this.signalUserMoved.next({
+                    fromTile: lastTile.coordinates,
+                    toTile: tile.coordinates,
+                });
+                await this.waitInterval(movingTimeInterval);
 
-                    if (tile.type === TileType.Ice) {
-                        if (Math.random() < 0.1) {
-                            didPlayerTripped = true;
-                            break;
-                        }
+                if (tile.type === TileType.Ice) {
+                    if (Math.random() < 0.1) {
+                        didPlayerTripped = true;
+                        break;
                     }
                 }
-
-                lastTile = tile as WalkableTile;
             }
 
-            this.signalUserFinishedMoving.next();
-
-            if (didPlayerTripped) {
-                this.signalUserGotTurnEnded.next();
-                return;
-            }
-
-            this.setupPossibleMoves(userPlayerCharacter);
+            lastTile = tile as WalkableTile;
         }
+
+        this.signalUserFinishedMoving.next();
+
+        if (didPlayerTripped) {
+            this.signalUserGotTurnEnded.next();
+            return;
+        }
+
+        this.setupPossibleMoves(userPlayerCharacter);
     }
 
     movePlayer(playerId: string, fromTile: Vec2, toTile: Vec2) {
@@ -205,6 +203,24 @@ export class PlayGameBoardManagerService {
 
     getCurrentGrid(): Tile[][] {
         return this.gameMapDataManagerService.getCurrentGrid();
+    }
+
+    getCurrentPlayerTile(): Tile | null {
+        const player = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+
+        if (!player) {
+            return null;
+        }
+
+        return this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates);
+    }
+
+    getAdjacentActionTiles(tile: Tile): Tile[] {
+        const neighboursTiles = this.gameMapDataManagerService.getNeighbours(tile);
+
+        return neighboursTiles.filter((neighbourTile) => {
+            return (neighbourTile instanceof WalkableTile && neighbourTile.hasPlayer()) || neighbourTile.isDoor();
+        });
     }
 
     findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {

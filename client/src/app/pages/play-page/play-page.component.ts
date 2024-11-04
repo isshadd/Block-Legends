@@ -62,6 +62,10 @@ export class PlayPageComponent {
         this.playPageMouseHandlerService.discardRightSelectedTile();
     }
 
+    toggleAction(): void {
+        this.playPageMouseHandlerService.toggleAction();
+    }
+
     endTurn(): void {
         this.playGameBoardSocketService.endTurn();
     }
