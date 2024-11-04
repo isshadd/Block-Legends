@@ -7,7 +7,7 @@ import { Tile } from './tile';
 })
 export class DoorTile extends Tile {
     type: TileType = TileType.Door;
-    description: string = "Porte fermée. Ne peut être franchie que si elle est ouverte. Cliquez avec une autre porte pour l'ouvrir.";
+    description: string = 'Ouvrir la porte pour passer';
     imageUrl: string = 'assets/images/tiles/door.jpg';
 
     isDoor(): boolean {

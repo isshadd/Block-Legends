@@ -7,7 +7,7 @@ import { TileType } from '@common/enums/tile-type';
 })
 export class IceTile extends TerrainTile {
     type: TileType = TileType.Ice;
-    description: string = 'Glace. Risque de chute en marchant dessus.';
+    gmoveCost: number = 0;
+    description: string = `Glace. 10% de risque de chute en marchant dessus. Consomme ${this.moveCost} movement.`;
     imageUrl: string = 'assets/images/tiles/ice.jpg';
-    moveCost: number = 0;
 }

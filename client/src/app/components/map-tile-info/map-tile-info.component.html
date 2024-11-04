@@ -8,8 +8,12 @@
             {{ tile.type }}
         </div>
         <div id="tile-info">
-            <div>Coût:</div>
-            <div>Effet:</div>
+            @if(tileMovementCost(tile)){
+            <div>Coût: {{ tileMovementCost(tile) }}</div>
+            } @else{
+            <div>Coût: Non passable</div>
+            }
+            <div>Effet:{{ tile.description }}</div>
         </div>
     </div>
 </div>
