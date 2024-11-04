@@ -96,6 +96,7 @@ export class PlayGameBoardManagerService {
         this.userCurrentPossibleMoves.forEach((path, tile) => {
             tile.visibleState = VisibleState.NotSelected;
         });
+        this.userCurrentPossibleMoves.clear();
     }
 
     removePlayerFromMap(playerId: string) {

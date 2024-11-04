@@ -14,6 +14,8 @@
             id="map-container"
             [grid]="playGameBoardManagerService.getCurrentGrid()"
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
+            (mapTileMouseEnter)="onMapTileMouseEnter($event)"
+            (mapTileMouseLeave)="onMapTileMouseLeave($event)"
         ></app-map>
 
         <app-timer

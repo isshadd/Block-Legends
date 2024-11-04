@@ -46,6 +46,14 @@ export class PlayPageComponent {
         this.playPageMouseHandlerService.onMapTileMouseDown(event, tile);
     }
 
+    onMapTileMouseEnter(tile: Tile) {
+        this.playPageMouseHandlerService.onMapTileMouseEnter(tile);
+    }
+
+    onMapTileMouseLeave(tile: Tile) {
+        this.playPageMouseHandlerService.onMapTileMouseLeave(tile);
+    }
+
     closePlayerInfoPanel(): void {
         this.playPageMouseHandlerService.discardRightClickSelecterPlayer();
     }

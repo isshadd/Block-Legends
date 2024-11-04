@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Socket } from 'socket.io-client';
+import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 @Injectable({
@@ -12,6 +13,7 @@ export class PlayGameBoardSocketService {
     constructor(
         public webSocketService: WebSocketService,
         public playGameBoardManagerService: PlayGameBoardManagerService,
+        public playPageMouseHandlerService: PlayPageMouseHandlerService,
     ) {}
 
     init() {
@@ -46,6 +48,7 @@ export class PlayGameBoardSocketService {
         this.socket.on('endTurn', () => {
             if (this.playGameBoardManagerService.isUserTurn) {
                 this.playGameBoardManagerService.endTurn();
+                this.playPageMouseHandlerService.endTurn();
             }
             this.playGameBoardManagerService.currentPlayerIdTurn = '';
             this.playGameBoardManagerService.isUserTurn = false;
