@@ -3,15 +3,21 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Vec2 } from '@common/interfaces/vec2';
+import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayGameBoardManagerService {
+    signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserMoved$ = this.signalUserMoved.asObservable();
+
     currentTime: number = 0;
     isBattleOn: boolean = false;
     currentPlayerIdTurn: string = '';
@@ -97,6 +103,50 @@ export class PlayGameBoardManagerService {
             tile.visibleState = VisibleState.NotSelected;
         });
         this.userCurrentPossibleMoves.clear();
+    }
+
+    async moveUserPlayer(tile: Tile) {
+        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+
+        if (!this.isUserTurn || !userPlayerCharacter) {
+            return;
+        }
+
+        const path = this.userCurrentPossibleMoves.get(tile);
+        const movingTimeInterval = 150;
+
+        if (path) {
+            let lastTile: WalkableTile | null = null;
+            for (const tile of path) {
+                if (lastTile) {
+                    this.signalUserMoved.next({
+                        fromTile: lastTile.coordinates,
+                        toTile: tile.coordinates,
+                    });
+                    await this.waitInterval(movingTimeInterval);
+                }
+
+                lastTile = tile as WalkableTile;
+            }
+        }
+    }
+
+    movePlayer(playerId: string, fromTile: Vec2, toTile: Vec2) {
+        const userPlayerCharacter = this.findPlayerFromSocketId(playerId);
+
+        if (!userPlayerCharacter) {
+            return;
+        }
+
+        const fromTileInstance = this.gameMapDataManagerService.getTileAt(fromTile) as WalkableTile;
+        fromTileInstance.removePlayer();
+
+        const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
+        toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
+    }
+
+    async waitInterval(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     removePlayerFromMap(playerId: string) {

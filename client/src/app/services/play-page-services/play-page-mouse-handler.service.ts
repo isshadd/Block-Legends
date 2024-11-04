@@ -5,6 +5,11 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 
+enum MouseButton {
+    Left = 0,
+    Right = 2,
+}
+
 @Injectable({
     providedIn: 'root',
 })
@@ -17,10 +22,14 @@ export class PlayPageMouseHandlerService {
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {}
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
-        if (event.button == 2) {
+        if (event.button === MouseButton.Left) {
+            this.handleLeftClick(tile);
+        } else if (event.button === MouseButton.Right) {
             this.handleRightClick(tile);
         }
     }
+
+    onMapTileMouseUp(tile: Tile) {}
 
     onMapTileMouseEnter(tile: Tile) {
         const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
@@ -50,6 +59,10 @@ export class PlayPageMouseHandlerService {
                 tile.visibleState = VisibleState.NotSelected;
             }
         }
+    }
+
+    handleLeftClick(tile: Tile) {
+        this.playGameBoardManagerService.moveUserPlayer(tile);
     }
 
     handleRightClick(tile: Tile) {

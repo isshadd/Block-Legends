@@ -1,6 +1,7 @@
 import { GameBoardParameters, GameSocketRoomService, GameTimerState } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -43,20 +44,35 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('userEndTurn')
     handleUserEndTurn(client: Socket, accessCode: number) {
+        if (!this.isClientTurn(client, accessCode)) {
+            return;
+        }
+        this.handleTimeOut(accessCode);
+    }
+
+    @SubscribeMessage('userMoved')
+    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
+        if (!this.isClientTurn(client, data.accessCode)) {
+            return;
+        }
+        this.server.to(data.accessCode.toString()).emit('roomUserMoved', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+    }
+
+    isClientTurn(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
 
         if (!room) {
             this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
-            return;
+            return false;
         }
 
         if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ACTIVE_TURN) {
             this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
-            return;
+            return false;
         }
 
-        this.handleTimeOut(accessCode);
+        return true;
     }
 
     startRoomGame(accessCode: number) {

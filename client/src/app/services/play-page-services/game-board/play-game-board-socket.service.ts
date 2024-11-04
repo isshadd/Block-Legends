@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Socket } from 'socket.io-client';
 import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
@@ -14,7 +15,11 @@ export class PlayGameBoardSocketService {
         public webSocketService: WebSocketService,
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
-    ) {}
+    ) {
+        this.playGameBoardManagerService.signalUserMoved$.subscribe((data) => {
+            this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
+        });
+    }
 
     init() {
         this.socket = this.webSocketService.socket;
@@ -64,6 +69,10 @@ export class PlayGameBoardSocketService {
 
         this.socket.on('gameBoardPlayerLeft', (playerId: string) => {
             this.playGameBoardManagerService.removePlayerFromMap(playerId);
+        });
+
+        this.socket.on('roomUserMoved', (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
+            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
         });
     }
 }
