@@ -31,6 +31,9 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.endTurn();
         });
+        this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((tileCoordinate) => {
+            this.socket.emit('userDidDoorAction', { tileCoordinate, accessCode: this.webSocketService.getRoomInfo().accessCode });
+        });
     }
 
     ngOnDestroy() {
@@ -90,6 +93,10 @@ export class PlayGameBoardSocketService {
 
         this.socket.on('roomUserMoved', (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+        });
+
+        this.socket.on('roomUserDidDoorAction', (tileCoordinate: Vec2) => {
+            this.playGameBoardManagerService.toggleDoor(tileCoordinate);
         });
     }
 }

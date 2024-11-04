@@ -74,6 +74,14 @@ export class PlayGameBoardGateway {
         this.server.to(data.accessCode.toString()).emit('roomUserMoved', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
+    @SubscribeMessage('userDidDoorAction')
+    handleUserDidDoorAction(client: Socket, data: { tileCoordinate: Vec2; accessCode: number }) {
+        if (!this.isClientTurn(client, data.accessCode)) {
+            return;
+        }
+        this.server.to(data.accessCode.toString()).emit('roomUserDidDoorAction', data.tileCoordinate);
+    }
+
     isClientTurn(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);

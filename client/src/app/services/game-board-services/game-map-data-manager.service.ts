@@ -158,6 +158,10 @@ export class GameMapDataManagerService {
         return this.currentGrid[coordinates.x][coordinates.y];
     }
 
+    setTileAt(coordinates: Vec2, tile: Tile) {
+        this.currentGrid[coordinates.x][coordinates.y] = tile;
+    }
+
     getNeighbours(tile: Tile): Tile[] {
         const neighbours: Tile[] = [];
         const directions: Vec2[] = [

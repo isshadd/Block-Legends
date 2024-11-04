@@ -6,6 +6,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -28,7 +29,7 @@ export class PlayGameBoardManagerService {
     signalUserGotTurnEnded = new Subject<void>();
     signalUserGotTurnEnded$ = this.signalUserGotTurnEnded.asObservable();
 
-    signalUserDidDoorAction = new Subject<void>();
+    signalUserDidDoorAction = new Subject<Vec2>();
     signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
 
     signalUserDidBattleAction = new Subject<void>();
@@ -46,6 +47,7 @@ export class PlayGameBoardManagerService {
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
+        public tileFactoryService: TileFactoryService,
     ) {}
 
     init(gameBoardParameters: GameBoardParameters) {
@@ -93,7 +95,7 @@ export class PlayGameBoardManagerService {
     }
 
     setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
-        if (this.userCurrentMovePoints <= 0) {
+        if (this.userCurrentMovePoints <= 0 || !this.isUserTurn) {
             return;
         }
         this.setPossibleMoves(userPlayerCharacter);
@@ -209,7 +211,8 @@ export class PlayGameBoardManagerService {
         }
 
         if (tile.isDoor()) {
-            this.signalUserDidDoorAction.next();
+            this.hidePossibleMoves();
+            this.signalUserDidDoorAction.next(tile.coordinates);
             this.userCurrentActionPoints -= 1;
             this.checkIfPLayerDidEverything();
             return;
@@ -221,6 +224,27 @@ export class PlayGameBoardManagerService {
             const currentPlayerTile = this.getCurrentPlayerTile();
             if (this.userCurrentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
                 this.signalUserGotTurnEnded.next();
+            }
+        }
+    }
+
+    toggleDoor(tileCoordinate: Vec2) {
+        const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
+
+        if (tile && tile.isDoor()) {
+            if (tile.type === TileType.Door) {
+                const openDoor = this.tileFactoryService.createTile(TileType.OpenDoor);
+                openDoor.coordinates = tile.coordinates;
+                this.gameMapDataManagerService.setTileAt(tileCoordinate, openDoor);
+            } else if (tile.type === TileType.OpenDoor) {
+                const door = this.tileFactoryService.createTile(TileType.Door);
+                door.coordinates = tile.coordinates;
+                this.gameMapDataManagerService.setTileAt(tileCoordinate, door);
+            }
+
+            const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+            if (userPlayerCharacter && this.isUserTurn) {
+                this.setupPossibleMoves(userPlayerCharacter);
             }
         }
     }

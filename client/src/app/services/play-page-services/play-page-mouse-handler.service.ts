@@ -79,7 +79,7 @@ export class PlayPageMouseHandlerService {
 
     handleLeftClick(tile: Tile) {
         if (this.actionTiles.includes(tile)) {
-            this.toggleAction();
+            this.clearUI();
             this.playGameBoardManagerService.handlePlayerAction(tile);
         } else {
             this.playGameBoardManagerService.moveUserPlayer(tile);
