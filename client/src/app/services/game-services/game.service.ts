@@ -21,6 +21,13 @@ export class GameService {
     setCharacter(character: PlayerCharacter) {
         this.characterSubject.next(character);
     }
+    
+    updatePlayerName(name: string) {
+        const character = this.characterSubject.getValue();
+        character.name = name;
+        this.characterSubject.next(character);
+    }
+    
 
     generateVirtualCharacter(index: number): PlayerCharacter {
         return new PlayerCharacter('Joueur virtuel ' + (index + 1));
