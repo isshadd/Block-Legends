@@ -16,8 +16,6 @@ import { GameService } from '@app/services/game-services/game.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 @Component({
@@ -41,12 +39,13 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
     styleUrl: './play-page.component.scss',
 })
 export class PlayPageComponent implements OnInit, OnDestroy {
-    selectedPlayerCharacter: PlayerCharacter | null = null;
     selectedTile: Tile | null = null;
-    mainPlayer: PlayerCharacter = new PlayerCharacter('sam');
     isBattlePhase: boolean = false;
-    currentPlayer: PlayerCharacter;
-    players: PlayerCharacter[];
+    myPlayer: PlayerCharacter;
+    currentPlayer: PlayerCharacter | null;
+    players: PlayerCharacter[] = [];
+    actionPoints: number;
+    totalLifePoints: number;
 
     private destroy$ = new Subject<void>();
     constructor(
@@ -54,7 +53,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
         public router: Router,
-        private webSocketService: WebSocketService,
+        //private webSocketService: WebSocketService,
         private gameService: GameService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
@@ -62,21 +61,35 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.playGameBoardSocketService.init();
-        this.mainPlayer.avatar = AvatarEnum.Alex;
     }
 
     onPlayGameBoardManagerInit() {
-        // do something
+        this.actionPoints = this.playGameBoardManagerService.userCurrentActionPoints;
+        this.isBattlePhase = this.playGameBoardManagerService.isBattleOn;
+        this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
+        this.getPlayersTurn();
+        console.log('Joueurs:', this.players);
     }
 
+    getPlayersTurn(): void {
+        let playerName: string;
+        let player: PlayerCharacter | null;
+        for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
+            playerName = this.playGameBoardManagerService.turnOrder[i];
+            console.log('Nom du joueur:', playerName);
+            player = this.playGameBoardManagerService.findPlayerFromSocketId(playerName);
+            if (playerName && player) {
+                this.players.push(player);
+            }
+        }
+    }
     ngOnInit(): void {
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-        this.players = this.webSocketService.getTotalPlayers();
-            this.currentPlayer = player;
-                console.log('Joueur actuel:', this.currentPlayer);
-            if (this.currentPlayer) {
-            }
+            //this.players = this.webSocketService.getTotalPlayers();
+            this.myPlayer = player;
+            console.log('Joueur actuel:', this.myPlayer);
         });
+        this.totalLifePoints = this.myPlayer.attributes.life;
     }
     ngOnDestroy(): void {
         this.destroy$.next();

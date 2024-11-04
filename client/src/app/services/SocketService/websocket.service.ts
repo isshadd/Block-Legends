@@ -5,8 +5,8 @@ import { GameService } from '@app/services/game-services/game.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { ChatService } from '../chat-service.service';
 import { environment } from 'src/environments/environment';
+import { ChatService } from '../chat-service.service';
 
 export interface GameRoom {
     roomId: string;
@@ -37,6 +37,7 @@ export class WebSocketService {
     currentRoom: GameRoom;
 
     constructor(
+        private chatService: ChatService,
         private router: Router,
         private gameService: GameService,
     ) {}
@@ -45,9 +46,9 @@ export class WebSocketService {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }
-    
+
     send<T>(event: string, data?: T, callback?: Function): void {
-        this.socket.emit(event, ...([data, callback].filter(x => x)));
+        this.socket.emit(event, ...[data, callback].filter((x) => x));
     }
 
     createGame(gameId: string, player: PlayerCharacter) {

@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            @for (player of players; track player.name) {
+            @for (player of players; track player.socketId) {
             <tr [ngClass]="{ CurrentPlayer: isTurn(player) }">
                 <td><img src="{{ player.avatar.headImage }}" />{{ player.name }}</td>
                 <td>--</td>
