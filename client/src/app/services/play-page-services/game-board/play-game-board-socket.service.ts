@@ -19,6 +19,12 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserMoved$.subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
+        this.playGameBoardManagerService.signalUserStartedMoving$.subscribe(() => {
+            this.socket.emit('userStartedMoving', this.webSocketService.getRoomInfo().accessCode);
+        });
+        this.playGameBoardManagerService.signalUserFinishedMoving$.subscribe(() => {
+            this.socket.emit('userFinishedMoving', this.webSocketService.getRoomInfo().accessCode);
+        });
     }
 
     init() {

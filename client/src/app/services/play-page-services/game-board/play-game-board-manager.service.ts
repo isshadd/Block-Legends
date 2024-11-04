@@ -18,6 +18,12 @@ export class PlayGameBoardManagerService {
     signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
+    signalUserStartedMoving = new Subject<void>();
+    signalUserStartedMoving$ = this.signalUserStartedMoving.asObservable();
+
+    signalUserFinishedMoving = new Subject<void>();
+    signalUserFinishedMoving$ = this.signalUserFinishedMoving.asObservable();
+
     currentTime: number = 0;
     isBattleOn: boolean = false;
     currentPlayerIdTurn: string = '';
@@ -116,6 +122,8 @@ export class PlayGameBoardManagerService {
         const movingTimeInterval = 150;
 
         if (path) {
+            this.signalUserStartedMoving.next();
+
             let lastTile: WalkableTile | null = null;
             for (const tile of path) {
                 if (lastTile) {
@@ -128,6 +136,8 @@ export class PlayGameBoardManagerService {
 
                 lastTile = tile as WalkableTile;
             }
+
+            this.signalUserFinishedMoving.next();
         }
     }
 

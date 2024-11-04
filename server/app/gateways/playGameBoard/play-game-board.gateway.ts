@@ -50,6 +50,22 @@ export class PlayGameBoardGateway {
         this.handleTimeOut(accessCode);
     }
 
+    @SubscribeMessage('userStartedMoving')
+    handleUserStartedMoving(client: Socket, accessCode: number) {
+        if (!this.isClientTurn(client, accessCode)) {
+            return;
+        }
+        this.playGameBoardTimeService.pauseTimer(accessCode);
+    }
+
+    @SubscribeMessage('userFinishedMoving')
+    handleUserFinishedMoving(client: Socket, accessCode: number) {
+        if (!this.isClientTurn(client, accessCode)) {
+            return;
+        }
+        this.playGameBoardTimeService.resumeTimer(accessCode);
+    }
+
     @SubscribeMessage('userMoved')
     handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
         if (!this.isClientTurn(client, data.accessCode)) {
