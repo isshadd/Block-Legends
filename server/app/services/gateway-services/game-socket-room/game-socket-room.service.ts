@@ -1,8 +1,11 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
+import { Avatar } from '@common/enums/avatar-enum';
 import { MapSize } from '@common/enums/map-size';
 import { Injectable, Logger } from '@nestjs/common';
+import { WebSocketServer } from '@nestjs/websockets';
 import { Subject } from 'rxjs';
+import { Server } from 'socket.io';
 
 export class PlayerAttributes {
     life: number;
@@ -12,6 +15,7 @@ export class PlayerAttributes {
 }
 
 export interface PlayerCharacter {
+    avatar: Avatar;
     name: string;
     socketId: string;
     attributes: PlayerAttributes;
@@ -51,7 +55,7 @@ export class GameSocketRoomService {
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
-
+    @WebSocketServer() server: Server;
     signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
     signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
 
@@ -157,6 +161,13 @@ export class GameSocketRoomService {
     addPlayerToRoom(accessCode: number, player: PlayerCharacter, playerName: string): boolean {
         const room = this.rooms.get(accessCode);
         if (room && !room.isLocked) {
+            const existingAvatars = room.players.map(p => p.avatar.name);
+            if (existingAvatars.includes(player.avatar.name)) {
+                this.logger.log(`Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`);
+                // this.server.emit('avatarTakenError', { message: 'Avatar already chosen by another player. Please select a different avatar.' });
+                return; // Avatar is already taken
+            }
+            
             const existingNames = room.players.map(p => p.name);
             let baseName = player.name;
             let suffix = 1;

@@ -97,6 +97,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 valid: true,
                 message: 'Rejoint avec succès',
                 playerName: player.name,
+                playerAvatar: player.avatar,
+                takenAvatars: room.players.map(p => p.avatar.name), // Send the list of taken avatars
             });
             this.updateRoomState(accessCode);
 
@@ -110,10 +112,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     });
                 }
             }
-        } else {
+        } else if (room.isLocked) {
             client.emit('joinGameResponseCanJoin', {
                 valid: false,
                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+            });
+        } 
+        else {
+            client.emit('avatarTakenError', {
+                message: `Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`,
             });
         }
     }

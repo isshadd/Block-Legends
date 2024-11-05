@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 
 @Component({
@@ -13,9 +14,17 @@ import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 export class AvatarSelectionComponent {
     @Input() character: PlayerCharacter;
     avatarList: Avatar[] = [];
+    takenAvatars: string[] = [];
 
-    constructor() {
+    constructor( private webSocketService: WebSocketService) {
         this.setAvatars();
+    }
+
+    ngOnInit(): void {
+        this.webSocketService.takenAvatars$.subscribe((takenAvatars) => {
+            this.takenAvatars = takenAvatars;
+            this.filterAvatars();
+        });
     }
 
     setAvatars() {
@@ -23,6 +32,11 @@ export class AvatarSelectionComponent {
             const avatar = AvatarEnum[key as keyof typeof AvatarEnum];
             this.avatarList.push(avatar);
         }
+    }
+    
+    filterAvatars() {
+        if (!this.takenAvatars) return;
+        this.avatarList = this.avatarList.filter(avatar => !this.takenAvatars.includes(avatar.name));
     }
 
     selectAvatar(avatar: Avatar) {

@@ -27,6 +27,16 @@ export class JoinGameComponent {
         private router: Router,
     ) {}
 
+
+    ngOnInit(): void {
+        this.webSocketService.avatarTakenError$.subscribe((message) => {
+            if (message) {
+                this.errorMessage = message;
+                alert(message); // Display the error message in an alert
+            }
+        });
+    }
+
     joinGame(): void {
         if (!this.accessCode) {
             this.errorMessage = "Le code d'accès est invalide !";
