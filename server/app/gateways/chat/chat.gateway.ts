@@ -3,10 +3,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
 import { ChatEvents } from '@common/enums/chat-events';
-import { GameRoom } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { Message } from '@app/model/schema/message.schema';
 import {RoomMessage} from '@common/interfaces/roomMessage';
-import { access } from 'fs';
 import {GameSocketRoomService} from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 
 @WebSocketGateway({ cors: true })
