@@ -77,6 +77,9 @@ export class PlayPageMouseHandlerService {
     }
 
     handleLeftClick(tile: Tile) {
+        this.discardRightClickSelectedPlayer();
+        this.discardRightSelectedTile();
+
         if (this.actionTiles.includes(tile)) {
             this.clearUI();
             this.playGameBoardManagerService.handlePlayerAction(tile);
