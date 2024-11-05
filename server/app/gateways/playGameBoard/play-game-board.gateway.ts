@@ -325,7 +325,12 @@ export class PlayGameBoardGateway {
             gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
             gameBoardRoom.turnOrder = gameBoardRoom.turnOrder.filter((id) => id !== socketId);
 
-            this.server.to(accessCode.toString()).emit('gameBoardPlayerLeft', socketId);
+            if (gameBoardRoom.turnOrder.length === 1) {
+                this.playGameBoardTimeService.pauseTimer(accessCode);
+                this.server.to(accessCode.toString()).emit('lastPlayerStanding');
+            } else {
+                this.server.to(accessCode.toString()).emit('gameBoardPlayerLeft', socketId);
+            }
         }
     }
 }

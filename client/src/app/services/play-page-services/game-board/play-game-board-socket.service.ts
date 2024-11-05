@@ -178,5 +178,10 @@ export class PlayGameBoardSocketService {
                 this.leaveGame();
             }, 5000);
         });
+
+        this.socket.on('lastPlayerStanding', () => {
+            alert('Tous les autres joueurs ont quitté la partie. Fin de partie');
+            this.leaveGame();
+        });
     }
 }
