@@ -12,6 +12,8 @@
     <div id="map-wrapper">
         @if(battleManagerService.opponentPlayer) {
         <app-fight-view id="fight-comp"></app-fight-view>
+        } @if(playGameBoardManagerService.getWinnerPlayer()) {
+        <app-win-panel [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
         }
         <app-map
             id="map-container"

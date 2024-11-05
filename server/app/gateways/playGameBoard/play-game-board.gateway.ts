@@ -148,6 +148,19 @@ export class PlayGameBoardGateway {
         this.endBattleTurn(accessCode);
     }
 
+    @SubscribeMessage('userWon')
+    handleUserWon(client: Socket, accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (!room) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.playGameBoardTimeService.pauseTimer(accessCode);
+        this.server.to(accessCode.toString()).emit('gameBoardPlayerWon', client.id);
+    }
+
     isClientTurn(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);

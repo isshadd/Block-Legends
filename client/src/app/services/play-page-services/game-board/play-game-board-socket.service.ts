@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
@@ -20,6 +21,7 @@ export class PlayGameBoardSocketService {
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public battleManagerService: BattleManagerService,
+        public router: Router,
     ) {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
@@ -41,6 +43,9 @@ export class PlayGameBoardSocketService {
         });
         this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
             this.socket.emit('userDidBattleAction', { enemyPlayerId, accessCode: this.webSocketService.getRoomInfo().accessCode });
+        });
+        this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.socket.emit('userWon', this.webSocketService.getRoomInfo().accessCode);
         });
 
         this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
@@ -74,6 +79,7 @@ export class PlayGameBoardSocketService {
 
     leaveGame(): void {
         this.socket.disconnect();
+        this.router.navigate(['/home']);
     }
 
     private setupSocketListeners(): void {
@@ -97,7 +103,7 @@ export class PlayGameBoardSocketService {
         this.socket.on('startTurn', (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
-            if (this.playGameBoardManagerService.isUserTurn) {
+            if (this.playGameBoardManagerService.isUserTurn && !this.playGameBoardManagerService.winnerPlayer) {
                 this.playGameBoardManagerService.startTurn();
             }
         });
@@ -112,6 +118,7 @@ export class PlayGameBoardSocketService {
 
         this.socket.on('roomUserRespawned', (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+            this.playGameBoardManagerService.continueTurn();
         });
 
         this.socket.on('roomUserDidDoorAction', (tileCoordinate: Vec2) => {
@@ -162,6 +169,14 @@ export class PlayGameBoardSocketService {
         this.socket.on('secondPlayerWonBattle', (data: { winnerPlayer: string; loserPlayer: string }) => {
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.winnerPlayer, data.loserPlayer);
+        });
+
+        this.socket.on('gameBoardPlayerWon', (playerId: string) => {
+            this.playGameBoardManagerService.endGame(playerId);
+
+            setTimeout(() => {
+                this.leaveGame();
+            }, 5000);
         });
     }
 }

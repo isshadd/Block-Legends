@@ -9,6 +9,7 @@ import { FightViewComponent } from '@app/components/play-area/fight-view/fight-v
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
+import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
@@ -31,6 +32,7 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
         TimerComponent,
         InfoPanelComponent,
         FightViewComponent,
+        WinPanelComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',

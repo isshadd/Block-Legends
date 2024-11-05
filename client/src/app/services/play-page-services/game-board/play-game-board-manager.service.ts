@@ -42,6 +42,9 @@ export class PlayGameBoardManagerService {
     signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
+    signalUserWon = new Subject<void>();
+    signalUserWon$ = this.signalUserWon.asObservable();
+
     currentTime: number = 0;
     areOtherPlayersInBattle: boolean = false;
     currentPlayerIdTurn: string = '';
@@ -50,6 +53,8 @@ export class PlayGameBoardManagerService {
     userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
+
+    winnerPlayer: PlayerCharacter | null = null;
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -297,6 +302,7 @@ export class PlayGameBoardManagerService {
 
         if (winnerPlayerCharacter && loserPlayerCharacter) {
             winnerPlayerCharacter.fightWins++;
+            this.checkIfPlayerWonGame(winnerPlayerCharacter);
 
             if (loserPlayerCharacter === this.getCurrentPlayerCharacter()) {
                 const currentTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
@@ -311,6 +317,22 @@ export class PlayGameBoardManagerService {
                 });
             }
         }
+    }
+
+    checkIfPlayerWonGame(playerCharacter: PlayerCharacter) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= 3) {
+            this.signalUserWon.next();
+        }
+    }
+
+    endGame(playerId: string) {
+        this.winnerPlayer = this.findPlayerFromSocketId(playerId);
+    }
+
+    getWinnerPlayer(): PlayerCharacter | null {
+        return this.winnerPlayer;
     }
 
     removePlayerFromMap(playerId: string) {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -9,10 +9,5 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     styleUrl: './win-panel.component.scss',
 })
 export class WinPanelComponent {
-    @Input() winner: PlayerCharacter;
-    @Output() close = new EventEmitter<void>();
-
-    closeWinPanel() {
-        this.close.emit();
-    }
+    @Input() winner: PlayerCharacter | null = null;
 }

@@ -41,28 +41,6 @@
         font-weight: bold;
         margin: 10px 0;
     }
-
-    #ok-button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: lighten($primary-dark, 10%);
-        color: $primary-light;
-        font-size: 1em;
-        font-weight: bold;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-        
-        &:hover {
-            background-color: darken($primary-dark, 10%);
-            transform: scale(1.05);
-        }
-
-        &:active {
-            transform: scale(0.95);
-        }
-    }
 }
 
 // Fade-in animation for the panel
