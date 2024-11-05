@@ -22,7 +22,7 @@ class MockServer {
     to = jest.fn().mockReturnThis();
     emitTo = jest.fn();
     sockets = {
-        sockets: new Map<string, any>(),
+        sockets: new Map<string, unknown>(),
     };
     on = jest.fn();
 }
@@ -147,7 +147,7 @@ describe('GameSocketRoomService', () => {
             expect(service['gameTimerRooms'].get(1111)).toEqual({
                 time: 0,
                 isPaused: true,
-                state: GameTimerState.PREPARING_TURN,
+                state: GameTimerState.PreparingTurn,
             });
 
             expect(gameService.getGame).toHaveBeenCalledWith('game123');
@@ -218,7 +218,7 @@ describe('GameSocketRoomService', () => {
             expect(result).toBe(true);
             expect(room.players).toContain(player1);
             expect(service['playerRooms'].get('socket1')).toBe(undefined);
-            expect(service.logger.log).toHaveBeenCalledWith(`Joueur socket1 ajouté au room 2222 avec le nom Player1`);
+            expect(service.logger.log).toHaveBeenCalledWith('Joueur socket1 ajouté au room 2222 avec le nom Player1');
         });
 
         it('should not add a player if avatar is already taken', () => {
@@ -227,7 +227,7 @@ describe('GameSocketRoomService', () => {
             expect(result).toBeUndefined();
             expect(room.players).toContain(player1);
             expect(room.players).not.toContain(player3);
-            expect(service.logger.log).toHaveBeenCalledWith(`Avatar WARRIOR déjà pris dans la salle 2222`);
+            expect(service.logger.log).toHaveBeenCalledWith('Avatar WARRIOR déjà pris dans la salle 2222');
         });
 
         it('should append suffix to player name if name already exists', () => {
@@ -251,7 +251,7 @@ describe('GameSocketRoomService', () => {
                 name: 'Player1-2',
             });
             expect(service['playerRooms'].get('socket4')).toBe(2222);
-            expect(service.logger.log).toHaveBeenCalledWith(`Joueur socket4 ajouté au room 2222 avec le nom Player1-2`);
+            expect(service.logger.log).toHaveBeenCalledWith('Joueur socket4 ajouté au room 2222 avec le nom Player1-2');
         });
 
         it('should not add a player to a locked room', () => {
@@ -313,7 +313,7 @@ describe('GameSocketRoomService', () => {
             service.removePlayerFromRoom('socket2');
             expect(room.players).not.toContain(player2);
             expect(service['playerRooms'].has('socket2')).toBe(false);
-            expect(service.logger.log).toHaveBeenCalledWith(`Joueur socket2 enlevé du room 3333`);
+            expect(service.logger.log).toHaveBeenCalledWith('Joueur socket2 enlevé du room 3333');
             expect(service.signalPlayerLeftRoom.next).toHaveBeenCalledWith({ accessCode: 3333, playerSocketId: 'socket2' });
         });
 
@@ -323,13 +323,13 @@ describe('GameSocketRoomService', () => {
             expect(service['rooms'].has(3333)).toBe(false);
             expect(service['gameBoardRooms'].has(3333)).toBe(false);
             expect(service['gameTimerRooms'].has(3333)).toBe(false);
-            expect(service.logger.log).toHaveBeenCalledWith(`Room 3333 suprimmé car il n'y a plus de joueurs`);
+            expect(service.logger.log).toHaveBeenCalledWith("Room 3333 suprimmé car il n'y a plus de joueurs");
         });
 
         it('should assign a new organizer if the organizer leaves', () => {
             service.removePlayerFromRoom('socket1');
             expect(room.organizer).toBe('socket2');
-            expect(service.logger.log).toHaveBeenCalledWith(`L'organisateur est parti, le nouveau: socket2`);
+            expect(service.logger.log).toHaveBeenCalledWith("L'organisateur est parti, le nouveau: socket2");
         });
     });
 
@@ -383,7 +383,7 @@ describe('GameSocketRoomService', () => {
             const result = service.lockRoom(4444, 'socket1');
             expect(result).toBe(true);
             expect(room.isLocked).toBe(true);
-            expect(service.logger.log).toHaveBeenCalledWith(`Room 4444 verrouillé par organisateur socket1`);
+            expect(service.logger.log).toHaveBeenCalledWith('Room 4444 verrouillé par organisateur socket1');
         });
 
         it('should not lock the room if not called by the organizer', () => {
@@ -397,7 +397,7 @@ describe('GameSocketRoomService', () => {
             const result = service.unlockRoom(4444, 'socket1');
             expect(result).toBe(true);
             expect(room.isLocked).toBe(false);
-            expect(service.logger.log).toHaveBeenCalledWith(`Room 4444 déverrouillé par organisateur socket1`);
+            expect(service.logger.log).toHaveBeenCalledWith('Room 4444 déverrouillé par organisateur socket1');
         });
 
         it('should not unlock the room if players are at max', () => {
@@ -467,14 +467,14 @@ describe('GameSocketRoomService', () => {
             expect(result).toBe(true);
             expect(room.players).not.toContain(player);
             expect(service['playerRooms'].has('socket2')).toBe(false);
-            expect(service.logger.log).toHaveBeenCalledWith(`Joueur socket2 enlevé du room 5555`);
+            expect(service.logger.log).toHaveBeenCalledWith('Joueur socket2 enlevé du room 5555');
         });
 
         it('should not allow a non-organizer to kick a player', () => {
             const result = service.kickPlayer(5555, 'socket2', 'socket2');
             expect(result).toBe(false);
             expect(room.players).toContain(player);
-            expect(service.logger.log).not.toHaveBeenCalledWith(`Joueur socket2 enlevé du room 5555`);
+            expect(service.logger.log).not.toHaveBeenCalledWith('Joueur socket2 enlevé du room 5555');
         });
     });
 
@@ -529,7 +529,7 @@ describe('GameSocketRoomService', () => {
             expect(room.players).not.toContain(player2);
             expect(service['playerRooms'].has('socket2')).toBe(false);
             expect(service.signalPlayerLeftRoom.next).toHaveBeenCalledWith({ accessCode: 6666, playerSocketId: 'socket2' });
-            expect(service.logger.log).toHaveBeenCalledWith(`Joueur socket2 enlevé du room 6666`);
+            expect(service.logger.log).toHaveBeenCalledWith('Joueur socket2 enlevé du room 6666');
         });
 
         it('should delete the room if the last player disconnects', () => {
@@ -538,13 +538,13 @@ describe('GameSocketRoomService', () => {
             expect(service['rooms'].has(6666)).toBe(false);
             expect(service['gameBoardRooms'].has(6666)).toBe(false);
             expect(service['gameTimerRooms'].has(6666)).toBe(false);
-            expect(service.logger.log).toHaveBeenCalledWith(`Room 6666 suprimmé car il n'y a plus de joueurs`);
+            expect(service.logger.log).toHaveBeenCalledWith("Room 6666 suprimmé car il n'y a plus de joueurs");
         });
 
         it('should assign a new organizer if the organizer disconnects', () => {
             service.handlePlayerDisconnect('socket1');
             expect(room.organizer).toBe('socket2');
-            expect(service.logger.log).toHaveBeenCalledWith(`L'organisateur est parti, le nouveau: socket2`);
+            expect(service.logger.log).toHaveBeenCalledWith("L'organisateur est parti, le nouveau: socket2");
         });
     });
 
@@ -675,7 +675,7 @@ describe('GameSocketRoomService', () => {
                 turnOrder: [],
             });
             expect(service['rooms'].get(1010)?.maxPlayers).toBe(2); // MapSize.SMALL => 2
-            expect(service.logger.log).toHaveBeenCalledWith(`maxPlayers mis à jour à 2 pour la salle 1010`);
+            expect(service.logger.log).toHaveBeenCalledWith('maxPlayers mis à jour à 2 pour la salle 1010');
         });
     });
 });

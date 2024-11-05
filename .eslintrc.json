@@ -105,7 +105,7 @@
                 "@typescript-eslint/no-magic-numbers": [
                     "error",
                     {
-                        "ignore": [0, 1, 2, -1],
+                        "ignore": [0, 0.5, 1, 2, 1000, -1],
                         "ignoreArrayIndexes": true,
                         "ignoreReadonlyClassProperties": true,
                         "ignoreEnums": true

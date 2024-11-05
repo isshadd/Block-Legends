@@ -22,8 +22,8 @@ export interface PlayerCharacter {
 }
 
 export enum GameTimerState {
-    ACTIVE_TURN,
-    PREPARING_TURN,
+    ActiveTurn,
+    PreparingTurn,
 }
 
 export interface GameTimer {
@@ -50,14 +50,14 @@ export interface GameRoom {
 
 @Injectable()
 export class GameSocketRoomService {
-    public readonly logger = new Logger(GameSocketRoomService.name);
-    private rooms: Map<number, GameRoom> = new Map();
-    playerRooms: Map<string, number> = new Map();
-    gameBoardRooms: Map<number, GameBoardParameters> = new Map();
-    gameTimerRooms: Map<number, GameTimer> = new Map();
     @WebSocketServer() server: Server;
     signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
     signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
+    playerRooms: Map<string, number> = new Map();
+    gameBoardRooms: Map<number, GameBoardParameters> = new Map();
+    gameTimerRooms: Map<number, GameTimer> = new Map();
+    readonly logger = new Logger(GameSocketRoomService.name);
+    private rooms: Map<number, GameRoom> = new Map();
 
     constructor(private readonly gameService: GameService) {}
 
@@ -99,7 +99,7 @@ export class GameSocketRoomService {
 
     setupGameBoardRoom(accessCode: number, game: Game) {
         this.gameBoardRooms.set(accessCode, { game, spawnPlaces: [], turnOrder: [] });
-        let room = this.rooms.get(accessCode);
+        const room = this.rooms.get(accessCode);
         room.maxPlayers = this.setSpawnCounter(game.size);
         this.rooms.set(accessCode, room);
     }
@@ -134,7 +134,7 @@ export class GameSocketRoomService {
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
-        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PREPARING_TURN });
+        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PreparingTurn });
         this.logger.log(`
             Jeu crée avec ID: ${gameId},
             code d'acces: ${accessCode},
@@ -168,7 +168,7 @@ export class GameSocketRoomService {
             }
 
             const existingNames = room.players.map((p) => p.name);
-            let baseName = player.name;
+            const baseName = player.name;
             let suffix = 1;
             while (existingNames.includes(player.name)) {
                 suffix++;
@@ -213,7 +213,7 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId) {
             room.isLocked = true;
-            this.logger.log(`Room ${accessCode} verrouillé par organisateur ${clientId}`);
+            // this.logger.log(`Room ${accessCode} verrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
@@ -223,7 +223,7 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
-            this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
+            // this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
