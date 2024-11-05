@@ -303,11 +303,11 @@ export class PlayGameBoardGateway {
         if (gameBoardRoom) {
             if (room.currentPlayerTurn === socketId) {
                 switch (this.gameSocketRoomService.gameTimerRooms.get(accessCode).state) {
-                    case GameTimerState.ACTIVE_TURN:
+                    case GameTimerState.ActiveTurn:
                         this.handleTimeOut(accessCode);
                         break;
 
-                    case GameTimerState.PREPARING_TURN:
+                    case GameTimerState.PreparingTurn:
                         this.playGameBoardSocketService.changeTurn(accessCode);
                 }
             }
