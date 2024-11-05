@@ -32,14 +32,16 @@
         ></app-timer>
 
         @if (playPageMouseHandlerService.rightSelectedTile) {
-            <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
+        <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
         }
 
         <div class="action-container">
             <div class="button-container">
+                @if(this.playGameBoardManagerService.isUserTurn) {
                 <button class="action-button" (click)="toggleAction()">Action</button>
-                <button class="action-button">Abandon</button>
                 <button class="action-button" (click)="endTurn()">Fin de tour</button>
+                }
+                <button class="action-button">Abandon</button>
             </div>
         </div>
     </div>
