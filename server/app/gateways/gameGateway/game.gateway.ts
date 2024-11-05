@@ -1,13 +1,12 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService, PlayerCharacter } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
-    private readonly logger = new Logger(GameGateway.name);
+    private readonly connectedClients = new Set<string>();
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
@@ -23,6 +22,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 accessCode: room.accessCode,
                 players: room.players,
                 isLocked: room.isLocked,
+                maxPlayers: room.maxPlayers,
             });
         } else {
             client.emit('error', { message: 'Room pas trouvé' });
@@ -95,12 +95,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             client.emit('joinGameResponseCanJoin', {
                 valid: true,
                 message: 'Rejoint avec succès',
+                playerName: player.name,
+                playerAvatar: player.avatar,
+                takenAvatars: room.players.map((p) => p.avatar.name), // Send the list of taken avatars
             });
             this.updateRoomState(accessCode);
-        } else {
+
+            const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+            if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {
+                const locked = this.gameSocketRoomService.lockRoom(accessCode, updatedRoom.organizer);
+                if (locked) {
+                    this.server.to(accessCode.toString()).emit('roomLocked', {
+                        message: 'La salle est verrouillée car le nombre maximal de joueurs a été atteint.',
+                        isLocked: true,
+                    });
+                }
+            }
+        } else if (room.isLocked) {
             client.emit('joinGameResponseCanJoin', {
                 valid: false,
                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+            });
+        } else {
+            client.emit('avatarTakenError', {
+                message: `Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`,
             });
         }
     }
@@ -145,11 +163,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 message: "L'organisateur a quitté la partie",
             });
             return;
+        } else {
+            client.emit('playerLeft');
         }
 
         const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (updatedRoom) {
             this.updateRoomState(accessCode);
+            if (updatedRoom.isLocked && updatedRoom.players.length < updatedRoom.maxPlayers) {
+                const unlocked = this.gameSocketRoomService.unlockRoom(accessCode, updatedRoom.organizer);
+                if (unlocked) {
+                    this.server.to(accessCode.toString()).emit('roomUnlocked', {
+                        message: 'La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.',
+                        isLocked: false,
+                    });
+                }
+            }
         } else {
             this.server.to(accessCode.toString()).emit('roomClosed');
         }
@@ -172,7 +201,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const kicked = this.gameSocketRoomService.kickPlayer(accessCode, player.socketId, client.id);
         if (kicked) {
-            // Emit to the entire room, but include the kicked player's ID
             this.server.to(accessCode.toString()).emit('playerKicked', {
                 message: 'Vous avez été expulsé de la salle',
                 kickedPlayerId: player.socketId,
@@ -184,17 +212,41 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             }
 
             this.updateRoomState(accessCode);
+            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+            if (room && room.isLocked && room.players.length < room.maxPlayers) {
+                const unlocked = this.gameSocketRoomService.unlockRoom(accessCode, room.organizer);
+                if (unlocked) {
+                    this.server.to(accessCode.toString()).emit('roomUnlocked', {
+                        message: 'La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.',
+                        isLocked: false,
+                    });
+                }
+            }
         } else {
             client.emit('error', { message: 'Pas authorisé ou joueur pas trouvé' });
         }
     }
 
+    @SubscribeMessage('getGameParameters')
+    sendGameParameters(accessCode: number) {
+        const gameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+
+        if (!gameBoardParameters) {
+            this.server.to(accessCode.toString()).emit('error', { message: 'Room pas trouvé' });
+            return;
+        }
+
+        this.server.to(accessCode.toString()).emit('gameParameters', { gameBoardParameters });
+    }
+
     handleConnection(client: Socket) {
-        this.logger.log(`Client connecté: ${client.id}`);
+        this.connectedClients.add(client.id);
+        this.server.emit('clientConnected', { clientId: client.id });
     }
 
     handleDisconnect(client: Socket) {
-        this.logger.log(`Client déconnecté: ${client.id}`);
+        this.connectedClients.delete(client.id);
+        this.server.emit('clientDisconnected', { clientId: client.id });
         this.gameSocketRoomService.handlePlayerDisconnect(client.id);
     }
 

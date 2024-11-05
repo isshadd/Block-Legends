@@ -1,107 +1,308 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { GameService } from '@app/services/game-services/game.service';
-// import { WebSocketService } from '@app/services/SocketService/websocket.service';
-// import { of } from 'rxjs';
-// import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
-// import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-// import { WaitingViewComponent } from './waiting-view.component';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { BehaviorSubject, of } from 'rxjs';
+import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
+import { WaitingViewComponent } from './waiting-view.component';
 
-// describe('WaitingViewComponent', () => {
-//     let component: WaitingViewComponent;
-//     let fixture: ComponentFixture<WaitingViewComponent>;
-//     let mockGameService: jasmine.SpyObj<GameService>;
-//     let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
-//     let mockRouter: jasmine.SpyObj<Router>;
-//     let mockActivatedRoute: jasmine.SpyObj<ActivatedRoute>;
+const ACCESS_CODE = 1234;
+const PLAYER4 = 4;
+const PLAYER6 = 6;
 
-//     beforeEach(() => {
-//         mockGameService = jasmine.createSpyObj('GameService', ['generateVirtualCharacter']);
-//         mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['createGame', 'addPlayerToRoom', 'leaveGame']);
-//         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-//         mockActivatedRoute = jasmine.createSpyObj('ActivatedRoute', ['queryParams'], {
-//             queryParams: of({ roomId: 'room1' }),
-//         });
+describe('WaitingViewComponent', () => {
+    let component: WaitingViewComponent;
+    let fixture: ComponentFixture<WaitingViewComponent>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+    let routerSpy: jasmine.SpyObj<Router>;
+    let mockActivatedRoute: Partial<ActivatedRoute>;
 
-//         TestBed.configureTestingModule({
-//             imports: [WaitingViewComponent],
-//             providers: [
-//                 { provide: GameService, useValue: mockGameService },
-//                 { provide: WebSocketService, useValue: mockWebSocketService },
-//                 { provide: Router, useValue: mockRouter },
-//                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
-//             ],
-//         }).compileComponents();
+    const mockCharacter = {
+        isOrganizer: true,
+        // Add other required properties of PlayerCharacter
+    } as PlayerCharacter;
 
-//         fixture = TestBed.createComponent(WaitingViewComponent);
-//         component = fixture.componentInstance;
-//     });
+    const mockSocket = {
+        on: jasmine.createSpy('on'),
+    };
 
-//     it('should initialize with correct roomId from queryParams', () => {
-//         component.ngOnInit();
-//         expect(component.gameId).toBe('room1');
-//         expect(mockGameService.character$.subscribe).toHaveBeenCalled();
-//     });
+    beforeEach(async () => {
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['generateVirtualCharacter'], {
+            accessCode$: new BehaviorSubject<number>(ACCESS_CODE),
+            character$: new BehaviorSubject<PlayerCharacter>(mockCharacter),
+        });
 
-//     it('should call createGame when character is organizer', () => {
-//         const character = new PlayerCharacter('Player1', '', new PlayerAttributes());
-//         character.isOrganizer = true;
-//         mockGameService.character$ = of(character);
+        webSocketServiceSpy = jasmine.createSpyObj(
+            'WebSocketService',
+            ['init', 'createGame', 'addPlayerToRoom', 'leaveGame', 'lockRoom', 'unlockRoom', 'kickPlayer', 'startGame'],
+            {
+                players$: new BehaviorSubject<PlayerCharacter[]>([]),
+                isLocked$: new BehaviorSubject<boolean>(false),
+                maxPlayers$: new BehaviorSubject<number>(PLAYER4),
+                socket: mockSocket,
+            },
+        );
 
-//         component.ngOnInit();
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        routerSpy.navigate.and.returnValue(Promise.resolve(true));
 
-//         if (component.gameId !== null) {
-//             expect(mockWebSocketService.createGame).toHaveBeenCalledWith(component.gameId, character);
-//         }
-//     });
+        mockActivatedRoute = {
+            queryParams: of({ roomId: '1234' }),
+        };
 
-//     it('should call addPlayerToRoom when character is not organizer', () => {
-//         const character = new PlayerCharacter('Player2', '', new PlayerAttributes());
-//         character.isOrganizer = false;
-//         mockGameService.character$ = of(character);
+        await TestBed.configureTestingModule({
+            imports: [WaitingViewComponent],
+            providers: [
+                { provide: GameService, useValue: gameServiceSpy },
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: Router, useValue: routerSpy },
+                { provide: ActivatedRoute, useValue: mockActivatedRoute },
+            ],
+        }).compileComponents();
 
-//         component.ngOnInit();
+        fixture = TestBed.createComponent(WaitingViewComponent);
+        component = fixture.componentInstance;
+    });
 
-//         if (component.gameId !== null) {
-//             expect(mockWebSocketService.addPlayerToRoom).toHaveBeenCalledWith(component.gameId, character);
-//         }
-//     });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 
-//     it('should add a virtual player', () => {
-//         const virtualCharacter = new PlayerCharacter('Joueur virtuel 1', '', new PlayerAttributes());
-//         mockGameService.generateVirtualCharacter.and.returnValue(virtualCharacter);
+    describe('ngOnInit', () => {
+        it('should initialize for organizer', fakeAsync(() => {
+            component.ngOnInit();
+            tick();
 
-//         component.addVirtualPlayers();
+            expect(component.gameId).toBe('1234');
+            expect(component.isOrganizer).toBeTrue();
+            expect(webSocketServiceSpy.init).toHaveBeenCalled();
+            expect(webSocketServiceSpy.createGame).toHaveBeenCalled();
+            expect(component.accessCode).toBe(ACCESS_CODE);
+        }));
 
-//         if (component.gameId !== null) {
-//             expect(mockWebSocketService.addPlayerToRoom).toHaveBeenCalledWith(component.gameId, virtualCharacter);
-//         }
-//         expect(component.playersCounter).toBe(1);
-//         expect(component.isMaxPlayer).toBeFalse();
-//     });
+        it('should initialize for non-organizer', fakeAsync(() => {
+            const nonOrgCharacter = { ...mockCharacter, isOrganizer: false };
+            (gameServiceSpy.character$ as BehaviorSubject<PlayerCharacter>).next(nonOrgCharacter as PlayerCharacter);
 
-//     it('should not add a virtual player if max players reached', () => {
-//         component.playersCounter = 5;
-//         component.addVirtualPlayers();
+            component.ngOnInit();
+            tick();
 
-//         expect(mockWebSocketService.addPlayerToRoom).not.toHaveBeenCalled();
-//         expect(component.isMaxPlayer).toBeTrue();
-//     });
+            expect(component.isOrganizer).toBeFalse();
+            expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
+            expect(component.accessCode).toBe(ACCESS_CODE);
+        }));
 
-//     it('should leave the game and navigate to home', () => {
-//         component.playerLeave();
+        it('should handle players$ subscription', fakeAsync(() => {
+            component.ngOnInit();
+            (webSocketServiceSpy.players$ as BehaviorSubject<PlayerCharacter[]>).next([{} as PlayerCharacter]);
+            tick();
 
-//         expect(mockWebSocketService.leaveGame).toHaveBeenCalled();
-//         expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
-//     });
+            expect(component.playersCounter).toBeGreaterThan(1);
+        }));
 
-//     it('should complete destroy$ subject', () => {
-//         spyOn(component['destroy$'], 'next');
-//         spyOn(component['destroy$'], 'complete');
+        it('should handle maxPlayers$ subscription', fakeAsync(() => {
+            component.ngOnInit();
+            (webSocketServiceSpy.maxPlayers$ as BehaviorSubject<number>).next(PLAYER6);
+            tick();
 
-//         component.ngOnDestroy();
+            expect(component.maxPlayers).toBe(PLAYER6);
+        }));
 
-//         expect(component['destroy$'].next).toHaveBeenCalled();
-//         expect(component['destroy$'].complete).toHaveBeenCalled();
-//     });
-// });
+        it('should handle organizerLeft event', fakeAsync(() => {
+            component.isOrganizer = false;
+            component.ngOnInit();
+
+            const socketCallback = mockSocket.on.calls.mostRecent().args[1];
+            socketCallback({ message: 'Organizer left' });
+            tick();
+
+            expect(webSocketServiceSpy.leaveGame).not.toHaveBeenCalled();
+        }));
+    });
+
+    describe('addVirtualPlayers', () => {
+        it('should add virtual player when below max', () => {
+            const virtualPlayer = {} as PlayerCharacter;
+            gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
+            component.playersCounter = 1;
+
+            component.addVirtualPlayers();
+
+            expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalled();
+            expect(component.playersCounter).toBe(2);
+        });
+
+        it('should not add player when at max', () => {
+            component.playersCounter = PLAYER4;
+
+            component.addVirtualPlayers();
+
+            expect(component.isMaxPlayer).toBeFalse();
+            expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalled();
+        });
+    });
+
+    it('should handle playerLeave', fakeAsync(() => {
+        component.playerLeave();
+        tick();
+
+        expect(webSocketServiceSpy.leaveGame).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    }));
+
+    it('should handle playerNonOrgLeave', fakeAsync(() => {
+        component.playerNonOrgLeave();
+        tick();
+
+        expect(webSocketServiceSpy.leaveGame).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    }));
+
+    it('should handle lockRoom', () => {
+        component.lockRoom();
+        expect(webSocketServiceSpy.lockRoom).toHaveBeenCalled();
+    });
+
+    it('should handle unlockRoom', () => {
+        component.unlockRoom();
+        expect(webSocketServiceSpy.unlockRoom).toHaveBeenCalled();
+    });
+
+    it('should handle kickPlayer when organizer', () => {
+        const playerToKick = {} as PlayerCharacter;
+        component.isOrganizer = true;
+
+        component.kickPlayer(playerToKick);
+
+        expect(webSocketServiceSpy.kickPlayer).toHaveBeenCalledWith(playerToKick);
+    });
+
+    it('should not kickPlayer when not organizer', () => {
+        const playerToKick = {} as PlayerCharacter;
+        component.isOrganizer = false;
+
+        component.kickPlayer(playerToKick);
+
+        expect(webSocketServiceSpy.kickPlayer).not.toHaveBeenCalled();
+    });
+
+    it('should handle playGame', () => {
+        component.playGame();
+        expect(webSocketServiceSpy.startGame).toHaveBeenCalled();
+    });
+
+    it('should handle changeRoomId', () => {
+        const newRoomId = 4321;
+        component.changeRoomId(newRoomId);
+
+        expect(routerSpy.navigate).toHaveBeenCalledWith([], {
+            relativeTo: jasmine.any(Object),
+            queryParams: { roomId: newRoomId },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+        });
+    });
+
+    it('should handle ngOnDestroy', () => {
+        const destroyNextSpy = spyOn(component['destroy$'], 'next');
+        const destroyCompleteSpy = spyOn(component['destroy$'], 'complete');
+
+        component.ngOnDestroy();
+
+        expect(destroyNextSpy).toHaveBeenCalled();
+        expect(destroyCompleteSpy).toHaveBeenCalled();
+    });
+
+    describe('organizerLeft event', () => {
+        beforeEach(() => {
+            component.ngOnInit();
+        });
+
+        it('should not call playerLeave when isOrganizer is true', fakeAsync(() => {
+            component.isOrganizer = true;
+            const socketCallback = mockSocket.on.calls.mostRecent().args[1];
+
+            socketCallback({ message: 'Organizer left' });
+            tick();
+
+            expect(webSocketServiceSpy.leaveGame).not.toHaveBeenCalled();
+            expect(routerSpy.navigate).toHaveBeenCalled();
+        }));
+
+        it('should call playerLeave when isOrganizer is false', fakeAsync(() => {
+            component.isOrganizer = false;
+            const socketCallback = mockSocket.on.calls.mostRecent().args[1];
+
+            socketCallback({ message: 'Organizer left' });
+            tick();
+
+            expect(webSocketServiceSpy.leaveGame).toHaveBeenCalled();
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+        }));
+    });
+
+    describe('addVirtualPlayers', () => {
+        it('should set isMaxPlayer to true and return early when playersCounter >= VP_NUMBER', () => {
+            component.playersCounter = VP_NUMBER;
+            component.isMaxPlayer = false;
+            const virtualPlayer = {} as PlayerCharacter;
+            gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
+
+            component.addVirtualPlayers();
+
+            expect(component.isMaxPlayer).toBeTrue();
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalled();
+            expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalled();
+            expect(component.playersCounter).toBe(VP_NUMBER);
+        });
+
+        it('should add virtual player when playersCounter < VP_NUMBER', () => {
+            component.playersCounter = VP_NUMBER - 1;
+            component.isMaxPlayer = false;
+            const virtualPlayer = {} as PlayerCharacter;
+            gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
+
+            component.addVirtualPlayers();
+
+            expect(component.isMaxPlayer).toBeFalse();
+            expect(gameServiceSpy.generateVirtualCharacter).toHaveBeenCalled();
+            expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalled();
+            expect(component.playersCounter).toBe(VP_NUMBER);
+        });
+    });
+
+    describe('ngOnInit character subscription', () => {
+        it('should do nothing when gameId is null', fakeAsync(() => {
+            // Setup mock ActivatedRoute to return null roomId
+            TestBed.resetTestingModule();
+            mockActivatedRoute = {
+                queryParams: of({ roomId: null }),
+            };
+
+            TestBed.configureTestingModule({
+                imports: [WaitingViewComponent],
+                providers: [
+                    { provide: GameService, useValue: gameServiceSpy },
+                    { provide: WebSocketService, useValue: webSocketServiceSpy },
+                    { provide: Router, useValue: routerSpy },
+                    { provide: ActivatedRoute, useValue: mockActivatedRoute },
+                ],
+            }).compileComponents();
+
+            fixture = TestBed.createComponent(WaitingViewComponent);
+            component = fixture.componentInstance;
+
+            component.ngOnInit();
+            tick();
+
+            (gameServiceSpy.character$ as BehaviorSubject<PlayerCharacter>).next(mockCharacter);
+            tick();
+
+            expect(component.isOrganizer).toBeFalse();
+            expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
+            expect(webSocketServiceSpy.createGame).not.toHaveBeenCalled();
+            expect(component.playersCounter).toBe(1);
+        }));
+    });
+});

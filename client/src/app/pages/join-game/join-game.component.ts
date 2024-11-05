@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 // import { Router } from '@angular/router';
@@ -17,7 +17,7 @@ const MAX_VALUE = 4;
     templateUrl: './join-game.component.html',
     styleUrl: './join-game.component.scss',
 })
-export class JoinGameComponent {
+export class JoinGameComponent implements OnInit {
     accessCode: number | null;
     errorMessage: string | null;
 
@@ -27,11 +27,21 @@ export class JoinGameComponent {
         private router: Router,
     ) {}
 
+    ngOnInit(): void {
+        this.webSocketService.avatarTakenError$.subscribe((message) => {
+            if (message) {
+                this.errorMessage = message;
+                alert(message); // Display the error message in an alert
+            }
+        });
+    }
+
     joinGame(): void {
         if (!this.accessCode) {
             this.errorMessage = "Le code d'accès est invalide !";
         } else {
             this.errorMessage = null;
+            this.webSocketService.init();
             this.webSocketService.joinGame(this.accessCode);
         }
     }

@@ -22,6 +22,12 @@ export class GameService {
         this.characterSubject.next(character);
     }
 
+    updatePlayerName(name: string) {
+        const character = this.characterSubject.getValue();
+        character.name = name;
+        this.characterSubject.next(character);
+    }
+
     generateVirtualCharacter(index: number): PlayerCharacter {
         return new PlayerCharacter('Joueur virtuel ' + (index + 1));
     }
@@ -29,10 +35,5 @@ export class GameService {
     clearGame(): void {
         this.accessCodeSubject.next(null);
         this.characterSubject.next(new PlayerCharacter(''));
-    }
-
-    clearLocalStorage(): void {
-        localStorage.removeItem('accessCode');
-        localStorage.removeItem('roomId');
     }
 }

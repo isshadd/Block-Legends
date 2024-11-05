@@ -19,10 +19,13 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode: number | null;
     players$ = this.webSocketService.players$;
     isLocked$ = this.webSocketService.isLocked$;
+    maxPlayers$ = this.webSocketService.maxPlayers$;
     gameId: string | null;
-    playersCounter = 0;
+    size: number;
+    playersCounter = 1;
     isMaxPlayer = false;
     isOrganizer = false;
+    maxPlayers: number = 0;
 
     private destroy$ = new Subject<void>();
 
@@ -44,16 +47,35 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.isOrganizer = character.isOrganizer;
 
             if (character.isOrganizer) {
+                this.playersCounter++;
+                this.webSocketService.init();
                 this.webSocketService.createGame(this.gameId, character);
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                 });
             } else {
+                this.playersCounter++;
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                 });
+            }
+        });
+
+        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+            players.forEach(() => {
+                this.playersCounter++;
+            });
+        });
+
+        this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
+            this.maxPlayers = max;
+        });
+
+        this.webSocketService.socket.on('organizerLeft', () => {
+            if (!this.isOrganizer) {
+                this.playerLeave();
             }
         });
     }
@@ -71,11 +93,19 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     playerLeave(): void {
         this.webSocketService.leaveGame();
-        this.router.navigate(['/home']);
+        this.router.navigate(['/home']).then(() => {
+            alert('Le créateur a quitté la partie');
+        });
+    }
+
+    playerNonOrgLeave(): void {
+        this.webSocketService.leaveGame();
+        this.router.navigate(['/home']).then(() => {
+            alert('Vous avez quitté la partie');
+        });
     }
 
     ngOnDestroy(): void {
-        this.gameService.clearLocalStorage();
         this.destroy$.next();
         this.destroy$.complete();
     }

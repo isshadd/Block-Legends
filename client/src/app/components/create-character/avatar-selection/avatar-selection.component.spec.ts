@@ -20,6 +20,13 @@ describe('AvatarSelectionComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('should filter out taken avatars from the avatarList', () => {
+        component.takenAvatars = [AvatarEnum.Steve.name];
+        component.avatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+        component.filterAvatars();
+        expect(component.avatarList).not.toContain(AvatarEnum.Steve);
+    });
+
     it('should initialize avatarList with an available avatar', () => {
         component.setAvatars();
         expect(component.avatarList).toContain(AvatarEnum.Steve);

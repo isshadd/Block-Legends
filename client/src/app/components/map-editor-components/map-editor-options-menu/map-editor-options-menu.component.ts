@@ -5,7 +5,6 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MapEditorModalComponent } from '@app/components/map-editor-components/map-editor-modal/map-editor-modal.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
-import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
     selector: 'app-map-editor-options-menu',
@@ -26,10 +25,13 @@ export class MapEditorOptionsMenuComponent {
             data: { name: this.gameMapDataManagerService.currentName, description: this.gameMapDataManagerService.currentDescription },
         });
 
-        dialogRef.afterClosed().subscribe((result: GameShared) => {
+        dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.gameMapDataManagerService.currentName = result.name;
                 this.gameMapDataManagerService.currentDescription = result.description;
+                if (result.isSavedPressed) {
+                    this.onSaveClick();
+                }
             }
         });
     }

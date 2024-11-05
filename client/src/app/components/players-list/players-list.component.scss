@@ -1,0 +1,51 @@
+@import 'src/_variables.scss';
+.table-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    max-height: 150px; /* Hauteur maximale du conteneur */
+    overflow-y: auto; /* Active le défilement vertical */
+    border: 1px solid #ddd; /* Bordure autour du tableau */
+    border-radius: 5px; /* Coins arrondis */
+    background-color: darken($primary, 20);
+}
+
+th:first-child,
+td:first-child {
+    width: 50%; /* Set the first column to take 50% of the width */
+}
+
+th:not(:first-child),
+td:not(:first-child) {
+    width: 25%; /* Set the remaining columns to take 10% of the width */
+}
+
+img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+}
+
+th,
+td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background-color: darken($primary, 40);
+    color: white;
+    font-weight: bold;
+}
+
+// tr:nth-child(even) {
+//     background-color: #f2f2f2;
+// }

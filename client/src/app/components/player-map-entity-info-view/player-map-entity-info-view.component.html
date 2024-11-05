@@ -1,30 +1,29 @@
-<div id="info-view">
+<div id="info-view" [ngStyle]="{ transform: 'scale(' + scale + ')' }">
+    <div *ngIf="showButton">
+        <button class="close-button" (click)="closePanel()">×</button>
+    </div>
     <div class="info-content">
         <div class="player-info">{{ playerCharacter.name }}</div>
         <div class="player-info-details">
-            Santé:@for(defense of speedArray; track defense){
-            <span class="icon-container">
+            Santé:
+            <span *ngFor="let _ of healthArray" class="icon-container">
                 <img src="assets/images/heart.png" alt="Heart" class="icon" />
             </span>
-            }
             <br />
-            Défense:@for(defense of speedArray; track defense){
-            <span class="icon-container">
+            Défense:
+            <span *ngFor="let _ of defenseArray" class="icon-container">
                 <img src="assets/images/armor.png" alt="Armor" class="icon" />
             </span>
-            }
             <br />
-            Vitesse: @for(speed of speedArray; track speed){
-            <span class="icon-container">
+            Vitesse:
+            <span *ngFor="let _ of speedArray" class="icon-container">
                 <img src="assets/images/view/boots.png" alt="Speed" class="icon" />
             </span>
-            }
             <br />
-            Attaque:@for(speed of speedArray; track speed){
-            <span class="icon-container">
+            Attaque:
+            <span *ngFor="let _ of attackArray" class="icon-container">
                 <img src="assets/images/view/sword.png" alt="Attack" class="icon" />
             </span>
-            }
         </div>
     </div>
     <div id="player-image">

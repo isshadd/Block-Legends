@@ -1,113 +1,526 @@
-// import { TestBed } from '@angular/core/testing';
-// import { Router } from '@angular/router';
-// import { PlayerCharacter } from '@app/classes/Characters/player-character';
-// import { GameService } from '@app/services/game-services/game.service';
-// import { io, Socket } from 'socket.io-client';
-// import { WebSocketService } from './websocket.service';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines*/
+/* eslint-disable @typescript-eslint/no-empty-function*/
+/* eslint-disable @typescript-eslint/promise-function-async*/
+/* eslint-disable no-undef*/
+/* eslint-disable @typescript-eslint/ban-types*/
 
-// describe('WebSocketService', () => {
-//     let service: WebSocketService;
-//     let mockRouter: Router;
-//     let mockGameService: GameService;
-//     let mockPlayerCharacter: PlayerCharacter;
-//     let mockSocket: jasmine.SpyObj<Socket>;
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { GameService } from '@app/services/game-services/game.service';
+import { Socket } from 'socket.io-client';
+import { GameRoom, WebSocketService } from './websocket.service';
 
-//     beforeEach(() => {
-//         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-//         mockGameService = jasmine.createSpyObj('GameService', ['setAccessCode', 'clearGame']);
-//         mockPlayerCharacter = jasmine.createSpyObj('PlayerCharacter', ['name', 'socketId']);
-//         mockSocket = jasmine.createSpyObj<Socket>('Socket', ['emit', 'on']);
+const ACCESS_CODE = 1234;
 
-//         TestBed.configureTestingModule({
-//             //imports: [WebSocketService],
-//             providers: [
-//                 { provide: WebSocketService, useValue: { socket: mockSocket } },
-//                 { provide: Router, useValue: mockRouter },
-//                 { provide: GameService, useValue: mockGameService },
-//             ],
-//         });
+describe('WebSocketService', () => {
+    let service: WebSocketService;
+    let routerSpy: jasmine.SpyObj<Router>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let socketSpy: jasmine.SpyObj<Socket>;
 
-//         service = TestBed.inject(WebSocketService);
-//     });
+    beforeEach(() => {
+        const router = jasmine.createSpyObj('Router', ['navigate']);
+        const gameService = jasmine.createSpyObj('GameService', ['setAccessCode', 'clearGame', 'updatePlayerName']);
+        const socket = jasmine.createSpyObj('Socket', ['emit', 'on', 'disconnect']);
+        socket.id = 'socket-id';
 
-//     afterEach(() => {
-//         jasmine.clock().uninstall();
-//     });
+        TestBed.configureTestingModule({
+            providers: [WebSocketService, { provide: Router, useValue: router }, { provide: GameService, useValue: gameService }],
+        });
 
-//     it('should connect to the socket and setup listeners', () => {
-//         const socket = { on: jasmine.createSpy(), emit: jasmine.createSpy() };
-//         (io as jasmine.Spy).and.returnValue(socket);
+        service = TestBed.inject(WebSocketService);
+        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+        gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
+        service.socket = socket as any;
+        socketSpy = service.socket as jasmine.SpyObj<Socket>;
+    });
 
-//         expect(socket.on).toHaveBeenCalled();
-//     });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 
-//     it('should handle room state reception', () => {
-//         const roomState = { roomId: 'room1', accessCode: 1234, players: [] };
+    it('should initialize socket and set up listeners', async () => {
+        spyOn(service, 'setupSocketListeners');
+        service.init();
+        expect(service.socket).toBeDefined();
+        expect(service.setupSocketListeners).toHaveBeenCalled();
+    });
 
-//         const onSpy = mockSocket.on as jasmine.Spy;
-//         const eventHandler = onSpy.calls.mostRecent().args[1];
-//         eventHandler(roomState);
+    it('should emit createGame event', async () => {
+        const gameId = 'game123';
+        const player = new PlayerCharacter('Hero');
+        service.createGame(gameId, player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('createGame', {
+            gameId,
+            playerOrganizer: player,
+        });
+    });
 
-//         expect(mockGameService.setAccessCode).toHaveBeenCalledWith(roomState.accessCode);
-//         expect(service.playersSubject.getValue()).toEqual(roomState.players);
-//     });
+    it('should emit joinGame event', async () => {
+        const accessCode = ACCESS_CODE;
+        service.joinGame(accessCode);
+        expect(socketSpy.emit).toHaveBeenCalledWith('joinGame', accessCode);
+    });
 
-//     it('should handle players update', () => {
-//         const players: PlayerCharacter[] = [mockPlayerCharacter];
+    it('should emit addPlayerToRoom event', async () => {
+        const accessCode = ACCESS_CODE;
+        const player = new PlayerCharacter('Hero');
+        service.addPlayerToRoom(accessCode, player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('addPlayerToRoom', {
+            accessCode,
+            player,
+        });
+    });
 
-//         const onSpy = mockSocket.on as jasmine.Spy;
-//         const eventHandler = onSpy.calls.mostRecent().args[1];
-//         eventHandler(players);
+    it('should emit kickPlayer event', async(() => {
+        const player = new PlayerCharacter('Hero');
+        service.kickPlayer(player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('kickPlayer', player);
+    }));
 
-//         expect(service.playersSubject.getValue()).toEqual(players);
-//     });
+    it('should leave game and reset state', fakeAsync(() => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.leaveGame();
+        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
+        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        tick();
+    }));
 
-//     it('should handle valid join game response', () => {
-//         const response = { valid: true, message: 'Joined successfully', roomId: 'room1', accessCode: 1234 };
+    it('should lock the room', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.lockRoom();
+        expect(socketSpy.emit).toHaveBeenCalledWith('lockRoom', ACCESS_CODE);
+    });
 
-//         const onSpy = mockSocket.on as jasmine.Spy;
-//         onSpy.calls.mostRecent().args[1](response);
+    it('should unlock the room', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.unlockRoom();
+        expect(socketSpy.emit).toHaveBeenCalledWith('unlockRoom', ACCESS_CODE);
+    });
 
-//         expect(localStorage.getItem('roomId')).toBe('room1');
-//         expect(mockGameService.setAccessCode).toHaveBeenCalledWith(response.accessCode);
-//         expect(mockRouter.navigate).toHaveBeenCalledWith(['/player-create-character'], { queryParams: { roomId: 'room1' } });
-//     });
+    it('should start the game', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.startGame();
+        expect(socketSpy.emit).toHaveBeenCalledWith('startGame', ACCESS_CODE);
+    });
 
-//     it('should handle invalid join game response', () => {
-//         const response = { valid: false, message: 'Invalid access code', roomId: '', accessCode: 0 };
-//         spyOn(window, 'alert');
+    it('should get room info', async () => {
+        service.currentRoom = { roomId: 'room123' } as any;
+        expect(service.getRoomInfo()).toEqual(service.currentRoom);
+    });
 
-//         const onSpy = mockSocket.on as jasmine.Spy;
-//         onSpy.calls.mostRecent().args[1](response);
+    it('should set up socket listeners', async () => {
+        // spyOn(socketSpy, 'on');
+        service.setupSocketListeners();
+        expect(socketSpy.on).toHaveBeenCalledWith('roomState', jasmine.any(Function));
+        expect(socketSpy.on).toHaveBeenCalledWith('joinGameResponse', jasmine.any(Function));
+        // Add checks for all other socket.on handlers
+    });
 
-//         expect(window.alert).toHaveBeenCalledWith("Code d'accès invalide");
-//     });
+    it('should handle roomState event', fakeAsync(() => {
+        const room: GameRoom = {
+            accessCode: ACCESS_CODE,
+            players: [],
+            isLocked: false,
+            maxPlayers: 4,
+            currentPlayerTurn: '',
+            roomId: 'room123',
+        } as GameRoom;
 
-//     it('should create a game', () => {
-//         service.createGame('game1', mockPlayerCharacter);
+        let handler: (room: GameRoom) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'roomState') {
+                handler = fn as (room: GameRoom) => void;
+            }
+            return socketSpy;
+        });
 
-//         expect(mockSocket.emit).toHaveBeenCalledWith('createGame', { gameId: 'game1', playerOrganizer: mockPlayerCharacter });
-//         expect(localStorage.getItem('roomId')).toBe('game1');
-//     });
+        service.setupSocketListeners();
 
-//     it('should join a game', () => {
-//         service.joinGame(1234);
+        handler(room);
+        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
+        service.players$.subscribe((players) => {
+            expect(players).toEqual([]);
+        });
+        expect(service.currentRoom).toEqual(room);
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        tick();
+    }));
 
-//         expect(mockSocket.emit).toHaveBeenCalledWith('joinGame', 1234);
-//     });
+    it('should handle joinGameResponse event with valid response', fakeAsync(() => {
+        const response = {
+            valid: true,
+            message: '',
+            roomId: 'room123',
+            accessCode: ACCESS_CODE,
+            isLocked: false,
+            playerName: 'Player1',
+            takenAvatars: ['avatar1'],
+        };
 
-//     it('should add player to room', () => {
-//         service.addPlayerToRoom('game1', mockPlayerCharacter);
+        let handler: (response: any) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponse') {
+                handler = fn as (response: any) => void;
+            }
+            return socketSpy;
+        });
 
-//         expect(mockSocket.emit).toHaveBeenCalledWith('addPlayerToRoom', { gameId: 'game1', player: mockPlayerCharacter });
-//     });
+        service.setupSocketListeners();
 
-//     it('should leave the game', () => {
-//         localStorage.setItem('roomId', 'game1');
-//         service.leaveGame();
+        handler(response);
+        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        service.takenAvatars$.subscribe((avatars) => {
+            expect(avatars).toEqual(['avatar1']);
+        });
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-create-character'], {
+            queryParams: { roomId: ACCESS_CODE },
+        });
+        expect(gameServiceSpy.updatePlayerName).toHaveBeenCalledWith('Player1');
+        tick();
+    }));
 
-//         expect(mockSocket.emit).toHaveBeenCalledWith('leaveGame', 'game1');
-//         expect(localStorage.getItem('roomId')).toBe(null);
-//         expect(mockGameService.clearGame).toHaveBeenCalled();
-//     });
-// });
+    it('should handle joinGameResponse event with invalid response', fakeAsync(() => {
+        const response = {
+            valid: false,
+            message: 'Error message',
+            roomId: '',
+            accessCode: 0,
+            isLocked: false,
+            playerName: '',
+            takenAvatars: [],
+        };
+
+        spyOn(window, 'alert');
+
+        let handler: (response: any) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponse') {
+                handler = fn as (response: any) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(response);
+
+        expect(window.alert).toHaveBeenCalledWith('Error message');
+        tick();
+    }));
+
+    it('should handle avatarTakenError event', fakeAsync(() => {
+        const data = { message: 'Avatar already taken' };
+
+        let handler: (data: { message: string }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'avatarTakenError') {
+                handler = fn as (data: { message: string }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(data);
+
+        service.avatarTakenError$.subscribe((message) => {
+            expect(message).toEqual('Avatar already taken');
+        });
+        tick();
+    }));
+
+    it('should handle playerKicked event when current player is kicked', async () => {
+        const data = { message: 'You have been kicked', kickedPlayerId: 'socket-id' };
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        spyOn(window, 'alert').and.stub();
+        routerSpy.navigate.and.returnValue(Promise.resolve(true));
+        socketSpy.id = 'socket-id';
+
+        let handler: (data: { message: string; kickedPlayerId: string }) => Promise<void> = () => Promise.resolve();
+
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'playerKicked') {
+                handler = fn as (data: { message: string; kickedPlayerId: string }) => Promise<void>;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        await handler(data);
+
+        expect(window.alert).toHaveBeenCalledWith('You have been kicked');
+        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
+        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
+        expect(service.isLockedSubject.value).toBeFalse();
+        expect(service.playersSubject.value).toEqual([]);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    });
+
+    it('should handle playerLeft event', fakeAsync(() => {
+        let handler: () => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'playerLeft') {
+                handler = fn as () => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler();
+
+        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        service.players$.subscribe((players) => {
+            expect(players).toEqual([]);
+        });
+        expect(service.socket.disconnect).toHaveBeenCalled();
+        tick();
+    }));
+
+    it('should handle gameStarted event', fakeAsync(() => {
+        let handler: () => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'gameStarted') {
+                handler = fn as () => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler();
+
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/play-page']);
+        tick();
+    }));
+
+    it('should handle roomClosed event', fakeAsync(() => {
+        const player1 = new PlayerCharacter('Hero');
+        player1.isOrganizer = false;
+        const player2 = new PlayerCharacter('Hero2');
+        player2.isOrganizer = true;
+
+        service.currentRoom = {
+            players: [player1, player2],
+        } as any;
+
+        spyOn(service, 'leaveGame');
+
+        let handler: () => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'roomClosed') {
+                handler = fn as () => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler();
+
+        expect(service.leaveGame).toHaveBeenCalled();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+        tick();
+    }));
+
+    it('should handle error event', fakeAsync(() => {
+        const message = 'An error occurred';
+        spyOn(window, 'alert');
+
+        let handler: (message: string) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'error') {
+                handler = fn as (message: string) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(message);
+
+        expect(window.alert).toHaveBeenCalledWith(message);
+        tick();
+    }));
+
+    it('leaveGame should not emit if accessCode is undefined', fakeAsync(() => {
+        service.currentRoom = {} as any;
+        service.leaveGame();
+        expect(socketSpy.emit).not.toHaveBeenCalledWith('leaveGame', jasmine.anything());
+        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        tick();
+    }));
+
+    it('lockRoom should not emit if accessCode is undefined', fakeAsync(() => {
+        service.currentRoom = {} as any;
+        service.lockRoom();
+        expect(socketSpy.emit).not.toHaveBeenCalled();
+        tick();
+    }));
+
+    it('unlockRoom should not emit if accessCode is undefined', fakeAsync(() => {
+        service.currentRoom = {} as any;
+        service.unlockRoom();
+        expect(socketSpy.emit).not.toHaveBeenCalled();
+        tick();
+    }));
+
+    it('startGame should not emit if accessCode is undefined', fakeAsync(() => {
+        service.currentRoom = {} as any;
+        service.startGame();
+        expect(socketSpy.emit).not.toHaveBeenCalled();
+        tick();
+    }));
+
+    it('should handle roomLocked event', fakeAsync(() => {
+        const data = { message: 'Room is locked', isLocked: true };
+        spyOn(window, 'alert');
+
+        let handler: (data: { message: string; isLocked: boolean }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'roomLocked') {
+                handler = fn as (data: { message: string; isLocked: boolean }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(data);
+
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeTrue();
+        });
+        expect(window.alert).toHaveBeenCalledWith('Room is locked');
+        tick();
+    }));
+
+    it('should handle roomUnlocked event', fakeAsync(() => {
+        const data = { message: 'Room is unlocked', isLocked: false };
+        spyOn(window, 'alert');
+
+        let handler: (data: { message: string; isLocked: boolean }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'roomUnlocked') {
+                handler = fn as (data: { message: string; isLocked: boolean }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(data);
+
+        service.isLocked$.subscribe((isLocked) => {
+            expect(isLocked).toBeFalse();
+        });
+        expect(window.alert).toHaveBeenCalledWith('Room is unlocked');
+        tick();
+    }));
+
+    it('should handle joinGameResponseCodeInvalid event', fakeAsync(() => {
+        const response = { message: 'Invalid code' };
+        spyOn(window, 'alert');
+
+        let handler: (response: { message: string }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponseCodeInvalid') {
+                handler = fn as (response: { message: string }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(response);
+
+        expect(window.alert).toHaveBeenCalledWith('Invalid code');
+        tick();
+    }));
+
+    it('should handle joinGameResponseLockedRoom event', fakeAsync(() => {
+        const response = { message: 'Room is locked' };
+        spyOn(window, 'alert');
+
+        let handler: (response: { message: string }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponseLockedRoom') {
+                handler = fn as (response: { message: string }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(response);
+
+        expect(window.alert).toHaveBeenCalledWith('Room is locked');
+        tick();
+    }));
+
+    it('should handle joinGameResponseNoMoreExisting event', fakeAsync(() => {
+        const response = { message: 'Room does not exist' };
+        spyOn(window, 'alert');
+
+        let handler: (response: { message: string }) => void = () => {};
+
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponseNoMoreExisting') {
+                handler = fn as (response: { message: string }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(response);
+
+        expect(window.alert).toHaveBeenCalledWith('Room does not exist');
+        tick();
+    }));
+
+    it('should handle joinGameResponseLockedAfterJoin event', fakeAsync(() => {
+        const response = { message: 'Room was locked' };
+        spyOn(window, 'alert');
+
+        let handler: (response: { message: string }) => void = () => {};
+        socketSpy.on.and.callFake(function (event, fn) {
+            if (event === 'joinGameResponseLockedAfterJoin') {
+                handler = fn as (response: { message: string }) => void;
+            }
+            return socketSpy;
+        });
+
+        service.setupSocketListeners();
+
+        handler(response);
+
+        expect(window.alert).toHaveBeenCalledWith('Room was locked');
+        tick();
+    }));
+});
+
+function async(fn: Function): (done: DoneFn) => void {
+    return (done: DoneFn) => {
+        fn();
+        done();
+    };
+}
