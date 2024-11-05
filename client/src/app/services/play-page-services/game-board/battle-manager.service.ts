@@ -49,7 +49,6 @@ export class BattleManagerService {
     onUserAttack() {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
-            console.log('attackResult', attackResult);
             this.signalUserAttacked.next(attackResult);
         }
     }
@@ -67,6 +66,9 @@ export class BattleManagerService {
         }
 
         if (!this.isUserTurn) {
+            if (attackResult > 0) {
+                this.userRemainingHealth--;
+            }
             this.signalOpponentAttacked.next(attackResult);
         }
     }
@@ -82,7 +84,6 @@ export class BattleManagerService {
     }
 
     attackDiceResult(): number {
-        console.log('currentPlayer', this.currentPlayer);
         if (this.currentPlayer) {
             return this.currentPlayer.attributes.attack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
         }
@@ -90,7 +91,6 @@ export class BattleManagerService {
     }
 
     defenseDiceResult(): number {
-        console.log('opponentPlayer', this.opponentPlayer);
         if (this.opponentPlayer) {
             return this.opponentPlayer.attributes.defense + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }
