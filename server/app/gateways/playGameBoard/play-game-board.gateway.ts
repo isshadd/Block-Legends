@@ -84,7 +84,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('userRespawned')
     handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
-        this.server.to(data.accessCode.toString()).emit('roomUserMoved', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+        this.server.to(data.accessCode.toString()).emit('roomUserRespawned', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage('userDidDoorAction')

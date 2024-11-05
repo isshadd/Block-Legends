@@ -110,6 +110,11 @@ export class PlayGameBoardSocketService {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
         });
 
+        this.socket.on('roomUserRespawned', (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
+            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+            this.playGameBoardManagerService.endBattleFirstPlayerContinueTurn();
+        });
+
         this.socket.on('roomUserDidDoorAction', (tileCoordinate: Vec2) => {
             this.playGameBoardManagerService.toggleDoor(tileCoordinate);
         });
@@ -153,7 +158,6 @@ export class PlayGameBoardSocketService {
             this.playGameBoardManagerService.isUserTurn = data.firstPlayer === this.socket.id;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.firstPlayer, data.loserPlayer);
-            this.playGameBoardManagerService.endBattleFirstPlayerContinueTurn();
         });
 
         this.socket.on('secondPlayerWonBattle', (data: { winnerPlayer: string; loserPlayer: string }) => {
