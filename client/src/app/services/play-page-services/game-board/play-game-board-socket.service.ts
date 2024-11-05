@@ -142,7 +142,20 @@ export class PlayGameBoardSocketService {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
             this.battleManagerService.endBattle();
-            this.playGameBoardManagerService.endBattleByEscape();
+            this.playGameBoardManagerService.endBattleFirstPlayerContinueTurn();
+        });
+
+        this.socket.on('firstPlayerWonBattle', (data: { firstPlayer: string; loserPlayer: string }) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = data.firstPlayer;
+            this.playGameBoardManagerService.isUserTurn = data.firstPlayer === this.socket.id;
+            this.battleManagerService.endBattle();
+            this.playGameBoardManagerService.endBattleByDeath(data.loserPlayer);
+            this.playGameBoardManagerService.endBattleFirstPlayerContinueTurn();
+        });
+
+        this.socket.on('secondPlayerWonBattle', (loserPlayer: string) => {
+            this.battleManagerService.endBattle();
+            this.playGameBoardManagerService.endBattleByDeath(loserPlayer);
         });
     }
 }

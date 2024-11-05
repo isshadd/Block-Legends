@@ -114,6 +114,11 @@ export class PlayGameBoardGateway {
             const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(data.accessCode);
 
             this.server.to(data.accessCode.toString()).emit('successfulAttack');
+
+            if (isPlayerDead) {
+                this.handleBattleEndedByDeath(data.accessCode, client.id);
+                return;
+            }
         }
 
         this.endBattleTurn(data.accessCode);
@@ -227,6 +232,20 @@ export class PlayGameBoardGateway {
 
         this.handleEndBattle(accessCode);
         this.server.to(accessCode.toString()).emit('battleEndedByEscape', firstPlayer);
+    }
+
+    handleBattleEndedByDeath(accessCode: number, winnerPlayer: string) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        const firstPlayer = battleRoom.firstPlayerId;
+        const secondPlayer = battleRoom.secondPlayerId;
+
+        this.handleEndBattle(accessCode);
+        if (winnerPlayer === firstPlayer) {
+            this.server.to(accessCode.toString()).emit('firstPlayerWonBattle', { firstPlayer: firstPlayer, loserPlayer: secondPlayer });
+        } else {
+            this.server.to(accessCode.toString()).emit('secondPlayerWonBattle', firstPlayer);
+            this.handleTimeOut(accessCode);
+        }
     }
 
     handleEndBattle(accessCode: number) {

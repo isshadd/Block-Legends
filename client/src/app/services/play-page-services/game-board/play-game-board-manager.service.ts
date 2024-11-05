@@ -280,13 +280,15 @@ export class PlayGameBoardManagerService {
         this.battleManagerService.init(currentPlayer, opponentPlayer);
     }
 
-    endBattleByEscape() {
+    endBattleFirstPlayerContinueTurn() {
         const userPlayerCharacter = this.getCurrentPlayerCharacter();
         if (userPlayerCharacter && this.isUserTurn) {
             this.checkIfPLayerDidEverything();
             this.setupPossibleMoves(userPlayerCharacter);
         }
     }
+
+    endBattleByDeath(loserPlayer: string) {}
 
     removePlayerFromMap(playerId: string) {
         const playerCharacter = this.findPlayerFromSocketId(playerId);

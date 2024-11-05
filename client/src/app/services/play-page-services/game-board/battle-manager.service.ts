@@ -119,7 +119,9 @@ export class BattleManagerService {
     }
 
     endBattle() {
-        this.clearBattle();
+        setTimeout(() => {
+            this.clearBattle();
+        }, 1000);
     }
 
     clearBattle() {
