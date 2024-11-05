@@ -73,7 +73,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.maxPlayers = max;
         });
 
-        this.webSocketService.socket.on('organizerLeft', (data: { message: string }) => {
+        this.webSocketService.socket.on('organizerLeft', () => {
             if (!this.isOrganizer) {
                 this.playerLeave();
             }

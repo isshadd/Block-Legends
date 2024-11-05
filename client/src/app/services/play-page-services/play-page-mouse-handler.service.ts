@@ -14,7 +14,7 @@ export class PlayPageMouseHandlerService {
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {}
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
-        if (event.button == 2) {
+        if (event.button === 2) {
             this.handleRightClick(tile);
         }
     }

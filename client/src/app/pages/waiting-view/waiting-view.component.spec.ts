@@ -6,6 +6,10 @@ import { BehaviorSubject, of } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { WaitingViewComponent } from './waiting-view.component';
 
+const ACCESS_CODE = 1234;
+const PLAYER4 = 4;
+const PLAYER6 = 6;
+
 describe('WaitingViewComponent', () => {
     let component: WaitingViewComponent;
     let fixture: ComponentFixture<WaitingViewComponent>;
@@ -25,7 +29,7 @@ describe('WaitingViewComponent', () => {
 
     beforeEach(async () => {
         gameServiceSpy = jasmine.createSpyObj('GameService', ['generateVirtualCharacter'], {
-            accessCode$: new BehaviorSubject<number>(1234),
+            accessCode$: new BehaviorSubject<number>(ACCESS_CODE),
             character$: new BehaviorSubject<PlayerCharacter>(mockCharacter),
         });
 
@@ -35,7 +39,7 @@ describe('WaitingViewComponent', () => {
             {
                 players$: new BehaviorSubject<PlayerCharacter[]>([]),
                 isLocked$: new BehaviorSubject<boolean>(false),
-                maxPlayers$: new BehaviorSubject<number>(4),
+                maxPlayers$: new BehaviorSubject<number>(PLAYER4),
                 socket: mockSocket,
             },
         );
@@ -74,7 +78,7 @@ describe('WaitingViewComponent', () => {
             expect(component.isOrganizer).toBeTrue();
             expect(webSocketServiceSpy.init).toHaveBeenCalled();
             expect(webSocketServiceSpy.createGame).toHaveBeenCalled();
-            expect(component.accessCode).toBe(1234);
+            expect(component.accessCode).toBe(ACCESS_CODE);
         }));
 
         it('should initialize for non-organizer', fakeAsync(() => {
@@ -86,7 +90,7 @@ describe('WaitingViewComponent', () => {
 
             expect(component.isOrganizer).toBeFalse();
             expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
-            expect(component.accessCode).toBe(1234);
+            expect(component.accessCode).toBe(ACCESS_CODE);
         }));
 
         it('should handle players$ subscription', fakeAsync(() => {
@@ -99,10 +103,10 @@ describe('WaitingViewComponent', () => {
 
         it('should handle maxPlayers$ subscription', fakeAsync(() => {
             component.ngOnInit();
-            (webSocketServiceSpy.maxPlayers$ as BehaviorSubject<number>).next(6);
+            (webSocketServiceSpy.maxPlayers$ as BehaviorSubject<number>).next(PLAYER6);
             tick();
 
-            expect(component.maxPlayers).toBe(6);
+            expect(component.maxPlayers).toBe(PLAYER6);
         }));
 
         it('should handle organizerLeft event', fakeAsync(() => {
@@ -130,7 +134,7 @@ describe('WaitingViewComponent', () => {
         });
 
         it('should not add player when at max', () => {
-            component.playersCounter = 4;
+            component.playersCounter = PLAYER4;
 
             component.addVirtualPlayers();
 
@@ -189,7 +193,7 @@ describe('WaitingViewComponent', () => {
     });
 
     it('should handle changeRoomId', () => {
-        const newRoomId = 54321;
+        const newRoomId = 4321;
         component.changeRoomId(newRoomId);
 
         expect(routerSpy.navigate).toHaveBeenCalledWith([], {

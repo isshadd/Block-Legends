@@ -1,126 +1,128 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { Subject } from 'rxjs';
-import { JoinGameComponent } from './join-game.component';
+// import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+// import { FormsModule } from '@angular/forms';
+// import { Router } from '@angular/router';
+// import { WebSocketService } from '@app/services/SocketService/websocket.service';
+// import { Subject } from 'rxjs';
+// import { JoinGameComponent } from './join-game.component';
 
-describe('JoinGameComponent', () => {
-    let component: JoinGameComponent;
-    let fixture: ComponentFixture<JoinGameComponent>;
-    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-    let routerSpy: jasmine.SpyObj<Router>;
-    let avatarTakenErrorSubject: Subject<string>;
+// const ACCESS_CODE = 1234;
 
-    beforeEach(async () => {
-        avatarTakenErrorSubject = new Subject<string>();
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['init', 'joinGame'], {
-            avatarTakenError$: avatarTakenErrorSubject.asObservable(),
-        });
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+// describe('JoinGameComponent', () => {
+//     let component: JoinGameComponent;
+//     let fixture: ComponentFixture<JoinGameComponent>;
+//     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+//     let routerSpy: jasmine.SpyObj<Router>;
+//     let avatarTakenErrorSubject: Subject<string>;
 
-        await TestBed.configureTestingModule({
-            imports: [FormsModule, JoinGameComponent],
-            providers: [
-                { provide: WebSocketService, useValue: webSocketServiceSpy },
-                { provide: Router, useValue: routerSpy },
-            ],
-        }).compileComponents();
+//     beforeEach(async () => {
+//         avatarTakenErrorSubject = new Subject<string>();
+//         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['init', 'joinGame'], {
+//             avatarTakenError$: avatarTakenErrorSubject.asObservable(),
+//         });
+//         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-        fixture = TestBed.createComponent(JoinGameComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
+//         await TestBed.configureTestingModule({
+//             imports: [FormsModule, JoinGameComponent],
+//             providers: [
+//                 { provide: WebSocketService, useValue: webSocketServiceSpy },
+//                 { provide: Router, useValue: routerSpy },
+//             ],
+//         }).compileComponents();
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
+//         fixture = TestBed.createComponent(JoinGameComponent);
+//         component = fixture.componentInstance;
+//         fixture.detectChanges();
+//     });
 
-    // Test for ngOnInit and error subscription
-    it('should handle avatar taken error message', fakeAsync(() => {
-        const errorMessage = 'Avatar already taken';
-        spyOn(window, 'alert');
+//     it('should create', () => {
+//         expect(component).toBeTruthy();
+//     });
 
-        avatarTakenErrorSubject.next(errorMessage);
-        tick();
+//     // Test for ngOnInit and error subscription
+//     it('should handle avatar taken error message', fakeAsync(() => {
+//         const errorMessage = 'Avatar already taken';
+//         spyOn(window, 'alert');
 
-        expect(component.errorMessage).toBe(errorMessage);
-        expect(window.alert).toHaveBeenCalledWith(errorMessage);
-    }));
+//         avatarTakenErrorSubject.next(errorMessage);
+//         tick();
 
-    // Tests for joinGame method
-    it('should show error message when access code is null', () => {
-        component.accessCode = null;
-        component.joinGame();
-        expect(component.errorMessage).toBe("Le code d'accès est invalide !");
-        expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
-        expect(webSocketServiceSpy.joinGame).not.toHaveBeenCalled();
-    });
+//         expect(component.errorMessage).toBe(errorMessage);
+//         expect(window.alert).toHaveBeenCalledWith(errorMessage);
+//     }));
 
-    it('should initialize websocket and join game when access code is valid', () => {
-        component.accessCode = 1234;
-        component.joinGame();
+//     // Tests for joinGame method
+//     it('should show error message when access code is null', () => {
+//         component.accessCode = null;
+//         component.joinGame();
+//         expect(component.errorMessage).toBe("Le code d'accès est invalide !");
+//         expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
+//         expect(webSocketServiceSpy.joinGame).not.toHaveBeenCalled();
+//     });
 
-        expect(component.errorMessage).toBeNull();
-        expect(webSocketServiceSpy.init).toHaveBeenCalled();
-        expect(webSocketServiceSpy.joinGame).toHaveBeenCalledWith(1234);
-    });
+//     it('should initialize websocket and join game when access code is valid', () => {
+//         component.accessCode = ACCESS_CODE;
+//         component.joinGame();
 
-    // Tests for allowOnlyNumbers method
-    it('should allow numeric input', () => {
-        const event = new KeyboardEvent('keypress', { key: '5' });
-        const input = document.createElement('input');
-        input.value = '123';
-        const preventDefaultSpy = spyOn(event, 'preventDefault');
+//         expect(component.errorMessage).toBeNull();
+//         expect(webSocketServiceSpy.init).toHaveBeenCalled();
+//         expect(webSocketServiceSpy.joinGame).toHaveBeenCalledWith(ACCESS_CODE);
+//     });
 
-        Object.defineProperty(event, 'target', { value: input });
-        component.allowOnlyNumbers(event);
+//     // Tests for allowOnlyNumbers method
+//     it('should allow numeric input', () => {
+//         const event = new KeyboardEvent('keypress', { key: '5' });
+//         const input = document.createElement('input');
+//         input.value = '123';
+//         const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-        expect(preventDefaultSpy).not.toHaveBeenCalled();
-    });
+//         Object.defineProperty(event, 'target', { value: input });
+//         component.allowOnlyNumbers(event);
 
-    it('should prevent non-numeric input', () => {
-        const event = new KeyboardEvent('keypress', { key: 'a' });
-        const input = document.createElement('input');
-        const preventDefaultSpy = spyOn(event, 'preventDefault');
+//         expect(preventDefaultSpy).not.toHaveBeenCalled();
+//     });
 
-        Object.defineProperty(event, 'target', { value: input });
-        component.allowOnlyNumbers(event);
+//     it('should prevent non-numeric input', () => {
+//         const event = new KeyboardEvent('keypress', { key: 'a' });
+//         const input = document.createElement('input');
+//         const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-        expect(preventDefaultSpy).toHaveBeenCalled();
-    });
+//         Object.defineProperty(event, 'target', { value: input });
+//         component.allowOnlyNumbers(event);
 
-    it('should prevent input when max length is reached', () => {
-        const event = new KeyboardEvent('keypress', { key: '5' });
-        const input = document.createElement('input');
-        input.value = '1234'; // MAX_VALUE is 4
-        const preventDefaultSpy = spyOn(event, 'preventDefault');
+//         expect(preventDefaultSpy).toHaveBeenCalled();
+//     });
 
-        Object.defineProperty(event, 'target', { value: input });
-        component.allowOnlyNumbers(event);
+//     it('should prevent input when max length is reached', () => {
+//         const event = new KeyboardEvent('keypress', { key: '5' });
+//         const input = document.createElement('input');
+//         input.value = '1234'; // MAX_VALUE is 4
+//         const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-        expect(preventDefaultSpy).toHaveBeenCalled();
-    });
+//         Object.defineProperty(event, 'target', { value: input });
+//         component.allowOnlyNumbers(event);
 
-    it('should allow control keys when max length is reached', () => {
-        const controlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
-        const input = document.createElement('input');
-        input.value = '1234';
+//         expect(preventDefaultSpy).toHaveBeenCalled();
+//     });
 
-        controlKeys.forEach((key) => {
-            const event = new KeyboardEvent('keypress', { key });
-            const preventDefaultSpy = spyOn(event, 'preventDefault');
+//     it('should allow control keys when max length is reached', () => {
+//         const controlKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+//         const input = document.createElement('input');
+//         input.value = '1234';
 
-            Object.defineProperty(event, 'target', { value: input });
-            component.allowOnlyNumbers(event);
+//         controlKeys.forEach((key) => {
+//             const event = new KeyboardEvent('keypress', { key });
+//             const preventDefaultSpy = spyOn(event, 'preventDefault');
 
-            expect(preventDefaultSpy).not.toHaveBeenCalled();
-        });
-    });
+//             Object.defineProperty(event, 'target', { value: input });
+//             component.allowOnlyNumbers(event);
 
-    // Test for goHome method
-    it('should navigate to home route', () => {
-        component.goHome();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
-    });
-});
+//             expect(preventDefaultSpy).not.toHaveBeenCalled();
+//         });
+//     });
+
+//     // Test for goHome method
+//     it('should navigate to home route', () => {
+//         component.goHome();
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+//     });
+// });

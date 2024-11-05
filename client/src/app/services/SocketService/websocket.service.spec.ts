@@ -1,9 +1,18 @@
-import { TestBed, fakeAsync, inject, tick } from '@angular/core/testing';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines*/
+/* eslint-disable @typescript-eslint/no-empty-function*/
+/* eslint-disable @typescript-eslint/promise-function-async*/
+/* eslint-disable no-undef*/
+/* eslint-disable @typescript-eslint/ban-types*/
+
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService } from '@app/services/game-services/game.service';
 import { Socket } from 'socket.io-client';
 import { GameRoom, WebSocketService } from './websocket.service';
+
+const ACCESS_CODE = 1234;
 
 describe('WebSocketService', () => {
     let service: WebSocketService;
@@ -32,59 +41,49 @@ describe('WebSocketService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should initialize socket and set up listeners', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            spyOn(service, 'setupSocketListeners');
-            service.init();
-            expect(service.socket).toBeDefined();
-            expect(service.setupSocketListeners).toHaveBeenCalled();
-        }),
-    ));
+    it('should initialize socket and set up listeners', async () => {
+        spyOn(service, 'setupSocketListeners');
+        service.init();
+        expect(service.socket).toBeDefined();
+        expect(service.setupSocketListeners).toHaveBeenCalled();
+    });
 
-    it('should emit createGame event', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            const gameId = 'game123';
-            const player = new PlayerCharacter('Hero');
-            service.createGame(gameId, player);
-            expect(socketSpy.emit).toHaveBeenCalledWith('createGame', {
-                gameId,
-                playerOrganizer: player,
-            });
-        }),
-    ));
+    it('should emit createGame event', async () => {
+        const gameId = 'game123';
+        const player = new PlayerCharacter('Hero');
+        service.createGame(gameId, player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('createGame', {
+            gameId,
+            playerOrganizer: player,
+        });
+    });
 
-    it('should emit joinGame event', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            const accessCode = 1234;
-            service.joinGame(accessCode);
-            expect(socketSpy.emit).toHaveBeenCalledWith('joinGame', accessCode);
-        }),
-    ));
+    it('should emit joinGame event', async () => {
+        const accessCode = ACCESS_CODE;
+        service.joinGame(accessCode);
+        expect(socketSpy.emit).toHaveBeenCalledWith('joinGame', accessCode);
+    });
 
-    it('should emit addPlayerToRoom event', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            const accessCode = 1234;
-            const player = new PlayerCharacter('Hero');
-            service.addPlayerToRoom(accessCode, player);
-            expect(socketSpy.emit).toHaveBeenCalledWith('addPlayerToRoom', {
-                accessCode,
-                player,
-            });
-        }),
-    ));
+    it('should emit addPlayerToRoom event', async () => {
+        const accessCode = ACCESS_CODE;
+        const player = new PlayerCharacter('Hero');
+        service.addPlayerToRoom(accessCode, player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('addPlayerToRoom', {
+            accessCode,
+            player,
+        });
+    });
 
-    it('should emit kickPlayer event', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            const player = new PlayerCharacter('Hero');
-            service.kickPlayer(player);
-            expect(socketSpy.emit).toHaveBeenCalledWith('kickPlayer', player);
-        }),
-    ));
+    it('should emit kickPlayer event', async(() => {
+        const player = new PlayerCharacter('Hero');
+        service.kickPlayer(player);
+        expect(socketSpy.emit).toHaveBeenCalledWith('kickPlayer', player);
+    }));
 
     it('should leave game and reset state', fakeAsync(() => {
-        service.currentRoom = { accessCode: 1234 } as any;
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
         service.leaveGame();
-        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', 1234);
+        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
         expect(gameServiceSpy.clearGame).toHaveBeenCalled();
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeFalse();
@@ -92,50 +91,40 @@ describe('WebSocketService', () => {
         tick();
     }));
 
-    it('should lock the room', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            service.currentRoom = { accessCode: 1234 } as any;
-            service.lockRoom();
-            expect(socketSpy.emit).toHaveBeenCalledWith('lockRoom', 1234);
-        }),
-    ));
+    it('should lock the room', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.lockRoom();
+        expect(socketSpy.emit).toHaveBeenCalledWith('lockRoom', ACCESS_CODE);
+    });
 
-    it('should unlock the room', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            service.currentRoom = { accessCode: 1234 } as any;
-            service.unlockRoom();
-            expect(socketSpy.emit).toHaveBeenCalledWith('unlockRoom', 1234);
-        }),
-    ));
+    it('should unlock the room', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.unlockRoom();
+        expect(socketSpy.emit).toHaveBeenCalledWith('unlockRoom', ACCESS_CODE);
+    });
 
-    it('should start the game', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            service.currentRoom = { accessCode: 1234 } as any;
-            service.startGame();
-            expect(socketSpy.emit).toHaveBeenCalledWith('startGame', 1234);
-        }),
-    ));
+    it('should start the game', async () => {
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
+        service.startGame();
+        expect(socketSpy.emit).toHaveBeenCalledWith('startGame', ACCESS_CODE);
+    });
 
-    it('should get room info', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            service.currentRoom = { roomId: 'room123' } as any;
-            expect(service.getRoomInfo()).toEqual(service.currentRoom);
-        }),
-    ));
+    it('should get room info', async () => {
+        service.currentRoom = { roomId: 'room123' } as any;
+        expect(service.getRoomInfo()).toEqual(service.currentRoom);
+    });
 
-    it('should set up socket listeners', async(
-        inject([WebSocketService], (service: WebSocketService) => {
-            spyOn(socketSpy, 'on');
-            service.setupSocketListeners();
-            expect(socketSpy.on).toHaveBeenCalledWith('roomState', jasmine.any(Function));
-            expect(socketSpy.on).toHaveBeenCalledWith('joinGameResponse', jasmine.any(Function));
-            // Add checks for all other socket.on handlers
-        }),
-    ));
+    it('should set up socket listeners', async () => {
+        // spyOn(socketSpy, 'on');
+        service.setupSocketListeners();
+        expect(socketSpy.on).toHaveBeenCalledWith('roomState', jasmine.any(Function));
+        expect(socketSpy.on).toHaveBeenCalledWith('joinGameResponse', jasmine.any(Function));
+        // Add checks for all other socket.on handlers
+    });
 
     it('should handle roomState event', fakeAsync(() => {
         const room: GameRoom = {
-            accessCode: 1234,
+            accessCode: ACCESS_CODE,
             players: [],
             isLocked: false,
             maxPlayers: 4,
@@ -154,7 +143,7 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(room);
-        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(1234);
+        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
         service.players$.subscribe((players) => {
             expect(players).toEqual([]);
         });
@@ -170,7 +159,7 @@ describe('WebSocketService', () => {
             valid: true,
             message: '',
             roomId: 'room123',
-            accessCode: 1234,
+            accessCode: ACCESS_CODE,
             isLocked: false,
             playerName: 'Player1',
             takenAvatars: ['avatar1'],
@@ -187,7 +176,7 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(response);
-        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(1234);
+        expect(gameServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeFalse();
         });
@@ -195,7 +184,7 @@ describe('WebSocketService', () => {
             expect(avatars).toEqual(['avatar1']);
         });
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/player-create-character'], {
-            queryParams: { roomId: 1234 },
+            queryParams: { roomId: ACCESS_CODE },
         });
         expect(gameServiceSpy.updatePlayerName).toHaveBeenCalledWith('Player1');
         tick();
@@ -251,39 +240,35 @@ describe('WebSocketService', () => {
         tick();
     }));
 
-    it('should handle playerKicked event when current player is kicked', fakeAsync(() => {
+    it('should handle playerKicked event when current player is kicked', async () => {
         const data = { message: 'You have been kicked', kickedPlayerId: 'socket-id' };
-        service.currentRoom = { accessCode: 1234 } as any;
+        service.currentRoom = { accessCode: ACCESS_CODE } as any;
         spyOn(window, 'alert').and.stub();
+        routerSpy.navigate.and.returnValue(Promise.resolve(true));
+        socketSpy.id = 'socket-id';
 
-        let handler: (data: { message: string; kickedPlayerId: string }) => void = () => {};
+        let handler: (data: { message: string; kickedPlayerId: string }) => Promise<void> = () => Promise.resolve();
+
         socketSpy.on.and.callFake(function (event, fn) {
             if (event === 'playerKicked') {
-                handler = fn as (data: { message: string; kickedPlayerId: string }) => void;
+                handler = fn as (data: { message: string; kickedPlayerId: string }) => Promise<void>;
             }
             return socketSpy;
         });
 
         service.setupSocketListeners();
 
-        handler(data);
+        await handler(data);
 
         expect(window.alert).toHaveBeenCalledWith('You have been kicked');
-        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', 1234);
+        expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
         expect(gameServiceSpy.clearGame).toHaveBeenCalled();
-        service.isLocked$.subscribe((isLocked) => {
-            expect(isLocked).toBeFalse();
-        });
-        service.players$.subscribe((players) => {
-            expect(players).toEqual([]);
-        });
+        expect(service.isLockedSubject.value).toBeFalse();
+        expect(service.playersSubject.value).toEqual([]);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
-        tick();
-    }));
+    });
 
     it('should handle playerLeft event', fakeAsync(() => {
-        spyOn(service.socket, 'disconnect');
-
         let handler: () => void = () => {};
         socketSpy.on.and.callFake(function (event, fn) {
             if (event === 'playerLeft') {
@@ -434,7 +419,7 @@ describe('WebSocketService', () => {
 
         let handler: (data: { message: string; isLocked: boolean }) => void = () => {};
         socketSpy.on.and.callFake(function (event, fn) {
-            if (event === 'roomUnLocked') {
+            if (event === 'roomUnlocked') {
                 handler = fn as (data: { message: string; isLocked: boolean }) => void;
             }
             return socketSpy;

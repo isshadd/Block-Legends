@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 // import { Router } from '@angular/router';
@@ -17,7 +17,7 @@ const MAX_VALUE = 4;
     templateUrl: './join-game.component.html',
     styleUrl: './join-game.component.scss',
 })
-export class JoinGameComponent {
+export class JoinGameComponent implements OnInit {
     accessCode: number | null;
     errorMessage: string | null;
 
@@ -26,7 +26,6 @@ export class JoinGameComponent {
         private webSocketService: WebSocketService,
         private router: Router,
     ) {}
-
 
     ngOnInit(): void {
         this.webSocketService.avatarTakenError$.subscribe((message) => {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/member-ordering*/
+
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
@@ -96,7 +98,7 @@ export class WebSocketService {
         return this.currentRoom;
     }
 
-    public setupSocketListeners() {
+    setupSocketListeners() {
         this.socket.on('roomState', (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);

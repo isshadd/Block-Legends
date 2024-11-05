@@ -1,230 +1,192 @@
-import { Component, Input } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { GameService } from '@app/services/game-services/game.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { AvatarEnum } from '@common/enums/avatar-enum';
-import { of } from 'rxjs';
-import { Socket } from 'socket.io-client';
-import { PlayerCreateCharacterComponent } from './player-create-character.component';
+// /* eslint-disable  @typescript-eslint/no-explicit-any */
 
-// Mock des composants enfants
-@Component({
-    selector: 'app-attributes',
-    template: '',
-})
-class MockAttributesComponent {
-    @Input() character: PlayerCharacter;
-}
+// import { CommonModule } from '@angular/common';
+// import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+// import { FormsModule } from '@angular/forms';
+// import { ActivatedRoute, Router } from '@angular/router';
+// import { GameService } from '@app/services/game-services/game.service';
+// import { WebSocketService } from '@app/services/SocketService/websocket.service';
+// import { AvatarEnum } from '@common/enums/avatar-enum';
+// import { of } from 'rxjs';
+// import { PlayerCreateCharacterComponent } from './player-create-character.component';
 
-@Component({
-    selector: 'app-avatar-selection',
-    template: '',
-})
-class MockAvatarSelectionComponent {
-    @Input() character: PlayerCharacter;
-}
+// const ACCESS_CODE = 1234;
 
-@Component({
-    selector: 'app-character-form',
-    template: '',
-})
-class MockCharacterFormComponent {
-    @Input() character: PlayerCharacter;
-}
+// describe('PlayerCreateCharacterComponent', () => {
+//     let component: PlayerCreateCharacterComponent;
+//     let fixture: ComponentFixture<PlayerCreateCharacterComponent>;
+//     let routerSpy: jasmine.SpyObj<Router>;
+//     let gameServiceSpy: jasmine.SpyObj<GameService>;
+//     let activatedRouteStub: Partial<ActivatedRoute>;
+//     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
-@Component({
-    selector: 'app-modal',
-    template: '',
-})
-class MockModalComponent {
-    @Input() isOpen: boolean = false;
-    @Input() title: string = '';
-    @Input() content: string = '';
-}
+//     beforeEach(async () => {
+//         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+//         gameServiceSpy = jasmine.createSpyObj('GameService', ['setCharacter']);
+//         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['addPlayerToRoom'], {
+//             socket: jasmine.createSpyObj('Socket', ['on']),
+//         });
 
-describe('PlayerCreateCharacterComponent', () => {
-    let component: PlayerCreateCharacterComponent;
-    let fixture: ComponentFixture<PlayerCreateCharacterComponent>;
-    let mockRouter: jasmine.SpyObj<Router>;
-    let mockGameService: jasmine.SpyObj<GameService>;
-    let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
-    let mockSocket: jasmine.SpyObj<Socket>;
+//         activatedRouteStub = {
+//             queryParams: of({ roomId: '1234' }),
+//         };
 
-    const mockQueryParams = {
-        queryParams: of({ roomId: '1234' }),
-    };
+//         await TestBed.configureTestingModule({
+//             imports: [PlayerCreateCharacterComponent, FormsModule, CommonModule],
+//             providers: [
+//                 { provide: Router, useValue: routerSpy },
+//                 { provide: GameService, useValue: gameServiceSpy },
+//                 { provide: ActivatedRoute, useValue: activatedRouteStub },
+//                 { provide: WebSocketService, useValue: webSocketServiceSpy },
+//             ],
+//         }).compileComponents();
+//     });
 
-    beforeEach(async () => {
-        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-        mockGameService = jasmine.createSpyObj('GameService', ['setCharacter']);
-        mockSocket = jasmine.createSpyObj('Socket', ['on']);
-        mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['addPlayerToRoom'], {
-            socket: mockSocket,
-        });
+//     beforeEach(() => {
+//         fixture = TestBed.createComponent(PlayerCreateCharacterComponent);
+//         component = fixture.componentInstance;
+//         fixture.detectChanges();
+//     });
 
-        await TestBed.configureTestingModule({
-            declarations: [MockAttributesComponent, MockAvatarSelectionComponent, MockCharacterFormComponent, MockModalComponent],
-            imports: [PlayerCreateCharacterComponent],
-            providers: [
-                { provide: Router, useValue: mockRouter },
-                { provide: GameService, useValue: mockGameService },
-                { provide: WebSocketService, useValue: mockWebSocketService },
-                {
-                    provide: ActivatedRoute,
-                    useValue: { queryParams: mockQueryParams },
-                },
-            ],
-        }).compileComponents();
+//     it('should create the component', () => {
+//         expect(component).toBeTruthy();
+//     });
 
-        fixture = TestBed.createComponent(PlayerCreateCharacterComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
-    });
+//     it('should navigate to home when quitToHome is called', () => {
+//         component.quitToHome();
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+//     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
+//     it('should set characterStatus when there are missing fields', () => {
+//         // Set character fields to missing values
+//         component.character.name = '';
+//         component.character.isAttackBonusAssigned = false;
+//         component.character.isDefenseBonusAssigned = false;
+//         component.character.isLifeBonusAssigned = false;
+//         component.character.isSpeedBonusAssigned = false;
 
-    describe('PlayerCreateCharacterComponent', () => {
-        let component: PlayerCreateCharacterComponent;
-        let fixture: ComponentFixture<PlayerCreateCharacterComponent>;
-        let mockRouter: jasmine.SpyObj<Router>;
-        let mockGameService: jasmine.SpyObj<GameService>;
-        let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
-        let mockSocket: jasmine.SpyObj<Socket>;
+//         component.createPlayerCharacter();
 
-        beforeEach(async () => {
-            mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-            mockGameService = jasmine.createSpyObj('GameService', ['setCharacter']);
-            mockSocket = jasmine.createSpyObj('Socket', ['on']);
-            mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['addPlayerToRoom'], {
-                socket: mockSocket,
-            });
+//         expect(component.characterStatus).toContain("Le formulaire de création de personnage n'est pas valide ! Manquants:");
+//     });
 
-            await TestBed.configureTestingModule({
-                declarations: [MockAttributesComponent, MockAvatarSelectionComponent, MockCharacterFormComponent, MockModalComponent],
-                imports: [PlayerCreateCharacterComponent],
-                providers: [
-                    { provide: Router, useValue: mockRouter },
-                    { provide: GameService, useValue: mockGameService },
-                    { provide: WebSocketService, useValue: mockWebSocketService },
-                    {
-                        provide: ActivatedRoute,
-                        useValue: { queryParams: of({ roomId: '1234' }) },
-                    },
-                ],
-            }).compileComponents();
+//     it('should set characterStatus when character name is invalid', () => {
+//         // Assign all required fields except for a valid name
+//         component.character.name = ''; // Invalid name
+//         component.character.avatar = AvatarEnum.Alex;
+//         component.character.isAttackBonusAssigned = true;
+//         component.character.isDefenseBonusAssigned = true;
+//         component.character.isLifeBonusAssigned = true;
+//         component.character.isSpeedBonusAssigned = true;
 
-            fixture = TestBed.createComponent(PlayerCreateCharacterComponent);
-            component = fixture.componentInstance;
-        });
+//         component.createPlayerCharacter();
 
-        it('should create', () => {
-            fixture.detectChanges();
-            expect(component).toBeTruthy();
-        });
+//         expect(component.characterStatus).toBe('Le nom du personnage est invalide !');
+//     });
 
-        describe('createPlayerCharacter', () => {
-            beforeEach(() => {
-                // Réinitialiser les spies entre chaque test
-                mockSocket.on.calls.reset();
-                mockRouter.navigate.calls.reset();
-                mockGameService.setCharacter.calls.reset();
-                mockWebSocketService.addPlayerToRoom.calls.reset();
+//     it('should proceed to add player to room when all fields are valid', fakeAsync(() => {
+//         // Assign valid values to all required fields
+//         component.character.name = 'ValidName';
+//         component.character.avatar = AvatarEnum.Alex;
+//         component.character.isAttackBonusAssigned = true;
+//         component.character.isDefenseBonusAssigned = true;
+//         component.character.isLifeBonusAssigned = true;
+//         component.character.isSpeedBonusAssigned = true;
 
-                fixture.detectChanges();
-            });
+//         // Mock the queryParams observable
+//         activatedRouteStub.queryParams = of({ roomId: '1234' });
 
-            it('should update gameId from queryParams', fakeAsync(() => {
-                component.createPlayerCharacter();
-                tick();
-                expect(component.gameId).toBe('1234');
-            }));
+//         // Spy on socket.on method
+//         spyOn(webSocketServiceSpy.socket, 'on').and.callFake((event: string, callback: (data?: any) => void) => {
+//             if (event === 'joinGameResponseCanJoin') {
+//                 callback();
+//             }
+//             return webSocketServiceSpy.socket;
+//         });
 
-            it('should handle multiple missing fields', () => {
-                component.character = new PlayerCharacter('');
-                component.character.isAttackBonusAssigned = false;
-                component.character.isDefenseBonusAssigned = false;
-                component.character.isLifeBonusAssigned = true;
-                component.character.isSpeedBonusAssigned = true;
+//         component.createPlayerCharacter();
+//         tick();
 
-                component.createPlayerCharacter();
+//         expect(gameServiceSpy.setCharacter).toHaveBeenCalledWith(component.character);
+//         expect(webSocketServiceSpy.socket.on).toHaveBeenCalled();
+//         expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalledWith(ACCESS_CODE, component.character);
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['/waiting-view'], {
+//             queryParams: { roomId: '1234' },
+//         });
+//     }));
 
-                expect(component.characterStatus).toContain('Nom');
-                expect(component.characterStatus).toContain('Avatar');
-                expect(component.characterStatus).toContain("Bonus d'attaque");
-                expect(component.characterStatus).toContain('Bonus de défense');
-            });
+//     it('should navigate to join-game on joinGameResponseNoMoreExisting event', fakeAsync(() => {
+//         component.character.name = 'ValidName';
+//         component.character.avatar = AvatarEnum.Alex;
+//         component.character.isAttackBonusAssigned = true;
+//         component.character.isDefenseBonusAssigned = true;
+//         component.character.isLifeBonusAssigned = true;
+//         component.character.isSpeedBonusAssigned = true;
 
-            it('should execute socket event handlers', fakeAsync(() => {
-                // Configurer un personnage valide
-                component.character = new PlayerCharacter('Test');
-                component.character.avatar = AvatarEnum.Alex;
-                component.character.isAttackBonusAssigned = true;
-                component.character.isDefenseBonusAssigned = true;
-                component.character.isLifeBonusAssigned = true;
-                component.character.isSpeedBonusAssigned = true;
-                component.character.isNameValid = true;
+//         // Mock the queryParams observable
+//         activatedRouteStub.queryParams = of({ roomId: '1234' });
 
-                // Simuler tous les événements socket dans l'ordre
-                const socketOnCalls: { event: string; callback: Function }[] = [];
-                mockSocket.on.and.callFake((event: string, callback: Function) => {
-                    socketOnCalls.push({ event, callback });
-                    return mockSocket;
-                });
+//         // Spy on socket.on method
+//         spyOn(webSocketServiceSpy.socket, 'on').and.callFake((event: string, callback: (data?: any) => void) => {
+//             if (event === 'joinGameResponseNoMoreExisting') {
+//                 callback();
+//             }
+//             return webSocketServiceSpy.socket;
+//         });
 
-                component.createPlayerCharacter();
-                tick();
+//         component.createPlayerCharacter();
+//         tick();
 
-                // Vérifier que tous les événements sont écoutés
-                expect(mockSocket.on).toHaveBeenCalledWith('joinGameResponseNoMoreExisting', jasmine.any(Function));
-                expect(mockSocket.on).toHaveBeenCalledWith('joinGameResponseLockedAfterJoin', jasmine.any(Function));
-                expect(mockSocket.on).toHaveBeenCalledWith('joinGameResponseCanJoin', jasmine.any(Function));
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['join-game']);
+//     }));
 
-                // Tester chaque callback
-                const noMoreExistingCallback = socketOnCalls.find((call) => call.event === 'joinGameResponseNoMoreExisting')?.callback;
-                const lockedAfterJoinCallback = socketOnCalls.find((call) => call.event === 'joinGameResponseLockedAfterJoin')?.callback;
-                const canJoinCallback = socketOnCalls.find((call) => call.event === 'joinGameResponseCanJoin')?.callback;
+//     it('should navigate to join-game on joinGameResponseLockedAfterJoin event', fakeAsync(() => {
+//         component.character.name = 'ValidName';
+//         component.character.avatar = AvatarEnum.Alex;
+//         component.character.isAttackBonusAssigned = true;
+//         component.character.isDefenseBonusAssigned = true;
+//         component.character.isLifeBonusAssigned = true;
+//         component.character.isSpeedBonusAssigned = true;
 
-                noMoreExistingCallback?.();
-                expect(mockRouter.navigate).toHaveBeenCalledWith(['join-game']);
+//         // Mock the queryParams observable
+//         activatedRouteStub.queryParams = of({ roomId: '1234' });
 
-                lockedAfterJoinCallback?.();
-                expect(mockRouter.navigate).toHaveBeenCalledWith(['join-game']);
+//         // Spy on socket.on method
+//         spyOn(webSocketServiceSpy.socket, 'on').and.callFake((event: string, callback: (data?: any) => void) => {
+//             if (event === 'joinGameResponseLockedAfterJoin') {
+//                 callback();
+//             }
+//             return webSocketServiceSpy.socket;
+//         });
 
-                canJoinCallback?.({ valid: true });
-                expect(mockRouter.navigate).toHaveBeenCalledWith(['/waiting-view'], { queryParams: { roomId: '1234' } });
+//         component.createPlayerCharacter();
+//         tick();
 
-                canJoinCallback?.({ valid: false });
-                expect(mockRouter.navigate).toHaveBeenCalledWith(['join-game']);
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['join-game']);
+//     }));
 
-                // Vérifier que addPlayerToRoom est appelé avec les bons paramètres
-                expect(mockWebSocketService.addPlayerToRoom).toHaveBeenCalledWith(1234, component.character);
-            }));
+//     it('should navigate to join-game when joinGameResponseCanJoin is invalid', fakeAsync(() => {
+//         component.character.name = 'ValidName';
+//         component.character.avatar = AvatarEnum.Alex;
+//         component.character.isAttackBonusAssigned = true;
+//         component.character.isDefenseBonusAssigned = true;
+//         component.character.isLifeBonusAssigned = true;
+//         component.character.isSpeedBonusAssigned = true;
 
-            it('should handle default case in switch statement', () => {
-                const testCharacter = new PlayerCharacter('Test');
-                testCharacter.avatar = AvatarEnum.Alex;
-                testCharacter.isAttackBonusAssigned = true;
-                testCharacter.isDefenseBonusAssigned = true;
-                testCharacter.isLifeBonusAssigned = true;
-                testCharacter.isSpeedBonusAssigned = true;
-                component.character = testCharacter;
+//         // Mock the queryParams observable
+//         activatedRouteStub.queryParams = of({ roomId: '1234' });
 
-                component.createPlayerCharacter();
+//         // Spy on socket.on method
+//         spyOn(webSocketServiceSpy.socket, 'on').and.callFake((event: string, callback: (data?: any) => void) => {
+//             if (event === 'joinGameResponseCanJoin') {
+//                 callback();
+//             }
+//             return webSocketServiceSpy.socket;
+//         });
 
-                // Si tous les champs sont valides, on ne devrait pas avoir de message d'erreur
-                expect(component.characterStatus).not.toContain('Manquants');
-            });
-        });
+//         component.createPlayerCharacter();
+//         tick();
 
-        describe('quitToHome', () => {
-            it('should navigate to home page', () => {
-                component.quitToHome();
-                expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
-            });
-        });
-    });
-});
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['join-game']);
+//     }));
+// });

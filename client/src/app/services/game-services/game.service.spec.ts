@@ -1,8 +1,11 @@
-// src/app/services/game-services/game.service.spec.ts
+/* eslint-disable no-undef*/
 
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService, VP_NUMBER } from './game.service';
+
+const ACCESS_CODE = 5678;
+const CINQ = 5;
 
 describe('GameService', () => {
     let service: GameService;
@@ -28,9 +31,9 @@ describe('GameService', () => {
     });
 
     it('should set and get access code correctly', (done: DoneFn) => {
-        service.setAccessCode(5678);
+        service.setAccessCode(ACCESS_CODE);
         service.accessCode$.subscribe((code) => {
-            expect(code).toBe(5678);
+            expect(code).toBe(ACCESS_CODE);
             done();
         });
     });
@@ -44,6 +47,15 @@ describe('GameService', () => {
         });
     });
 
+    it('should update player name correctly', (done: DoneFn) => {
+        service.setCharacter(new PlayerCharacter('Hero'));
+        service.updatePlayerName('New Hero');
+        service.character$.subscribe((char) => {
+            expect(char.name).toBe('New Hero');
+            done();
+        });
+    });
+
     it('should generate virtual character correctly', () => {
         const index = 2;
         const virtualCharacter = service.generateVirtualCharacter(index);
@@ -51,7 +63,7 @@ describe('GameService', () => {
     });
 
     it('should clear game correctly', (done: DoneFn) => {
-        service.setAccessCode(5678);
+        service.setAccessCode(ACCESS_CODE);
         service.setCharacter(new PlayerCharacter('Hero'));
 
         service.clearGame();
@@ -66,6 +78,6 @@ describe('GameService', () => {
     });
 
     it('should return VP_NUMBER correctly', () => {
-        expect(VP_NUMBER).toBe(5);
+        expect(VP_NUMBER).toBe(CINQ);
     });
 });
