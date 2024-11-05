@@ -35,17 +35,19 @@ export class PlayGameBoardManagerService {
     signalUserDidDoorAction = new Subject<Vec2>();
     signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
 
-    signalUserDidBattleAction = new Subject<void>();
+    signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
     currentTime: number = 0;
-    isBattleOn: boolean = false;
+    areOtherPlayersInBattle: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
     userCurrentMovePoints: number = 0;
     userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
+
+    opponentCharacter: PlayerCharacter | null = null;
 
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -120,7 +122,7 @@ export class PlayGameBoardManagerService {
     }
 
     endTurn() {
-        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
 
         if (!this.isUserTurn || !userPlayerCharacter) {
             return;
@@ -138,7 +140,7 @@ export class PlayGameBoardManagerService {
     }
 
     async moveUserPlayer(tile: Tile) {
-        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
         const path = this.userCurrentPossibleMoves.get(tile);
 
         if (!this.isUserTurn || !userPlayerCharacter || !path) {
@@ -207,10 +209,14 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        if (tile instanceof WalkableTile && tile.hasPlayer()) {
-            this.signalUserDidBattleAction.next();
-            this.userCurrentActionPoints -= 1;
-            this.checkIfPLayerDidEverything();
+        if (tile instanceof WalkableTile && tile.hasPlayer() && tile.player) {
+            const playerCharacter = this.findPlayerFromPlayerMapEntity(tile.player);
+            if (playerCharacter?.socketId) {
+                this.signalUserDidBattleAction.next(playerCharacter.socketId);
+                this.hidePossibleMoves();
+                this.userCurrentActionPoints -= 1;
+                // this.checkIfPLayerDidEverything();
+            }
             return;
         }
 
@@ -246,11 +252,20 @@ export class PlayGameBoardManagerService {
                 this.gameMapDataManagerService.setTileAt(tileCoordinate, door);
             }
 
-            const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+            const userPlayerCharacter = this.getCurrentPlayerCharacter();
             if (userPlayerCharacter && this.isUserTurn) {
                 this.setupPossibleMoves(userPlayerCharacter);
             }
         }
+    }
+
+    startBattle(playerId: string, enemyPlayerId: string) {
+        const userId = this.webSocketService.socket.id;
+        if (userId !== playerId && userId !== enemyPlayerId) {
+            this.areOtherPlayersInBattle = true;
+            return;
+        }
+        this.opponentCharacter = this.findPlayerFromSocketId(enemyPlayerId);
     }
 
     removePlayerFromMap(playerId: string) {
@@ -272,7 +287,7 @@ export class PlayGameBoardManagerService {
     }
 
     getCurrentPlayerTile(): Tile | null {
-        const player = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const player = this.getCurrentPlayerCharacter();
 
         if (!player) {
             return null;
@@ -306,5 +321,9 @@ export class PlayGameBoardManagerService {
 
     getCurrentPlayerTurnName(): string {
         return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === this.currentPlayerIdTurn)?.name || '';
+    }
+
+    getCurrentPlayerCharacter(): PlayerCharacter | null {
+        return this.findPlayerFromSocketId(this.webSocketService.socket.id);
     }
 }

@@ -82,6 +82,15 @@ export class PlayGameBoardGateway {
         this.server.to(data.accessCode.toString()).emit('roomUserDidDoorAction', data.tileCoordinate);
     }
 
+    @SubscribeMessage('userDidBattleAction')
+    handleUserDidBattleAction(client: Socket, data: { enemyPlayerId: string; accessCode: number }) {
+        if (!this.isClientTurn(client, data.accessCode)) {
+            return;
+        }
+        this.handleStartBattle(data.accessCode, client.id, data.enemyPlayerId);
+        this.server.to(data.accessCode.toString()).emit('roomUserDidBattleAction', { playerId: client.id, enemyPlayerId: data.enemyPlayerId });
+    }
+
     isClientTurn(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
@@ -114,6 +123,17 @@ export class PlayGameBoardGateway {
 
     startRoomTurn(accessCode: number, playerIdTurn: string) {
         this.server.to(accessCode.toString()).emit('startTurn', playerIdTurn);
+    }
+
+    handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (!room) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.playGameBoardTimeService.pauseTimer(accessCode);
     }
 
     handleTimeOut(accessCode: number) {

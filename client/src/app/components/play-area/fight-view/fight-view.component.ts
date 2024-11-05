@@ -12,18 +12,18 @@ const DELAY = 300;
     styleUrls: ['./fight-view.component.scss'],
 })
 export class FightViewComponent {
-    @Input() playerCharacter: PlayerCharacter;
-    @Input() opponentCharacter: PlayerCharacter;
+    @Input() playerCharacter: PlayerCharacter | null;
+    @Input() opponentCharacter: PlayerCharacter | null;
 
     @Output() attack = new EventEmitter<void>();
     @Output() escape = new EventEmitter<void>();
 
     get healthArray(): unknown[] {
-        return new Array(this.opponentCharacter.attributes.life);
+        return this.opponentCharacter ? new Array(this.opponentCharacter.attributes.life) : [];
     }
 
     get defenseArray(): unknown[] {
-        return new Array(this.opponentCharacter.attributes.defense);
+        return this.opponentCharacter ? new Array(this.opponentCharacter.attributes.defense) : [];
     }
 
     onAttack() {

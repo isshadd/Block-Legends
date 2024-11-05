@@ -34,6 +34,9 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((tileCoordinate) => {
             this.socket.emit('userDidDoorAction', { tileCoordinate, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
+        this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
+            this.socket.emit('userDidBattleAction', { enemyPlayerId, accessCode: this.webSocketService.getRoomInfo().accessCode });
+        });
     }
 
     ngOnDestroy() {
@@ -97,6 +100,10 @@ export class PlayGameBoardSocketService {
 
         this.socket.on('roomUserDidDoorAction', (tileCoordinate: Vec2) => {
             this.playGameBoardManagerService.toggleDoor(tileCoordinate);
+        });
+
+        this.socket.on('roomUserDidBattleAction', (data: { playerId: string; enemyPlayerId: string }) => {
+            this.playGameBoardManagerService.startBattle(data.playerId, data.enemyPlayerId);
         });
     }
 }

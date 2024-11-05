@@ -10,6 +10,13 @@
         <app-players-list></app-players-list>
     </div>
     <div id="map-wrapper">
+        @if(playGameBoardManagerService.opponentCharacter) {
+        <app-fight-view
+            id="comp"
+            [playerCharacter]="playGameBoardManagerService.getCurrentPlayerCharacter()"
+            [opponentCharacter]="playGameBoardManagerService.opponentCharacter"
+        ></app-fight-view>
+        }
         <app-map
             id="map-container"
             [grid]="playGameBoardManagerService.getCurrentGrid()"
@@ -21,7 +28,7 @@
         <app-timer
             [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
             [seconds]="playGameBoardManagerService.currentTime"
-            [isBattle]="playGameBoardManagerService.isBattleOn"
+            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
         ></app-timer>
 
         @if (playPageMouseHandlerService.rightSelectedTile) {
