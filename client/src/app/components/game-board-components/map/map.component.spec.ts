@@ -95,11 +95,11 @@ describe('MapComponent', () => {
     it('should return the player of a TerrainTile', () => {
         const terrainTile = component.grid[1][0] as TerrainTile;
         terrainTile.player = new PlayerMapEntity('');
-        expect(component.getTerrainPlayer(terrainTile)).toEqual(terrainTile.player);
+        expect(component.getPlayer(terrainTile)).toEqual(terrainTile.player);
     });
 
     it('should return null if the tile is not terrain while looking for player', () => {
         const tile = component.grid[0][0] as Tile;
-        expect(component.getTerrainPlayer(tile)).toBeNull();
+        expect(component.getPlayer(tile)).toBeNull();
     });
 });

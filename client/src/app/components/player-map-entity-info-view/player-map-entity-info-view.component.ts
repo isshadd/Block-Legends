@@ -11,6 +11,8 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 })
 export class PlayerMapEntityInfoViewComponent {
     @Input() playerCharacter: PlayerCharacter;
+    @Input() actionPoints: number;
+    @Input() totalLife: number;
     @Output() close = new EventEmitter<void>();
     @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
     @Input() showButton: boolean = true;

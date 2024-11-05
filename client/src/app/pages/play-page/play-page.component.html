@@ -1,14 +1,14 @@
 <div id="page-container">
     <div id="side-menu">
-        <app-infos-game [currentPlayer]="this.currentPlayer.name" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
-        <app-player-map-entity-info-view [showButton]="false" [playerCharacter]="currentPlayer!"></app-player-map-entity-info-view>
-        <app-players-list [players]="players"></app-players-list>
-        <!-- <div class="chat">
-            <h3>Clavardage</h3>
-            <textarea placeholder="Entrez votre message ici..."></textarea>
-        </div> -->
+        <app-infos-game [currentPlayer]="this.myPlayer.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
+        <app-player-map-entity-info-view
+            [showButton]="false"
+            [playerCharacter]="this.myPlayer"
+            [actionPoints]="this.actionPoints"
+            [totalLife]="totalLifePoints"
+        ></app-player-map-entity-info-view>
+        <app-players-list [players]="this.players"></app-players-list>
         <app-tab-container></app-tab-container>
-        <button class="dark-button" routerLink="/home">Retour</button>
     </div>
     <div id="map-wrapper">
         <app-map

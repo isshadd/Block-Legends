@@ -16,7 +16,7 @@ describe('MapEditorModalComponent', () => {
         const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['saveGame']);
 
         await TestBed.configureTestingModule({
-            imports: [ReactiveFormsModule, MapEditorModalComponent, BrowserAnimationsModule], // Add BrowserAnimationsModule here
+            imports: [ReactiveFormsModule, MapEditorModalComponent, BrowserAnimationsModule],
             providers: [
                 FormBuilder,
                 { provide: MatDialogRef, useValue: dialogSpy },
@@ -48,22 +48,30 @@ describe('MapEditorModalComponent', () => {
         expect(dialogRefSpy.close).toHaveBeenCalledWith();
     });
 
-    it('should close the dialog with form data when onOkClick is called and form is valid', () => {
+    it('should close the dialog with form data and isSavedPressed: false when onOkClick is called and form is valid', () => {
         component.infoForm.setValue({ name: 'Updated Name', description: 'Updated Description' });
         component.onOkClick();
-        expect(dialogRefSpy.close).toHaveBeenCalledWith({ name: 'Updated Name', description: 'Updated Description' });
+        expect(dialogRefSpy.close).toHaveBeenCalledWith({
+            name: 'Updated Name',
+            description: 'Updated Description',
+            isSavedPressed: false,
+        });
     });
 
     it('should not close the dialog with data when onOkClick is called and form is invalid', () => {
         component.infoForm.setValue({ name: '', description: 'Updated Description' }); // Invalid due to empty name
         component.onOkClick();
-        expect(dialogRefSpy.close).not.toHaveBeenCalledWith();
+        expect(dialogRefSpy.close).not.toHaveBeenCalled();
     });
 
-    it('should save the game and close the dialog with form data when onSaveClick is called', () => {
+    it('should save the game and close the dialog with form data and isSavedPressed: true when onSaveClick is called', () => {
         component.infoForm.setValue({ name: 'Updated Name', description: 'Updated Description' });
         component.onSaveClick();
-        expect(gameMapDataManagerServiceSpy.saveGame).toHaveBeenCalled();
-        expect(dialogRefSpy.close).toHaveBeenCalledWith({ name: 'Updated Name', description: 'Updated Description' });
+        expect(gameMapDataManagerServiceSpy.saveGame).toHaveBeenCalled(); // Ensure saveGame is called
+        expect(dialogRefSpy.close).toHaveBeenCalledWith({
+            name: 'Updated Name',
+            description: 'Updated Description',
+            isSavedPressed: true,
+        });
     });
 });

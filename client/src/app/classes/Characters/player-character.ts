@@ -17,6 +17,7 @@ export class PlayerCharacter {
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
+    isAbsent: boolean = false;
 
     constructor(public name: string) {}
 

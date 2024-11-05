@@ -17,7 +17,6 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 @Component({
@@ -41,12 +40,14 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
     styleUrl: './play-page.component.scss',
 })
 export class PlayPageComponent implements OnInit, OnDestroy {
-    selectedPlayerCharacter: PlayerCharacter | null = null;
     selectedTile: Tile | null = null;
-    mainPlayer: PlayerCharacter = new PlayerCharacter('sam');
     isBattlePhase: boolean = false;
-    currentPlayer: PlayerCharacter;
-    players: PlayerCharacter[];
+    myPlayer: PlayerCharacter;
+    currentPlayer: PlayerCharacter | null;
+    players: PlayerCharacter[] = [];
+    actualPlayers: PlayerCharacter[] = [];
+    actionPoints: number;
+    totalLifePoints: number;
 
     private destroy$ = new Subject<void>();
     constructor(
@@ -62,22 +63,64 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.playGameBoardSocketService.init();
-        this.mainPlayer.avatar = AvatarEnum.Alex;
     }
 
     onPlayGameBoardManagerInit() {
-        // do something
+        this.actionPoints = this.playGameBoardManagerService.userCurrentActionPoints;
+        this.isBattlePhase = this.playGameBoardManagerService.isBattleOn;
+        this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
+        this.getPlayersTurn();
+        console.log('Joueurs:', this.players);
     }
 
+    getPlayersTurn(): void {
+        let playerName: string;
+        let player: PlayerCharacter | null;
+        for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
+            playerName = this.playGameBoardManagerService.turnOrder[i];
+            console.log('Nom du joueur:', playerName);
+            player = this.playGameBoardManagerService.findPlayerFromSocketId(playerName);
+            if (playerName && player) {
+                this.players.push(player);
+            }
+        }
+    }
     ngOnInit(): void {
+        // Abonnement à la liste des joueurs
+        this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
+            this.actualPlayers = updatedPlayers;
+            this.updatePlayersList();
+        });
+
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-        this.players = this.webSocketService.getTotalPlayers();
-            this.currentPlayer = player;
-                console.log('Joueur actuel:', this.currentPlayer);
-            if (this.currentPlayer) {
+            this.myPlayer = player;
+            console.log('Joueur actuel:', this.myPlayer);
+        });
+
+        this.totalLifePoints = this.myPlayer.attributes.life;
+    }
+
+    updatePlayersList(): void {
+        const allPlayers = this.webSocketService.getTotalPlayers();
+
+        // Met à jour la liste en réglant `isAbsent` sur true pour les joueurs non présents dans `allPlayers`
+        this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
+            const player = allPlayers.find((p) => p.name === playerName);
+            if (player) {
+                player.isAbsent = false; // Joueur présent
+                return player;
+            } else {
+                // Crée une instance temporaire de PlayerCharacter pour les joueurs absents
+                const absentPlayer = new PlayerCharacter(playerName);
+                absentPlayer.isAbsent = true;
+                return absentPlayer;
             }
         });
+
+        // Trie les joueurs pour que les absents soient en bas
+        this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
     }
+
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
