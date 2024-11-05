@@ -120,15 +120,4 @@ export class FightViewComponent {
     isAttackDisabled(): boolean {
         return !this.battleManagerService.isUserTurn;
     }
-
-    getResultMessage(): string {
-        if (this.battleManagerService.currentPlayer?.attributes.life === 0) {
-            return 'Vous avez perdu!';
-        } else if (this.battleManagerService.opponentPlayer?.attributes.life === 0) {
-            return 'Vous avez gagné!';
-        } else {
-            return 'En fuite!';
-        }
-        return '';
-    }
 }

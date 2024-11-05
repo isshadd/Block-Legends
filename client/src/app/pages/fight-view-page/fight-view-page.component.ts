@@ -10,10 +10,11 @@ import { BattleManagerService } from '@app/services/play-page-services/game-boar
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
 import { ItemInfoComponent } from '../../components/item-info/item-info.component';
+import { WinPanelComponent } from "../../components/win-panel/win-panel.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
-    imports: [FightViewComponent, PlayerMapEntityInfoViewComponent, MapTileInfoComponent, ItemInfoComponent, InfoPanelComponent],
+    imports: [FightViewComponent, PlayerMapEntityInfoViewComponent, MapTileInfoComponent, ItemInfoComponent, InfoPanelComponent, WinPanelComponent],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })

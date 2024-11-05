@@ -1,0 +1,9 @@
+<div id="win-panel">
+    <div id="winner-image">
+        <img [src]="winner.avatar.fullImage" />
+    </div>
+    <div>
+        <h1 id="winner-announce">{{ winner.name }} a gagné!</h1>
+    </div>
+    <button id="ok-button" (click)="closeWinPanel()">OK</button>
+</div>
