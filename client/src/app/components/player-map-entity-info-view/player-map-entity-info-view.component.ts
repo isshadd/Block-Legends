@@ -16,7 +16,7 @@ export class PlayerMapEntityInfoViewComponent {
     @Input() showButton: boolean = true;
 
     constructor(
-        private el: ElementRef,
+        public el: ElementRef,
         private renderer: Renderer2,
     ) {}
 
