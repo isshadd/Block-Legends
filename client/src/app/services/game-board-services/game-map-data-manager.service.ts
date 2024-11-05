@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -159,9 +160,10 @@ export class GameMapDataManagerService {
         return this.currentGrid[coordinates.x][coordinates.y];
     }
 
-    getClosestWalkableTileWithoutPlayerAt(coordinates: Vec2): WalkableTile {
+    getClosestWalkableTileWithoutPlayerAt(mapPlayer: PlayerMapEntity): WalkableTile {
+        let coordinates = mapPlayer.spawnCoordinates;
         let tile = this.getTileAt(coordinates);
-        if (tile && tile.isWalkable() && !(tile as WalkableTile).hasPlayer()) {
+        if (tile && tile.isWalkable() && (!(tile as WalkableTile).hasPlayer() || (tile as WalkableTile).player === mapPlayer)) {
             return tile as WalkableTile;
         }
 

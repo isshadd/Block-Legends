@@ -308,9 +308,7 @@ export class PlayGameBoardManagerService {
                 const currentTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
                     loserPlayerCharacter.mapEntity.coordinates,
                 ) as WalkableTile;
-                const spawnTile: WalkableTile = this.gameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt(
-                    loserPlayerCharacter.mapEntity.spawnCoordinates,
-                );
+                const spawnTile: WalkableTile = this.gameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt(loserPlayerCharacter.mapEntity);
                 this.signalUserRespawned.next({
                     fromTile: currentTile.coordinates,
                     toTile: spawnTile.coordinates,
