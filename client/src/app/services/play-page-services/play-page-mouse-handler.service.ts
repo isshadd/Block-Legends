@@ -38,7 +38,7 @@ export class PlayPageMouseHandlerService {
         if (event.button === MouseButton.Left) {
             this.handleLeftClick(tile);
         } else if (event.button === MouseButton.Right) {
-            this.handleRightClick(tile);
+            this.handleRightClick(event, tile);
         }
     }
 
@@ -88,22 +88,10 @@ export class PlayPageMouseHandlerService {
         }
     }
 
-    // handleRightClick(tile: Tile) {
-    //     if (tile.isTerrain() && (tile as TerrainTile).player) {
-    //         const player = (tile as TerrainTile).player;
-    //         if (player) {
-    //             this.discardRightSelectedTile();
-    //             this.rightClickSelectedPlayerCharacter = this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(player);
-    //         }
-    //     } else {
-    //         this.discardRightClickSelectedPlayer();
-    //         this.rightSelectedTile = tile;
-    //     }
-    // }
-
-    handleRightClick(tile: Tile) {
+    handleRightClick(event: MouseEvent, tile: Tile) {
         this.discardRightSelectedTile();
         this.rightSelectedTile = tile;
+        event.preventDefault();
     }
 
     toggleAction(): void {

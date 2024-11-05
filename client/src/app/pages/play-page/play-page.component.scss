@@ -9,9 +9,9 @@
     #side-menu {
         display: flex;
         flex-direction: column;
-        flex-basis: 25%; // Take up 25% of the viewport width
+        flex-basis: 25%;
         max-width: 25%;
-        height: 100%; // Fill the full height of the viewport
+        height: 100%;
         background-color: $primary-dark;
         overflow-y: auto;
         scrollbar-width: thin;
@@ -27,21 +27,35 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        flex-grow: 1; // Allow the map wrapper to expand and take remaining space
-        height: 100vh; // Make the map wrapper occupy full height
-        overflow: hidden; // Hide overflow to prevent scrollbars
+        flex-grow: 1;
+        height: 100vh;
+        overflow: hidden;
 
         #map-container {
-            flex-grow: 1; // Allow the map container to expand to fill available space
+            flex-grow: 1;
             display: flex;
             justify-content: center;
-            position: relative; // Allow absolute positioning of overlays
+            position: relative;
+        }
+
+        #fight-comp {
+            position: absolute;
+            top: 50%; // Center it vertically in the viewport
+            left: 50%; // Center it horizontally in the viewport
+            transform: translate(-50%, -50%); // Centering transform
+            z-index: 20; // Higher z-index to ensure it appears above other elements
+            width: 80%; // Set width as needed for a larger display
+            max-width: 600px;
+            background-color: $primary-light;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
         #info-container {
             position: absolute;
-            top: 20px; // Position near the top of the map
-            right: 900px; // Align to the right edge of the map
+            top: 20px;
+            right: 20px;
             width: 360px;
             padding: 10px;
             background-color: $primary-dark;
@@ -57,21 +71,9 @@
         align-items: center;
         margin-top: 10px;
 
-        .containers {
-            display: flex;
-            padding-left: 10px;
-
-            app-placeable-entity-container {
-                margin-right: 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-        }
-
         .button-container {
             display: flex;
-            margin-left: auto; // Push buttons to the far right of the container
+            margin-left: auto;
 
             .action-button {
                 margin-left: 10px;
