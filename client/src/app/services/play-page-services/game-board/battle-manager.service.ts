@@ -14,6 +14,12 @@ export class BattleManagerService {
     signalUserTriedEscape = new Subject<void>();
     signalUserTriedEscape$ = this.signalUserTriedEscape.asObservable();
 
+    signalOpponentAttacked = new Subject<void>();
+    signalOpponentAttacked$ = this.signalOpponentAttacked.asObservable();
+
+    signalOpponentTriedEscape = new Subject<void>();
+    signalOpponentTriedEscape$ = this.signalOpponentTriedEscape.asObservable();
+
     currentPlayer: PlayerCharacter | null = null;
     opponentPlayer: PlayerCharacter | null = null;
     currentPlayerIdTurn: string | null = null;
@@ -42,6 +48,28 @@ export class BattleManagerService {
         if (this.isValidAction() && this.userEvasionAttempts > 0) {
             this.userEvasionAttempts--;
             this.signalUserTriedEscape.next();
+        }
+    }
+
+    onOpponentAttack(playerIdTurn: string) {
+        if (!this.currentPlayer || !this.opponentPlayer) {
+            return;
+        }
+
+        if (!this.isUserTurn) {
+            console.log('Opponent attacked');
+            this.signalOpponentAttacked.next();
+        }
+    }
+
+    onOpponentEscape(playerIdTurn: string) {
+        if (!this.currentPlayer || !this.opponentPlayer) {
+            return;
+        }
+
+        if (!this.isUserTurn) {
+            console.log('Opponent escape');
+            this.signalOpponentTriedEscape.next();
         }
     }
 

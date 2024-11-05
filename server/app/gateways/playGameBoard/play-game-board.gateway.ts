@@ -108,6 +108,9 @@ export class PlayGameBoardGateway {
             return;
         }
 
+        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
+        this.server.to(accessCode.toString()).emit('opponentAttacked', { playerId: playerIdTurn });
+
         this.endBattleTurn(accessCode);
     }
 
@@ -119,6 +122,9 @@ export class PlayGameBoardGateway {
             this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
             return;
         }
+
+        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
+        this.server.to(accessCode.toString()).emit('opponentTriedEscape', { playerId: playerIdTurn });
 
         if (this.playGameBoardBattleService.userUsedEvade(accessCode, client.id)) {
             this.handleBattleEndedByEscape(accessCode);
@@ -192,6 +198,9 @@ export class PlayGameBoardGateway {
             this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
             return;
         }
+
+        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
+        this.server.to(accessCode.toString()).emit('opponentAttacked', { playerId: playerIdTurn });
 
         this.server.to(accessCode.toString()).emit('automaticAttack');
     }

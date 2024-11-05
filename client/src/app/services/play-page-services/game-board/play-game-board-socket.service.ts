@@ -122,6 +122,14 @@ export class PlayGameBoardSocketService {
             this.battleManagerService.isUserTurn = playerIdTurn === this.socket.id;
         });
 
+        this.socket.on('opponentAttacked', (playerIdTurn: string) => {
+            this.battleManagerService.onOpponentAttack(playerIdTurn);
+        });
+
+        this.socket.on('opponentTriedEscape', (playerIdTurn: string) => {
+            this.battleManagerService.onOpponentEscape(playerIdTurn);
+        });
+
         this.socket.on('automaticAttack', () => {
             this.battleManagerService.onUserAttack();
         });

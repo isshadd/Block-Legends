@@ -282,12 +282,7 @@ export class PlayGameBoardManagerService {
 
     endBattleByEscape() {
         const userPlayerCharacter = this.getCurrentPlayerCharacter();
-        console.log(userPlayerCharacter);
-        console.log(this.userCurrentMovePoints);
         if (userPlayerCharacter && this.isUserTurn) {
-            console.log('endBattleByEscape');
-            console.log(userPlayerCharacter);
-            console.log(this.userCurrentMovePoints);
             this.checkIfPLayerDidEverything();
             this.setupPossibleMoves(userPlayerCharacter);
         }

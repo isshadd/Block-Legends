@@ -20,6 +20,12 @@ export class FightViewComponent {
         this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
             this.escapeAnimation();
         });
+        this.battleManagerService.signalOpponentAttacked$.subscribe(() => {
+            this.onOpponentAttack();
+        });
+        this.battleManagerService.signalOpponentTriedEscape$.subscribe(() => {
+            this.onOpponentEscape();
+        });
     }
 
     get healthArray(): unknown[] {
