@@ -51,10 +51,10 @@
         .info-line {
             display: flex;
             align-items: center;
-            justify-content: flex-end; 
+            justify-content: flex-end;
 
             span {
-                margin-right: 2px; 
+                margin-right: 2px;
             }
 
             .icon {
@@ -202,7 +202,7 @@
                     transform: translateX(0) scale(1);
                 }
                 50% {
-                    transform: translateX(200px) scale(1.2);
+                    transform: translateX(200px) scale(0);
                 }
                 100% {
                     transform: translateX(0) scale(1);

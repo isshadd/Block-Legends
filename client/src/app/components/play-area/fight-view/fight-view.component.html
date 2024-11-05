@@ -3,12 +3,11 @@
     <div class="fight-header">
         <div class="opponent-title">Nom D'Adversaire: {{ battleManagerService.opponentPlayer.name }}</div>
         <div class="fight-info">
-            Santé d'adversaire:
+            @if(battleManagerService.opponentRemainingHealth > 0){ Santé d'adversaire:
             <span *ngFor="let _ of opponentPlayerHealthArray">
                 <img src="assets/images/heart.png" alt="Heart" class="icon" />
             </span>
-            <br />
-            Défense d'adversaire:
+            <br />} Défense d'adversaire:
             <span *ngFor="let _ of opponentPlayerDefenseArray">
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
@@ -27,10 +26,8 @@
         </div>
         <div id="player-side">
             <div class="info-line">
-                <span>Santé:</span>
-                <span *ngFor="let _ of playerHealthArray">
-                    <img src="assets/images/heart.png" alt="Heart" class="icon" />
-                </span>
+                @if(battleManagerService.userRemainingHealth > 0){<span>Santé:</span>
+                <span *ngFor="let _ of playerHealthArray"> <img src="assets/images/heart.png" alt="Heart" class="icon" /> </span>}
             </div>
             <div class="info-line">
                 <span>Défense:</span>
