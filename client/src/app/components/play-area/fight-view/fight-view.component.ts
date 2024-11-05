@@ -12,10 +12,10 @@ const DELAY = 500;
     styleUrls: ['./fight-view.component.scss'],
 })
 export class FightViewComponent {
-    playerDiceResult = 6;
+    playerDiceResult = 0;
     constructor(public battleManagerService: BattleManagerService) {
         this.battleManagerService.signalUserAttacked$.subscribe(() => {
-            this.attackAnimation();
+            this.attackAnimation(6);
         });
         this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
             this.escapeAnimation();
@@ -40,8 +40,8 @@ export class FightViewComponent {
         this.battleManagerService.onUserAttack();
     }
 
-    attackAnimation() {
-        this.onPlayerRollDice();
+    attackAnimation(playerDiceResult: number): void {
+        this.onPlayerRollDice(playerDiceResult);
         this.onPlayerAttack();
     }
 
@@ -99,18 +99,13 @@ export class FightViewComponent {
         }, DELAY);
     }
 
-    onPlayerRollDice(): void {
+    onPlayerRollDice(playerDiceResult: number): void {
         const diceResult = document.getElementById('dice-result');
-        this.playerDiceResult = Math.floor(Math.random() * 6) + 1;
+        this.playerDiceResult = playerDiceResult;
         diceResult?.classList.add('dice-roll');
         setTimeout(() => {
             diceResult?.classList.remove('dice-roll');
         }, DELAY);
-    }
-
-    getDiceResult(): number {
-        //TODO TEMP
-        return this.playerDiceResult;
     }
 
     isEscapeDisabled(): boolean {

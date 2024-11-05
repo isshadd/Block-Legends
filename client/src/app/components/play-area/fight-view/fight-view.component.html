@@ -22,7 +22,7 @@
             <div class="layer-2">
                 <img id="opponent" [src]="battleManagerService.opponentPlayer.avatar.fullImage" alt="Character Image" />
                 <img id="player" [src]="battleManagerService.currentPlayer.avatar.fullImage" alt="Character Image" />
-                <div class="layer-3" id="dice-result">{{ getDiceResult() }}</div>
+                <div class="layer-3" id="dice-result">{{ playerDiceResult }}</div>
             </div>
         </div>
         <div class="player-info">Nombre de tentative d'evision: {{ battleManagerService.userEvasionAttempts }}</div>
