@@ -12,9 +12,9 @@ export class PlayerCharacter {
     isDefenseBonusAssigned: boolean = true;
     isOrganizer: boolean = false;
     socketId: string;
-    dice: string;
-    attackDice: number;
-    defenseDice: number;
+    dice: string = 'attack';
+    attackDice: number = BONUS;
+    defenseDice: number = BASE_STATS;
     isNameValid: boolean = false;
     avatar: Avatar;
     attributes = new PlayerAttributes();
