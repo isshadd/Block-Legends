@@ -96,7 +96,7 @@ export class WebSocketService {
         return this.currentRoom;
     }
 
-    private setupSocketListeners() {
+    public setupSocketListeners() {
         this.socket.on('roomState', (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
@@ -104,22 +104,33 @@ export class WebSocketService {
             this.isLockedSubject.next(room.isLocked);
         });
 
-        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean; playerName: string ; takenAvatars: string[] }) => {
-            if (response.valid) {
-                this.gameService.setAccessCode(response.accessCode);
-                this.isLockedSubject.next(response.isLocked);
-                this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
-                this.takenAvatarsSubject.next(response.takenAvatars); // Update the list of taken avatars
-                this.router.navigate(['/player-create-character'], {
-                    queryParams: { roomId: response.accessCode },
-                });
-                if (response.playerName) {
-                    this.gameService.updatePlayerName(response.playerName);
+        this.socket.on(
+            'joinGameResponse',
+            (response: {
+                valid: boolean;
+                message: string;
+                roomId: string;
+                accessCode: number;
+                isLocked: boolean;
+                playerName: string;
+                takenAvatars: string[];
+            }) => {
+                if (response.valid) {
+                    this.gameService.setAccessCode(response.accessCode);
+                    this.isLockedSubject.next(response.isLocked);
+                    this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
+                    this.takenAvatarsSubject.next(response.takenAvatars); // Update the list of taken avatars
+                    this.router.navigate(['/player-create-character'], {
+                        queryParams: { roomId: response.accessCode },
+                    });
+                    if (response.playerName) {
+                        this.gameService.updatePlayerName(response.playerName);
+                    }
+                } else {
+                    alert(response.message); // Notify the user that the avatar is already taken
                 }
-            } else {
-                alert(response.message); // Notify the user that the avatar is already taken
-            }
-        });
+            },
+        );
 
         this.socket.on('avatarTakenError', (data: { message: string }) => {
             this.avatarTakenErrorSubject.next(data.message);

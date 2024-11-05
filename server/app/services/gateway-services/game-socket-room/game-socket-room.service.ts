@@ -50,7 +50,7 @@ export interface GameRoom {
 
 @Injectable()
 export class GameSocketRoomService {
-    private readonly logger = new Logger(GameSocketRoomService.name);
+    public readonly logger = new Logger(GameSocketRoomService.name);
     private rooms: Map<number, GameRoom> = new Map();
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
@@ -160,14 +160,14 @@ export class GameSocketRoomService {
     addPlayerToRoom(accessCode: number, player: PlayerCharacter): boolean {
         const room = this.rooms.get(accessCode);
         if (room && !room.isLocked) {
-            const existingAvatars = room.players.map(p => p.avatar.name);
+            const existingAvatars = room.players.map((p) => p.avatar.name);
             if (existingAvatars.includes(player.avatar.name)) {
                 this.logger.log(`Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`);
                 // this.server.emit('avatarTakenError', { message: 'Avatar already chosen by another player. Please select a different avatar.' });
                 return; // Avatar is already taken
             }
-            
-            const existingNames = room.players.map(p => p.name);
+
+            const existingNames = room.players.map((p) => p.name);
             let baseName = player.name;
             let suffix = 1;
             while (existingNames.includes(player.name)) {

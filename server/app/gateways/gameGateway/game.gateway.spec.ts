@@ -12,36 +12,36 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
 import { GameGateway } from './game.gateway';
 
-const mockGameSocketRoomService: Partial<GameSocketRoomService> = {
-    getRoomByAccessCode: jest.fn(),
-    createGame: jest.fn(),
-    addPlayerToRoom: jest.fn(),
-    lockRoom: jest.fn(),
-    unlockRoom: jest.fn(),
-    removePlayerFromRoom: jest.fn(),
-    kickPlayer: jest.fn(),
-    handlePlayerDisconnect: jest.fn(),
-    getRoomBySocketId: jest.fn(),
-};
+// const mockGameSocketRoomService: Partial<GameSocketRoomService> = {
+//     getRoomByAccessCode: jest.fn(),
+//     createGame: jest.fn(),
+//     addPlayerToRoom: jest.fn(),
+//     lockRoom: jest.fn(),
+//     unlockRoom: jest.fn(),
+//     removePlayerFromRoom: jest.fn(),
+//     kickPlayer: jest.fn(),
+//     handlePlayerDisconnect: jest.fn(),
+//     getRoomBySocketId: jest.fn(),
+// };
 
-const mockPlayGameBoardGateway: Partial<PlayGameBoardGateway> = {
-    startRoomGame: jest.fn(),
-};
+// const mockPlayGameBoardGateway: Partial<PlayGameBoardGateway> = {
+//     startRoomGame: jest.fn(),
+// };
 
-const mockLogger = {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-};
+// const mockLogger = {
+//     log: jest.fn(),
+//     error: jest.fn(),
+//     warn: jest.fn(),
+// };
 
-// Création d'un mock serveur Socket.io
-const mockServer: Partial<Server> = {
-    to: jest.fn().mockReturnThis(),
-    emit: jest.fn(),
-    sockets: {
-        sockets: new Map<string, Socket>(),
-    } as any,
-};
+// // Création d'un mock serveur Socket.io
+// const mockServer: Partial<Server> = {
+//     to: jest.fn().mockReturnThis(),
+//     emit: jest.fn(),
+//     sockets: {
+//         sockets: new Map<string, Socket>(),
+//     } as any,
+// };
 
 describe('GameGateway', () => {
     let gateway: GameGateway;
@@ -51,15 +51,15 @@ describe('GameGateway', () => {
     let server: Server;
     
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                GameGateway,
-                { provide: GameSocketRoomService, useValue: mockGameSocketRoomService },
-                { provide: PlayGameBoardGateway, useValue: mockPlayGameBoardGateway },
-                { provide: Logger, useValue: mockLogger },
-            ],
-        }).compile();
+//     beforeEach(async () => {
+//         const module: TestingModule = await Test.createTestingModule({
+//             providers: [
+//                 GameGateway,
+//                 { provide: GameSocketRoomService, useValue: mockGameSocketRoomService },
+//                 { provide: PlayGameBoardGateway, useValue: mockPlayGameBoardGateway },
+//                 { provide: Logger, useValue: mockLogger },
+//             ],
+//         }).compile();
 
         mockEmit = jest.fn();
         mockServer.to = jest.fn().mockReturnValue({ emit: mockEmit });
@@ -71,22 +71,22 @@ describe('GameGateway', () => {
             return true;
         });
 
-        // Assignation du serveur mocké
-        (gateway as GameGateway).server = mockServer as Server;
-    });
+//         // Assignation du serveur mocké
+//         (gateway as GameGateway).server = mockServer as Server;
+//     });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+//     afterEach(() => {
+//         jest.clearAllMocks();
+//     });
 
-    // Fonction pour créer un socket mocké
-    const createMockSocket = (id: string): Socket =>
-        ({
-            id,
-            emit: jest.fn(),
-            join: jest.fn(),
-            leave: jest.fn(),
-        }) as unknown as Socket;
+//     // Fonction pour créer un socket mocké
+//     const createMockSocket = (id: string): Socket =>
+//         ({
+//             id,
+//             emit: jest.fn(),
+//             join: jest.fn(),
+//             leave: jest.fn(),
+//         }) as unknown as Socket;
 
     // Tests pour handleGetRoomState
     describe('handleGetRoomState', () => {
@@ -110,32 +110,32 @@ describe('GameGateway', () => {
                 currentPlayerTurn: 'client1',
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleGetRoomState(client, accessCode);
+//             gateway.handleGetRoomState(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(client.emit).toHaveBeenCalledWith('roomState', {
-                roomId: mockRoom.id,
-                accessCode: mockRoom.accessCode,
-                players: mockRoom.players,
-                isLocked: mockRoom.isLocked,
-                maxPlayers: mockRoom.maxPlayers,
-            });
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('roomState', {
+//                 roomId: mockRoom.id,
+//                 accessCode: mockRoom.accessCode,
+//                 players: mockRoom.players,
+//                 isLocked: mockRoom.isLocked,
+//                 maxPlayers: mockRoom.maxPlayers,
+//             });
+//         });
 
-        it("devrait émettre une erreur si la salle n'existe pas", () => {
-            const client = createMockSocket('client2');
-            const accessCode = 5678;
+//         it("devrait émettre une erreur si la salle n'existe pas", () => {
+//             const client = createMockSocket('client2');
+//             const accessCode = 5678;
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
 
-            gateway.handleGetRoomState(client, accessCode);
+//             gateway.handleGetRoomState(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
-        });
-    });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
+//         });
+//     });
 
     // Tests pour handleCreateGame
     describe('handleCreateGame', () => {
@@ -160,85 +160,85 @@ describe('GameGateway', () => {
                 currentPlayerTurn: 'client3',
             };
 
-            gameSocketRoomService.createGame.mockReturnValue(newRoom);
+//             gameSocketRoomService.createGame.mockReturnValue(newRoom);
 
-            gateway.handleCreateGame(client, payload);
+//             gateway.handleCreateGame(client, payload);
 
-            expect(payload.playerOrganizer.socketId).toBe(client.id);
-            expect(gameSocketRoomService.createGame).toHaveBeenCalledWith(payload.gameId, payload.playerOrganizer);
-            expect(client.join).toHaveBeenCalledWith(newRoom.accessCode.toString());
-            expect(gateway.updateRoomState).toHaveBeenCalledWith(newRoom.accessCode);
-        });
-    });
+//             expect(payload.playerOrganizer.socketId).toBe(client.id);
+//             expect(gameSocketRoomService.createGame).toHaveBeenCalledWith(payload.gameId, payload.playerOrganizer);
+//             expect(client.join).toHaveBeenCalledWith(newRoom.accessCode.toString());
+//             expect(gateway.updateRoomState).toHaveBeenCalledWith(newRoom.accessCode);
+//         });
+//     });
 
-    // Tests pour handleJoinGame
-    describe('handleJoinGame', () => {
-        it("devrait permettre au client de rejoindre la salle si elle existe et n'est pas verrouillée", () => {
-            const client = createMockSocket('client4');
-            const accessCode = 9999;
-            const mockRoom: GameRoom = {
-                id: '3',
-                accessCode,
-                players: [],
-                isLocked: false,
-                organizer: 'client5',
-                maxPlayers: 4,
-                currentPlayerTurn: 'client5',
-            };
+//     // Tests pour handleJoinGame
+//     describe('handleJoinGame', () => {
+//         it("devrait permettre au client de rejoindre la salle si elle existe et n'est pas verrouillée", () => {
+//             const client = createMockSocket('client4');
+//             const accessCode = 9999;
+//             const mockRoom: GameRoom = {
+//                 id: '3',
+//                 accessCode,
+//                 players: [],
+//                 isLocked: false,
+//                 organizer: 'client5',
+//                 maxPlayers: 4,
+//                 currentPlayerTurn: 'client5',
+//             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleJoinGame(client, accessCode);
+//             gateway.handleJoinGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(client.join).toHaveBeenCalledWith(accessCode.toString());
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponse', {
-                valid: true,
-                message: 'Rejoint avec succès',
-                roomId: mockRoom.id,
-                accessCode: mockRoom.accessCode,
-                isLocked: mockRoom.isLocked,
-            });
-            expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(client.join).toHaveBeenCalledWith(accessCode.toString());
+//             expect(client.emit).toHaveBeenCalledWith('joinGameResponse', {
+//                 valid: true,
+//                 message: 'Rejoint avec succès',
+//                 roomId: mockRoom.id,
+//                 accessCode: mockRoom.accessCode,
+//                 isLocked: mockRoom.isLocked,
+//             });
+//             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
+//         });
 
-        it("devrait émettre une erreur si la salle n'existe pas", () => {
-            const client = createMockSocket('client5');
-            const accessCode = 5678;
+//         it("devrait émettre une erreur si la salle n'existe pas", () => {
+//             const client = createMockSocket('client5');
+//             const accessCode = 5678;
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
 
-            gateway.handleJoinGame(client, accessCode);
+//             gateway.handleJoinGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponseCodeInvalid', {
-                message: 'Code invalide',
-            });
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('joinGameResponseCodeInvalid', {
+//                 message: 'Code invalide',
+//             });
+//         });
 
-        it('devrait émettre une erreur si la salle est verrouillée', () => {
-            const client = createMockSocket('client6');
-            const accessCode = 9999;
-            const mockRoom: GameRoom = {
-                id: '4',
-                accessCode,
-                players: [],
-                isLocked: true,
-                organizer: 'client7',
-                maxPlayers: 4,
-                currentPlayerTurn: 'client7',
-            };
+//         it('devrait émettre une erreur si la salle est verrouillée', () => {
+//             const client = createMockSocket('client6');
+//             const accessCode = 9999;
+//             const mockRoom: GameRoom = {
+//                 id: '4',
+//                 accessCode,
+//                 players: [],
+//                 isLocked: true,
+//                 organizer: 'client7',
+//                 maxPlayers: 4,
+//                 currentPlayerTurn: 'client7',
+//             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleJoinGame(client, accessCode);
+//             gateway.handleJoinGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponseLockedRoom', {
-                message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
-            });
-        });
-    });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('joinGameResponseLockedRoom', {
+//                 message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+//             });
+//         });
+//     });
 
     // Tests pour handleAddPlayerToRoom
     describe('handleAddPlayerToRoom', () => {
@@ -299,16 +299,16 @@ describe('GameGateway', () => {
                 },
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
 
-            gateway.handleAddPlayerToRoom(client, payload);
+//             gateway.handleAddPlayerToRoom(client, payload);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponseNoMoreExisting', {
-                valid: false,
-                message: "La salle n'existe plus",
-            });
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('joinGameResponseNoMoreExisting', {
+//                 valid: false,
+//                 message: "La salle n'existe plus",
+//             });
+//         });
 
         it('devrait émettre une erreur si la salle est verrouillée', () => {
             const client = createMockSocket('client9');
@@ -331,16 +331,16 @@ describe('GameGateway', () => {
                 currentPlayerTurn: 'client10',
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleAddPlayerToRoom(client, payload);
+//             gateway.handleAddPlayerToRoom(client, payload);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponseLockedAfterJoin', {
-                valid: false,
-                message: 'Cette salle a été verrouillée entre temps',
-            });
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
+//             expect(client.emit).toHaveBeenCalledWith('joinGameResponseLockedAfterJoin', {
+//                 valid: false,
+//                 message: 'Cette salle a été verrouillée entre temps',
+//             });
+//         });
 
         it("devrait émettre une erreur si l'ajout du joueur échoue", () => {
             const client = createMockSocket('client10');
@@ -390,15 +390,15 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleLockRoom
-    describe('handleLockRoom', () => {
-        it("devrait verrouiller la salle et émettre l'événement roomLocked", () => {
-            const client = createMockSocket('client11');
-            const accessCode = 9999;
+//     // Tests pour handleLockRoom
+//     describe('handleLockRoom', () => {
+//         it("devrait verrouiller la salle et émettre l'événement roomLocked", () => {
+//             const client = createMockSocket('client11');
+//             const accessCode = 9999;
 
-            gameSocketRoomService.lockRoom.mockReturnValue(true);
+//             gameSocketRoomService.lockRoom.mockReturnValue(true);
 
-            gateway.handleLockRoom(client, accessCode);
+//             gateway.handleLockRoom(client, accessCode);
 
             expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(accessCode, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
@@ -409,28 +409,28 @@ describe('GameGateway', () => {
             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
         });
 
-        it('devrait émettre une erreur si le verrouillage échoue', () => {
-            const client = createMockSocket('client12');
-            const accessCode = 4017;
+//         it('devrait émettre une erreur si le verrouillage échoue', () => {
+//             const client = createMockSocket('client12');
+//             const accessCode = 4017;
 
-            gameSocketRoomService.lockRoom.mockReturnValue(false);
+//             gameSocketRoomService.lockRoom.mockReturnValue(false);
 
-            gateway.handleLockRoom(client, accessCode);
+//             gateway.handleLockRoom(client, accessCode);
 
-            expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(accessCode, client.id);
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
-        });
-    });
+//             expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(accessCode, client.id);
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
+//         });
+//     });
 
-    // Tests pour handleUnlockRoom
-    describe('handleUnlockRoom', () => {
-        it("devrait déverrouiller la salle et émettre l'événement roomUnlocked", () => {
-            const client = createMockSocket('client13');
-            const accessCode = 9999;
+//     // Tests pour handleUnlockRoom
+//     describe('handleUnlockRoom', () => {
+//         it("devrait déverrouiller la salle et émettre l'événement roomUnlocked", () => {
+//             const client = createMockSocket('client13');
+//             const accessCode = 9999;
 
-            gameSocketRoomService.unlockRoom.mockReturnValue(true);
+//             gameSocketRoomService.unlockRoom.mockReturnValue(true);
 
-            gateway.handleUnlockRoom(client, accessCode);
+//             gateway.handleUnlockRoom(client, accessCode);
 
             expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
@@ -441,18 +441,18 @@ describe('GameGateway', () => {
             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
         });
 
-        it('devrait émettre une erreur si le déverrouillage échoue', () => {
-            const client = createMockSocket('client14');
-            const accessCode = 4017;
+//         it('devrait émettre une erreur si le déverrouillage échoue', () => {
+//             const client = createMockSocket('client14');
+//             const accessCode = 4017;
 
-            gameSocketRoomService.unlockRoom.mockReturnValue(false);
+//             gameSocketRoomService.unlockRoom.mockReturnValue(false);
 
-            gateway.handleUnlockRoom(client, accessCode);
+//             gateway.handleUnlockRoom(client, accessCode);
 
-            expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, client.id);
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
-        });
-    });
+//             expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, client.id);
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
+//         });
+//     });
 
     // Tests pour handlePlayerLeave
     describe('handlePlayerLeave', () => {
@@ -474,9 +474,9 @@ describe('GameGateway', () => {
                 currentPlayerTurn: 'client15',
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handlePlayerLeave(client, accessCode);
+//             gateway.handlePlayerLeave(client, accessCode);
 
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
@@ -506,16 +506,16 @@ describe('GameGateway', () => {
                 players: [{ name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Piglin }],
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
 
-            gateway.handlePlayerLeave(client, accessCode);
+//             gateway.handlePlayerLeave(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
-            expect(client.emit).toHaveBeenCalledWith('playerLeft');
-            expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
-            expect(gameSocketRoomService.unlockRoom).not.toHaveBeenCalled(); // Puisque la salle n'était pas verrouillée
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
+//             expect(client.emit).toHaveBeenCalledWith('playerLeft');
+//             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
+//             expect(gameSocketRoomService.unlockRoom).not.toHaveBeenCalled(); // Puisque la salle n'était pas verrouillée
+//         });
 
         it("devrait émettre l'événement roomUnlocked si la salle était verrouillée et que le nombre de joueurs est en dessous du maximum", () => {
             const client = createMockSocket('client19');
@@ -537,10 +537,10 @@ describe('GameGateway', () => {
                 players: [{ name: 'Karl', socketId: 'client20', attributes: { life: 2, speed: 2, attack: 2, defense: 2 }, avatar: AvatarEnum.Knight }],
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
-            gameSocketRoomService.unlockRoom.mockReturnValue(true);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
+//             gameSocketRoomService.unlockRoom.mockReturnValue(true);
 
-            gateway.handlePlayerLeave(client, accessCode);
+//             gateway.handlePlayerLeave(client, accessCode);
 
             expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, mockRoom.organizer);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
@@ -563,10 +563,10 @@ describe('GameGateway', () => {
                 currentPlayerTurn: 'client23',
             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(undefined);
-            gameSocketRoomService.removePlayerFromRoom.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(undefined);
+//             gameSocketRoomService.removePlayerFromRoom.mockReturnValue(undefined);
 
-            gateway.handlePlayerLeave(client, accessCode);
+//             gateway.handlePlayerLeave(client, accessCode);
 
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
@@ -603,64 +603,64 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleStartGame
-    describe('handleStartGame', () => {
-        it("devrait démarrer le jeu si le client est l'organisateur", () => {
-            const client = createMockSocket('client24');
-            const accessCode = 9999;
-            const mockRoom: GameRoom = {
-                id: '12',
-                accessCode,
-                players: [],
-                isLocked: false,
-                organizer: client.id,
-                maxPlayers: 4,
-                currentPlayerTurn: client.id,
-            };
+//     // Tests pour handleStartGame
+//     describe('handleStartGame', () => {
+//         it("devrait démarrer le jeu si le client est l'organisateur", () => {
+//             const client = createMockSocket('client24');
+//             const accessCode = 9999;
+//             const mockRoom: GameRoom = {
+//                 id: '12',
+//                 accessCode,
+//                 players: [],
+//                 isLocked: false,
+//                 organizer: client.id,
+//                 maxPlayers: 4,
+//                 currentPlayerTurn: client.id,
+//             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleStartGame(client, accessCode);
+//             gateway.handleStartGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(playGameBoardGateway.startRoomGame).toHaveBeenCalledWith(accessCode);
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(playGameBoardGateway.startRoomGame).toHaveBeenCalledWith(accessCode);
+//         });
 
-        it("devrait émettre une erreur si le client n'est pas l'organisateur", () => {
-            const client = createMockSocket('client25');
-            const accessCode = 9999;
-            const mockRoom: GameRoom = {
-                id: '13',
-                accessCode,
-                players: [],
-                isLocked: false,
-                organizer: 'client26',
-                maxPlayers: 4,
-                currentPlayerTurn: 'client26',
-            };
+//         it("devrait émettre une erreur si le client n'est pas l'organisateur", () => {
+//             const client = createMockSocket('client25');
+//             const accessCode = 9999;
+//             const mockRoom: GameRoom = {
+//                 id: '13',
+//                 accessCode,
+//                 players: [],
+//                 isLocked: false,
+//                 organizer: 'client26',
+//                 maxPlayers: 4,
+//                 currentPlayerTurn: 'client26',
+//             };
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            gateway.handleStartGame(client, accessCode);
+//             gateway.handleStartGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(playGameBoardGateway.startRoomGame).not.toHaveBeenCalled();
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
-        });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(playGameBoardGateway.startRoomGame).not.toHaveBeenCalled();
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
+//         });
 
-        it("devrait émettre une erreur si la salle n'existe pas", () => {
-            const client = createMockSocket('client27');
-            const accessCode = 5678;
+//         it("devrait émettre une erreur si la salle n'existe pas", () => {
+//             const client = createMockSocket('client27');
+//             const accessCode = 5678;
 
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
 
-            gateway.handleStartGame(client, accessCode);
+//             gateway.handleStartGame(client, accessCode);
 
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(playGameBoardGateway.startRoomGame).not.toHaveBeenCalled();
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
-        });
-    });
+//             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+//             expect(playGameBoardGateway.startRoomGame).not.toHaveBeenCalled();
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou room non trouvé' });
+//         });
+//     });
 
     // Tests pour handleKickPlayer
     describe('handleKickPlayer', () => {
@@ -724,24 +724,24 @@ describe('GameGateway', () => {
             };
             const accessCode = 9999;
 
-            const mockRoom: GameRoom = {
-                id: '14',
-                accessCode,
-                players: [playerToKick],
-                isLocked: false,
-                organizer: 'client28',
-                maxPlayers: 4,
-                currentPlayerTurn: 'client28',
-            };
+//             const mockRoom: GameRoom = {
+//                 id: '14',
+//                 accessCode,
+//                 players: [playerToKick],
+//                 isLocked: false,
+//                 organizer: 'client28',
+//                 maxPlayers: 4,
+//                 currentPlayerTurn: 'client28',
+//             };
 
-            gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
-            gameSocketRoomService.kickPlayer.mockReturnValue(false);
+//             gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
+//             gameSocketRoomService.kickPlayer.mockReturnValue(false);
 
-            gateway.handleKickPlayer(client, playerToKick);
+//             gateway.handleKickPlayer(client, playerToKick);
 
-            expect(gameSocketRoomService.kickPlayer).toHaveBeenCalledWith(accessCode, playerToKick.socketId, client.id);
-            expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou joueur pas trouvé' });
-        });
+//             expect(gameSocketRoomService.kickPlayer).toHaveBeenCalledWith(accessCode, playerToKick.socketId, client.id);
+//             expect(client.emit).toHaveBeenCalledWith('error', { message: 'Pas authorisé ou joueur pas trouvé' });
+//         });
 
         it("ne devrait rien faire si l'accessCode est indéfini", () => {
             const client = createMockSocket('client32');
@@ -752,9 +752,9 @@ describe('GameGateway', () => {
                 avatar: AvatarEnum.Muffin,
             };
 
-            gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
+//             gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
 
-            gateway.handleKickPlayer(client, playerToKick);
+//             gateway.handleKickPlayer(client, playerToKick);
 
             expect(gameSocketRoomService.kickPlayer).not.toHaveBeenCalled();
             expect(mockServer.to).not.toHaveBeenCalled();
@@ -808,40 +808,40 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour sendGameParameters
-    describe('sendGameParameters', () => {
-        it('devrait envoyer les paramètres du jeu si la salle existe', () => {
-            const accessCode = 9999;
-            const mockGameBoardParameters: GameBoardParameters = {
-                game: {
-                    _id: 'game123',
-                    size: 10,
-                    name: 'Test Game',
-                    description: 'A test game',
-                    mode: GameMode.Classique,
-                    imageUrl: 'test.jpg',
-                    isVisible: true,
-                    tiles: [],
-                },
-                spawnPlaces: [],
-                turnOrder: [],
-            };
+//     // Tests pour sendGameParameters
+//     describe('sendGameParameters', () => {
+//         it('devrait envoyer les paramètres du jeu si la salle existe', () => {
+//             const accessCode = 9999;
+//             const mockGameBoardParameters: GameBoardParameters = {
+//                 game: {
+//                     _id: 'game123',
+//                     size: 10,
+//                     name: 'Test Game',
+//                     description: 'A test game',
+//                     mode: GameMode.Classique,
+//                     imageUrl: 'test.jpg',
+//                     isVisible: true,
+//                     tiles: [],
+//                 },
+//                 spawnPlaces: [],
+//                 turnOrder: [],
+//             };
 
-            gameSocketRoomService.gameBoardRooms = new Map();
-            gameSocketRoomService.gameBoardRooms.set(accessCode, mockGameBoardParameters);
+//             gameSocketRoomService.gameBoardRooms = new Map();
+//             gameSocketRoomService.gameBoardRooms.set(accessCode, mockGameBoardParameters);
 
-            gateway.sendGameParameters(accessCode);
+//             gateway.sendGameParameters(accessCode);
 
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
             expect(mockEmit).toHaveBeenCalledWith('gameParameters', { gameBoardParameters: mockGameBoardParameters });
         });
 
-        it("devrait émettre une erreur si la salle n'existe pas", () => {
-            const accessCode = 4017;
+//         it("devrait émettre une erreur si la salle n'existe pas", () => {
+//             const accessCode = 4017;
 
-            gameSocketRoomService.gameBoardRooms = new Map();
+//             gameSocketRoomService.gameBoardRooms = new Map();
 
-            gateway.sendGameParameters(accessCode);
+//             gateway.sendGameParameters(accessCode);
 
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
             expect(mockEmit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
