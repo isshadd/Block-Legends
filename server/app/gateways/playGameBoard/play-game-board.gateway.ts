@@ -106,10 +106,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('userAttacked')
     handleUserAttacked(client: Socket, data: { attackResult: number; accessCode: number }) {
-        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(data.accessCode);
-
-        if (!battleRoom) {
-            this.logger.error(`Room pas trouvé pour code: ${data.accessCode}`);
+        if (!this.isValidRoom(data.accessCode)) {
             return;
         }
 
@@ -131,10 +128,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('userTriedEscape')
     handleUserTriedEscape(client: Socket, accessCode: number) {
-        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
-
-        if (!battleRoom) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
@@ -150,10 +144,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage('userWon')
     handleUserWon(client: Socket, accessCode: number) {
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-
-        if (!room) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
@@ -165,13 +156,23 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
 
-        if (!room) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return false;
         }
 
         if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ACTIVE_TURN) {
             this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
+            return false;
+        }
+
+        return true;
+    }
+
+    isValidRoom(accessCode: number) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (!room) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
             return false;
         }
 
@@ -200,10 +201,7 @@ export class PlayGameBoardGateway {
     }
 
     handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-
-        if (!room) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
@@ -219,10 +217,7 @@ export class PlayGameBoardGateway {
     }
 
     handleBattleTimeOut(accessCode: number) {
-        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
-
-        if (!battleRoom) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
@@ -230,10 +225,7 @@ export class PlayGameBoardGateway {
     }
 
     endBattleTurn(accessCode: number) {
-        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
-
-        if (!battleRoom) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
@@ -272,13 +264,11 @@ export class PlayGameBoardGateway {
     }
 
     handleTimeOut(accessCode: number) {
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-
-        if (!room) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+        if (!this.isValidRoom(accessCode)) {
             return;
         }
 
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
 
         switch (gameTimer.state) {
