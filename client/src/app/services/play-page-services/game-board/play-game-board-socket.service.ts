@@ -109,11 +109,8 @@ export class PlayGameBoardSocketService {
         });
 
         this.socket.on('startBattleTurn', (playerIdTurn: string) => {
-            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
-            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
-            if (this.playGameBoardManagerService.isUserTurn) {
-                this.battleManagerService.startBattleTurn();
-            }
+            this.battleManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.battleManagerService.isUserTurn = playerIdTurn === this.socket.id;
         });
     }
 }
