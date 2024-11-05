@@ -4,6 +4,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
+import { BattleManagerService } from './battle-manager.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 @Injectable({
@@ -18,6 +19,7 @@ export class PlayGameBoardSocketService {
         public webSocketService: WebSocketService,
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
+        public battleManagerService: BattleManagerService,
     ) {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
@@ -104,6 +106,14 @@ export class PlayGameBoardSocketService {
 
         this.socket.on('roomUserDidBattleAction', (data: { playerId: string; enemyPlayerId: string }) => {
             this.playGameBoardManagerService.startBattle(data.playerId, data.enemyPlayerId);
+        });
+
+        this.socket.on('startBattleTurn', (playerIdTurn: string) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+            if (this.playGameBoardManagerService.isUserTurn) {
+                this.battleManagerService.startBattleTurn();
+            }
         });
     }
 }

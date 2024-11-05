@@ -12,4 +12,6 @@ export class BattleManagerService {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
     }
+
+    startBattleTurn() {}
 }

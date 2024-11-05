@@ -1,4 +1,5 @@
 import { GameBoardParameters, GameSocketRoomService, GameTimerState } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -15,6 +16,7 @@ export class PlayGameBoardGateway {
     constructor(
         private readonly playGameBoardSocketService: PlayGameBoardSocketService,
         private readonly playGameBoardTimeService: PlayGameBoardTimeService,
+        private readonly playGameBoardBattleService: PlayGameBoardBattleService,
         private readonly gameSocketRoomService: GameSocketRoomService,
     ) {
         this.playGameBoardTimeService.signalRoomTimePassed$.subscribe((accessCode) => {
@@ -24,7 +26,13 @@ export class PlayGameBoardGateway {
             this.handleTimeOut(accessCode);
         });
         this.gameSocketRoomService.signalPlayerLeftRoom$.subscribe(({ accessCode, playerSocketId }) => {
-            this.handlePlayerLeftRoom(playerSocketId);
+            this.handlePlayerLeftRoom(accessCode, playerSocketId);
+        });
+        this.playGameBoardBattleService.signalRoomTimeOut$.subscribe((accessCode) => {
+            this.handleBattleTimeOut(accessCode);
+        });
+        this.playGameBoardBattleService.signalRoomTimePassed$.subscribe((accessCode) => {
+            this.handleBattleSecondPassed(accessCode);
         });
     }
 
@@ -125,6 +133,10 @@ export class PlayGameBoardGateway {
         this.server.to(accessCode.toString()).emit('startTurn', playerIdTurn);
     }
 
+    startBattleTurn(accessCode: number, playerId: string) {
+        this.server.to(accessCode.toString()).emit('startBattleTurn', playerId);
+    }
+
     handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
@@ -134,6 +146,29 @@ export class PlayGameBoardGateway {
         }
 
         this.playGameBoardTimeService.pauseTimer(accessCode);
+        this.playGameBoardBattleService.createBattleTimer(accessCode, playerId, enemyPlayerId);
+
+        const playerTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
+        this.startBattleTurn(accessCode, playerTurn);
+    }
+
+    handleBattleSecondPassed(accessCode: number) {
+        this.server.to(accessCode.toString()).emit('setTime', this.gameSocketRoomService.gameBattleRooms.get(accessCode).time);
+    }
+
+    handleBattleTimeOut(accessCode: number) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+
+        if (!battleRoom) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.playGameBoardBattleService.endBattleTurn(accessCode);
+        this.handleBattleSecondPassed(accessCode);
+
+        const playerTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
+        this.startBattleTurn(accessCode, playerTurn);
     }
 
     handleTimeOut(accessCode: number) {
@@ -162,30 +197,26 @@ export class PlayGameBoardGateway {
         }
     }
 
-    handlePlayerLeftRoom(socketId: string) {
-        const accessCode = this.gameSocketRoomService.playerRooms.get(socketId);
+    handlePlayerLeftRoom(accessCode: number, socketId: string) {
+        const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
-        if (accessCode) {
-            const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
-            const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (gameBoardRoom) {
+            if (room.currentPlayerTurn === socketId) {
+                switch (this.gameSocketRoomService.gameTimerRooms.get(accessCode).state) {
+                    case GameTimerState.ACTIVE_TURN:
+                        this.handleTimeOut(accessCode);
+                        break;
 
-            if (gameBoardRoom) {
-                if (room.currentPlayerTurn === socketId) {
-                    switch (this.gameSocketRoomService.gameTimerRooms.get(accessCode).state) {
-                        case GameTimerState.ACTIVE_TURN:
-                            this.handleTimeOut(accessCode);
-                            break;
-
-                        case GameTimerState.PREPARING_TURN:
-                            this.playGameBoardSocketService.changeTurn(accessCode);
-                    }
+                    case GameTimerState.PREPARING_TURN:
+                        this.playGameBoardSocketService.changeTurn(accessCode);
                 }
-
-                gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
-                gameBoardRoom.turnOrder = gameBoardRoom.turnOrder.filter((id) => id !== socketId);
-
-                this.server.to(accessCode.toString()).emit('gameBoardPlayerLeft', socketId);
             }
+
+            gameBoardRoom.spawnPlaces = gameBoardRoom.spawnPlaces.filter(([, id]) => id !== socketId);
+            gameBoardRoom.turnOrder = gameBoardRoom.turnOrder.filter((id) => id !== socketId);
+
+            this.server.to(accessCode.toString()).emit('gameBoardPlayerLeft', socketId);
         }
     }
 }

@@ -28,6 +28,13 @@ export interface GameTimer {
     state: GameTimerState;
 }
 
+export interface GameBattle {
+    time: number;
+    firstPlayerId: string;
+    secondPlayerId: string;
+    isFirstPlayerTurn: boolean;
+}
+
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
@@ -51,6 +58,7 @@ export class GameSocketRoomService {
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
+    gameBattleRooms: Map<number, GameBattle> = new Map();
 
     signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
     signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
@@ -181,6 +189,7 @@ export class GameSocketRoomService {
                     this.rooms.delete(accessCode);
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
+                    this.gameBattleRooms.delete(accessCode);
 
                     this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
                 } else if (room.organizer === socketId) {
