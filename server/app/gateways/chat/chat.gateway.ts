@@ -34,6 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.RoomMessage)
     roomMessage(socket: Socket, message : RoomMessage) {
+        this.logger.log(`Message received in room ${message.room}`);
       if (socket.rooms.has(message.room)) {
         const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
         this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);

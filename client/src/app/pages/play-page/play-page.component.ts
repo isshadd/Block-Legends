@@ -18,6 +18,9 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
+//import { ChatService } from '@app/services/chat-service.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 @Component({
     selector: 'app-play-page',
     standalone: true,
@@ -53,8 +56,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
         public router: Router,
-        //private webSocketService: WebSocketService,
+        private webSocketService: WebSocketService,
         private gameService: GameService,
+        //private chatService: ChatService,
+        private socketStateService: SocketStateService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -84,6 +89,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         }
     }
     ngOnInit(): void {
+        this.socketStateService.setActiveSocket(this.webSocketService)
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
             //this.players = this.webSocketService.getTotalPlayers();
             this.myPlayer = player;
