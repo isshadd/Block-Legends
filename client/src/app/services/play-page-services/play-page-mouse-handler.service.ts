@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { Subject, takeUntil } from 'rxjs';
@@ -86,17 +85,22 @@ export class PlayPageMouseHandlerService {
         }
     }
 
+    // handleRightClick(tile: Tile) {
+    //     if (tile.isTerrain() && (tile as TerrainTile).player) {
+    //         const player = (tile as TerrainTile).player;
+    //         if (player) {
+    //             this.discardRightSelectedTile();
+    //             this.rightClickSelectedPlayerCharacter = this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(player);
+    //         }
+    //     } else {
+    //         this.discardRightClickSelectedPlayer();
+    //         this.rightSelectedTile = tile;
+    //     }
+    // }
+
     handleRightClick(tile: Tile) {
-        if (tile.isTerrain() && (tile as TerrainTile).player) {
-            const player = (tile as TerrainTile).player;
-            if (player) {
-                this.discardRightSelectedTile();
-                this.rightClickSelectedPlayerCharacter = this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(player);
-            }
-        } else {
-            this.discardRightClickSelecterPlayer();
-            this.rightSelectedTile = tile;
-        }
+        this.discardRightSelectedTile();
+        this.rightSelectedTile = tile;
     }
 
     toggleAction(): void {
@@ -144,7 +148,7 @@ export class PlayPageMouseHandlerService {
         this.isActionOpen = false;
     }
 
-    discardRightClickSelecterPlayer(): void {
+    discardRightClickSelectedPlayer(): void {
         this.rightClickSelectedPlayerCharacter = null;
     }
 

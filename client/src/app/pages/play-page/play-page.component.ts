@@ -12,6 +12,7 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
+import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 
 @Component({
@@ -26,6 +27,7 @@ import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-en
         MapTileInfoComponent,
         PlaceableEntityContainerComponent,
         TimerComponent,
+        InfoPanelComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
@@ -63,7 +65,7 @@ export class PlayPageComponent {
     }
 
     closePlayerInfoPanel(): void {
-        this.playPageMouseHandlerService.discardRightClickSelecterPlayer();
+        this.playPageMouseHandlerService.discardRightClickSelectedPlayer();
     }
 
     closeTileInfoPanel(): void {

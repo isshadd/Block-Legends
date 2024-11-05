@@ -24,14 +24,8 @@
             [isBattle]="playGameBoardManagerService.isBattleOn"
         ></app-timer>
 
-        @if(playPageMouseHandlerService.rightClickSelectedPlayerCharacter) {
-        <app-player-map-entity-info-view
-            [playerCharacter]="playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
-            (close)="closePlayerInfoPanel()"
-            id="info-panel"
-        ></app-player-map-entity-info-view>
-        } @if (playPageMouseHandlerService.rightSelectedTile) {
-        <app-map-tile-info id="info-panel" [tile]="playPageMouseHandlerService.rightSelectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        @if (playPageMouseHandlerService.rightSelectedTile) {
+            <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
         }
 
         <div class="action-container">
