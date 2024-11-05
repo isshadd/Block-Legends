@@ -1,5 +1,5 @@
 <div class="waiting-room">
-    <h1>Attente de partie - League of Versions</h1>
+    <h1>Salle d'attente - BLOCK LEGENDS</h1>
 
     <h2>Code d'accès : {{ accessCode$ | async }}</h2>
     @if (isLocked$ | async) { ::: 🔒 Salle verrouillée ::: } @else { ::: 🔓 Salle déverrouillée ::: }
@@ -38,6 +38,17 @@
         <button class="dark-button" type="button" (click)="playerNonOrgLeave()">Quitter la partie</button>
     </div>
     }
-
-    <app-clavardage></app-clavardage>
+    <!-- <div class="toggle-container">
+        <button class="toggle-button" (click)="toggleView()">
+          {{ showClavardage ? 'Show Event Journal' : 'Show Clavardage' }}
+        </button>
+      </div>
+      
+      <div *ngIf="showClavardage">
+        <app-clavardage></app-clavardage>
+      </div>
+      <div *ngIf="!showClavardage">
+        <app-event-journal></app-event-journal>
+      </div> -->
+      <app-clavardage></app-clavardage>
 </div>
