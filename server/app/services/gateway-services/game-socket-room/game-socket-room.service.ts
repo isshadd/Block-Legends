@@ -32,6 +32,8 @@ export interface GameBattle {
     time: number;
     firstPlayerId: string;
     secondPlayerId: string;
+    firstPlayerRemainingEvades: number;
+    secondPlayerRemainingEvades: number;
     isFirstPlayerTurn: boolean;
 }
 

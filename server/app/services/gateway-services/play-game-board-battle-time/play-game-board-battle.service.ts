@@ -5,6 +5,8 @@ import { GameSocketRoomService } from '../game-socket-room/game-socket-room.serv
 @Injectable()
 export class PlayGameBoardBattleService {
     readonly ACTIVE_TURN_TIME = 5;
+    readonly NO_EVADE_ACTIVE_TURN_TIME = 3;
+    readonly STARTING_EVADE_ATTEMPTS = 2;
 
     signalRoomTimeOut = new Subject<number>();
     signalRoomTimeOut$ = this.signalRoomTimeOut.asObservable();
@@ -55,6 +57,8 @@ export class PlayGameBoardBattleService {
             firstPlayerId: firstPlayerId,
             secondPlayerId: secondPlayerId,
             isFirstPlayerTurn: isFirstPlayerTurn,
+            firstPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
+            secondPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
         });
     }
 
@@ -66,6 +70,12 @@ export class PlayGameBoardBattleService {
 
         battleRoom.isFirstPlayerTurn = !battleRoom.isFirstPlayerTurn;
         battleRoom.time = this.ACTIVE_TURN_TIME;
+
+        if (battleRoom.isFirstPlayerTurn && battleRoom.firstPlayerRemainingEvades === 0) {
+            battleRoom.time = this.NO_EVADE_ACTIVE_TURN_TIME;
+        } else if (!battleRoom.isFirstPlayerTurn && battleRoom.secondPlayerRemainingEvades === 0) {
+            battleRoom.time = this.NO_EVADE_ACTIVE_TURN_TIME;
+        }
     }
 
     getPlayerBattleTurn(accessCode: number): string {
@@ -75,5 +85,28 @@ export class PlayGameBoardBattleService {
         }
 
         return battleRoom.isFirstPlayerTurn ? battleRoom.firstPlayerId : battleRoom.secondPlayerId;
+    }
+
+    userUsedEvade(accessCode: number, playerId: string): boolean {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        if (!battleRoom) {
+            return false;
+        }
+
+        if (battleRoom.firstPlayerId === playerId) {
+            if (battleRoom.firstPlayerRemainingEvades === 0) {
+                return false;
+            }
+            battleRoom.firstPlayerRemainingEvades--;
+        } else if (battleRoom.secondPlayerId === playerId) {
+            if (battleRoom.secondPlayerRemainingEvades === 0) {
+                return false;
+            }
+            battleRoom.secondPlayerRemainingEvades--;
+        } else {
+            return false;
+        }
+
+        return Math.random() < 0.4;
     }
 }

@@ -120,6 +120,11 @@ export class PlayGameBoardGateway {
             return;
         }
 
+        if (this.playGameBoardBattleService.userUsedEvade(accessCode, client.id)) {
+            // User escaped
+            return;
+        }
+
         this.handleBattleTimeOut(accessCode);
     }
 
