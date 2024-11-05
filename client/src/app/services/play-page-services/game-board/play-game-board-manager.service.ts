@@ -395,4 +395,17 @@ export class PlayGameBoardManagerService {
     getCurrentPlayerCharacter(): PlayerCharacter | null {
         return this.findPlayerFromSocketId(this.webSocketService.socket.id);
     }
+
+    resetManager() {
+        this.currentTime = 0;
+        this.areOtherPlayersInBattle = false;
+        this.currentPlayerIdTurn = '';
+        this.isUserTurn = false;
+        this.userCurrentMovePoints = 0;
+        this.userCurrentActionPoints = 0;
+        this.userCurrentPossibleMoves = new Map();
+        this.turnOrder;
+
+        this.winnerPlayer = null;
+    }
 }

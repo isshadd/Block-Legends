@@ -23,6 +23,8 @@ export class PlayGameBoardSocketService {
         public battleManagerService: BattleManagerService,
         public router: Router,
     ) {
+        this.socket = this.webSocketService.socket;
+        this.setupSocketListeners();
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
@@ -62,8 +64,6 @@ export class PlayGameBoardSocketService {
     }
 
     init() {
-        this.socket = this.webSocketService.socket;
-        this.setupSocketListeners();
         this.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
     }
 
@@ -79,6 +79,9 @@ export class PlayGameBoardSocketService {
 
     leaveGame(): void {
         this.socket.disconnect();
+        this.battleManagerService.clearBattle();
+        this.playGameBoardManagerService.resetManager();
+        this.playPageMouseHandlerService.clearUI();
         this.router.navigate(['/home']);
     }
 

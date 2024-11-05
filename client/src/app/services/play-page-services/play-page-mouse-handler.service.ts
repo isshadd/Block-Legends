@@ -137,6 +137,8 @@ export class PlayPageMouseHandlerService {
         this.actionTiles = [];
         this.lastTilePath = [];
         this.isActionOpen = false;
+        this.rightClickSelectedPlayerCharacter = null;
+        this.rightSelectedTile = null;
     }
 
     discardRightClickSelectedPlayer(): void {

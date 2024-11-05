@@ -88,6 +88,5 @@ export class PlayPageComponent {
 
     leaveGame(): void {
         this.playGameBoardSocketService.leaveGame();
-        this.router.navigate(['/home']);
     }
 }
