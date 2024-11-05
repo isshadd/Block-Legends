@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
-const DELAY = 300;
+const DELAY = 500;
 
 @Component({
     selector: 'app-fight-view',
@@ -18,6 +18,8 @@ export class FightViewComponent {
     @Output() attack = new EventEmitter<void>();
     @Output() escape = new EventEmitter<void>();
 
+    private playerDiceResult: number = 0;
+
     get healthArray(): unknown[] {
         return this.opponentCharacter ? new Array(this.opponentCharacter.attributes.life) : [];
     }
@@ -28,6 +30,7 @@ export class FightViewComponent {
 
     onAttack() {
         this.attack.emit();
+        this.onPlayerRollDice();
         this.onPlayerAttack();
     }
 
@@ -80,5 +83,19 @@ export class FightViewComponent {
         setTimeout(() => {
             opponentImage?.classList.remove('escape-opponent');
         }, DELAY);
+    }
+
+    onPlayerRollDice(): void {
+        const diceResult = document.getElementById('dice-result');
+        this.playerDiceResult = Math.floor(Math.random() * 6) + 1;
+        diceResult?.classList.add('dice-roll');
+        setTimeout(() => {
+            diceResult?.classList.remove('dice-roll');
+        }, DELAY);
+    }
+
+    getDiceResult(): number {
+        //TODO TEMP
+        return this.playerDiceResult;
     }
 }
