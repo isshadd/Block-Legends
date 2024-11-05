@@ -1,7 +1,7 @@
 @import 'src/_variables.scss';
 
 #win-panel {
-    position: absolute;
+    justify-content: center;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -14,7 +14,6 @@
     background-color: $primary-dark;
     border: 2px solid darken($primary-dark, 10%);
     border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     text-align: center;
     animation: fadeIn 0.5s ease-in-out;
 

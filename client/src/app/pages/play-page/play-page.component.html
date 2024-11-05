@@ -1,4 +1,7 @@
 <div id="page-container">
+    @if(playGameBoardManagerService.getWinnerPlayer()) {
+    <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
+    }
     <div id="side-menu">
         <button class="dark-button" (click)="leaveGame()">Sortir</button>
         <app-player-map-entity-info-view
@@ -12,9 +15,8 @@
     <div id="map-wrapper">
         @if(battleManagerService.opponentPlayer) {
         <app-fight-view id="fight-comp"></app-fight-view>
-        } @if(playGameBoardManagerService.getWinnerPlayer()) {
-        <app-win-panel [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
         }
+
         <app-map
             id="map-container"
             [grid]="playGameBoardManagerService.getCurrentGrid()"

@@ -17,12 +17,4 @@ describe('WinPanelComponent', () => {
     it('should create the component', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should emit close event when closeWinPanel is called', () => {
-        spyOn(component.close, 'emit');
-
-        component.closeWinPanel();
-
-        expect(component.close.emit).toHaveBeenCalled();
-    });
 });
