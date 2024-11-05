@@ -121,7 +121,7 @@ export class PlayGameBoardGateway {
         }
 
         if (this.playGameBoardBattleService.userUsedEvade(accessCode, client.id)) {
-            // User escaped
+            this.handleBattleEndedByEscape(accessCode);
             return;
         }
 
@@ -209,6 +209,19 @@ export class PlayGameBoardGateway {
 
         const playerTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
         this.startBattleTurn(accessCode, playerTurn);
+    }
+
+    handleBattleEndedByEscape(accessCode: number) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        const firstPlayer = battleRoom.firstPlayerId;
+
+        this.handleEndBattle(accessCode);
+        this.server.to(accessCode.toString()).emit('battleEndedByEscape', firstPlayer);
+    }
+
+    handleEndBattle(accessCode: number) {
+        this.playGameBoardBattleService.battleRoomFinished(accessCode);
+        this.playGameBoardTimeService.resumeTimer(accessCode);
     }
 
     handleTimeOut(accessCode: number) {

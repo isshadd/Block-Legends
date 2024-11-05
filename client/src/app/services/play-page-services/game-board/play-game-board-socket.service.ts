@@ -125,5 +125,12 @@ export class PlayGameBoardSocketService {
         this.socket.on('automaticAttack', () => {
             this.battleManagerService.onUserAttack();
         });
+
+        this.socket.on('battleEndedByEscape', (playerIdTurn: string) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+            this.battleManagerService.endBattle();
+            this.playGameBoardManagerService.endBattleByEscape();
+        });
     }
 }

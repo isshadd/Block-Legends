@@ -19,11 +19,13 @@ export class BattleManagerService {
     currentPlayerIdTurn: string | null = null;
     isUserTurn = false;
     userEvasionAttempts = 0;
+    opponentEvasionAttempts = 0;
 
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
         this.userEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
+        this.opponentEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
     }
 
     isValidAction(): boolean {
@@ -41,5 +43,18 @@ export class BattleManagerService {
             this.userEvasionAttempts--;
             this.signalUserTriedEscape.next();
         }
+    }
+
+    endBattle() {
+        this.clearBattle();
+    }
+
+    clearBattle() {
+        this.currentPlayer = null;
+        this.opponentPlayer = null;
+        this.currentPlayerIdTurn = null;
+        this.isUserTurn = false;
+        this.userEvasionAttempts = 0;
+        this.opponentEvasionAttempts = 0;
     }
 }

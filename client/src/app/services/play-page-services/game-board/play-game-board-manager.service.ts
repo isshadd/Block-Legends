@@ -215,7 +215,6 @@ export class PlayGameBoardManagerService {
                 this.signalUserDidBattleAction.next(playerCharacter.socketId);
                 this.hidePossibleMoves();
                 this.userCurrentActionPoints -= 1;
-                // this.checkIfPLayerDidEverything();
             }
             return;
         }
@@ -279,6 +278,19 @@ export class PlayGameBoardManagerService {
         if (!opponentPlayer) return;
 
         this.battleManagerService.init(currentPlayer, opponentPlayer);
+    }
+
+    endBattleByEscape() {
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
+        console.log(userPlayerCharacter);
+        console.log(this.userCurrentMovePoints);
+        if (userPlayerCharacter && this.isUserTurn) {
+            console.log('endBattleByEscape');
+            console.log(userPlayerCharacter);
+            console.log(this.userCurrentMovePoints);
+            this.checkIfPLayerDidEverything();
+            this.setupPossibleMoves(userPlayerCharacter);
+        }
     }
 
     removePlayerFromMap(playerId: string) {

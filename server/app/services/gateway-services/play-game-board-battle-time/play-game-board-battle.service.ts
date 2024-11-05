@@ -109,4 +109,8 @@ export class PlayGameBoardBattleService {
 
         return Math.random() < 0.4;
     }
+
+    battleRoomFinished(accessCode: number): void {
+        this.gameSocketRoomService.gameBattleRooms.delete(accessCode);
+    }
 }
