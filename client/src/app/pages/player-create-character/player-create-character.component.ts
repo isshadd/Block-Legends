@@ -82,16 +82,7 @@ export class PlayerCreateCharacterComponent {
         }
     }
 
-    openModal() {
-        this.isModalOpen = true;
-    }
-
-    closeModal() {
-        this.isModalOpen = false;
-    }
-
-    confirmBack() {
-        this.closeModal();
-        this.router.navigate(['/create-game']);
+    quitToHome() {
+        this.router.navigate(['/home']);
     }
 }

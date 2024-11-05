@@ -160,7 +160,7 @@ export class PlayGameBoardGateway {
             return false;
         }
 
-        if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ACTIVE_TURN) {
+        if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ActiveTurn) {
             this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
             return false;
         }
@@ -272,14 +272,14 @@ export class PlayGameBoardGateway {
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
 
         switch (gameTimer.state) {
-            case GameTimerState.ACTIVE_TURN:
+            case GameTimerState.ActiveTurn:
                 this.endRoomTurn(accessCode);
                 this.playGameBoardSocketService.changeTurn(accessCode);
                 this.playGameBoardTimeService.setTimerPreparingTurn(accessCode);
                 this.updateRoomTime(accessCode);
                 break;
 
-            case GameTimerState.PREPARING_TURN:
+            case GameTimerState.PreparingTurn:
                 this.startRoomTurn(accessCode, room.currentPlayerTurn);
                 this.playGameBoardTimeService.setTimerActiveTurn(accessCode);
                 this.updateRoomTime(accessCode);

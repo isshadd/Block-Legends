@@ -12,14 +12,14 @@ import { TileType } from '@common/enums/tile-type';
 })
 export class MapTileInfoComponent {
     @Input() tile: Tile;
-    @Output() close = new EventEmitter<void>();
+    @Output() closeP = new EventEmitter<void>();
 
     tileTypeToImage(tileType: TileType): string {
         return `/assets/images/tiles/blocks/${tileType}.png`;
     }
 
     closePanel() {
-        this.close.emit();
+        this.closeP.emit();
     }
 
     tileMovementCost(tile: Tile): number | null {

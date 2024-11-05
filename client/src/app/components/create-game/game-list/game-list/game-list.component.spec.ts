@@ -1,46 +1,96 @@
-// /* eslint-disable import/no-deprecated */
-// import { HttpClientTestingModule } from '@angular/common/http/testing';
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+// import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 // import { Router } from '@angular/router';
+// import { Tile } from '@app/classes/Tiles/tile';
 // import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
+// import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 // import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 // import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 // import { GameMode } from '@common/enums/game-mode';
 // import { MapSize } from '@common/enums/map-size';
 // import { GameShared } from '@common/interfaces/game-shared';
-// import { of } from 'rxjs';
+// import { TileShared } from '@common/interfaces/tile-shared';
+// import { BehaviorSubject, of, throwError } from 'rxjs';
 // import { GameListComponent } from './game-list.component';
 
 // describe('GameListComponent', () => {
 //     let component: GameListComponent;
 //     let fixture: ComponentFixture<GameListComponent>;
-//     let modeService: jasmine.SpyObj<ModeService>;
-//     let router: jasmine.SpyObj<Router>;
-//     let mockGameServerCommunicationService: jasmine.SpyObj<GameServerCommunicationService>;
-//     let mockAdministrationService: jasmine.SpyObj<AdministrationPageManagerService>;
-
-//     let mockGames: GameShared[];
+//     // let modeServiceSpy: jasmine.SpyObj<ModeService>;
+//     let routerSpy: jasmine.SpyObj<Router>;
+//     let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
+//     let administrationServiceSpy: jasmine.SpyObj<AdministrationPageManagerService>;
+//     let gameServerCommunicationServiceSpy: jasmine.SpyObj<GameServerCommunicationService>;
 
 //     beforeEach(async () => {
-//         const modeServiceSpy = jasmine.createSpyObj('ModeService', ['selectedMode$']);
-//         const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
-//         mockAdministrationService = jasmine.createSpyObj('AdministrationPageManagerService', [], {
-//             games: [
-//                 {
-//                     _id: '1',
-//                     name: 'Game 1',
-//                     isVisible: true,
-//                     mode: GameMode.Classique,
-//                     description: 'Description 1',
-//                     size: MapSize.SMALL,
-//                     imageUrl: '',
-//                     tiles: [],
-//                 },
-//             ],
+//         const modeService = jasmine.createSpyObj('ModeService', [], {
+//             selectedMode$: new BehaviorSubject<GameMode>(GameMode.Classique),
 //         });
 
-//         mockGames = [
+//         const router = jasmine.createSpyObj('Router', ['navigate']);
+
+//         const tileFactoryService = jasmine.createSpyObj('TileFactoryService', ['loadGridFromJSON']);
+
+//         const administrationService = jasmine.createSpyObj('AdministrationPageManagerService', ['setGames'], {
+//             signalGamesSetted$: new BehaviorSubject<GameShared[]>([]),
+//         });
+
+//         const gameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
+
+//         await TestBed.configureTestingModule({
+//             declarations: [GameListComponent],
+//             providers: [
+//                 { provide: ModeService, useValue: modeService },
+//                 { provide: Router, useValue: router },
+//                 { provide: TileFactoryService, useValue: tileFactoryService },
+//                 { provide: AdministrationPageManagerService, useValue: administrationService },
+//                 { provide: GameServerCommunicationService, useValue: gameServerCommunicationService },
+//             ],
+//         }).compileComponents();
+
+//         fixture = TestBed.createComponent(GameListComponent);
+//         component = fixture.componentInstance;
+
+//         // modeServiceSpy = TestBed.inject(ModeService) as jasmine.SpyObj<ModeService>;
+//         routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+//         tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
+//         administrationServiceSpy = TestBed.inject(AdministrationPageManagerService) as jasmine.SpyObj<AdministrationPageManagerService>;
+//         gameServerCommunicationServiceSpy = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
+//     });
+
+//     it('should create the component', () => {
+//         expect(component).toBeTruthy();
+//     });
+
+//     it('should subscribe to selectedMode$ and update selectedMode', () => {
+//         const newMode = GameMode.CTF;
+//         //  modeServiceSpy.selectedMode$.next(newMode);
+//         expect(component.selectedMode).toBe(newMode);
+//     });
+
+//     it('should subscribe to signalGamesSetted$ and call getGames', () => {
+//         spyOn(component, 'getGames');
+//         const games = [
+//             {
+//                 _id: '1',
+//                 name: 'Game 1',
+//                 isVisible: true,
+//                 mode: GameMode.Classique,
+//                 description: 'Description 1',
+//                 size: MapSize.SMALL,
+//                 imageUrl: '',
+//                 tiles: [],
+//             },
+//         ];
+//         // administrationServiceSpy.signalGamesSetted$.next(games);
+//         expect(component.getGames).toHaveBeenCalledWith(games);
+//     });
+
+//     it('should call administrationService.setGames in constructor', () => {
+//         expect(administrationServiceSpy.setGames).toHaveBeenCalled();
+//     });
+
+//     it('should set databaseGames and loadedTiles in getGames()', () => {
+//         const games = [
 //             {
 //                 _id: '1',
 //                 name: 'Game 1',
@@ -63,85 +113,129 @@
 //             },
 //         ];
 
-//         mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGames', 'getGame']);
-
-//         mockGameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', {
-//             getGames: of(mockGames),
-//             getGame: of(mockGames[0]),
+//         const loadedTiles1 = [[new Tile()]];
+//         const loadedTiles2 = [[new Tile()]];
+//         tileFactoryServiceSpy.loadGridFromJSON.and.callFake((tiles: TileShared[][]) => {
+//             if (tiles === loadedTiles1) return loadedTiles1;
+//             if (tiles === loadedTiles2) return loadedTiles2;
+//             return [];
 //         });
 
-//         Object.defineProperty(modeServiceSpy, 'selectedMode$', { get: () => of(GameMode.Classique) });
+//         component.getGames(games);
 
-//         await TestBed.configureTestingModule({
-//             imports: [GameListComponent, HttpClientTestingModule],
-//             providers: [
-//                 { provide: ModeService, useValue: modeServiceSpy },
-//                 { provide: Router, useValue: routerSpy },
-//                 { provide: GameServerCommunicationService, useValue: mockGameServerCommunicationService },
-//                 { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
-//             ],
-//         }).compileComponents();
-
-//         fixture = TestBed.createComponent(GameListComponent);
-//         component = fixture.componentInstance;
-//         modeService = TestBed.inject(ModeService) as jasmine.SpyObj<ModeService>;
-//         router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-
-//         Object.defineProperty(modeService, 'selectedMode$', { get: () => of(GameMode.Classique) });
+//         expect(component.databaseGames).toEqual(games);
+//         expect(tileFactoryServiceSpy.loadGridFromJSON).toHaveBeenCalledWith(loadedTiles1);
+//         expect(tileFactoryServiceSpy.loadGridFromJSON).toHaveBeenCalledWith(loadedTiles2);
+//         expect(component.loadedTiles).toEqual([loadedTiles1, loadedTiles2]);
 //     });
 
-//     it('should create the component', () => {
-//         expect(component).toBeTruthy();
-//     });
-
-//     it('should initialize with the default selected mode', () => {
-//         fixture.detectChanges();
-//         expect(component.selectedMode).toBe(GameMode.Classique);
-//     });
-
-//     // it('should populate games from GameServerCommunicationService', () => {
-//     //     component.ngOnInit();
-//     //     expect(mockGameServerCommunicationService.getGames).toHaveBeenCalled();
-//     //     expect(component.games.length).toBe(2);
-//     //     expect(component.games).toEqual(mockGames);
-//     // });
-
-//     // it('should return games from AdministrationPageManagerService', () => {
-//     //     const games = component.getGames();
-//     //     expect(games.length).toBe(1);
-//     //     expect(games[0]).toEqual(mockGames[0]);
-//     // });
-
-//     it('should navigate to /home when homeButton is called', () => {
+//     it('homeButton() should navigate to /home', () => {
 //         component.homeButton();
-//         expect(router.navigate).toHaveBeenCalledWith(['/home']);
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
 //     });
 
-//     it('should set selectedGame and navigate to /create-character when a visible game is selected', () => {
-//         const visibleGame = mockGames[0];
-//         component.selectGame(visibleGame);
+//     it('selectGame() should set gameStatus and selectedGame to null if game is not available', fakeAsync(() => {
+//         const game = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+//         const updatedGame: GameShared | null = null;
+//         gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame as unknown as GameShared));
 
-//         expect(component.selectedGame).toEqual(visibleGame);
-//         expect(component.gameStatus).toBeNull();
-//         expect(router.navigate).toHaveBeenCalledWith(['/create-character']);
-//     });
+//         component.selectGame(game);
+//         tick();
 
-//     it('should not select a game and set gameStatus when an invisible game is selected', () => {
-//         mockGames[0].isVisible = false;
-//         const invisibleGame = mockGames[0];
-//         component.selectGame(invisibleGame);
-
+//         expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+//         expect(component.gameStatus).toBe('Le jeu choisi  n`est plus disponible');
 //         expect(component.selectedGame).toBeNull();
-//         expect(component.gameStatus).toBe(`Le jeu choisi ${invisibleGame.name} n'est plus disponible`);
-//         expect(router.navigate).not.toHaveBeenCalled();
-//     });
+//     }));
 
-//     it('should filter games based on the selected mode and visibility', () => {
-//         component.databaseGames = mockGames;
-//         fixture.detectChanges();
+//     it('selectGame() should set gameStatus and selectedGame to null if game is not visible', fakeAsync(() => {
+//         const game = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+//         const updatedGame = { _id: '1', name: 'Game 1', isVisible: false } as GameShared;
+//         gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame));
+
+//         component.selectGame(game);
+//         tick();
+
+//         expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+//         expect(component.gameStatus).toBe('Le jeu choisi Game 1 n`est plus disponible');
+//         expect(component.selectedGame).toBeNull();
+//     }));
+
+//     it('selectGame() should set selectedGame and navigate when game is available and visible', fakeAsync(() => {
+//         const game = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+//         const updatedGame = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+//         gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame));
+
+//         component.selectGame(game);
+//         tick();
+
+//         expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+//         expect(component.selectedGame).toEqual(updatedGame);
+//         expect(component.gameStatus).toBeNull();
+//         expect(routerSpy.navigate).toHaveBeenCalledWith(['/create-character'], { queryParams: { id: '1' } });
+//     }));
+
+//     it('getFilteredGames() should return games that are visible, match selectedMode, and not null', () => {
+//         component.databaseGames = [
+//             { _id: '1', name: 'Game 1', isVisible: true, mode: GameMode.Classique } as GameShared,
+//             { _id: '2', name: 'Game 2', isVisible: false, mode: GameMode.Classique } as GameShared,
+//             { _id: '3', name: 'Game 3', isVisible: true, mode: GameMode.CTF } as GameShared,
+//             { _id: '4', name: 'Game 4', isVisible: true, mode: GameMode.Classique } as GameShared,
+//         ];
+
+//         component.selectedMode = GameMode.Classique;
 
 //         const filteredGames = component.getFilteredGames();
-//         expect(filteredGames.length).toBe(1);
-//         expect(filteredGames[0].name).toBe('Game 1');
+
+//         expect(filteredGames.length).toBe(2);
+//         expect(filteredGames).toEqual([
+//             { _id: '1', name: 'Game 1', isVisible: true, mode: GameMode.Classique } as GameShared,
+//             { _id: '4', name: 'Game 4', isVisible: true, mode: GameMode.Classique } as GameShared,
+//         ]);
 //     });
+
+//     it('findDatabaseGameIndex() should return the index of the game in databaseGames', () => {
+//         component.databaseGames = [{ _id: '1', name: 'Game 1' } as GameShared, { _id: '2', name: 'Game 2' } as GameShared];
+//         const index = component.findDatabaseGameIndex({ _id: '2' } as GameShared);
+//         expect(index).toBe(1);
+//     });
+
+//     it('findDatabaseGameIndex() should return -1 if game is not found', () => {
+//         component.databaseGames = [{ _id: '1', name: 'Game 1' } as GameShared, { _id: '2', name: 'Game 2' } as GameShared];
+//         const index = component.findDatabaseGameIndex({ _id: '3' } as GameShared);
+//         expect(index).toBe(-1);
+//     });
+
+//     it('openModal() should set isModalOpen to true', () => {
+//         component.isModalOpen = false;
+//         component.openModal();
+//         expect(component.isModalOpen).toBeTrue();
+//     });
+
+//     it('closeModal() should set isModalOpen to false and reset gameStatus', () => {
+//         component.isModalOpen = true;
+//         component.gameStatus = 'Error message';
+//         component.closeModal();
+//         expect(component.isModalOpen).toBeFalse();
+//         expect(component.gameStatus).toBeNull();
+//     });
+
+//     it('confirmBack() should call closeModal and reload the window', () => {
+//         spyOn(component, 'closeModal');
+//         spyOn(window.location, 'reload');
+//         component.confirmBack();
+//         expect(component.closeModal).toHaveBeenCalled();
+//         expect(window.location.reload).toHaveBeenCalled();
+//     });
+
+//     it('selectGame() should handle error when getGame throws an error', fakeAsync(() => {
+//         const game = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+//         gameServerCommunicationServiceSpy.getGame.and.returnValue(throwError(() => new Error('Error fetching game')));
+
+//         component.selectGame(game);
+//         tick();
+
+//         expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+//         expect(component.gameStatus).toBe('Le jeu choisi Game 1 n`est plus disponible');
+//         expect(component.selectedGame).toBeNull();
+//     }));
 // });

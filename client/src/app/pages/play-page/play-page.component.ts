@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
@@ -8,6 +10,7 @@ import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-inf
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
@@ -16,7 +19,6 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
-import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 
 @Component({
     selector: 'app-play-page',

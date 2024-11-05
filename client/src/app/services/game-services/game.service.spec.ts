@@ -1,76 +1,83 @@
-// import { TestBed } from '@angular/core/testing';
-// import { PlayerAttributes } from 'src/app/classes/Characters/player-attributes';
-// import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-// import { GameService } from './game.service';
+/* eslint-disable no-undef*/
 
-// describe('GameService', () => {
-//     let mockService: GameService;
+import { TestBed } from '@angular/core/testing';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { GameService, VP_NUMBER } from './game.service';
 
-//     beforeEach(() => {
-//         TestBed.configureTestingModule({
-//             providers: [GameService],
-//         });
-//         mockService = TestBed.inject(GameService);
-//     });
+const ACCESS_CODE = 5678;
+const CINQ = 5;
 
-//     it('should initialize accessCode$ with null', (done) => {
-//         mockService.accessCode$.subscribe((code) => {
-//             expect(code).toBeNull();
-//             done();
-//         });
-//     });
+describe('GameService', () => {
+    let service: GameService;
 
-//     it('should initialize character$ with a default PlayerCharacter', (done) => {
-//         mockService.character$.subscribe((character) => {
-//             expect(character).toEqual(new PlayerCharacter('', '', new PlayerAttributes()));
-//             done();
-//         });
-//     });
+    beforeEach(() => {
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(GameService);
+    });
 
-//     it('should set the access code', (done) => {
-//         const code = 1234;
-//         mockService.accessCode$.subscribe((newCode) => {
-//             if (newCode === code) {
-//                 expect(newCode).toBe(code);
-//                 done();
-//             }
-//         });
-//         mockService.setAccessCode(code);
-//     });
+    it('should be created', () => {
+        expect(service).toBeTruthy();
+    });
 
-//     it('should set the character', (done) => {
-//         const character = new PlayerCharacter('Player1', '', new PlayerAttributes());
-//         mockService.character$.subscribe((newCharacter) => {
-//             if (newCharacter.name === character.name) {
-//                 expect(newCharacter).toEqual(character);
-//                 done();
-//             }
-//         });
-//         mockService.setCharacter(character);
-//     });
+    it('should initialize accessCode$ and character$', (done: DoneFn) => {
+        service.accessCode$.subscribe((code) => {
+            expect(code).toBeNull();
+            done();
+        });
+        service.character$.subscribe((character) => {
+            expect(character).toEqual(new PlayerCharacter(''));
+            // done();
+        });
+    });
 
-//     it('should generate a virtual character', () => {
-//         const index = 0;
-//         const virtualCharacter = mockService.generateVirtualCharacter(index);
-//         expect(virtualCharacter.name).toBe('Joueur virtuel 1');
-//         expect(virtualCharacter).toBeInstanceOf(PlayerCharacter);
-//     });
+    it('should set and get access code correctly', (done: DoneFn) => {
+        service.setAccessCode(ACCESS_CODE);
+        service.accessCode$.subscribe((code) => {
+            expect(code).toBe(ACCESS_CODE);
+            done();
+        });
+    });
 
-//     // Test clearGame
-//     it('should clear game state', (done) => {
-//         const character = new PlayerCharacter('Player1', '', new PlayerAttributes());
-//         mockService.setCharacter(character);
-//         mockService.setAccessCode(1234);
+    it('should set and get character correctly', (done: DoneFn) => {
+        const character = new PlayerCharacter('Hero');
+        service.setCharacter(character);
+        service.character$.subscribe((char) => {
+            expect(char).toBe(character);
+            done();
+        });
+    });
 
-//         mockService.accessCode$.subscribe((code) => {
-//             expect(code).toBeNull();
-//         });
+    it('should update player name correctly', (done: DoneFn) => {
+        service.setCharacter(new PlayerCharacter('Hero'));
+        service.updatePlayerName('New Hero');
+        service.character$.subscribe((char) => {
+            expect(char.name).toBe('New Hero');
+            done();
+        });
+    });
 
-//         mockService.character$.subscribe((newCharacter) => {
-//             expect(newCharacter).toEqual(new PlayerCharacter('', '', new PlayerAttributes()));
-//             done();
-//         });
+    it('should generate virtual character correctly', () => {
+        const index = 2;
+        const virtualCharacter = service.generateVirtualCharacter(index);
+        expect(virtualCharacter.name).toBe('Joueur virtuel 3');
+    });
 
-//         mockService.clearGame();
-//     });
-// });
+    it('should clear game correctly', (done: DoneFn) => {
+        service.setAccessCode(ACCESS_CODE);
+        service.setCharacter(new PlayerCharacter('Hero'));
+
+        service.clearGame();
+
+        service.accessCode$.subscribe((code) => {
+            expect(code).toBeNull();
+            service.character$.subscribe((character) => {
+                expect(character).toEqual(new PlayerCharacter(''));
+                done();
+            });
+        });
+    });
+
+    it('should return VP_NUMBER correctly', () => {
+        expect(VP_NUMBER).toBe(CINQ);
+    });
+});
