@@ -3,12 +3,12 @@
     <div class="fight-header">
         <div class="opponent-title">Nom D'Adversaire: {{ battleManagerService.opponentPlayer.name }}</div>
         <div class="fight-info">
-            Santé:
+            Santé d'adversaire:
             <span *ngFor="let _ of healthArray">
                 <img src="assets/images/heart.png" alt="Heart" class="icon" />
             </span>
             <br />
-            Défense:
+            Défense d'adversaire:
             <span *ngFor="let _ of defenseArray">
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
@@ -25,7 +25,24 @@
                 <div class="layer-3" id="dice-result">{{ playerDiceResult }}</div>
             </div>
         </div>
-        <div class="player-info">Nombre de tentative d'evision: {{ battleManagerService.userEvasionAttempts }}</div>
+        <div id="player-side">
+            <div class="info-line">
+                <span>Santé:</span>
+                <span *ngFor="let _ of healthArray">
+                    <img src="assets/images/heart.png" alt="Heart" class="icon" />
+                </span>
+            </div>
+            <div class="info-line">
+                <span>Défense:</span>
+                <span *ngFor="let _ of defenseArray">
+                    <img id="armor" src="assets/images/armor.png" alt="Armor" class="icon" />
+                </span>
+            </div>
+            <div class="info-line">
+                <span>Nombre de tentative d'évasion: {{ 2 }}</span>
+            </div>
+        </div>
+        
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">
