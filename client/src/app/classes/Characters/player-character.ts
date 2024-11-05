@@ -15,6 +15,7 @@ export class PlayerCharacter {
     dice: string = 'attack';
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
+    fightWins: number = 0;
     isNameValid: boolean = false;
     avatar: Avatar;
     attributes = new PlayerAttributes();

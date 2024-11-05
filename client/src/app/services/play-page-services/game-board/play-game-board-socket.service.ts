@@ -24,6 +24,9 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit('userMoved', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
+        this.playGameBoardManagerService.signalUserRespawned$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit('userRespawned', { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
+        });
         this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit('userStartedMoving', this.webSocketService.getRoomInfo().accessCode);
         });
@@ -149,13 +152,13 @@ export class PlayGameBoardSocketService {
             this.playGameBoardManagerService.currentPlayerIdTurn = data.firstPlayer;
             this.playGameBoardManagerService.isUserTurn = data.firstPlayer === this.socket.id;
             this.battleManagerService.endBattle();
-            this.playGameBoardManagerService.endBattleByDeath(data.loserPlayer);
+            this.playGameBoardManagerService.endBattleByDeath(data.firstPlayer, data.loserPlayer);
             this.playGameBoardManagerService.endBattleFirstPlayerContinueTurn();
         });
 
-        this.socket.on('secondPlayerWonBattle', (loserPlayer: string) => {
+        this.socket.on('secondPlayerWonBattle', (data: { winnerPlayer: string; loserPlayer: string }) => {
             this.battleManagerService.endBattle();
-            this.playGameBoardManagerService.endBattleByDeath(loserPlayer);
+            this.playGameBoardManagerService.endBattleByDeath(data.winnerPlayer, data.loserPlayer);
         });
     }
 }
