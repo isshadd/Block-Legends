@@ -13,6 +13,8 @@ export class PlayerCharacter {
     isOrganizer: boolean = false;
     socketId: string;
     dice: string;
+    attackDice: number;
+    defenseDice: number;
     isNameValid: boolean = false;
     avatar: Avatar;
     attributes = new PlayerAttributes();
@@ -22,12 +24,16 @@ export class PlayerCharacter {
 
     assignAttackDice() {
         this.dice = 'attack';
+        this.attackDice = BONUS;
+        this.defenseDice = BASE_STATS;
         this.isAttackBonusAssigned = true;
         this.isDefenseBonusAssigned = true;
     }
 
     assignDefenseDice() {
         this.dice = 'defense';
+        this.defenseDice = BONUS;
+        this.attackDice = BASE_STATS;
         this.isDefenseBonusAssigned = true;
         this.isAttackBonusAssigned = true;
     }

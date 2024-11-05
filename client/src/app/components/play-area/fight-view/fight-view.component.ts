@@ -14,14 +14,14 @@ const DELAY = 500;
 export class FightViewComponent {
     playerDiceResult = 0;
     constructor(public battleManagerService: BattleManagerService) {
-        this.battleManagerService.signalUserAttacked$.subscribe(() => {
-            this.attackAnimation(6);
+        this.battleManagerService.signalUserAttacked$.subscribe((attackResult: number) => {
+            this.attackAnimation(attackResult);
         });
         this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
             this.escapeAnimation();
         });
-        this.battleManagerService.signalOpponentAttacked$.subscribe(() => {
-            this.onOpponentAttack();
+        this.battleManagerService.signalOpponentAttacked$.subscribe((attackResult: number) => {
+            this.opponentAttackAnimation(attackResult);
         });
         this.battleManagerService.signalOpponentTriedEscape$.subscribe(() => {
             this.onOpponentEscape();
@@ -58,6 +58,11 @@ export class FightViewComponent {
         setTimeout(() => {
             opponentImage?.classList.remove('hit');
         }, DELAY);
+    }
+
+    opponentAttackAnimation(playerDiceResult: number): void {
+        this.onPlayerRollDice(playerDiceResult);
+        this.onOpponentAttack();
     }
 
     onOpponentAttack() {

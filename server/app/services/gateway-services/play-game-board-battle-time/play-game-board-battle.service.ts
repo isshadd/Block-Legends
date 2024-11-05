@@ -59,6 +59,8 @@ export class PlayGameBoardBattleService {
             isFirstPlayerTurn: isFirstPlayerTurn,
             firstPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
             secondPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
+            firstPlayerRemainingLife: firstPlayer.attributes.life,
+            secondPlayerRemainingLife: secondPlayer.attributes.life,
         });
     }
 
@@ -108,6 +110,25 @@ export class PlayGameBoardBattleService {
         }
 
         return Math.random() < 0.4;
+    }
+
+    userSuccededAttack(accessCode: number): boolean {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        if (!battleRoom) {
+            return false;
+        }
+
+        if (battleRoom.isFirstPlayerTurn) {
+            battleRoom.secondPlayerRemainingLife--;
+            if (battleRoom.secondPlayerRemainingLife <= 0) {
+                return true;
+            }
+        } else {
+            battleRoom.firstPlayerRemainingLife--;
+            if (battleRoom.firstPlayerRemainingLife <= 0) {
+                return true;
+            }
+        }
     }
 
     battleRoomFinished(accessCode: number): void {

@@ -40,8 +40,8 @@ export class PlayGameBoardSocketService {
             this.socket.emit('userDidBattleAction', { enemyPlayerId, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
 
-        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit('userAttacked', this.webSocketService.getRoomInfo().accessCode);
+        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
+            this.socket.emit('userAttacked', { attackResult, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
         this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit('userTriedEscape', this.webSocketService.getRoomInfo().accessCode);
@@ -122,16 +122,20 @@ export class PlayGameBoardSocketService {
             this.battleManagerService.isUserTurn = playerIdTurn === this.socket.id;
         });
 
-        this.socket.on('opponentAttacked', (playerIdTurn: string) => {
-            this.battleManagerService.onOpponentAttack(playerIdTurn);
+        this.socket.on('opponentAttacked', (attackResult: number) => {
+            this.battleManagerService.onOpponentAttack(attackResult);
         });
 
-        this.socket.on('opponentTriedEscape', (playerIdTurn: string) => {
-            this.battleManagerService.onOpponentEscape(playerIdTurn);
+        this.socket.on('opponentTriedEscape', () => {
+            this.battleManagerService.onOpponentEscape();
         });
 
         this.socket.on('automaticAttack', () => {
             this.battleManagerService.onUserAttack();
+        });
+
+        this.socket.on('successfulAttack', () => {
+            this.battleManagerService.onSuccessfulAttack();
         });
 
         this.socket.on('battleEndedByEscape', (playerIdTurn: string) => {

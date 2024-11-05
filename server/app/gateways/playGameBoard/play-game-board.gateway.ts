@@ -100,18 +100,23 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage('userAttacked')
-    handleUserAttacked(client: Socket, accessCode: number) {
-        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+    handleUserAttacked(client: Socket, data: { attackResult: number; accessCode: number }) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(data.accessCode);
 
         if (!battleRoom) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            this.logger.error(`Room pas trouvé pour code: ${data.accessCode}`);
             return;
         }
 
-        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
-        this.server.to(accessCode.toString()).emit('opponentAttacked', { playerId: playerIdTurn });
+        this.server.to(data.accessCode.toString()).emit('opponentAttacked', data.attackResult);
 
-        this.endBattleTurn(accessCode);
+        if (data.attackResult > 0) {
+            const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(data.accessCode);
+
+            this.server.to(data.accessCode.toString()).emit('successfulAttack');
+        }
+
+        this.endBattleTurn(data.accessCode);
     }
 
     @SubscribeMessage('userTriedEscape')
@@ -123,8 +128,7 @@ export class PlayGameBoardGateway {
             return;
         }
 
-        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
-        this.server.to(accessCode.toString()).emit('opponentTriedEscape', { playerId: playerIdTurn });
+        this.server.to(accessCode.toString()).emit('opponentTriedEscape');
 
         if (this.playGameBoardBattleService.userUsedEvade(accessCode, client.id)) {
             this.handleBattleEndedByEscape(accessCode);
@@ -198,9 +202,6 @@ export class PlayGameBoardGateway {
             this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
             return;
         }
-
-        const playerIdTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
-        this.server.to(accessCode.toString()).emit('opponentAttacked', { playerId: playerIdTurn });
 
         this.server.to(accessCode.toString()).emit('automaticAttack');
     }

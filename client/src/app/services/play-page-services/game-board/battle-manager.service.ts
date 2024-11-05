@@ -8,13 +8,13 @@ import { Subject } from 'rxjs';
 export class BattleManagerService {
     readonly STARTING_EVADE_ATTEMPTS = 2;
 
-    signalUserAttacked = new Subject<void>();
+    signalUserAttacked = new Subject<number>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
 
     signalUserTriedEscape = new Subject<void>();
     signalUserTriedEscape$ = this.signalUserTriedEscape.asObservable();
 
-    signalOpponentAttacked = new Subject<void>();
+    signalOpponentAttacked = new Subject<number>();
     signalOpponentAttacked$ = this.signalOpponentAttacked.asObservable();
 
     signalOpponentTriedEscape = new Subject<void>();
@@ -26,12 +26,20 @@ export class BattleManagerService {
     isUserTurn = false;
     userEvasionAttempts = 0;
     opponentEvasionAttempts = 0;
+    userRemainingHealth = 0;
+    opponentRemainingHealth = 0;
+    userDefence = 0;
+    opponentDefence = 0;
 
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
         this.userEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
         this.opponentEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
+        this.userRemainingHealth = currentPlayer.attributes.life;
+        this.opponentRemainingHealth = opponentPlayer.attributes.life;
+        this.userDefence = currentPlayer.attributes.defense;
+        this.opponentDefence = opponentPlayer.attributes.defense;
     }
 
     isValidAction(): boolean {
@@ -40,7 +48,9 @@ export class BattleManagerService {
 
     onUserAttack() {
         if (this.isValidAction()) {
-            this.signalUserAttacked.next();
+            const attackResult = this.attackDiceResult() - this.defenseDiceResult();
+            console.log('attackResult', attackResult);
+            this.signalUserAttacked.next(attackResult);
         }
     }
 
@@ -51,26 +61,48 @@ export class BattleManagerService {
         }
     }
 
-    onOpponentAttack(playerIdTurn: string) {
+    onOpponentAttack(attackResult: number) {
         if (!this.currentPlayer || !this.opponentPlayer) {
             return;
         }
 
         if (!this.isUserTurn) {
-            console.log('Opponent attacked');
-            this.signalOpponentAttacked.next();
+            this.signalOpponentAttacked.next(attackResult);
         }
     }
 
-    onOpponentEscape(playerIdTurn: string) {
+    onOpponentEscape() {
         if (!this.currentPlayer || !this.opponentPlayer) {
             return;
         }
 
         if (!this.isUserTurn) {
-            console.log('Opponent escape');
             this.signalOpponentTriedEscape.next();
         }
+    }
+
+    attackDiceResult(): number {
+        console.log('currentPlayer', this.currentPlayer);
+        if (this.currentPlayer) {
+            return this.currentPlayer.attributes.attack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
+        }
+        return 0;
+    }
+
+    defenseDiceResult(): number {
+        console.log('opponentPlayer', this.opponentPlayer);
+        if (this.opponentPlayer) {
+            return this.opponentPlayer.attributes.defense + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
+        }
+        return 0;
+    }
+
+    onSuccessfulAttack() {
+        if (!this.isValidAction()) {
+            return;
+        }
+
+        this.opponentRemainingHealth--;
     }
 
     endBattle() {
@@ -84,5 +116,9 @@ export class BattleManagerService {
         this.isUserTurn = false;
         this.userEvasionAttempts = 0;
         this.opponentEvasionAttempts = 0;
+        this.userRemainingHealth = 0;
+        this.opponentRemainingHealth = 0;
+        this.userDefence = 0;
+        this.opponentDefence = 0;
     }
 }
