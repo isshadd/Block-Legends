@@ -5,8 +5,10 @@ import { GameService } from '@app/services/game-services/game.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
 import { ChatService } from '../chat-service.service';
+import { environment } from 'src/environments/environment';
+import {RoomMessage} from '@common/interfaces/roomMessage';
+import { EventJournalService } from '@app/services/event-journal.service';
 
 export interface GameRoom {
     roomId: string;
@@ -35,24 +37,34 @@ export class WebSocketService {
     maxPlayersSubject = new BehaviorSubject<number>(0);
     maxPlayers$ = this.maxPlayersSubject.asObservable();
     currentRoom: GameRoom;
+    chatRoom: GameRoom;
 
     constructor(
-        private chatService: ChatService,
         private router: Router,
         private gameService: GameService,
+        private chatService: ChatService,
+        private eventJournalService: EventJournalService
     ) {}
 
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }
-
+    
     send<T>(event: string, data?: T, callback?: Function): void {
-        this.socket.emit(event, ...[data, callback].filter((x) => x));
+        this.socket.emit(event, ...([data, callback].filter(x => x)));
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
         this.socket.emit('createGame', { gameId, playerOrganizer: player });
+    }
+    
+    sendMsgToRoom(roomMessage: RoomMessage): void {
+        this.socket.emit('roomMessage', roomMessage);
+    }
+
+    sendEventToRoom(time: Date, event: string, players: string[] ): void {
+        this.socket.emit('eventMessage', {time, event, associatedPlayers: players});
     }
 
     joinGame(accessCode: number) {
@@ -91,11 +103,6 @@ export class WebSocketService {
         if (this.currentRoom.accessCode) {
             this.socket.emit('startGame', this.currentRoom.accessCode);
         }
-    }
-
-    // Ajouté par Nihal
-    getTotalPlayers(): PlayerCharacter[] {
-        return this.playersSubject.value;
     }
 
     getRoomInfo() {
@@ -155,24 +162,18 @@ export class WebSocketService {
                     resolve(true);
                 });
 
-                // Then perform cleanup
                 if (this.currentRoom.accessCode) {
                     this.socket.emit('leaveGame', this.currentRoom.accessCode);
                 }
-
-                // Clear all local data
                 this.gameService.clearGame();
                 this.isLockedSubject.next(false);
                 this.playersSubject.next([]);
-
-                // Important: Force navigate to home page
                 this.router.navigate(['/home']).then(() => {
-                    alert('Vous avez été expulsé de la salle');
+                    alert('Vous avez été expulsé de la salle, redirection en cours...');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 });
-                // .then(() => {
-                //     // Optional: Refresh the page to ensure clean state
-                //     window.location.reload();
-                // });
             }
         });
 
@@ -188,9 +189,14 @@ export class WebSocketService {
         });
 
         this.socket.on('roomClosed', () => {
-            alert("La salle a été fermée par l'organisateur");
-            this.leaveGame();
-            this.router.navigate(['/home']);
+            this.currentRoom.players.forEach((player) => {
+                if (!player.isOrganizer) {
+                    this.leaveGame();
+                    this.router.navigate(['/home']).then(() => {
+                        location.reload();
+                    });
+                }
+            });
         });
 
         this.socket.on('error', (message: string) => {
@@ -199,10 +205,19 @@ export class WebSocketService {
 
         this.socket.on('clock', (serverClock: Date) => {
             this.chatService.serverClock = serverClock;
+            this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on('massMessage', (broadcastMessage: string) => {
-            this.chatService.roomMessages.push(broadcastMessage);
+        this.socket.on('eventReceived', (data: { sentEvent: string; associatedPlayers: string[] }) => {
+            const { sentEvent, associatedPlayers } = data;
+            this.eventJournalService.addEvent(sentEvent, associatedPlayers);
+          });
+
+        this.socket.on('roomMessage', (message: string) => {
+            this.chatService.roomMessages.push(message);
+            this.chatService.messageReceivedSubject.next();
         });
+
+
     }
 }
