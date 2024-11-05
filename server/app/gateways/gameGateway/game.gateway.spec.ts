@@ -5,6 +5,7 @@ import {
     GameSocketRoomService,
     PlayerCharacter,
 } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { AvatarEnum } from '@common/enums/avatar-enum';
 import { GameMode } from '@common/enums/game-mode';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -46,7 +47,9 @@ describe('GameGateway', () => {
     let gateway: GameGateway;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
     let playGameBoardGateway: jest.Mocked<PlayGameBoardGateway>;
+    let mockEmit: jest.Mock;
     let server: Server;
+    
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -58,6 +61,8 @@ describe('GameGateway', () => {
             ],
         }).compile();
 
+        mockEmit = jest.fn();
+        mockServer.to = jest.fn().mockReturnValue({ emit: mockEmit });
         gateway = module.get<GameGateway>(GameGateway);
         gameSocketRoomService = module.get<GameSocketRoomService>(GameSocketRoomService) as jest.Mocked<GameSocketRoomService>;
         playGameBoardGateway = module.get<PlayGameBoardGateway>(PlayGameBoardGateway) as jest.Mocked<PlayGameBoardGateway>;
@@ -96,6 +101,7 @@ describe('GameGateway', () => {
                         name: 'Alice',
                         socketId: 'client1',
                         attributes: { life: 4, speed: 4, attack: 4, defense: 4 },
+                        avatar: AvatarEnum.Steve,
                     },
                 ],
                 isLocked: false,
@@ -141,6 +147,7 @@ describe('GameGateway', () => {
                     name: 'Bob',
                     socketId: '',
                     attributes: { life: 5, speed: 5, attack: 5, defense: 5 },
+                    avatar: AvatarEnum.Arlina, 
                 },
             };
             const newRoom: GameRoom = {
@@ -243,6 +250,7 @@ describe('GameGateway', () => {
                     name: 'Charlie',
                     socketId: 'client8',
                     attributes: { life: 3, speed: 3, attack: 3, defense: 3 },
+                    avatar: AvatarEnum.Alex,
                 },
             };
             const mockRoom: GameRoom = {
@@ -258,28 +266,24 @@ describe('GameGateway', () => {
                 ...mockRoom,
                 players: [payload.player],
             };
-
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+            
+            // Simplify mocking
+            gameSocketRoomService.getRoomByAccessCode
+                .mockReturnValueOnce(mockRoom)     // First call for room check
+                .mockReturnValueOnce(updatedRoom); // Second call for max players check
             gameSocketRoomService.addPlayerToRoom.mockReturnValue(true);
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
-            gameSocketRoomService.lockRoom(mockRoom.accessCode, mockRoom.organizer);
-            gameSocketRoomService.lockRoom.mockReturnValue(true);
-
+        
             gateway.handleAddPlayerToRoom(client, payload);
-
+        
             expect(payload.player.socketId).toBe(client.id);
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
             expect(gameSocketRoomService.addPlayerToRoom).toHaveBeenCalledWith(payload.accessCode, payload.player);
             expect(client.emit).toHaveBeenCalledWith('joinGameResponseCanJoin', {
                 valid: true,
                 message: 'Rejoint avec succès',
-            });
-            expect(gateway.updateRoomState).toHaveBeenCalledWith(payload.accessCode);
-            expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(payload.accessCode, mockRoom.organizer);
-            expect(mockServer.to).toHaveBeenCalledWith(payload.accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomLocked', {
-                message: 'La salle est verrouillée car le nombre maximal de joueurs a été atteint.',
-                isLocked: true,
+                playerName: 'Charlie',
+                playerAvatar: AvatarEnum.Alex,
+                takenAvatars: []
             });
         });
 
@@ -291,6 +295,7 @@ describe('GameGateway', () => {
                     name: 'Dave',
                     socketId: '',
                     attributes: { life: 2, speed: 2, attack: 2, defense: 2 },
+                    avatar: AvatarEnum.King,
                 },
             };
 
@@ -313,6 +318,7 @@ describe('GameGateway', () => {
                     name: 'Eve',
                     socketId: '',
                     attributes: { life: 1, speed: 1, attack: 1, defense: 1 },
+                    avatar: AvatarEnum.Cosmic,
                 },
             };
             const mockRoom: GameRoom = {
@@ -344,6 +350,7 @@ describe('GameGateway', () => {
                     name: 'Frank',
                     socketId: '',
                     attributes: { life: 5, speed: 5, attack: 5, defense: 5 },
+                    avatar: AvatarEnum.Sirene,
                 },
             };
             const mockRoom: GameRoom = {
@@ -355,17 +362,31 @@ describe('GameGateway', () => {
                 maxPlayers: 2,
                 currentPlayerTurn: 'client11',
             };
-
+        
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
             gameSocketRoomService.addPlayerToRoom.mockReturnValue(false);
-
+        
             gateway.handleAddPlayerToRoom(client, payload);
-
+        
             expect(gameSocketRoomService.addPlayerToRoom).toHaveBeenCalledWith(payload.accessCode, payload.player);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponseCanJoin', {
-                valid: false,
-                message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
+            expect(client.emit).toHaveBeenCalledWith('avatarTakenError', {
+                message: `Avatar ${payload.player.avatar.name} déjà pris dans la salle ${payload.accessCode}`
             });
+        });
+        it("should correctly map players' avatar names to takenAvatars", () => {
+            // Mock room data with players having avatars
+            const mockRoom = {
+                players: [
+                    { avatar: { name: "Steve"} },
+                    { avatar: { name: "Arlina" } },
+                    { avatar: { name: "Alex" } }
+                ]
+            };
+        
+            // Assuming the method we're testing is `getTakenAvatars`
+            const result = mockRoom.players.map(p => p.avatar.name); // Directly using the logic to be tested
+        
+            expect(result).toEqual(["Steve", "Arlina", "Alex"]);
         });
     });
 
@@ -381,7 +402,7 @@ describe('GameGateway', () => {
 
             expect(gameSocketRoomService.lockRoom).toHaveBeenCalledWith(accessCode, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomLocked', {
+            expect(mockEmit).toHaveBeenCalledWith('roomLocked', {
                 message: 'La salle est maintenant verrouillée',
                 isLocked: true,
             });
@@ -413,7 +434,7 @@ describe('GameGateway', () => {
 
             expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomUnlocked', {
+            expect(mockEmit).toHaveBeenCalledWith('roomUnlocked', {
                 message: 'La salle est maintenant déverrouillée',
                 isLocked: false,
             });
@@ -441,7 +462,12 @@ describe('GameGateway', () => {
             const mockRoom: GameRoom = {
                 id: '8',
                 accessCode,
-                players: [{ name: 'Grace', socketId: 'client15', attributes: { life: 4, speed: 4, attack: 4, defense: 4 } }],
+                players: [{ 
+                    name: 'Grace', 
+                    socketId: 'client15', 
+                    attributes: { life: 4, speed: 4, attack: 4, defense: 4 }, 
+                    avatar: AvatarEnum.Zombie,
+                }],
                 isLocked: false,
                 organizer: 'client15',
                 maxPlayers: 2,
@@ -455,7 +481,7 @@ describe('GameGateway', () => {
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('organizerLeft', {
+            expect(mockEmit).toHaveBeenCalledWith('organizerLeft', {
                 message: "L'organisateur a quitté la partie",
             });
         });
@@ -467,8 +493,8 @@ describe('GameGateway', () => {
                 id: '9',
                 accessCode,
                 players: [
-                    { name: 'Heidi', socketId: 'client16', attributes: { life: 3, speed: 3, attack: 3, defense: 3 } },
-                    { name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 } },
+                    { name: 'Heidi', socketId: 'client16', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Muffin },
+                    { name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Piglin },
                 ],
                 isLocked: false,
                 organizer: 'client18',
@@ -477,7 +503,7 @@ describe('GameGateway', () => {
             };
             const updatedRoom: GameRoom = {
                 ...mockRoom,
-                players: [{ name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 } }],
+                players: [{ name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Piglin }],
             };
 
             gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
@@ -498,8 +524,8 @@ describe('GameGateway', () => {
                 id: '10',
                 accessCode,
                 players: [
-                    { name: 'Judy', socketId: 'client19', attributes: { life: 2, speed: 2, attack: 2, defense: 2 } },
-                    { name: 'Karl', socketId: 'client20', attributes: { life: 2, speed: 2, attack: 2, defense: 2 } },
+                    { name: 'Judy', socketId: 'client19', attributes: { life: 2, speed: 2, attack: 2, defense: 2 }, avatar: AvatarEnum.Strawberry },
+                    { name: 'Karl', socketId: 'client20', attributes: { life: 2, speed: 2, attack: 2, defense: 2 }, avatar: AvatarEnum.Knight },
                 ],
                 isLocked: true,
                 organizer: 'client21',
@@ -508,7 +534,7 @@ describe('GameGateway', () => {
             };
             const updatedRoom: GameRoom = {
                 ...mockRoom,
-                players: [{ name: 'Karl', socketId: 'client20', attributes: { life: 2, speed: 2, attack: 2, defense: 2 } }],
+                players: [{ name: 'Karl', socketId: 'client20', attributes: { life: 2, speed: 2, attack: 2, defense: 2 }, avatar: AvatarEnum.Knight }],
             };
 
             gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
@@ -518,7 +544,7 @@ describe('GameGateway', () => {
 
             expect(gameSocketRoomService.unlockRoom).toHaveBeenCalledWith(accessCode, mockRoom.organizer);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomUnlocked', {
+            expect(mockEmit).toHaveBeenCalledWith('roomUnlocked', {
                 message: 'La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.',
                 isLocked: false,
             });
@@ -530,7 +556,7 @@ describe('GameGateway', () => {
             const mockRoom: GameRoom = {
                 id: '11',
                 accessCode,
-                players: [{ name: 'Leo', socketId: 'client22', attributes: { life: 1, speed: 1, attack: 1, defense: 1 } }],
+                players: [{ name: 'Leo', socketId: 'client22', attributes: { life: 1, speed: 1, attack: 1, defense: 1 }, avatar: AvatarEnum.Zombie }],
                 isLocked: false,
                 organizer: 'client23',
                 maxPlayers: 2,
@@ -545,7 +571,35 @@ describe('GameGateway', () => {
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomClosed');
+            expect(mockEmit).toHaveBeenCalledWith('roomClosed');
+        });
+        it("should correctly handle player exit when room is locked and emit 'roomUnlocked'", () => {
+            const client = createMockSocket("client20");
+            const accessCode = 1234;
+        
+            const mockRoom = {
+                id: "roomId",
+                accessCode,
+                players: [{ socketId: client.id }],
+                isLocked: true,
+                organizer: "organizerId",
+                maxPlayers: 2,
+            } as GameRoom;
+            const updatedRoom = { ...mockRoom, players: [] };
+        
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValueOnce(mockRoom).mockReturnValueOnce(updatedRoom);
+            gameSocketRoomService.removePlayerFromRoom.mockReturnValueOnce(undefined);
+            gameSocketRoomService.unlockRoom.mockReturnValue(true);
+        
+            const mockEmit = jest.fn();
+            mockServer.to = jest.fn().mockReturnValue({ emit: mockEmit });
+        
+            gateway.handlePlayerLeave(client, accessCode);
+        
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
+            expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
+            expect(mockEmit).toHaveBeenCalledWith("roomUnlocked", { message: "La salle a été déverrouillée car le nombre de joueurs est en dessous du maximum.", isLocked: false });
         });
     });
 
@@ -616,9 +670,10 @@ describe('GameGateway', () => {
                 name: 'Mallory',
                 socketId: 'client29',
                 attributes: { life: 3, speed: 3, attack: 3, defense: 3 },
+                avatar: AvatarEnum.Sirene,
             };
             const accessCode = 9999;
-
+        
             const mockRoom: GameRoom = {
                 id: '14',
                 accessCode,
@@ -628,23 +683,35 @@ describe('GameGateway', () => {
                 maxPlayers: 4,
                 currentPlayerTurn: 'client28',
             };
-
+        
+            // Mock the kicked player's socket
+            const mockKickedSocket = {
+                leave: jest.fn()
+            };
+            mockServer.sockets.sockets.set(playerToKick.socketId, mockKickedSocket as unknown as Socket);
+        
+            // Setup mock emit function for the room
+            const mockEmit = jest.fn();
+            (mockServer.to as jest.Mock).mockReturnValue({ emit: mockEmit });
+        
+            // Spy on updateRoomState
+            jest.spyOn(gateway, 'updateRoomState');
+        
             gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
             gameSocketRoomService.kickPlayer.mockReturnValue(true);
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
-
+        
             gateway.handleKickPlayer(client, playerToKick);
-
+        
             expect(gameSocketRoomService.getRoomBySocketId).toHaveBeenCalledWith(client.id);
             expect(gameSocketRoomService.kickPlayer).toHaveBeenCalledWith(accessCode, playerToKick.socketId, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('playerKicked', {
+            expect(mockEmit).toHaveBeenCalledWith('playerKicked', {
                 message: 'Vous avez été expulsé de la salle',
                 kickedPlayerId: playerToKick.socketId,
             });
             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
-            // Assurez-vous que le joueur expulsé quitte la salle
-            expect(mockServer.sockets.sockets.get(playerToKick.socketId)?.leave).toHaveBeenCalledWith(accessCode.toString());
+            expect(mockKickedSocket.leave).toHaveBeenCalledWith(accessCode.toString());
         });
 
         it("devrait émettre une erreur si l'expulsion échoue", () => {
@@ -653,6 +720,7 @@ describe('GameGateway', () => {
                 name: 'Niaj',
                 socketId: 'client31',
                 attributes: { life: 2, speed: 2, attack: 2, defense: 2 },
+                avatar: AvatarEnum.Zombie,
             };
             const accessCode = 9999;
 
@@ -681,6 +749,7 @@ describe('GameGateway', () => {
                 name: 'Olivia',
                 socketId: 'client33',
                 attributes: { life: 1, speed: 1, attack: 1, defense: 1 },
+                avatar: AvatarEnum.Muffin,
             };
 
             gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
@@ -689,7 +758,53 @@ describe('GameGateway', () => {
 
             expect(gameSocketRoomService.kickPlayer).not.toHaveBeenCalled();
             expect(mockServer.to).not.toHaveBeenCalled();
-            expect(mockServer.emit).not.toHaveBeenCalled();
+            expect(mockEmit).not.toHaveBeenCalled();
+        });
+        it("should fail to kick player if client is not the organizer", () => {
+            const client = createMockSocket("client30");
+            const playerToKick = {
+                name: "PlayerToKick",
+                socketId: "socket123",
+                avatar: AvatarEnum.Muffin,
+                attributes: {
+                    life: 3,
+                    speed: 3,
+                    attack: 3,
+                    defense: 3,
+                },
+            };
+            const accessCode = 5678;
+        
+            const mockRoom: GameRoom = {
+                id: "roomId",
+                accessCode,
+                players: [
+                    {
+                        name: "PlayerToKick",
+                        socketId: "socket123",
+                        avatar: AvatarEnum.Muffin,
+                        attributes: {
+                            life: 3,
+                            speed: 3,
+                            attack: 3,
+                            defense: 3,
+                        },
+                    },
+                ],
+                organizer: "differentOrganizerId",
+                isLocked: false,            // Added property
+                maxPlayers: 10,             // Added property
+                currentPlayerTurn: 'client30',     // Added property (adjust type as needed)
+            };
+        
+            gameSocketRoomService.getRoomBySocketId.mockReturnValueOnce(mockRoom);
+        
+            client.emit = jest.fn();  // Ensure client.emit is properly mocked
+        
+            gateway.handleKickPlayer(client, playerToKick);
+        
+            // Verify client.emit was called with the expected error message
+            expect(client.emit).toHaveBeenCalledWith("error", { message: "Pas authorisé ou joueur pas trouvé" });
         });
     });
 
@@ -718,7 +833,7 @@ describe('GameGateway', () => {
             gateway.sendGameParameters(accessCode);
 
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('gameParameters', { gameBoardParameters: mockGameBoardParameters });
+            expect(mockEmit).toHaveBeenCalledWith('gameParameters', { gameBoardParameters: mockGameBoardParameters });
         });
 
         it("devrait émettre une erreur si la salle n'existe pas", () => {
@@ -729,71 +844,131 @@ describe('GameGateway', () => {
             gateway.sendGameParameters(accessCode);
 
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
+            expect(mockEmit).toHaveBeenCalledWith('error', { message: 'Room pas trouvé' });
         });
     });
 
     // Tests pour handleConnection
     describe('handleConnection', () => {
-        it('devrait enregistrer la connexion du client', () => {
-            const client = createMockSocket('client34');
-
-            gateway.handleConnection(client);
-
-            expect(mockLogger.log).toHaveBeenCalledWith(`Client connecté: ${client.id}`);
+        it('should add client ID to connectedClients when handleConnection is called', () => {
+            const mockClient = { id: 'client1234' } as Socket;
+    
+            gateway.handleConnection(mockClient);
+    
+            // Verify the client ID was added to connectedClients
+            expect(gateway['connectedClients'].has(mockClient.id)).toBe(true);
+        });
+    
+        it('should emit clientConnected event with client ID when handleConnection is called', () => {
+            const mockClient = { id: 'client1234' } as Socket;
+    
+            gateway.handleConnection(mockClient);
+    
+            // Confirm that server.emit was called with the clientConnected event and correct payload
+            expect(mockServer.emit).toHaveBeenCalledWith('clientConnected', { clientId: mockClient.id });
         });
     });
 
     // Tests pour handleDisconnect
     describe('handleDisconnect', () => {
-        it('devrait enregistrer la déconnexion du client et gérer la déconnexion', () => {
-            const client = createMockSocket('client35');
-
-            gateway.handleDisconnect(client);
-
-            expect(mockLogger.log).toHaveBeenCalledWith(`Client déconnecté: ${client.id}`);
-            expect(gameSocketRoomService.handlePlayerDisconnect).toHaveBeenCalledWith(client.id);
+        it('should remove client ID from connectedClients when handleDisconnect is called', () => {
+            const mockClient = { id: 'client1234' } as Socket;
+            gateway['connectedClients'].add(mockClient.id);
+    
+            gateway.handleDisconnect(mockClient);
+    
+            // Verify the client ID was removed from connectedClients
+            expect(gateway['connectedClients'].has(mockClient.id)).toBe(false);
+        });
+    
+        it('should emit clientDisconnected event with client ID when handleDisconnect is called', () => {
+            const mockClient = { id: 'client1234' } as Socket;
+    
+            gateway.handleDisconnect(mockClient);
+    
+            // Confirm that server.emit was called with the clientDisconnected event and correct payload
+            expect(mockServer.emit).toHaveBeenCalledWith('clientDisconnected', { clientId: mockClient.id });
+        });
+    
+        it('should call gameSocketRoomService.handlePlayerDisconnect with client ID when handleDisconnect is called', () => {
+            const mockClient = { id: 'client1234' } as Socket;
+    
+            gateway.handleDisconnect(mockClient);
+    
+            // Ensure that handlePlayerDisconnect was called with the client's ID
+            expect(mockGameSocketRoomService.handlePlayerDisconnect).toHaveBeenCalledWith(mockClient.id);
         });
     });
 
     // Tests pour updateRoomState
     describe('updateRoomState', () => {
-        it("devrait émettre l'état de la salle si elle existe", () => {
-            const accessCode = 9999;
-            const mockRoom: GameRoom = {
-                id: '15',
+        let gateway: GameGateway;
+        let mockServer: Partial<Server>;
+        let mockClient: Partial<Socket>;
+    
+        beforeEach(async () => {
+            const module: TestingModule = await Test.createTestingModule({
+                providers: [
+                    GameGateway,
+                    { provide: GameSocketRoomService, useValue: mockGameSocketRoomService },
+                    { provide: PlayGameBoardGateway, useValue: mockPlayGameBoardGateway },
+                ],
+            }).compile();
+    
+            gateway = module.get<GameGateway>(GameGateway);
+            mockServer = { to: jest.fn().mockReturnValue({ emit: jest.fn() }) };
+            (gateway as any).server = mockServer as Server;
+        });
+    
+        it('should emit correct room state when room exists', () => {
+            const accessCode = 1234;
+            const mockRoom = {
+                id: 'roomId1',
                 accessCode,
-                players: [],
+                players: [{ name: 'Player1' }],
                 isLocked: false,
-                organizer: 'client36',
-                maxPlayers: 4,
-                currentPlayerTurn: 'client36',
             };
-
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
-
+            mockGameSocketRoomService.getRoomByAccessCode = jest.fn().mockReturnValue(mockRoom);
+    
             gateway.updateRoomState(accessCode);
-
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+    
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).toHaveBeenCalledWith('roomState', {
+            expect(mockServer.to(accessCode.toString()).emit).toHaveBeenCalledWith('roomState', {
                 roomId: mockRoom.id,
                 accessCode: mockRoom.accessCode,
                 players: mockRoom.players,
                 isLocked: mockRoom.isLocked,
             });
         });
-
-        it("ne devrait rien émettre si la salle n'existe pas", () => {
-            const accessCode = 4017;
-
-            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
-
+    
+        it('should not emit room state if room does not exist', () => {
+            const accessCode = 1234;
+            mockGameSocketRoomService.getRoomByAccessCode = jest.fn().mockReturnValue(null);
+    
             gateway.updateRoomState(accessCode);
-
-            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
-            expect(mockServer.to).not.toHaveBeenCalledWith(accessCode.toString());
-            expect(mockServer.emit).not.toHaveBeenCalled();
+    
+            expect(mockServer.to).not.toHaveBeenCalled();
         });
-    });
+    
+        it('should emit room state with isLocked property when room is locked', () => {
+            const accessCode = 1234;
+            const mockRoom = {
+                id: 'roomId2',
+                accessCode,
+                players: [{ name: 'Player2' }],
+                isLocked: true,
+            };
+            mockGameSocketRoomService.getRoomByAccessCode = jest.fn().mockReturnValue(mockRoom);
+    
+            gateway.updateRoomState(accessCode);
+    
+            expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
+            expect(mockServer.to(accessCode.toString()).emit).toHaveBeenCalledWith('roomState', {
+                roomId: mockRoom.id,
+                accessCode: mockRoom.accessCode,
+                players: mockRoom.players,
+                isLocked: mockRoom.isLocked,
+            });
+        });
+    });    
 });

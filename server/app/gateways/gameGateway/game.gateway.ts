@@ -1,13 +1,12 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService, PlayerCharacter } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
-    private readonly logger = new Logger(GameGateway.name);
+    private readonly connectedClients = new Set<string>();
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
@@ -242,11 +241,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     handleConnection(client: Socket) {
-        this.logger.log(`Client connecté: ${client.id}`);
+        this.connectedClients.add(client.id);
+        this.server.emit('clientConnected', { clientId: client.id });
     }
 
     handleDisconnect(client: Socket) {
-        this.logger.log(`Client déconnecté: ${client.id}`);
+        this.connectedClients.delete(client.id);
+        this.server.emit('clientDisconnected', { clientId: client.id });
         this.gameSocketRoomService.handlePlayerDisconnect(client.id);
     }
 
