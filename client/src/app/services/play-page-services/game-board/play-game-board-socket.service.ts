@@ -39,6 +39,13 @@ export class PlayGameBoardSocketService {
         this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
             this.socket.emit('userDidBattleAction', { enemyPlayerId, accessCode: this.webSocketService.getRoomInfo().accessCode });
         });
+
+        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.socket.emit('userAttacked', this.webSocketService.getRoomInfo().accessCode);
+        });
+        this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            this.socket.emit('userTriedEscape', this.webSocketService.getRoomInfo().accessCode);
+        });
     }
 
     ngOnDestroy() {
@@ -109,6 +116,8 @@ export class PlayGameBoardSocketService {
         });
 
         this.socket.on('startBattleTurn', (playerIdTurn: string) => {
+            this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
+            this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
             this.battleManagerService.currentPlayerIdTurn = playerIdTurn;
             this.battleManagerService.isUserTurn = playerIdTurn === this.socket.id;
         });

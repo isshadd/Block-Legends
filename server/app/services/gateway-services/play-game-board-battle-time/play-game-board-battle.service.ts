@@ -28,7 +28,6 @@ export class PlayGameBoardBattleService {
                 gameTimer.time--;
                 this.signalRoomTimePassed.next(accessCode);
             } else {
-                gameTimer.time = this.ACTIVE_TURN_TIME;
                 this.signalRoomTimeOut.next(accessCode);
             }
         });
@@ -66,6 +65,7 @@ export class PlayGameBoardBattleService {
         }
 
         battleRoom.isFirstPlayerTurn = !battleRoom.isFirstPlayerTurn;
+        battleRoom.time = this.ACTIVE_TURN_TIME;
     }
 
     getPlayerBattleTurn(accessCode: number): string {

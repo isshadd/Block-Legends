@@ -99,6 +99,30 @@ export class PlayGameBoardGateway {
         this.server.to(data.accessCode.toString()).emit('roomUserDidBattleAction', { playerId: client.id, enemyPlayerId: data.enemyPlayerId });
     }
 
+    @SubscribeMessage('userAttacked')
+    handleUserAttacked(client: Socket, accessCode: number) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+
+        if (!battleRoom) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.handleBattleTimeOut(accessCode);
+    }
+
+    @SubscribeMessage('userTriedEscape')
+    handleUserTriedEscape(client: Socket, accessCode: number) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+
+        if (!battleRoom) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.handleBattleTimeOut(accessCode);
+    }
+
     isClientTurn(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
