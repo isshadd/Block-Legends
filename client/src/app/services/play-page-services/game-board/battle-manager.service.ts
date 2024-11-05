@@ -90,6 +90,7 @@ export class BattleManagerService {
         }
 
         if (!this.isUserTurn) {
+            this.opponentEvasionAttempts--;
             this.signalOpponentTriedEscape.next();
         }
     }
