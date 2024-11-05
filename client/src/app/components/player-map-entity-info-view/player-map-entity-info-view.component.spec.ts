@@ -52,11 +52,11 @@ describe('PlayerMapEntityInfoViewComponent', () => {
     });
 
     it('should emit close event when closePanel is called', () => {
-        spyOn(component.close, 'emit');
+        spyOn(component.closeP, 'emit');
 
         component.closePanel();
 
-        expect(component.close.emit).toHaveBeenCalled();
+        expect(component.closeP.emit).toHaveBeenCalled();
     });
 
     it('should set --dynamic-scale CSS variable on ngOnInit', () => {

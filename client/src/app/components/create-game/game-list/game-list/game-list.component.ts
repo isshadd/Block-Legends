@@ -76,12 +76,11 @@ export class GameListComponent {
 
     closeModal() {
         this.isModalOpen = false;
-        this.gameStatus = null; // Réinitialiser le message d'erreur
+        this.gameStatus = null;
     }
 
     confirmBack() {
         this.closeModal();
-        // this.router.navigate(['/create-game']);
         window.location.reload();
     }
 }
