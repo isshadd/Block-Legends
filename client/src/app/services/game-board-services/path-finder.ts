@@ -3,7 +3,7 @@ import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
 
-interface PathNode {
+export interface PathNode {
     tile: Tile;
     cost: number;
     path: Tile[];

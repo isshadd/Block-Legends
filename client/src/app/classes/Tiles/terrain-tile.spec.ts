@@ -21,6 +21,6 @@ describe('TerrainTile', () => {
         spyOn(player, 'setCoordinates');
         terrainTile.setPlayer(player);
         expect(terrainTile.player).toBe(player);
-        expect(player.setCoordinates).toHaveBeenCalledWith(terrainTile.coordinates);
+        expect(player.setCoordinates).toHaveBeenCalledWith(terrainTile.coordinates, false);
     });
 });
