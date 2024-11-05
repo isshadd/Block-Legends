@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 })
 export class BattleManagerService {
     readonly STARTING_EVADE_ATTEMPTS = 2;
+    readonly ICE_PENALITY = 2;
 
     signalUserAttacked = new Subject<number>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
@@ -38,8 +39,16 @@ export class BattleManagerService {
         this.opponentEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
         this.userRemainingHealth = currentPlayer.attributes.life;
         this.opponentRemainingHealth = opponentPlayer.attributes.life;
+
         this.userDefence = currentPlayer.attributes.defense;
+        if (currentPlayer.mapEntity.isPlayerOnIce) {
+            this.userDefence -= this.ICE_PENALITY;
+        }
+
         this.opponentDefence = opponentPlayer.attributes.defense;
+        if (opponentPlayer.mapEntity.isPlayerOnIce) {
+            this.opponentDefence -= this.ICE_PENALITY;
+        }
     }
 
     isValidAction(): boolean {
@@ -85,14 +94,18 @@ export class BattleManagerService {
 
     attackDiceResult(): number {
         if (this.currentPlayer) {
-            return this.currentPlayer.attributes.attack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
+            let currentPlayerAttack: number = this.currentPlayer.attributes.attack;
+            if (this.currentPlayer.mapEntity.isPlayerOnIce) {
+                currentPlayerAttack -= this.ICE_PENALITY;
+            }
+            return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
         }
         return 0;
     }
 
     defenseDiceResult(): number {
         if (this.opponentPlayer) {
-            return this.opponentPlayer.attributes.defense + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
+            return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }
         return 0;
     }
