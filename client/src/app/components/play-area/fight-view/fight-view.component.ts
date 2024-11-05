@@ -13,7 +13,14 @@ const DELAY = 500;
 })
 export class FightViewComponent {
     playerDiceResult = 6;
-    constructor(public battleManagerService: BattleManagerService) {}
+    constructor(public battleManagerService: BattleManagerService) {
+        this.battleManagerService.signalUserAttacked$.subscribe(() => {
+            this.attackAnimation();
+        });
+        this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
+            this.escapeAnimation();
+        });
+    }
 
     get healthArray(): unknown[] {
         return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.life) : [];
@@ -25,6 +32,9 @@ export class FightViewComponent {
 
     onAttack() {
         this.battleManagerService.onUserAttack();
+    }
+
+    attackAnimation() {
         this.onPlayerRollDice();
         this.onPlayerAttack();
     }
@@ -61,6 +71,9 @@ export class FightViewComponent {
 
     onEscape(): void {
         this.battleManagerService.onUserEscape();
+    }
+
+    escapeAnimation(): void {
         this.onPlayerEscape();
     }
 

@@ -108,7 +108,7 @@ export class PlayGameBoardGateway {
             return;
         }
 
-        this.handleBattleTimeOut(accessCode);
+        this.endBattleTurn(accessCode);
     }
 
     @SubscribeMessage('userTriedEscape')
@@ -125,7 +125,7 @@ export class PlayGameBoardGateway {
             return;
         }
 
-        this.handleBattleTimeOut(accessCode);
+        this.endBattleTurn(accessCode);
     }
 
     isClientTurn(client: Socket, accessCode: number) {
@@ -186,6 +186,17 @@ export class PlayGameBoardGateway {
     }
 
     handleBattleTimeOut(accessCode: number) {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+
+        if (!battleRoom) {
+            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
+            return;
+        }
+
+        this.server.to(accessCode.toString()).emit('automaticAttack');
+    }
+
+    endBattleTurn(accessCode: number) {
         const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
 
         if (!battleRoom) {

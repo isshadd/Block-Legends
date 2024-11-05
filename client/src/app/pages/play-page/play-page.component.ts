@@ -80,14 +80,6 @@ export class PlayPageComponent {
         this.playPageMouseHandlerService.toggleAction();
     }
 
-    onUserAttack(): void {
-        this.battleManagerService.onUserAttack();
-    }
-
-    onUserEscape(): void {
-        this.battleManagerService.onUserEscape();
-    }
-
     endTurn(): void {
         this.playGameBoardSocketService.endTurn();
     }
