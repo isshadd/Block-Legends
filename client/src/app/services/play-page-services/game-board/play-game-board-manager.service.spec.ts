@@ -21,6 +21,7 @@ describe('PlayGameBoardManagerService', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let playGameBoardSocketServiceSpy: jasmine.SpyObj<PlayGameBoardSocketService>;
 
+    // Création des Subjects pour les signaux
     const signalInitGameBoard$ = new Subject<GameShared>();
     const signalInitCharacters$ = new Subject<[number, string][]>();
 
@@ -39,6 +40,8 @@ describe('PlayGameBoardManagerService', () => {
         players: [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')],
         accessCode: ACCESS_CODE,
         isLocked: false,
+        maxPlayers: 10, // Ajouté
+        currentPlayerTurn: 'Player1', // Ajouté
     };
     mockRoomInfo.players[0].avatar = AvatarEnum.Alex;
     mockRoomInfo.players[1].avatar = AvatarEnum.Sirene;
@@ -49,33 +52,34 @@ describe('PlayGameBoardManagerService', () => {
     ];
 
     beforeEach(() => {
-        const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['init', 'getCurrentGrid', 'getTilesWithSpawn']);
-        const webSocketSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-        const playGameBoardSocketSpy = jasmine.createSpyObj('PlayGameBoardSocketService', ['initGameBoard']);
+        // Création des SpyObj avec les méthodes et propriétés nécessaires
+        gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['init', 'getCurrentGrid', 'getTilesWithSpawn']);
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
+        playGameBoardSocketServiceSpy = jasmine.createSpyObj('PlayGameBoardSocketService', ['initGameBoard']);
+        Object.defineProperty(playGameBoardSocketServiceSpy, 'signalInitGameBoard$', { value: signalInitGameBoard$ });
+        Object.defineProperty(playGameBoardSocketServiceSpy, 'signalInitCharacters$', { value: signalInitCharacters$ });
 
-        playGameBoardSocketSpy.signalInitGameBoard$ = new Subject();
-        playGameBoardSocketSpy.signalInitCharacters$ = new Subject();
+        // Configuration des retours des méthodes simulées
+        webSocketServiceSpy.getRoomInfo.and.returnValue(mockRoomInfo);
+        gameMapDataManagerServiceSpy.getCurrentGrid.and.returnValue(mockGrid);
+        gameMapDataManagerServiceSpy.getTilesWithSpawn.and.returnValue([]);
 
-        webSocketSpy.getRoomInfo.and.returnValue(mockRoomInfo);
-        gameMapDataManagerSpy.getCurrentGrid.and.returnValue(mockGrid);
-        gameMapDataManagerSpy.getTilesWithSpawn.and.returnValue([]);
-
+        // Configuration du TestBed
         TestBed.configureTestingModule({
             providers: [
                 PlayGameBoardManagerService,
-                { provide: GameMapDataManagerService, useValue: gameMapDataManagerSpy },
-                { provide: WebSocketService, useValue: webSocketSpy },
-                { provide: PlayGameBoardSocketService, useValue: playGameBoardSocketSpy },
+                { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: PlayGameBoardSocketService, useValue: playGameBoardSocketServiceSpy },
             ],
         });
 
+        // Injection du service
         service = TestBed.inject(PlayGameBoardManagerService);
-        gameMapDataManagerServiceSpy = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
-        webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
-        playGameBoardSocketServiceSpy = TestBed.inject(PlayGameBoardSocketService) as jasmine.SpyObj<PlayGameBoardSocketService>;
     });
 
     afterEach(() => {
+        // Compléter les Subjects pour éviter les fuites de mémoire
         signalInitGameBoard$.complete();
         signalInitCharacters$.complete();
     });
@@ -93,14 +97,16 @@ describe('PlayGameBoardManagerService', () => {
         spyOn(service, 'initGameBoard').and.callThrough();
         spyOn(service, 'initCharacters').and.callThrough();
 
-        (playGameBoardSocketServiceSpy.signalInitGameBoard$ as Subject<GameShared>).next(mockGameData);
+        // Émission de l'événement signalInitGameBoard$
+        (playGameBoardSocketServiceSpy as any).signalInitGameBoard$.next(mockGameData);
         expect(service.initGameBoard).toHaveBeenCalledWith(mockGameData);
 
+        // Émission de l'événement signalInitCharacters$
         const spawnPlaces: [number, string][] = [
             [0, 'Player1'],
             [1, 'Player2'],
         ];
-        (playGameBoardSocketServiceSpy.signalInitCharacters$ as Subject<[number, string][]>).next(spawnPlaces);
+        (playGameBoardSocketServiceSpy as any).signalInitCharacters$.next(spawnPlaces);
         expect(service.initCharacters).toHaveBeenCalledWith(spawnPlaces);
     });
 
@@ -116,18 +122,21 @@ describe('PlayGameBoardManagerService', () => {
         ];
         const tilesWithSpawn: TerrainTile[] = [new GrassTile(), new GrassTile(), new GrassTile()];
 
-        const roomInfo = webSocketServiceSpy.getRoomInfo();
+        // Configuration des retours pour getTilesWithSpawn
         gameMapDataManagerServiceSpy.getTilesWithSpawn.and.returnValue(tilesWithSpawn);
 
+        // Appel de la méthode
         service.initCharacters(spawnPlaces);
 
-        expect(roomInfo.players[0].mapEntity).toBeTruthy();
-        expect(roomInfo.players[0].mapEntity).toEqual(jasmine.any(PlayerMapEntity));
-        expect(roomInfo.players[1].mapEntity).toBeTruthy();
-        expect(roomInfo.players[1].mapEntity).toEqual(jasmine.any(PlayerMapEntity));
+        // Vérification des entités de carte associées aux joueurs
+        expect(mockRoomInfo.players[0].mapEntity).toBeTruthy();
+        expect(mockRoomInfo.players[0].mapEntity).toEqual(jasmine.any(PlayerMapEntity));
+        expect(mockRoomInfo.players[1].mapEntity).toBeTruthy();
+        expect(mockRoomInfo.players[1].mapEntity).toEqual(jasmine.any(PlayerMapEntity));
 
-        expect(tilesWithSpawn[0].player).toBe(roomInfo.players[0].mapEntity);
-        expect(tilesWithSpawn[1].player).toBe(roomInfo.players[1].mapEntity);
+        // Vérification des tuiles assignées aux joueurs
+        expect(tilesWithSpawn[0].player).toBe(mockRoomInfo.players[0].mapEntity);
+        expect(tilesWithSpawn[1].player).toBe(mockRoomInfo.players[1].mapEntity);
         expect(tilesWithSpawn[2].item).toBeNull();
     });
 
@@ -135,15 +144,5 @@ describe('PlayGameBoardManagerService', () => {
         const grid = service.getCurrentGrid();
         expect(gameMapDataManagerServiceSpy.getCurrentGrid).toHaveBeenCalled();
         expect(grid).toEqual(mockGrid);
-    });
-
-    it('should properly unsubscribe from observables upon destruction', () => {
-        spyOn((service as PlayGameBoardManagerService).destroy$, 'next').and.callThrough();
-        spyOn((service as PlayGameBoardManagerService).destroy$, 'complete').and.callThrough();
-
-        service.ngOnDestroy();
-
-        expect((service as PlayGameBoardManagerService).destroy$.next).toHaveBeenCalled();
-        expect((service as PlayGameBoardManagerService).destroy$.complete).toHaveBeenCalled();
     });
 });

@@ -89,7 +89,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
 
         if (!room) {
-            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
             return;
         }
 
@@ -158,7 +157,7 @@ export class GameSocketRoomService {
         return undefined;
     }
 
-    addPlayerToRoom(accessCode: number, player: PlayerCharacter, playerName: string): boolean {
+    addPlayerToRoom(accessCode: number, player: PlayerCharacter): boolean {
         const room = this.rooms.get(accessCode);
         if (room && !room.isLocked) {
             const existingAvatars = room.players.map(p => p.avatar.name);
@@ -175,7 +174,7 @@ export class GameSocketRoomService {
                 suffix++;
                 player.name = `${baseName}-${suffix}`;
             }
-    
+
             room.players.push(player);
             this.playerRooms.set(player.socketId, accessCode);
             this.logger.log(`Joueur ${player.socketId} ajouté au room ${accessCode} avec le nom ${player.name}`);
