@@ -13,7 +13,7 @@
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
             <br />
-            Nombre de tentative d'evision: {{ battleManagerService.userEvasionAttempts }}
+            Nombre de tentative d'evision d'adversaire: {{ 2 }}
         </div>
 
         <div class="fight-view">
@@ -25,7 +25,7 @@
                 <div class="layer-3" id="dice-result">{{ getDiceResult() }}</div>
             </div>
         </div>
-
+        <div class="player-info">Nombre de tentative d'evision: {{ battleManagerService.userEvasionAttempts }}</div>
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">
