@@ -88,19 +88,6 @@ export class PlayPageMouseHandlerService {
         }
     }
 
-    // handleRightClick(tile: Tile) {
-    //     if (tile.isTerrain() && (tile as TerrainTile).player) {
-    //         const player = (tile as TerrainTile).player;
-    //         if (player) {
-    //             this.discardRightSelectedTile();
-    //             this.rightClickSelectedPlayerCharacter = this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(player);
-    //         }
-    //     } else {
-    //         this.discardRightClickSelectedPlayer();
-    //         this.rightSelectedTile = tile;
-    //     }
-    // }
-
     handleRightClick(tile: Tile) {
         this.discardRightSelectedTile();
         this.rightSelectedTile = tile;
