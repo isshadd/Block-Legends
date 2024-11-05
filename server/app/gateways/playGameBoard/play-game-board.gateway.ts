@@ -286,7 +286,16 @@ export class PlayGameBoardGateway {
 
     handlePlayerLeftRoom(accessCode: number, socketId: string) {
         const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (battleRoom) {
+            if (battleRoom.firstPlayerId === socketId) {
+                this.handleBattleEndedByDeath(accessCode, battleRoom.secondPlayerId);
+            } else if (battleRoom.secondPlayerId === socketId) {
+                this.handleBattleEndedByDeath(accessCode, battleRoom.firstPlayerId);
+            }
+        }
 
         if (gameBoardRoom) {
             if (room.currentPlayerTurn === socketId) {

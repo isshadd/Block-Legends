@@ -21,6 +21,7 @@ export class BattleManagerService {
     signalOpponentTriedEscape = new Subject<void>();
     signalOpponentTriedEscape$ = this.signalOpponentTriedEscape.asObservable();
 
+    isBattleOn = false;
     currentPlayer: PlayerCharacter | null = null;
     opponentPlayer: PlayerCharacter | null = null;
     currentPlayerIdTurn: string | null = null;
@@ -39,6 +40,7 @@ export class BattleManagerService {
         this.opponentEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
         this.userRemainingHealth = currentPlayer.attributes.life;
         this.opponentRemainingHealth = opponentPlayer.attributes.life;
+        this.isBattleOn = true;
 
         this.userDefence = currentPlayer.attributes.defense;
         if (currentPlayer.mapEntity.isPlayerOnIce) {
@@ -119,6 +121,7 @@ export class BattleManagerService {
     }
 
     endBattle() {
+        this.isBattleOn = false;
         setTimeout(() => {
             this.clearBattle();
         }, 1000);
@@ -135,5 +138,6 @@ export class BattleManagerService {
         this.opponentRemainingHealth = 0;
         this.userDefence = 0;
         this.opponentDefence = 0;
+        this.isBattleOn = false;
     }
 }

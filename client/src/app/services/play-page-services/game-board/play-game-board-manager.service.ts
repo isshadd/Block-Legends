@@ -283,7 +283,7 @@ export class PlayGameBoardManagerService {
         this.battleManagerService.init(currentPlayer, opponentPlayer);
     }
 
-    endBattleFirstPlayerContinueTurn() {
+    continueTurn() {
         const userPlayerCharacter = this.getCurrentPlayerCharacter();
         if (userPlayerCharacter && this.isUserTurn) {
             this.checkIfPLayerDidEverything();
@@ -324,6 +324,10 @@ export class PlayGameBoardManagerService {
 
             const spawnTile: TerrainTile = this.gameMapDataManagerService.getTileAt(playerMapEntity.spawnCoordinates) as TerrainTile;
             spawnTile.removeItem();
+        }
+
+        if (!this.battleManagerService.isBattleOn) {
+            this.continueTurn();
         }
     }
 
