@@ -12,6 +12,7 @@ import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
+import { BattleManagerService } from './battle-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -47,12 +48,11 @@ export class PlayGameBoardManagerService {
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
 
-    opponentCharacter: PlayerCharacter | null = null;
-
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
         public tileFactoryService: TileFactoryService,
+        public battleManagerService: BattleManagerService,
     ) {}
 
     init(gameBoardParameters: GameBoardParameters) {
@@ -265,7 +265,20 @@ export class PlayGameBoardManagerService {
             this.areOtherPlayersInBattle = true;
             return;
         }
-        this.opponentCharacter = this.findPlayerFromSocketId(enemyPlayerId);
+
+        const currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) return;
+
+        let opponentPlayer: PlayerCharacter | null;
+        if (currentPlayer.socketId === playerId) {
+            opponentPlayer = this.findPlayerFromSocketId(enemyPlayerId);
+        } else {
+            opponentPlayer = this.findPlayerFromSocketId(playerId);
+        }
+
+        if (!opponentPlayer) return;
+
+        this.battleManagerService.init(currentPlayer, opponentPlayer);
     }
 
     removePlayerFromMap(playerId: string) {

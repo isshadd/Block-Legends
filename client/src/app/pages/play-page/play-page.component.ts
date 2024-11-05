@@ -9,6 +9,7 @@ import { FightViewComponent } from '@app/components/play-area/fight-view/fight-v
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
@@ -40,6 +41,7 @@ export class PlayPageComponent {
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
+        public battleManagerService: BattleManagerService,
         public router: Router,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {

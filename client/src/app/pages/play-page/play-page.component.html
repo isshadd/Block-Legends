@@ -10,11 +10,11 @@
         <app-players-list></app-players-list>
     </div>
     <div id="map-wrapper">
-        @if(playGameBoardManagerService.opponentCharacter) {
+        @if(battleManagerService.opponentPlayer) {
         <app-fight-view
             id="comp"
-            [playerCharacter]="playGameBoardManagerService.getCurrentPlayerCharacter()"
-            [opponentCharacter]="playGameBoardManagerService.opponentCharacter"
+            [playerCharacter]="battleManagerService.currentPlayer"
+            [opponentCharacter]="battleManagerService.opponentPlayer"
         ></app-fight-view>
         }
         <app-map
