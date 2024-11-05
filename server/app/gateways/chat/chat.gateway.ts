@@ -3,15 +3,21 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
 import { ChatEvents } from '@common/enums/chat-events';
+import { GameRoom } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { Message } from '@app/model/schema/message.schema';
+import {RoomMessage} from '@common/interfaces/roomMessage';
+import { access } from 'fs';
+import {GameSocketRoomService} from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
+    private logger = new Logger(ChatGateway.name);
+    private readonly room : string = PRIVATE_ROOM_ID;
 
-    private readonly room = PRIVATE_ROOM_ID;
-
-    constructor(private readonly logger: Logger) {}
+    constructor(private gameSocketRoomService: GameSocketRoomService,
+    ) {}
 
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, word: string) {
@@ -28,17 +34,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.server.emit(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`);
     }
 
-    @SubscribeMessage(ChatEvents.JoinRoom)
-    joinRoom(socket: Socket) {
-        socket.join(this.room);
-    }
 
     @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message: string) {
-        // Seulement un membre de la salle peut envoyer un message aux autres
-        if (socket.rooms.has(this.room)) {
-            this.server.to(this.room).emit(ChatEvents.RoomMessage, `${socket.id} : ${message}`);
-        }
+    roomMessage(socket: Socket, message : RoomMessage) {
+      if (socket.rooms.has(message.room)) {
+        const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
+        this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
+      } else {
+        this.logger.warn(`Socket ${socket.id} attempted to send message to room ${message.room} but is not a member.`);
+      }
+    }
+    
+    @SubscribeMessage(ChatEvents.EventMessage)
+    eventMessage(socket: Socket, payload: { time: Date; event: string; associatedPlayers: string[] }) {
+        this.logger.log(`Event received`);
+        const { time, event, associatedPlayers } = payload;
+        const sentEvent = `${time} ${event}`;
+        this.server.emit(ChatEvents.EventReceived, {sentEvent, associatedPlayers});
     }
 
     afterInit() {

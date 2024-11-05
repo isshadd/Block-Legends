@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SocketStateService } from './SocketService/socket-state.service';
-import { GameRoom, WebSocketService } from './SocketService/websocket.service';
-import {PlayerCharacter} from '@app/classes/Characters/player-character';
+import { WebSocketService } from './SocketService/websocket.service';
 import { Subject } from 'rxjs'; 
 //import { RoomMessage } from '@common/interfaces/roomMessage';
 //import { ChangeDetectorRef } from '@angular/core';
@@ -9,15 +8,12 @@ import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class EventJournalService {
   socket: WebSocketService | null = null;
   serverClock: Date;
-  roomMessages: string[] = [];
-  playerName: string;
-  room : GameRoom;
-  accessCode: number;
-  roomID : string;
-  character: PlayerCharacter;
+  roomEvents: string[] = [];
+  playersInvolved : string[][] = [];
+  players: string[] = ['JOSH', 'JAMES', 'JENNY', 'JESSICA'];
   public messageReceivedSubject = new Subject<void>();
   messageReceived$ = this.messageReceivedSubject.asObservable();
 
@@ -38,23 +34,15 @@ export class ChatService {
 
   }
 
-  setCharacter(character: PlayerCharacter) {
-    this.playerName = character.name;
+  broadcastEvent(event: string): void {
+    if (this.socket && event.trim()) {
+      this.socket.sendEventToRoom(this.serverClock, event, this.players);
+    }
   }
 
-  setAccessCode(code: number) {
-    this.accessCode = code;
-    this.roomID = this.accessCode.toString();
-  }
-
-  broadcastMessageToAll(roomMessage: string): void {
-    if (roomMessage.length > 200) {
-      alert('Message cannot exceed 200 characters.');
-      return;
-    }
-    if (this.socket && roomMessage.trim()) {
-      const message = {room: this.roomID, time: this.serverClock, sender: this.playerName, content: roomMessage};
-      this.socket.sendMsgToRoom(message);
-    }
+  addEvent(sentEvent: string, associatedPlayers: string[]): void {
+    this.roomEvents.push(sentEvent);
+    this.playersInvolved.push(associatedPlayers); // Add to array of arrays
   }
 }
+
