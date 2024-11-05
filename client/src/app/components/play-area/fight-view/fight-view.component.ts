@@ -29,19 +29,19 @@ export class FightViewComponent {
     }
 
     get opponentPlayerHealthArray(): unknown[] {
-        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.life) : [];
+        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentRemainingHealth) : [];
     }
 
     get opponentPlayerDefenseArray(): unknown[] {
-        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.defense) : [];
+        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentDefence) : [];
     }
 
     get playerHealthArray(): unknown[] {
-        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.currentPlayer.attributes.life) : [];
+        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.userRemainingHealth) : [];
     }
 
     get playerDefenseArray(): unknown[] {
-        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.currentPlayer.attributes.defense) : [];
+        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.userDefence) : [];
     }
 
     onAttack() {
