@@ -24,6 +24,9 @@ export class PlayGameBoardManagerService {
     signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
+    signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserRespawned$ = this.signalUserRespawned.asObservable();
+
     signalUserStartedMoving = new Subject<void>();
     signalUserStartedMoving$ = this.signalUserStartedMoving.asObservable();
 
@@ -288,7 +291,27 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    endBattleByDeath(loserPlayer: string) {}
+    endBattleByDeath(winnerPlayer: string, loserPlayer: string) {
+        const winnerPlayerCharacter = this.findPlayerFromSocketId(winnerPlayer);
+        const loserPlayerCharacter = this.findPlayerFromSocketId(loserPlayer);
+
+        if (winnerPlayerCharacter && loserPlayerCharacter) {
+            winnerPlayerCharacter.fightWins++;
+
+            if (loserPlayerCharacter === this.getCurrentPlayerCharacter()) {
+                const currentTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
+                    loserPlayerCharacter.mapEntity.coordinates,
+                ) as WalkableTile;
+                const spawnTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
+                    loserPlayerCharacter.mapEntity.spawnCoordinates,
+                ) as WalkableTile;
+                this.signalUserRespawned.next({
+                    fromTile: currentTile.coordinates,
+                    toTile: spawnTile.coordinates,
+                });
+            }
+        }
+    }
 
     removePlayerFromMap(playerId: string) {
         const playerCharacter = this.findPlayerFromSocketId(playerId);

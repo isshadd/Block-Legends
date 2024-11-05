@@ -82,6 +82,11 @@ export class PlayGameBoardGateway {
         this.server.to(data.accessCode.toString()).emit('roomUserMoved', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
+    @SubscribeMessage('userRespawned')
+    handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
+        this.server.to(data.accessCode.toString()).emit('roomUserMoved', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+    }
+
     @SubscribeMessage('userDidDoorAction')
     handleUserDidDoorAction(client: Socket, data: { tileCoordinate: Vec2; accessCode: number }) {
         if (!this.isClientTurn(client, data.accessCode)) {
@@ -243,7 +248,7 @@ export class PlayGameBoardGateway {
         if (winnerPlayer === firstPlayer) {
             this.server.to(accessCode.toString()).emit('firstPlayerWonBattle', { firstPlayer: firstPlayer, loserPlayer: secondPlayer });
         } else {
-            this.server.to(accessCode.toString()).emit('secondPlayerWonBattle', firstPlayer);
+            this.server.to(accessCode.toString()).emit('secondPlayerWonBattle', { winnerPlayer: secondPlayer, loserPlayer: firstPlayer });
             this.handleTimeOut(accessCode);
         }
     }
