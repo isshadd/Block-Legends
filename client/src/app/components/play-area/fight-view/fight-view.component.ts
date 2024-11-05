@@ -14,6 +14,8 @@ const DELAY = 500;
 export class FightViewComponent {
     @Input() playerCharacter: PlayerCharacter | null;
     @Input() opponentCharacter: PlayerCharacter | null;
+    @Input() isPlayerTurn: boolean;
+    @Input() userEvasionAttempts: number;
 
     @Output() attack = new EventEmitter<void>();
     @Output() escape = new EventEmitter<void>();
@@ -97,5 +99,13 @@ export class FightViewComponent {
     getDiceResult(): number {
         //TODO TEMP
         return this.playerDiceResult;
+    }
+
+    isEscapeDisabled(): boolean {
+        return !this.isPlayerTurn || this.userEvasionAttempts <= 0;
+    }
+
+    isAttackDisabled(): boolean {
+        return !this.isPlayerTurn;
     }
 }

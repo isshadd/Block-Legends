@@ -13,7 +13,7 @@
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
             <br />
-            Nombre de tentative d'evision:
+            Nombre de tentative d'evision: {{ userEvasionAttempts }}
         </div>
 
         <div class="fight-view">
@@ -29,8 +29,8 @@
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">
-                <button (click)="onAttack()" class="primary">Attaquer</button>
-                <button (click)="onEscape()" class="secondary">Fuir</button>
+                <button (click)="onAttack()" class="primary" [disabled]="(isAttackDisabled())" >Attaquer</button>
+                <button (click)="onEscape()" class="secondary" [disabled]="(isEscapeDisabled())">Fuir</button>
             </div>
         </div>
     </div>
