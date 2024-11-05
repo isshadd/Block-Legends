@@ -28,12 +28,20 @@ export class FightViewComponent {
         });
     }
 
-    get healthArray(): unknown[] {
+    get opponentPlayerHealthArray(): unknown[] {
         return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.life) : [];
     }
 
-    get defenseArray(): unknown[] {
+    get opponentPlayerDefenseArray(): unknown[] {
         return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.defense) : [];
+    }
+
+    get playerHealthArray(): unknown[] {
+        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.currentPlayer.attributes.life) : [];
+    }
+
+    get playerDefenseArray(): unknown[] {
+        return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.currentPlayer.attributes.defense) : [];
     }
 
     onAttack() {

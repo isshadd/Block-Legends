@@ -76,10 +76,10 @@ describe('FightViewComponent', () => {
     });
 
     it('should return an array of the correct length for healthArray', () => {
-        expect(component.healthArray.length).toBe(ATTACK_ARRAY);
+        expect(component.opponentPlayerHealthArray.length).toBe(ATTACK_ARRAY);
     });
 
     it('should return an array of the correct length for defenseArray', () => {
-        expect(component.defenseArray.length).toBe(DEFENSE_ARRAY);
+        expect(component.opponentPlayerDefenseArray.length).toBe(DEFENSE_ARRAY);
     });
 });
