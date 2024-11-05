@@ -76,7 +76,6 @@ export class FightViewComponent {
     onOpponentAttack() {
         const opponentImage = document.getElementById('opponent');
         const playerImage = document.getElementById('player');
-
         opponentImage?.classList.add('attack-opponent');
         setTimeout(() => {
             opponentImage?.classList.remove('attack-opponent');
