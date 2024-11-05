@@ -11,15 +11,7 @@
     </div>
     <div id="map-wrapper">
         @if(battleManagerService.opponentPlayer) {
-        <app-fight-view
-            id="fight-comp"
-            [playerCharacter]="battleManagerService.currentPlayer"
-            [opponentCharacter]="battleManagerService.opponentPlayer"
-            [userEvasionAttempts]="battleManagerService.userEvasionAttempts"
-            [isPlayerTurn]="battleManagerService.isUserTurn"
-            (attack)="onUserAttack()"
-            (escape)="onUserEscape()"
-        ></app-fight-view>
+        <app-fight-view id="fight-comp" (attack)="onUserAttack()" (escape)="onUserEscape()"></app-fight-view>
         }
         <app-map
             id="map-container"

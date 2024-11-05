@@ -1,7 +1,7 @@
-@if(playerCharacter && opponentCharacter) {
+@if(battleManagerService.currentPlayer && battleManagerService.opponentPlayer) {
 <div class="fight-container">
     <div class="fight-header">
-        <div class="opponent-title">Nom D'Adversaire: {{ opponentCharacter.name }}</div>
+        <div class="opponent-title">Nom D'Adversaire: {{ battleManagerService.opponentPlayer.name }}</div>
         <div class="fight-info">
             Santé:
             <span *ngFor="let _ of healthArray">
@@ -13,15 +13,15 @@
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
             <br />
-            Nombre de tentative d'evision: {{ userEvasionAttempts }}
+            Nombre de tentative d'evision: {{ battleManagerService.userEvasionAttempts }}
         </div>
 
         <div class="fight-view">
             <img src="assets/images/view/Minecraft-Forest.png" class="layer-1" alt="Minecraft Forest Background" />
 
             <div class="layer-2">
-                <img id="opponent" [src]="opponentCharacter.avatar.fullImage" alt="Character Image" />
-                <img id="player" [src]="playerCharacter.avatar.fullImage" alt="Character Image" />
+                <img id="opponent" [src]="battleManagerService.opponentPlayer.avatar.fullImage" alt="Character Image" />
+                <img id="player" [src]="battleManagerService.currentPlayer.avatar.fullImage" alt="Character Image" />
                 <div class="layer-3" id="dice-result">{{ getDiceResult() }}</div>
             </div>
         </div>
@@ -29,8 +29,8 @@
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">
-                <button (click)="onAttack()" class="primary" [disabled]="(isAttackDisabled())" >Attaquer</button>
-                <button (click)="onEscape()" class="secondary" [disabled]="(isEscapeDisabled())">Fuir</button>
+                <button (click)="onAttack()" class="primary" [disabled]="isAttackDisabled()">Attaquer</button>
+                <button (click)="onEscape()" class="secondary" [disabled]="isEscapeDisabled()">Fuir</button>
             </div>
         </div>
     </div>

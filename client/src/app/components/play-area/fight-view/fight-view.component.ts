@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { Component } from '@angular/core';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 
 const DELAY = 500;
 
@@ -12,26 +12,19 @@ const DELAY = 500;
     styleUrls: ['./fight-view.component.scss'],
 })
 export class FightViewComponent {
-    @Input() playerCharacter: PlayerCharacter | null;
-    @Input() opponentCharacter: PlayerCharacter | null;
-    @Input() isPlayerTurn: boolean;
-    @Input() userEvasionAttempts: number;
-
-    @Output() attack = new EventEmitter<void>();
-    @Output() escape = new EventEmitter<void>();
-
-    private playerDiceResult: number = 0;
+    playerDiceResult = 6;
+    constructor(public battleManagerService: BattleManagerService) {}
 
     get healthArray(): unknown[] {
-        return this.opponentCharacter ? new Array(this.opponentCharacter.attributes.life) : [];
+        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.life) : [];
     }
 
     get defenseArray(): unknown[] {
-        return this.opponentCharacter ? new Array(this.opponentCharacter.attributes.defense) : [];
+        return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentPlayer.attributes.defense) : [];
     }
 
     onAttack() {
-        this.attack.emit();
+        this.battleManagerService.onUserAttack();
         this.onPlayerRollDice();
         this.onPlayerAttack();
     }
@@ -67,7 +60,7 @@ export class FightViewComponent {
     }
 
     onEscape(): void {
-        this.escape.emit();
+        this.battleManagerService.onUserEscape();
         this.onPlayerEscape();
     }
 
@@ -102,10 +95,21 @@ export class FightViewComponent {
     }
 
     isEscapeDisabled(): boolean {
-        return !this.isPlayerTurn || this.userEvasionAttempts <= 0;
+        return !this.battleManagerService.isUserTurn || this.battleManagerService.userEvasionAttempts <= 0;
     }
 
     isAttackDisabled(): boolean {
-        return !this.isPlayerTurn;
+        return !this.battleManagerService.isUserTurn;
+    }
+
+    getResultMessage(): string {
+        if (this.battleManagerService.currentPlayer?.attributes.life === 0) {
+            return 'Vous avez perdu!';
+        } else if (this.battleManagerService.opponentPlayer?.attributes.life === 0) {
+            return 'Vous avez gagné!';
+        } else {
+            return 'En fuite!';
+        }
+        return '';
     }
 }

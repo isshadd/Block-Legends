@@ -36,7 +36,7 @@ export class FightViewPageComponent {
 
         this.tile.item = this.item;
 
-        this.battleManagerService.isUserTurn = false;
+        this.battleManagerService.isUserTurn = true;
         this.battleManagerService.userEvasionAttempts = 0;
     }
 }
