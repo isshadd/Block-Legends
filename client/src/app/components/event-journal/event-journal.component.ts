@@ -11,8 +11,8 @@ import { ChangeDetectorRef } from '@angular/core';
   styleUrl: './event-journal.component.scss'
 })
 export class EventJournalComponent implements AfterViewChecked, OnInit {
-  events: { event: string; associatedPlayers: string[] }[] = [];
-  filteredEvents: { event: string, associatedPlayers: string[] }[] = [];
+  events: { event: string; associatedPlayers: string[] }[] = this.journalService.roomEvents;
+  filteredEvents: { event: string, associatedPlayers: string[] }[] = this.getFilteredEvents();;
   shouldScroll: boolean = false; 
   showMyEvents: boolean = false;
   @ViewChild('journalEvents') eventsContainer: ElementRef;
@@ -24,9 +24,7 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
 
   ngOnInit() {
     this.journalService.initialize();
-    this.events = this.journalService.roomEvents;
     this.journalService.messageReceived$.subscribe(() => {
-      this.filteredEvents = this.getFilteredEvents();
       this.shouldScroll = true;
       this.cdr.detectChanges();
     });
