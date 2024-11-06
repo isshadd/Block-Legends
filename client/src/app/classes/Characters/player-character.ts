@@ -1,4 +1,4 @@
-import { Avatar } from '@common/enums/avatar-enum';
+import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { PlayerAttributes } from './player-attributes';
 import { PlayerMapEntity } from './player-map-entity';
 
@@ -17,9 +17,10 @@ export class PlayerCharacter {
     defenseDice: number = BASE_STATS;
     fightWins: number = 0;
     isNameValid: boolean = false;
-    avatar: Avatar;
+    avatar: Avatar = AvatarEnum.Alex;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
+    isAbsent: boolean = false;
 
     constructor(public name: string) {}
 

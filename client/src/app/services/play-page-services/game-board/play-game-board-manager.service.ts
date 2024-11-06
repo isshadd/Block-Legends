@@ -52,7 +52,7 @@ export class PlayGameBoardManagerService {
     userCurrentMovePoints: number = 0;
     userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
-    turnOrder: string[];
+    turnOrder: string[] = [];
 
     winnerPlayer: PlayerCharacter | null = null;
 

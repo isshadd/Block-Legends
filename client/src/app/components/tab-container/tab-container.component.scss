@@ -1,0 +1,33 @@
+.tabs-container {
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+    height: 100px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+app-clavardage {
+    transform: scale(0.55);
+    height: 150px;
+}
+
+button {
+    margin-top: 20px;
+    &.active {
+        background-color: #333;
+        color: white;
+    }
+}
+
+.tab-content {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    border: #333 3px solid;
+    border-radius: 2px;
+    align-items: center;
+    height: 150px;
+    width: auto;
+}

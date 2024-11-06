@@ -1,16 +1,23 @@
-import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 
 @Component({
     selector: 'app-players-list',
     standalone: true,
-    imports: [],
+    imports: [CommonModule],
     templateUrl: './players-list.component.html',
     styleUrl: './players-list.component.scss',
 })
 export class PlayersListComponent {
-    players = [
-        { name: 'Sam', health: 100, speed: 10, attack: 5, victories: 3, defeats: 1 },
-        { name: 'Béatrice', health: 90, speed: 12, attack: 6, victories: 5, defeats: 2 },
-        { name: 'Amine', health: 80, speed: 9, attack: 7, victories: 2, defeats: 4 },
-    ];
+    @Input() players: PlayerCharacter[] = [];
+    constructor(private playGameBoardManagerService: PlayGameBoardManagerService) {}
+
+    isTurn(player: PlayerCharacter): boolean {
+        if (player.socketId === this.playGameBoardManagerService.currentPlayerIdTurn) {
+            return true;
+        }
+        return false;
+    }
 }

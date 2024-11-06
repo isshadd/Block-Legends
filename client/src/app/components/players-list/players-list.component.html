@@ -14,11 +14,11 @@
             </tr>
         </thead>
         <tbody>
-            @for (player of players; track player.name) {
-            <tr>
-                <td><img src="assets/images/avatar/Knight_head.png" />{{ player.name }}</td>
-                <td>{{ player.victories }}</td>
-                <td>{{ player.defeats }}</td>
+            @for (player of players; track player.socketId) {
+            <tr [ngClass]="{ CurrentPlayer: isTurn(player) }" [class.absent]="player.isAbsent">
+                <td><img src="{{ player.avatar.headImage }}" />{{ player.name }}</td>
+                <td>--</td>
+                <td>--</td>
             </tr>
             }
         </tbody>

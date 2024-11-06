@@ -1,0 +1,22 @@
+@import 'src/_variables.scss';
+.rectangle {
+    display: flex;
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+.container {
+    width: 60px;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    background-color: $primary-dark;
+    border-radius: 5px;
+}

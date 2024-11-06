@@ -3,14 +3,15 @@
     <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
     }
     <div id="side-menu">
-        <button class="dark-button" (click)="leaveGame()">Sortir</button>
+        <app-infos-game [currentPlayer]="this.myPlayer.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
         <app-player-map-entity-info-view
-            [scale]="1.25"
             [showButton]="false"
-            [playerCharacter]="mainPlayer!"
-            (close)="closePlayerInfoPanel()"
+            [playerCharacter]="this.myPlayer!"
+            [actionPoints]="this.actionPoints"
+            [totalLife]="totalLifePoints"
         ></app-player-map-entity-info-view>
-        <app-players-list></app-players-list>
+        <app-players-list [players]="this.players"></app-players-list>
+        <app-tab-container></app-tab-container>
     </div>
     <div id="map-wrapper">
         @if(battleManagerService.opponentPlayer) {
@@ -36,6 +37,8 @@
         }
 
         <div class="action-container">
+            <app-container></app-container>
+
             <div class="button-container">
                 @if(this.playGameBoardManagerService.isUserTurn) {
                 <button class="action-button" (click)="toggleAction()">Action</button>

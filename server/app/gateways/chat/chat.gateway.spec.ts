@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { ChatEvents } from '@common/enums/chat-events';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
-import { Socket, Server, BroadcastOperator } from 'socket.io';
-import { ChatEvents } from './chat.gateway.events';
+import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 
 describe('ChatGateway', () => {
@@ -63,7 +63,7 @@ describe('ChatGateway', () => {
     });
 
     it('broadcastAll() should send a mass message to the server', () => {
-        gateway.broadcastAll(socket, 'X');
+        gateway.broadcastAll(socket, { time: new Date(), sender: 'X', content: 'null' });
         expect(server.emit.calledWith(ChatEvents.MassMessage, match.any)).toBeTruthy();
     });
 

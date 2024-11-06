@@ -1,0 +1,25 @@
+@import 'src/_variables.scss';
+
+.info-game {
+    display: flex;
+    flex-direction: column;
+    background-color: $primary-dark;
+    border: 2px solid darken($primary-dark, 10%);
+    border-radius: 8px;
+    padding: 2px;
+    width: 280px;
+    height: 120px;
+
+    h3 {
+        color: white;
+        font-size: small;
+        margin-bottom: 2px;
+    }
+
+    .infos {
+        color: white;
+        font-size: 0.6em;
+        text-align: left;
+        //flex: 1;
+    }
+}

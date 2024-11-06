@@ -11,6 +11,16 @@
     background-color: darken($primary, 20);
 }
 
+.CurrentPlayer {
+    border-color: black;
+    border: 5px solid;
+}
+
+.absent {
+    text-decoration: line-through;
+    color: gray;
+}
+
 th:first-child,
 td:first-child {
     width: 50%; /* Set the first column to take 50% of the width */

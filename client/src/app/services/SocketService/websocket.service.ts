@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { ChatService } from '@app/services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
@@ -43,6 +44,7 @@ export class WebSocketService {
     currentRoom: GameRoom;
 
     constructor(
+        private chatService: ChatService,
         private router: Router,
         public gameService: GameService,
     ) {}
@@ -50,6 +52,10 @@ export class WebSocketService {
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
+    }
+
+    send<T>(event: string, data?: T, callback?: () => void): void {
+        this.socket.emit(event, ...[data, callback].filter((x) => x));
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -92,6 +98,11 @@ export class WebSocketService {
         if (this.currentRoom.accessCode) {
             this.socket.emit('startGame', this.currentRoom.accessCode);
         }
+    }
+
+    // Ajouté par Nihal
+    getTotalPlayers(): PlayerCharacter[] {
+        return this.playersSubject.value;
     }
 
     getRoomInfo() {
@@ -210,6 +221,14 @@ export class WebSocketService {
 
         this.socket.on('error', (message: string) => {
             alert(message);
+        });
+
+        this.socket.on('clock', (serverClock: Date) => {
+            this.chatService.serverClock = serverClock;
+        });
+
+        this.socket.on('massMessage', (broadcastMessage: string) => {
+            this.chatService.roomMessages.push(broadcastMessage);
         });
     }
 }
