@@ -36,6 +36,7 @@ describe('InfoPanelComponent', () => {
         mockWalkableTile = new WalkableTile();
         mockTerrainTile = new TerrainTile();
         mockPlayerCharacter = new PlayerCharacter('test');
+        mockPlayerCharacter.avatar = AvatarEnum.Alex;
         // Mock the 'fullImage' property expected by PlayerMapEntityInfoViewComponent
         (mockPlayerCharacter as PlayerCharacter).avatar.fullImage = AvatarEnum.Alex.fullImage;
         mockItem = new Item();
@@ -49,10 +50,10 @@ describe('InfoPanelComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should emit close event when closePanel is called', () => {
-        spyOn(component.closePanel, 'emit');
+    it('should emit close event when closePanelEvent is called', () => {
+        spyOn(component.closePanelEvent, 'emit');
         component.closePanel();
-        expect(component.closePanel.emit).toHaveBeenCalled();
+        expect(component.closePanelEvent.emit).toHaveBeenCalled();
     });
 
     it('should return true for isWalkableTile() if tile is an instance of WalkableTile', () => {
@@ -76,9 +77,9 @@ describe('InfoPanelComponent', () => {
     });
 
     it('should return null for getPlayer() if tile is not WalkableTile', () => {
-        const nonWalkableTile = new Tile(); // Create a plain Tile which does not extend WalkableTile
+        const nonWalkableTile = new Tile();
         component.tile = nonWalkableTile;
-        fixture.detectChanges(); // Trigger change detection after setting tile
+        fixture.detectChanges();
         expect(component.getPlayer()).toBeNull();
     });
 
