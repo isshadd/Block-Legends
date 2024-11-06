@@ -1,8 +1,8 @@
+import { ChatEvents } from '@common/enums/chat-events';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatEvents } from '@common/enums/chat-events';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -16,7 +16,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage(ChatEvents.Validate)
     validate(socket: Socket, word: string) {
         socket.emit(ChatEvents.WordValidated, word?.length > WORD_MIN_LENGTH);
-    }           
+    }
 
     @SubscribeMessage(ChatEvents.ValidateACK)
     validateWithAck(_: Socket, word: string) {
@@ -24,7 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: {time: Date, sender: string, content: string }) {
+    broadcastAll(socket: Socket, message: { time: Date; sender: string; content: string }) {
         this.server.emit(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`);
     }
 
