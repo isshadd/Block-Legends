@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
-import { MapComponent } from '@app/components/game-board-components/map/map.component';
-import { ModalOneOptionComponent } from '@app/components/modal-one-option/modal-one-option.component';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
@@ -13,244 +10,252 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
-import { BehaviorSubject, Subject, of } from 'rxjs';
+import { TileShared } from '@common/interfaces/tile-shared';
+import { BehaviorSubject, of } from 'rxjs';
 import { GameListComponent } from './game-list.component';
+
+// Mocks pour les composants enfants
+@Component({
+    selector: 'app-modal-one-option',
+    template: '',
+    standalone: true,
+})
+class MockModalOneOptionComponent {}
+
+@Component({
+    selector: 'app-map',
+    template: '',
+    standalone: true,
+})
+class MockMapComponent {}
 
 describe('GameListComponent', () => {
     let component: GameListComponent;
     let fixture: ComponentFixture<GameListComponent>;
-
-    let mockModeService: Partial<ModeService>;
-    let mockRouter: Partial<Router>;
-    let mockTileFactoryService: Partial<TileFactoryService>;
-    let mockAdministrationService: Partial<AdministrationPageManagerService>;
-    let mockGameServerCommunicationService: Partial<GameServerCommunicationService>;
-
-    let selectedModeSubject: BehaviorSubject<GameMode>;
-    let signalGamesSettedSubject: Subject<GameShared[]>;
+    let routerSpy: jasmine.SpyObj<Router>;
+    let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
+    let administrationServiceSpy: jasmine.SpyObj<AdministrationPageManagerService>;
+    let gameServerCommunicationServiceSpy: jasmine.SpyObj<GameServerCommunicationService>;
+    let modeServiceSpy: jasmine.SpyObj<ModeService>;
 
     beforeEach(async () => {
-        selectedModeSubject = new BehaviorSubject<GameMode>(GameMode.Classique);
-        signalGamesSettedSubject = new Subject<GameShared[]>();
+        // Création des mocks pour les services
+        const modeService = jasmine.createSpyObj('ModeService', [], {
+            selectedMode$: new BehaviorSubject<GameMode>(GameMode.Classique),
+        });
 
-        mockModeService = {
-            selectedMode$: selectedModeSubject.asObservable(),
-        };
+        const router = jasmine.createSpyObj('Router', ['navigate']);
 
-        mockRouter = {
-            navigate: jasmine.createSpy('navigate'),
-        };
+        const tileFactoryService = jasmine.createSpyObj('TileFactoryService', ['loadGridFromJSON']);
 
-        mockTileFactoryService = {
-            loadGridFromJSON: jasmine.createSpy('loadGridFromJSON').and.callFake((tilesJSON: any) => {
-                return [
-                    [new Tile(), new Tile()],
-                    [new Tile(), new Tile()],
-                ];
-            }),
-        };
+        const administrationService = jasmine.createSpyObj('AdministrationPageManagerService', ['setGames'], {
+            signalGamesSetted$: new BehaviorSubject<GameShared[]>([]),
+        }) as jasmine.SpyObj<AdministrationPageManagerService & { signalGamesSetted$: BehaviorSubject<GameShared[]> }>;
 
-        mockAdministrationService = {
-            signalGamesSetted$: signalGamesSettedSubject.asObservable(),
-            setGames: jasmine.createSpy('setGames').and.callFake(() => {
-                const mockGames: GameShared[] = [
-                    {
-                        _id: 'game1',
-                        name: 'Game One',
-                        mode: GameMode.Classique,
-                        isVisible: true,
-                        tiles: [],
-                        description: '',
-                        size: MapSize.SMALL,
-                        imageUrl: '',
-                    },
-                    {
-                        _id: 'game2',
-                        name: 'Game Two',
-                        mode: GameMode.Classique,
-                        isVisible: false,
-                        tiles: [],
-                        description: '',
-                        size: MapSize.SMALL,
-                        imageUrl: '',
-                    },
-                ];
-                signalGamesSettedSubject.next(mockGames);
-            }),
-        };
-
-        mockGameServerCommunicationService = {
-            getGame: jasmine.createSpy('getGame').and.callFake((gameId: string) => {
-                const mockGame: GameShared = {
-                    _id: gameId,
-                    name: `Game ${gameId}`,
-                    mode: GameMode.Classique,
-                    isVisible: true,
-                    tiles: [],
-                    description: '',
-                    size: MapSize.SMALL,
-                    imageUrl: '',
-                };
-                return of(mockGame);
-            }),
-        };
+        const gameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
 
         await TestBed.configureTestingModule({
-            imports: [CommonModule, ModalOneOptionComponent, MapComponent, GameListComponent],
-            providers: [
-                { provide: ModeService, useValue: mockModeService },
-                { provide: Router, useValue: mockRouter },
-                { provide: TileFactoryService, useValue: mockTileFactoryService },
-                { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
-                { provide: GameServerCommunicationService, useValue: mockGameServerCommunicationService },
+            imports: [
+                CommonModule,
+                GameListComponent, // Import du composant standalone
+                MockModalOneOptionComponent, // Import des composants mock
+                MockMapComponent,
             ],
-            schemas: [NO_ERRORS_SCHEMA],
+            providers: [
+                { provide: ModeService, useValue: modeService },
+                { provide: Router, useValue: router },
+                { provide: TileFactoryService, useValue: tileFactoryService },
+                { provide: AdministrationPageManagerService, useValue: administrationService },
+                { provide: GameServerCommunicationService, useValue: gameServerCommunicationService },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(GameListComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
+
+        // Injection des spies
+        routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+        tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
+        administrationServiceSpy = TestBed.inject(AdministrationPageManagerService) as jasmine.SpyObj<AdministrationPageManagerService>;
+        gameServerCommunicationServiceSpy = TestBed.inject(GameServerCommunicationService) as jasmine.SpyObj<GameServerCommunicationService>;
+        modeServiceSpy = TestBed.inject(ModeService) as jasmine.SpyObj<ModeService>;
     });
 
-    it('should create', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize the game list with fetched games', () => {
-        expect(component.databaseGames.length).toBe(2);
-        expect(component.databaseGames[0].name).toBe('Game One');
-        expect(component.databaseGames[1].name).toBe('Game Two');
-        expect(mockTileFactoryService.loadGridFromJSON).toHaveBeenCalledTimes(2);
+    it('should subscribe to selectedMode$ and update selectedMode', () => {
+        const newMode = GameMode.CTF;
+        (modeServiceSpy.selectedMode$ as BehaviorSubject<GameMode>).next(newMode);
+        expect(component.selectedMode).toBe(newMode);
     });
 
-    it('should navigate to home when homeButton is called', () => {
-        component.homeButton();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
-    });
-
-    it('should select a visible game and navigate to create-character', () => {
-        const gameToSelect = component.databaseGames[0];
-        component.selectGame(gameToSelect);
-
-        expect(mockGameServerCommunicationService.getGame).toHaveBeenCalledWith('game1');
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/create-character'], { queryParams: { id: 'game1' } });
-        expect(component.selectedGame).toEqual({
-            _id: 'game1',
-            name: 'Game game1',
-            mode: GameMode.Classique,
-            isVisible: true,
-            tiles: [],
-            description: '',
-            size: MapSize.SMALL,
-            imageUrl: '',
-        });
-        expect(component.gameStatus).toBeNull();
-    });
-
-    it('should not select an invisible game and set gameStatus message', () => {
-        (mockGameServerCommunicationService.getGame as jasmine.Spy).and.callFake((gameId: string) => {
-            const mockGame: GameShared = {
-                _id: gameId,
-                name: `Game ${gameId}`,
+    it('should subscribe to signalGamesSetted$ and call getGames', () => {
+        spyOn(component, 'getGames');
+        const games: GameShared[] = [
+            {
+                _id: '1',
+                name: 'Game 1',
+                isVisible: true,
                 mode: GameMode.Classique,
-                isVisible: false,
-                tiles: [],
-                description: '',
+                description: 'Description 1',
                 size: MapSize.SMALL,
                 imageUrl: '',
-            };
-            return of(mockGame);
+                tiles: [],
+            },
+        ];
+        (administrationServiceSpy.signalGamesSetted$ as BehaviorSubject<GameShared[]>).next(games);
+        expect(component.getGames).toHaveBeenCalledWith(games);
+    });
+
+    it('should call administrationService.setGames in constructor', () => {
+        expect(administrationServiceSpy.setGames).toHaveBeenCalled();
+    });
+
+    it('should set databaseGames and loadedTiles in getGames()', () => {
+        const games: GameShared[] = [
+            {
+                _id: '1',
+                name: 'Game 1',
+                isVisible: true,
+                mode: GameMode.Classique,
+                description: 'Description 1',
+                size: MapSize.SMALL,
+                imageUrl: '',
+                tiles: [],
+            },
+            {
+                _id: '2',
+                name: 'Game 2',
+                isVisible: false,
+                mode: GameMode.Classique,
+                description: 'Description 2',
+                size: MapSize.LARGE,
+                imageUrl: '',
+                tiles: [],
+            },
+        ];
+
+        const loadedTiles1: Tile[][][] = [[[new Tile()]]];
+        const loadedTiles2: Tile[][][] = [[[new Tile()]]];
+        tileFactoryServiceSpy.loadGridFromJSON.and.callFake((jsonGrid: TileShared[][]) => {
+            if (jsonGrid === games[0].tiles) return loadedTiles1[0];
+            if (jsonGrid === games[1].tiles) return loadedTiles2[0];
+            return [];
         });
 
-        const gameToSelect = component.databaseGames[1];
-        component.selectGame(gameToSelect);
+        component.getGames(games);
 
-        expect(mockGameServerCommunicationService.getGame).toHaveBeenCalledWith('game2');
-        expect(mockRouter.navigate).not.toHaveBeenCalled();
+        expect(component.databaseGames).toEqual(games);
+        expect(tileFactoryServiceSpy.loadGridFromJSON).toHaveBeenCalledWith(games[0].tiles);
+        expect(tileFactoryServiceSpy.loadGridFromJSON).toHaveBeenCalledWith(games[1].tiles);
+        expect(component.loadedTiles).toEqual([loadedTiles1[0], loadedTiles2[0]]);
+    });
+
+    it('homeButton() should navigate to /home', () => {
+        component.homeButton();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    });
+
+    it('selectGame() should set gameStatus and selectedGame to null if game is not available', fakeAsync(() => {
+        const game: GameShared = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+        const updatedGame: GameShared | null = null;
+        gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame as unknown as GameShared));
+
+        component.selectGame(game);
+        tick();
+
+        expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+        expect(component.gameStatus).toBe("Le jeu choisi  n'est plus disponible");
         expect(component.selectedGame).toBeNull();
-        expect(component.gameStatus).toBe("Le jeu choisi Game game2 n'est plus disponible");
-    });
+    }));
 
-    it('should return only visible games with selected mode', () => {
+    it('selectGame() should set gameStatus and selectedGame to null if game is not visible', fakeAsync(() => {
+        const game: GameShared = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+        const updatedGame: GameShared = { _id: '1', name: 'Game 1', isVisible: false } as GameShared;
+        gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame));
+
+        component.selectGame(game);
+        tick();
+
+        expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+        expect(component.gameStatus).toBe("Le jeu choisi Game 1 n'est plus disponible");
+        expect(component.selectedGame).toBeNull();
+    }));
+
+    it('selectGame() should set selectedGame and navigate when game is available and visible', fakeAsync(() => {
+        const game: GameShared = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+        const updatedGame: GameShared = { _id: '1', name: 'Game 1', isVisible: true } as GameShared;
+        gameServerCommunicationServiceSpy.getGame.and.returnValue(of(updatedGame));
+
+        component.selectGame(game);
+        tick();
+
+        expect(gameServerCommunicationServiceSpy.getGame).toHaveBeenCalledWith('1');
+        expect(component.selectedGame).toEqual(updatedGame);
+        expect(component.gameStatus).toBeNull();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['/create-character'], { queryParams: { id: '1' } });
+    }));
+
+    it('getFilteredGames() should return games that are visible, match selectedMode, and not null', () => {
+        component.databaseGames = [
+            { _id: '1', name: 'Game 1', isVisible: true, mode: GameMode.Classique } as GameShared,
+            { _id: '2', name: 'Game 2', isVisible: false, mode: GameMode.Classique } as GameShared,
+            { _id: '3', name: 'Game 3', isVisible: true, mode: GameMode.CTF } as GameShared,
+            { _id: '4', name: 'Game 4', isVisible: true, mode: GameMode.Classique } as GameShared,
+        ];
+
         component.selectedMode = GameMode.Classique;
+
         const filteredGames = component.getFilteredGames();
-        expect(filteredGames.length).toBe(1);
-        expect(filteredGames[0].name).toBe('Game One');
+
+        expect(filteredGames.length).toBe(2);
+        expect(filteredGames).toEqual([
+            { _id: '1', name: 'Game 1', isVisible: true, mode: GameMode.Classique } as GameShared,
+            { _id: '4', name: 'Game 4', isVisible: true, mode: GameMode.Classique } as GameShared,
+        ]);
     });
 
-    it('should return correct index for a given game', () => {
-        const game = component.databaseGames[0];
-        const index = component.findDatabaseGameIndex(game);
-        expect(index).toBe(0);
+    it('findDatabaseGameIndex() should return the index of the game in databaseGames', () => {
+        component.databaseGames = [{ _id: '1', name: 'Game 1' } as GameShared, { _id: '2', name: 'Game 2' } as GameShared];
+        const index = component.findDatabaseGameIndex({ _id: '2' } as GameShared);
+        expect(index).toBe(1);
     });
 
-    it('should open and close the modal correctly', () => {
-        expect(component.isModalOpen).toBeFalse();
+    it('findDatabaseGameIndex() should return -1 if game is not found', () => {
+        component.databaseGames = [{ _id: '1', name: 'Game 1' } as GameShared, { _id: '2', name: 'Game 2' } as GameShared];
+        const index = component.findDatabaseGameIndex({ _id: '3' } as GameShared);
+        expect(index).toBe(-1);
+    });
 
+    it('openModal() should set isModalOpen to true', () => {
+        component.isModalOpen = false;
         component.openModal();
         expect(component.isModalOpen).toBeTrue();
+    });
 
+    it('closeModal() should set isModalOpen to false and reset gameStatus', () => {
+        component.isModalOpen = true;
+        component.gameStatus = 'Error message';
         component.closeModal();
         expect(component.isModalOpen).toBeFalse();
         expect(component.gameStatus).toBeNull();
     });
 
-    // it('should close the modal and reload the window when confirmBack is called', () => {
-    //     // Backup the original window.location.reload
-    //     const originalReload = window.location.reload;
+    // it('confirmBack() should call closeModal and reload the window', () => {
+    //     spyOn(component, 'closeModal');
 
-    //     // Attempt to override window.location.reload with a spy
-    //     (window.location as any).reload = jasmine.createSpy('reload');
+    //     // Spy sur la méthode reloadWindow
+    //     spyOn(window.location, 'reload');
 
-    //     // Invoke the method that should trigger reload
+    //     // Appeler la méthode confirmBack
     //     component.confirmBack();
 
-    //     // Assertions to verify the expected behavior
-    //     expect(component.isModalOpen).toBeFalse();
-    //     expect(component.gameStatus).toBeNull();
+    //     // Vérifier que closeModal a été appelé
+    //     expect(component.closeModal).toHaveBeenCalled();
+
+    //     // Vérifier que reloadWindow a été appelé
     //     expect(window.location.reload).toHaveBeenCalled();
-
-    //     // Restore the original window.location.reload
-    //     window.location.reload = originalReload;
     // });
-
-    it('should update selectedMode when modeService emits a new mode', () => {
-        selectedModeSubject.next(GameMode.Classique);
-        expect(component.selectedMode).toBe(GameMode.Classique);
-
-        selectedModeSubject.next(GameMode.Classique);
-        expect(component.selectedMode).toBe(GameMode.Classique);
-    });
-
-    // **Additional Test Case: Button Clicks - Simulate User Interactions**
-    it('should handle button clicks correctly', () => {
-        // Spy on component methods
-        spyOn(component, 'homeButton').and.callThrough();
-        spyOn(component, 'openModal').and.callThrough();
-        spyOn(component, 'confirmBack').and.callThrough();
-
-        // Find all button elements in the component's template
-        const buttons = fixture.debugElement.queryAll(By.css('button'));
-
-        // Helper function to find a button by its text content
-        const findButtonByText = (text: string) => {
-            return buttons.find((button) => button.nativeElement.textContent.trim() === text);
-        };
-
-        // Locate each button by its displayed text
-        const homeButton = findButtonByText('Home');
-        const openModalButton = findButtonByText('Open Modal');
-        const confirmBackButton = findButtonByText('Confirm Back');
-
-        // Simulate button clicks
-        if (homeButton) {
-            homeButton.triggerEventHandler('click', null);
-        }
-        if (openModalButton) {
-            openModalButton.triggerEventHandler('click', null);
-        }
-        if (confirmBackButton) {
-            confirmBackButton.triggerEventHandler('click', null);
-        }
-    });
 });

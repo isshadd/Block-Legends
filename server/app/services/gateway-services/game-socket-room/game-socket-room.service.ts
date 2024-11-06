@@ -212,7 +212,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId) {
             room.isLocked = true;
-            // this.logger.log(`Room ${accessCode} verrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
@@ -222,7 +221,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
-            // this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
