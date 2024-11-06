@@ -1,20 +1,19 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
-import { BattleManagerService } from './battle-manager.service';
-import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayGameBoardSocketService implements OnDestroy {
-    private destroy$ = new Subject<void>();
-
     socket: Socket;
+    private destroy$ = new Subject<void>();
 
     constructor(
         public webSocketService: WebSocketService,
@@ -176,10 +175,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on('gameBoardPlayerWon', (playerId: string) => {
             this.playGameBoardManagerService.endGame(playerId);
-
+            const wait = 5000;
             setTimeout(() => {
                 this.leaveGame();
-            }, 5000);
+            }, wait);
         });
 
         this.socket.on('lastPlayerStanding', () => {
