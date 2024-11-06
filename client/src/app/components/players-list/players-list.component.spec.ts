@@ -1,4 +1,3 @@
-import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PlayersListComponent } from './players-list.component';
@@ -11,7 +10,7 @@ describe('PlayersListComponent', () => {
         await TestBed.configureTestingModule({
             imports: [
                 PlayersListComponent,
-                HttpClientModule, // Add HttpClientModule here
+                // Add HttpClientModule here
             ],
         }).compileComponents();
 
