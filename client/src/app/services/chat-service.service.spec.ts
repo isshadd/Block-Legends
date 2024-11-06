@@ -45,7 +45,8 @@ describe('ChatService', () => {
         spyOn(window, 'alert');
 
         chatService.initialize();
-        chatService.broadcastMessageToAll('A'.repeat(201)); // Message longer than 200 characters
+        const repeatTimes = 201;
+        chatService.broadcastMessageToAll('A'.repeat(repeatTimes)); // Message longer than 200 characters
 
         expect(window.alert).toHaveBeenCalledWith('Message cannot exceed 200 characters.');
         expect(webSocketServiceMock.send).not.toHaveBeenCalled();

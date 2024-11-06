@@ -111,7 +111,7 @@ describe('PlayGameBoardManagerService - Subjects and Observables', () => {
 
 describe('PlayGameBoardManagerService - init', () => {
     let service: PlayGameBoardManagerService;
-    //let gameBoardParameters: GameBoardParameters;
+    // let gameBoardParameters: GameBoardParameters;
 
     let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 

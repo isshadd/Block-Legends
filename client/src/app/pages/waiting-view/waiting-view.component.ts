@@ -7,14 +7,14 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-//import { ChangeDetectionStrategy } from '@angular/core';
+// import { ChangeDetectionStrategy } from '@angular/core';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
     imports: [CommonModule, ClavardageComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    //changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode$ = this.gameService.accessCode$;
@@ -58,14 +58,14 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    //this.gameService.setCharacter(character);
+                    // this.gameService.setCharacter(character);
                 });
             } else {
                 this.playersCounter++;
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    //this.gameService.setCharacter(character);
+                    // this.gameService.setCharacter(character);
                 });
             }
         });

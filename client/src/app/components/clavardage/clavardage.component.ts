@@ -12,12 +12,11 @@ import { ChatService } from '@app/services/chat-service.service';
     styleUrl: './clavardage.component.scss',
 })
 export class ClavardageComponent implements OnInit, AfterViewChecked {
+    @ViewChild('chatMessages') messagesContainer: ElementRef;
     serverClock: Date;
     messageToSend: string = '';
     messages = this.chatService.roomMessages;
     playerName: string;
-
-    @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     constructor(
         private chatService: ChatService,
@@ -44,6 +43,8 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
     private scrollToBottom(): void {
         try {
             this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
-        } catch (err) {}
+        } catch (err) {
+            // eslint-disable-line
+        }
     }
 }
