@@ -134,7 +134,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     lockRoom(): void {
-        this.eventJournalService.broadcastEvent("Started Page", [`patrice`, `julien`]);
         this.webSocketService.lockRoom();
     }
 

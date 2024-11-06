@@ -12,7 +12,6 @@ export class EventJournalService {
   roomID : string;
   serverClock: Date;
   roomEvents: {event:string; associatedPlayers: string[]}[] = [];
-  //playersInvolved : string[][] = [];
   playerName: string = '';
   public messageReceivedSubject = new Subject<void>();
   messageReceived$ = this.messageReceivedSubject.asObservable();
@@ -53,10 +52,5 @@ export class EventJournalService {
   
   }
 
-  // getFilteredEvents(): { event: string, players: string[] }[] {
-  //   return this.roomEvents
-  //     .map((event, index) => ({ event, players: this.playersInvolved[index] }))
-  //     .filter(({ players }) => players.includes(this.playerName));
-  // }
 }
 

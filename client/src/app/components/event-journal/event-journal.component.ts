@@ -31,6 +31,7 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
   }
 
   ngAfterViewChecked() {
+    this.filteredEvents = this.getFilteredEvents();
     if (this.shouldScroll) {
       setTimeout(() => {
         this.scrollToBottom();

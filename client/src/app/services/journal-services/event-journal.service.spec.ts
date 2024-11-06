@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { EventJournalService } from './event-journal.service';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Subject } from 'rxjs';
 
 describe('EventJournalService', () => {
@@ -39,6 +40,16 @@ describe('EventJournalService', () => {
         expect(service).toBeTruthy();
     });
 
+    describe('Initial State', () => {
+        it('should initialize with default values', () => {
+            expect(service.socket).toBeNull();
+            expect(service.roomEvents).toEqual([]);
+            expect(service.playerName).toBe('');
+            expect(service.messageReceivedSubject).toBeTruthy();
+            expect(service.messageReceived$).toBeTruthy();
+        });
+    });
+
     describe('initialize', () => {
         it('should set socket initially', () => {
             service.initialize();
@@ -64,6 +75,28 @@ describe('EventJournalService', () => {
         });
     });
 
+    describe('setCharacter', () => {
+        it('should set playerName from character', () => {
+            const mockCharacter: PlayerCharacter = {
+                name: 'TestPlayer'
+            } as PlayerCharacter;
+
+            service.setCharacter(mockCharacter);
+
+            expect(service.playerName).toBe('TestPlayer');
+        });
+
+        it('should handle character with empty name', () => {
+            const mockCharacter: PlayerCharacter = {
+                name: ''
+            } as PlayerCharacter;
+
+            service.setCharacter(mockCharacter);
+
+            expect(service.playerName).toBe('');
+        });
+    });
+
     describe('setAccessCode', () => {
         it('should set accessCode and roomID', () => {
             const code = 12345;
@@ -71,6 +104,13 @@ describe('EventJournalService', () => {
 
             expect(service.accessCode).toBe(code);
             expect(service.roomID).toBe(code.toString());
+        });
+
+        it('should handle zero accessCode', () => {
+            service.setAccessCode(0);
+            
+            expect(service.accessCode).toBe(0);
+            expect(service.roomID).toBe('0');
         });
     });
 
@@ -85,7 +125,8 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom).toHaveBeenCalledWith(event, players);
+            expect(mockWebSocketService.sendEventToRoom)
+                .toHaveBeenCalledWith(event, players);
         });
 
         it('should not send event when socket is null', () => {
@@ -95,7 +136,8 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom)
+                .not.toHaveBeenCalled();
         });
 
         it('should not send event when event is empty string', () => {
@@ -104,7 +146,8 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom)
+                .not.toHaveBeenCalled();
         });
 
         it('should not send event when event is empty and socket is null', () => {
@@ -114,40 +157,53 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom)
+                .not.toHaveBeenCalled();
         });
     });
 
     describe('addEvent', () => {
-        it('should add event and players to respective arrays', () => {
-            const event = 'test event';
-            const players = ['player1', 'player2'];
+        it('should add event to roomEvents array', () => {
+            const eventData = {
+                event: 'test event',
+                associatedPlayers: ['player1', 'player2']
+            };
 
-            service.addEvent(event, players);
+            service.addEvent(eventData);
 
-            expect(service.roomEvents).toContain(event);
-            expect(service.playersInvolved).toContain(players);
+            expect(service.roomEvents).toContain(eventData);
             expect(service.roomEvents.length).toBe(1);
-            expect(service.playersInvolved.length).toBe(1);
         });
 
-        it('should maintain order of events and players', () => {
-            const events = ['event1', 'event2'];
-            const players = [['player1'], ['player2', 'player3']];
+        it('should maintain order of events', () => {
+            const event1 = {
+                event: 'first event',
+                associatedPlayers: ['player1']
+            };
+            const event2 = {
+                event: 'second event',
+                associatedPlayers: ['player2']
+            };
 
-            service.addEvent(events[0], players[0]);
-            service.addEvent(events[1], players[1]);
+            service.addEvent(event1);
+            service.addEvent(event2);
 
-            expect(service.roomEvents).toEqual(events);
-            expect(service.playersInvolved).toEqual(players);
+            expect(service.roomEvents).toEqual([event1, event2]);
+        });
+
+        it('should handle event with empty associatedPlayers', () => {
+            const eventData = {
+                event: 'test event',
+                associatedPlayers: []
+            };
+
+            service.addEvent(eventData);
+
+            expect(service.roomEvents).toContain(eventData);
         });
     });
 
     describe('messageReceived$ Observable', () => {
-        it('should be initialized', () => {
-            expect(service.messageReceived$).toBeTruthy();
-        });
-
         it('should emit when messageReceivedSubject emits', (done) => {
             service.messageReceived$.subscribe(() => {
                 expect(true).toBeTruthy();
@@ -155,16 +211,6 @@ describe('EventJournalService', () => {
             });
 
             service.messageReceivedSubject.next();
-        });
-    });
-
-    describe('Initial State', () => {
-        it('should have correct initial values', () => {
-            expect(service.socket).toBeNull();
-            expect(service.roomEvents).toEqual([]);
-            expect(service.playersInvolved).toEqual([]);
-            expect(service.messageReceivedSubject).toBeTruthy();
-            expect(service.messageReceived$).toBeTruthy();
         });
     });
 });

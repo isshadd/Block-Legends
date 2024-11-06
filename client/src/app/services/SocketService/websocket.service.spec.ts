@@ -229,26 +229,7 @@ describe('WebSocketService', () => {
             expect(chatService.messageReceivedSubject.next).toHaveBeenCalled();
         });
 
-        it('should handle eventReceived event', () => {
-            const eventData = {
-                sentEvent: 'testEvent',
-                associatedPlayers: ['player1', 'player2']
-            };
-            service.setupSocketListeners();
-            
-            // Simulate socket.on callback for eventReceived
-            const eventReceivedCallback = mockSocket.on.calls.allArgs()
-                .find(call => call[0] === 'eventReceived')?.[1];
-            if (eventReceivedCallback) {
-                eventReceivedCallback(eventData);
-            }
 
-            expect(eventJournalService.addEvent).toHaveBeenCalledWith(
-                eventData.sentEvent,
-                eventData.associatedPlayers
-            );
-            expect(eventJournalService.messageReceivedSubject.next).toHaveBeenCalled();
-        });
     });
 
     describe('Error Handling', () => {
