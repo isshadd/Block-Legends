@@ -25,7 +25,9 @@
         <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false || playersCounter === maxPlayers">
             Deverouiller la salle
         </button>
-        <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
+        <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false && playersCounter >= 1">
+            Lancer la partie!
+        </button>
     </div>
     } @if(isMaxPlayer) {
     <div class="error">Le nombre maximum de joueurs est atteint !</div>
