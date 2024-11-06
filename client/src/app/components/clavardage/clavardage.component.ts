@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { OnInit, AfterViewChecked } from '@angular/core';
-import { ChatService } from '@app/services/chat-service.service';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -17,7 +17,6 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
   messages = this.chatService.roomMessages;
   playerName : string = '';
   shouldScroll: boolean = false;
-  secondRoom = 'room';
   @ViewChild('chatMessages') messagesContainer: ElementRef;
 
   constructor(

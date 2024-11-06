@@ -8,9 +8,9 @@ import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 //import { ChangeDetectionStrategy } from '@angular/core';
-import { ChatService } from '@app/services/chat-service.service';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
-import { EventJournalService } from '@app/services/event-journal.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
@@ -57,6 +57,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
             this.isOrganizer = character.isOrganizer;
             this.chatService.setCharacter(character);
+            this.eventJournalService.setCharacter(character);
 
             if (character.isOrganizer) {
                 this.webSocketService.init();
@@ -67,6 +68,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.gameService.setCurrentPlayer(character);
                     if (this.accessCode !== null) {
                         this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.eventJournalService.setAccessCode(this.accessCode);
                     }
                 });
             } else {
@@ -76,6 +78,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.gameService.setCurrentPlayer(character);
                     if (this.accessCode !== null) {
                         this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.eventJournalService.setAccessCode(this.accessCode);
                     }
                 });
             }
@@ -131,6 +134,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     lockRoom(): void {
+        this.eventJournalService.broadcastEvent("Started Page", [`patrice`, `julien`]);
         this.webSocketService.lockRoom();
     }
 
@@ -160,7 +164,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent('ALLO');
-
+        this.eventJournalService.broadcastEvent("clicked Journal", [`${this.eventJournalService.playerName}`]);
     }
 }

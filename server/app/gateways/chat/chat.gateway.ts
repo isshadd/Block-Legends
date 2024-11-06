@@ -44,11 +44,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
     
     @SubscribeMessage(ChatEvents.EventMessage)
-    eventMessage(socket: Socket, payload: { time: Date; event: string; associatedPlayers: string[] }) {
+    eventMessage(socket: Socket, payload: { time: Date; content: string; roomID: string; associatedPlayers: string[] }) {
         this.logger.log(`Event received`);
-        const { time, event, associatedPlayers } = payload;
-        const sentEvent = `${time} ${event}`;
-        this.server.emit(ChatEvents.EventReceived, {sentEvent, associatedPlayers});
+        const { time, content, roomID , associatedPlayers } = payload;
+        if (socket.rooms.has(roomID)) {
+            const event = `${time} ${content}`;
+            this.server.to(roomID).emit(ChatEvents.EventReceived, {event, associatedPlayers});
+          } else {
+            this.logger.warn(`Socket ${socket.id} attempted to send message to room ${roomID} but is not a member.`);
+          }
     }
 
     afterInit() {

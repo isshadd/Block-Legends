@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { SocketStateService } from './SocketService/socket-state.service';
-import { GameRoom, WebSocketService } from './SocketService/websocket.service';
+import { SocketStateService } from '../SocketService/socket-state.service';
+import { WebSocketService } from '../SocketService/websocket.service';
 import {PlayerCharacter} from '@app/classes/Characters/player-character';
 import { Subject } from 'rxjs'; 
-//import { RoomMessage } from '@common/interfaces/roomMessage';
-//import { ChangeDetectorRef } from '@angular/core';
-//import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 @Injectable({
   providedIn: 'root'
 })
@@ -14,10 +11,9 @@ export class ChatService {
   serverClock: Date;
   roomMessages: string[] = [];
   playerName: string;
-  room : GameRoom;
   accessCode: number;
   roomID : string;
-  character: PlayerCharacter;
+  
   public messageReceivedSubject = new Subject<void>();
   messageReceived$ = this.messageReceivedSubject.asObservable();
 

@@ -5,10 +5,10 @@ import { GameService } from '@app/services/game-services/game.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { ChatService } from '../chat-service.service';
+import { ChatService } from '../chat-services/chat-service.service';
 import { environment } from 'src/environments/environment';
 import {RoomMessage} from '@common/interfaces/roomMessage';
-import { EventJournalService } from '@app/services/event-journal.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 
 export interface GameRoom {
     roomId: string;
@@ -51,10 +51,6 @@ export class WebSocketService {
         this.setupSocketListeners();
     }
     
-    send<T>(event: string, data?: T, callback?: Function): void {
-        this.socket.emit(event, ...([data, callback].filter(x => x)));
-    }
-
     createGame(gameId: string, player: PlayerCharacter) {
         this.socket.emit('createGame', { gameId, playerOrganizer: player });
     }
@@ -63,8 +59,11 @@ export class WebSocketService {
         this.socket.emit('roomMessage', roomMessage);
     }
 
-    sendEventToRoom(time: Date, event: string, players: string[] ): void {
-        this.socket.emit('eventMessage', {time, event, associatedPlayers: players});
+    sendEventToRoom(event: string, players: string[] ): void {
+        const time = this.eventJournalService.serverClock;
+        const roomID = this.eventJournalService.roomID;
+        const content = event;
+        this.socket.emit('eventMessage', {time, content, roomID, associatedPlayers: players});
     }
 
     joinGame(accessCode: number) {
@@ -109,7 +108,7 @@ export class WebSocketService {
         return this.currentRoom;
     }
 
-    private setupSocketListeners() {
+    public setupSocketListeners() {
         this.socket.on('roomState', (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
@@ -208,16 +207,14 @@ export class WebSocketService {
             this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on('eventReceived', (data: { sentEvent: string; associatedPlayers: string[] }) => {
-            const { sentEvent, associatedPlayers } = data;
-            this.eventJournalService.addEvent(sentEvent, associatedPlayers);
+        this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
+            this.eventJournalService.addEvent(data);
+            this.eventJournalService.messageReceivedSubject.next();
           });
 
         this.socket.on('roomMessage', (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });
-
-
     }
 }

@@ -1,8 +1,26 @@
 <div class="journal">
-    <h3>Event Journal</h3>
-    <div class="journal-container" #journalEvents>
-      <ul class="events">
-        <li *ngFor="let event of events">{{ event }}</li>
-      </ul>
-    </div>
+  <h3>Event Journal</h3>
+  <button (click)="showMyEvents = !showMyEvents">
+    {{ showMyEvents ? 'Show All Events' : 'Show My Events' }}
+  </button>
+  <div class="journal-container" #journalEvents>
+    <ul class="events">
+      <ng-container *ngIf="showMyEvents">
+        <li *ngFor="let event of filteredEvents">
+          <div>{{ event.event }}</div>
+          <ul>
+            <li *ngFor="let player of event.associatedPlayers">{{ player }}</li>
+          </ul>
+        </li>
+      </ng-container>
+      <ng-container *ngIf="!showMyEvents">
+        <li *ngFor="let event of events">
+          <div>{{ event.event }}</div>
+          <ul>
+            <li *ngFor="let player of event.associatedPlayers">{{ player }}</li>
+          </ul>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
 </div>

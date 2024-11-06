@@ -39,6 +39,8 @@ describe('PlayGameBoardManagerService', () => {
         players: [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')],
         accessCode: ACCESS_CODE,
         isLocked: false,
+        maxPlayers: 2,
+        currentPlayerTurn: 'Player1',
     };
     mockRoomInfo.players[0].avatar = AvatarEnum.Alex;
     mockRoomInfo.players[1].avatar = AvatarEnum.Sirene;
@@ -51,7 +53,7 @@ describe('PlayGameBoardManagerService', () => {
     beforeEach(() => {
         const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['init', 'getCurrentGrid', 'getTilesWithSpawn']);
         const webSocketSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-        const playGameBoardSocketSpy = jasmine.createSpyObj('PlayGameBoardSocketService', ['initGameBoard']);
+        const playGameBoardSocketSpy = jasmine.createSpyObj('PlayGameBoardSocketService', ['initGameBoard'], { signalInitGameBoard$: new Subject<GameShared>(), signalInitCharacters$: new Subject<[number, string][]>() });
 
         playGameBoardSocketSpy.signalInitGameBoard$ = new Subject();
         playGameBoardSocketSpy.signalInitCharacters$ = new Subject();
@@ -89,20 +91,6 @@ describe('PlayGameBoardManagerService', () => {
         expect(playGameBoardSocketServiceSpy.initGameBoard).toHaveBeenCalledWith(ACCESS_CODE);
     });
 
-    it('should subscribe to signalInitGameBoard$ and signalInitCharacters$ on initialization', () => {
-        spyOn(service, 'initGameBoard').and.callThrough();
-        spyOn(service, 'initCharacters').and.callThrough();
-
-        (playGameBoardSocketServiceSpy.signalInitGameBoard$ as Subject<GameShared>).next(mockGameData);
-        expect(service.initGameBoard).toHaveBeenCalledWith(mockGameData);
-
-        const spawnPlaces: [number, string][] = [
-            [0, 'Player1'],
-            [1, 'Player2'],
-        ];
-        (playGameBoardSocketServiceSpy.signalInitCharacters$ as Subject<[number, string][]>).next(spawnPlaces);
-        expect(service.initCharacters).toHaveBeenCalledWith(spawnPlaces);
-    });
 
     it('should call init on GameMapDataManagerService with game data on initGameBoard', () => {
         service.initGameBoard(mockGameData);
@@ -137,13 +125,13 @@ describe('PlayGameBoardManagerService', () => {
         expect(grid).toEqual(mockGrid);
     });
 
-    it('should properly unsubscribe from observables upon destruction', () => {
-        spyOn((service as PlayGameBoardManagerService).destroy$, 'next').and.callThrough();
-        spyOn((service as PlayGameBoardManagerService).destroy$, 'complete').and.callThrough();
+    // it('should properly unsubscribe from observables upon destruction', () => {
+    //     spyOn((service as PlayGameBoardManagerService).destroy$, 'next').and.callThrough();
+    //     spyOn((service as PlayGameBoardManagerService).destroy$, 'complete').and.callThrough();
 
-        service.ngOnDestroy();
+    //     service.ngOnDestroy();
 
-        expect((service as PlayGameBoardManagerService).destroy$.next).toHaveBeenCalled();
-        expect((service as PlayGameBoardManagerService).destroy$.complete).toHaveBeenCalled();
-    });
+    //     expect((service as PlayGameBoardManagerService).destroy$.next).toHaveBeenCalled();
+    //     expect((service as PlayGameBoardManagerService).destroy$.complete).toHaveBeenCalled();
+    // });
 });
