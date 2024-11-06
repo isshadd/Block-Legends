@@ -11,19 +11,41 @@ app-clavardage {
 }
 
 #page-container {
+    position: relative;
     display: flex;
     flex-direction: row;
     height: 100vh;
     width: 100vw;
 
+    #win-panel {
+        position: absolute;
+        display: flex;
+        top: 70%;
+        left: 70%;
+        transform: translate(-50%, -50%);
+        z-index: 20;
+        animation: fadeInScale 0.6s ease-in-out forwards;
+    }
+
+    @keyframes fadeInScale {
+        0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        100% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+    }
+
     #side-menu {
         display: flex;
         flex-direction: column;
-        min-width: 23%;
-        max-width: 200px;
-        height: auto;
+        flex-basis: 25%;
+        max-width: 25%;
+        height: 100%;
         background-color: $primary-dark;
-        overflow-y: scroll;
+        overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
         padding: 5px;
@@ -34,33 +56,70 @@ app-clavardage {
     }
 
     #map-wrapper {
-        position: relative; // Allows absolute positioning of the info panel
+        position: relative;
         display: flex;
-        flex-direction: column; // Stack the map and containers vertically
+        flex-direction: column;
         flex-grow: 1;
-        justify-content: flex-start; // Align children to the top
+        height: 100vh;
+        overflow: hidden;
+
+        #map-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        #fight-comp {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: fadeInScale 0.6s ease-in-out forwards;
+
+            @keyframes fadeInScale {
+                0% {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+        }
+
+        #info-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 360px;
+            padding: 10px;
+            background-color: $primary-dark;
+            border: 2px solid darken($primary-dark, 10%);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
     }
 
-    #map-container {
-        flex-grow: 1; // Allow the map to take available space
-        display: flex;
-        justify-content: center;
-        position: relative; // Needed for absolute positioning of overlays
-    }
-    .placeholder-timer {
-        font-size: 2em; // Adjust size as needed
-        color: #fff; // Change to desired color
-        text-align: center; // Center the text
-        margin-top: 10px; // Add some margin if needed
-    }
     .action-container {
-        display: flex; // Arrange containers and buttons in a row
-        align-items: center; // Center align items vertically
-        margin-top: 10px; // Space between the map and action container
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
 
         .button-container {
             display: flex;
             margin-left: 300px;
+            display: flex;
+            margin-left: auto;
 
             .action-button {
                 margin-left: 10px;
@@ -77,18 +136,5 @@ app-clavardage {
                 }
             }
         }
-    }
-
-    #info-panel {
-        position: absolute;
-        top: 20px; // Position near the top of the map
-        right: 20px; // Align to the right edge of the map
-        width: 200px;
-        padding: 10px;
-        background-color: $primary-dark;
-        border: 2px solid darken($primary-dark, 10%);
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        z-index: 10; // Ensure it appears on top of the map
     }
 }

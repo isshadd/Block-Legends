@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
@@ -158,6 +160,36 @@ export class GameMapDataManagerService {
         return this.currentGrid[coordinates.x][coordinates.y];
     }
 
+    getClosestWalkableTileWithoutPlayerAt(mapPlayer: PlayerMapEntity): WalkableTile {
+        let coordinates = mapPlayer.spawnCoordinates;
+        let tile = this.getTileAt(coordinates);
+        if (tile && tile.isWalkable() && (!(tile as WalkableTile).hasPlayer() || (tile as WalkableTile).player === mapPlayer)) {
+            return tile as WalkableTile;
+        }
+
+        const queue: Vec2[] = [coordinates];
+        const visited: Set<string> = new Set();
+        visited.add(`${coordinates.x},${coordinates.y}`);
+
+        while (queue.length > 0) {
+            const current = queue.shift()!;
+            const neighbours = this.getNeighbours(this.getTileAt(current)!);
+
+            for (const neighbour of neighbours) {
+                const key = `${neighbour.coordinates.x},${neighbour.coordinates.y}`;
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    if (neighbour.isWalkable() && !(neighbour as WalkableTile).hasPlayer()) {
+                        return neighbour as WalkableTile;
+                    }
+                    queue.push(neighbour.coordinates);
+                }
+            }
+        }
+
+        throw new Error('No walkable tile found');
+    }
+
     setTileAt(coordinates: Vec2, tile: Tile) {
         this.currentGrid[coordinates.x][coordinates.y] = tile;
     }
@@ -228,4 +260,5 @@ export class GameMapDataManagerService {
             data: { message },
         });
     }
+    
 }

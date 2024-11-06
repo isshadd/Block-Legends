@@ -12,6 +12,7 @@ import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
+import { BattleManagerService } from './battle-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +23,9 @@ export class PlayGameBoardManagerService {
 
     signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
+
+    signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserRespawned$ = this.signalUserRespawned.asObservable();
 
     signalUserStartedMoving = new Subject<void>();
     signalUserStartedMoving$ = this.signalUserStartedMoving.asObservable();
@@ -35,11 +39,14 @@ export class PlayGameBoardManagerService {
     signalUserDidDoorAction = new Subject<Vec2>();
     signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
 
-    signalUserDidBattleAction = new Subject<void>();
+    signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
+    signalUserWon = new Subject<void>();
+    signalUserWon$ = this.signalUserWon.asObservable();
+
     currentTime: number = 0;
-    isBattleOn: boolean = false;
+    areOtherPlayersInBattle: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
     userCurrentMovePoints: number = 0;
@@ -47,10 +54,13 @@ export class PlayGameBoardManagerService {
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[];
 
+    winnerPlayer: PlayerCharacter | null = null;
+
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
         public tileFactoryService: TileFactoryService,
+        public battleManagerService: BattleManagerService,
     ) {}
 
     init(gameBoardParameters: GameBoardParameters) {
@@ -120,7 +130,7 @@ export class PlayGameBoardManagerService {
     }
 
     endTurn() {
-        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
 
         if (!this.isUserTurn || !userPlayerCharacter) {
             return;
@@ -138,7 +148,7 @@ export class PlayGameBoardManagerService {
     }
 
     async moveUserPlayer(tile: Tile) {
-        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
         const path = this.userCurrentPossibleMoves.get(tile);
 
         if (!this.isUserTurn || !userPlayerCharacter || !path) {
@@ -207,10 +217,13 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        if (tile instanceof WalkableTile && tile.hasPlayer()) {
-            this.signalUserDidBattleAction.next();
-            this.userCurrentActionPoints -= 1;
-            this.checkIfPLayerDidEverything();
+        if (tile instanceof WalkableTile && tile.hasPlayer() && tile.player) {
+            const playerCharacter = this.findPlayerFromPlayerMapEntity(tile.player);
+            if (playerCharacter?.socketId) {
+                this.signalUserDidBattleAction.next(playerCharacter.socketId);
+                this.hidePossibleMoves();
+                this.userCurrentActionPoints -= 1;
+            }
             return;
         }
 
@@ -246,11 +259,78 @@ export class PlayGameBoardManagerService {
                 this.gameMapDataManagerService.setTileAt(tileCoordinate, door);
             }
 
-            const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+            const userPlayerCharacter = this.getCurrentPlayerCharacter();
             if (userPlayerCharacter && this.isUserTurn) {
                 this.setupPossibleMoves(userPlayerCharacter);
             }
         }
+    }
+
+    startBattle(playerId: string, enemyPlayerId: string) {
+        const userId = this.webSocketService.socket.id;
+        if (userId !== playerId && userId !== enemyPlayerId) {
+            this.areOtherPlayersInBattle = true;
+            return;
+        }
+
+        const currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) return;
+
+        let opponentPlayer: PlayerCharacter | null;
+        if (currentPlayer.socketId === playerId) {
+            opponentPlayer = this.findPlayerFromSocketId(enemyPlayerId);
+        } else {
+            opponentPlayer = this.findPlayerFromSocketId(playerId);
+        }
+
+        if (!opponentPlayer) return;
+
+        this.battleManagerService.init(currentPlayer, opponentPlayer);
+    }
+
+    continueTurn() {
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
+        if (userPlayerCharacter && this.isUserTurn) {
+            this.checkIfPLayerDidEverything();
+            this.setupPossibleMoves(userPlayerCharacter);
+        }
+    }
+
+    endBattleByDeath(winnerPlayer: string, loserPlayer: string) {
+        const winnerPlayerCharacter = this.findPlayerFromSocketId(winnerPlayer);
+        const loserPlayerCharacter = this.findPlayerFromSocketId(loserPlayer);
+
+        if (winnerPlayerCharacter && loserPlayerCharacter) {
+            winnerPlayerCharacter.fightWins++;
+            this.checkIfPlayerWonGame(winnerPlayerCharacter);
+
+            if (loserPlayerCharacter === this.getCurrentPlayerCharacter()) {
+                const currentTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
+                    loserPlayerCharacter.mapEntity.coordinates,
+                ) as WalkableTile;
+                const spawnTile: WalkableTile = this.gameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt(loserPlayerCharacter.mapEntity);
+                this.signalUserRespawned.next({
+                    fromTile: currentTile.coordinates,
+                    toTile: spawnTile.coordinates,
+                });
+            }
+        }
+    }
+
+    checkIfPlayerWonGame(playerCharacter: PlayerCharacter) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= 3) {
+            this.signalUserWon.next();
+        }
+    }
+
+    endGame(playerId: string) {
+        this.winnerPlayer = this.findPlayerFromSocketId(playerId);
+    }
+
+    getWinnerPlayer(): PlayerCharacter | null {
+        return this.winnerPlayer;
     }
 
     removePlayerFromMap(playerId: string) {
@@ -265,6 +345,10 @@ export class PlayGameBoardManagerService {
             const spawnTile: TerrainTile = this.gameMapDataManagerService.getTileAt(playerMapEntity.spawnCoordinates) as TerrainTile;
             spawnTile.removeItem();
         }
+
+        if (!this.battleManagerService.isBattleOn) {
+            this.continueTurn();
+        }
     }
 
     getCurrentGrid(): Tile[][] {
@@ -272,7 +356,7 @@ export class PlayGameBoardManagerService {
     }
 
     getCurrentPlayerTile(): Tile | null {
-        const player = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const player = this.getCurrentPlayerCharacter();
 
         if (!player) {
             return null;
@@ -306,5 +390,22 @@ export class PlayGameBoardManagerService {
 
     getCurrentPlayerTurnName(): string {
         return this.webSocketService.getRoomInfo().players.find((player) => player.socketId === this.currentPlayerIdTurn)?.name || '';
+    }
+
+    getCurrentPlayerCharacter(): PlayerCharacter | null {
+        return this.findPlayerFromSocketId(this.webSocketService.socket.id);
+    }
+
+    resetManager() {
+        this.currentTime = 0;
+        this.areOtherPlayersInBattle = false;
+        this.currentPlayerIdTurn = '';
+        this.isUserTurn = false;
+        this.userCurrentMovePoints = 0;
+        this.userCurrentActionPoints = 0;
+        this.userCurrentPossibleMoves = new Map();
+        this.turnOrder;
+
+        this.winnerPlayer = null;
     }
 }

@@ -1,3 +1,4 @@
+import { TileType } from '@common/enums/tile-type';
 import { PlayerMapEntity } from '../Characters/player-map-entity';
 import { Tile } from './tile';
 
@@ -15,7 +16,7 @@ export class WalkableTile extends Tile {
 
     setPlayer(player: PlayerMapEntity) {
         this.player = player;
-        player.setCoordinates(this.coordinates);
+        player.setCoordinates(this.coordinates, this.type === TileType.Ice);
     }
 
     removePlayer() {

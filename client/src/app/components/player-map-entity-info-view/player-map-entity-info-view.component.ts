@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -9,8 +9,9 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     templateUrl: './player-map-entity-info-view.component.html',
     styleUrl: './player-map-entity-info-view.component.scss',
 })
-export class PlayerMapEntityInfoViewComponent {
+export class PlayerMapEntityInfoViewComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
+    @Output() closeP = new EventEmitter<void>();
     @Input() actionPoints: number;
     @Input() totalLife: number;
     @Output() close = new EventEmitter<void>();
@@ -31,6 +32,11 @@ export class PlayerMapEntityInfoViewComponent {
         }
     }
 
+    constructor(
+        public el: ElementRef,
+        private renderer: Renderer2,
+    ) {}
+
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);
     }
@@ -47,7 +53,11 @@ export class PlayerMapEntityInfoViewComponent {
         return new Array(this.playerCharacter.attributes.attack);
     }
 
+    ngOnInit(): void {
+        this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+    }
+
     closePanel() {
-        this.close.emit();
+        this.closeP.emit();
     }
 }

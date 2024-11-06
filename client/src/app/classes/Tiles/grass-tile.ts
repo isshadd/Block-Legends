@@ -7,6 +7,6 @@ import { TileType } from '@common/enums/tile-type';
 })
 export class GrassTile extends TerrainTile {
     type: TileType = TileType.Grass;
-    description: string = 'Gazon';
+    description: string = "Gazon, pas d'effet";
     imageUrl: string = 'assets/images/tiles/grass.png';
 }

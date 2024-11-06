@@ -35,7 +35,7 @@ describe('PlayerMapEntity', () => {
 
     it('should update coordinates with setCoordinates()', () => {
         const newCoordinates: Vec2 = { x: 10, y: 20 };
-        playerMapEntity.setCoordinates(newCoordinates);
+        playerMapEntity.setCoordinates(newCoordinates, false);
         expect(playerMapEntity.coordinates).toEqual(newCoordinates);
     });
 

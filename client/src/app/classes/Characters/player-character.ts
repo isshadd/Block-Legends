@@ -12,7 +12,10 @@ export class PlayerCharacter {
     isDefenseBonusAssigned: boolean = true;
     isOrganizer: boolean = false;
     socketId: string;
-    dice: string;
+    dice: string = 'attack';
+    attackDice: number = BONUS;
+    defenseDice: number = BASE_STATS;
+    fightWins: number = 0;
     isNameValid: boolean = false;
     avatar: Avatar;
     attributes = new PlayerAttributes();
@@ -23,12 +26,16 @@ export class PlayerCharacter {
 
     assignAttackDice() {
         this.dice = 'attack';
+        this.attackDice = BONUS;
+        this.defenseDice = BASE_STATS;
         this.isAttackBonusAssigned = true;
         this.isDefenseBonusAssigned = true;
     }
 
     assignDefenseDice() {
         this.dice = 'defense';
+        this.defenseDice = BONUS;
+        this.attackDice = BASE_STATS;
         this.isDefenseBonusAssigned = true;
         this.isAttackBonusAssigned = true;
     }

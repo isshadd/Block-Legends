@@ -1,4 +1,7 @@
 <div id="page-container">
+    @if(playGameBoardManagerService.getWinnerPlayer()) {
+    <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
+    }
     <div id="side-menu">
         <app-infos-game [currentPlayer]="this.myPlayer.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
         <app-player-map-entity-info-view
@@ -11,6 +14,10 @@
         <app-tab-container></app-tab-container>
     </div>
     <div id="map-wrapper">
+        @if(battleManagerService.opponentPlayer) {
+        <app-fight-view id="fight-comp"></app-fight-view>
+        }
+
         <app-map
             id="map-container"
             [grid]="playGameBoardManagerService.getCurrentGrid()"
@@ -22,26 +29,22 @@
         <app-timer
             [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
             [seconds]="playGameBoardManagerService.currentTime"
-            [isBattle]="playGameBoardManagerService.isBattleOn"
+            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
         ></app-timer>
 
-        @if(playPageMouseHandlerService.rightClickSelectedPlayerCharacter) {
-        <app-player-map-entity-info-view
-            [playerCharacter]="playPageMouseHandlerService.rightClickSelectedPlayerCharacter!"
-            (close)="closePlayerInfoPanel()"
-            id="info-panel"
-        ></app-player-map-entity-info-view>
-        } @if (playPageMouseHandlerService.rightSelectedTile) {
-        <app-map-tile-info id="info-panel" [tile]="playPageMouseHandlerService.rightSelectedTile!" (close)="closeTileInfoPanel()"></app-map-tile-info>
+        @if (playPageMouseHandlerService.rightSelectedTile) {
+        <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
         }
 
         <div class="action-container">
             <app-container></app-container>
 
             <div class="button-container">
+                @if(this.playGameBoardManagerService.isUserTurn) {
                 <button class="action-button" (click)="toggleAction()">Action</button>
-                <button class="action-button">Abandon</button>
                 <button class="action-button" (click)="endTurn()">Fin de tour</button>
+                }
+                <button class="action-button" (click)="leaveGame()">Abandon</button>
             </div>
         </div>
     </div>

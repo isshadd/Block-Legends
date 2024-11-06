@@ -4,6 +4,7 @@ import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { MapComponent } from './map.component';
 
@@ -93,7 +94,7 @@ describe('MapComponent', () => {
     });
 
     it('should return the player of a TerrainTile', () => {
-        const terrainTile = component.grid[1][0] as TerrainTile;
+        const terrainTile = component.grid[1][0] as WalkableTile;
         terrainTile.player = new PlayerMapEntity('');
         expect(component.getPlayer(terrainTile)).toEqual(terrainTile.player);
     });

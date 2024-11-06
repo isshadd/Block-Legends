@@ -14,12 +14,14 @@ describe('MapEditorOptionsMenuComponent', () => {
     let mapEditorManagerServiceSpy: jasmine.SpyObj<MapEditorManagerService>;
     let matDialogSpy: jasmine.SpyObj<MatDialog>;
     let matDialogRefSpy: jasmine.SpyObj<MatDialogRef<MapEditorModalComponent>>;
+    let dialog: jasmine.SpyObj<MatDialog>;
 
     beforeEach(async () => {
         const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['resetGame', 'hasValidNameAndDescription', 'saveGame']);
         const mapEditorManagerSpy = jasmine.createSpyObj('MapEditorManagerService', ['itemCheckup']);
         const matDialogSpyObj = jasmine.createSpyObj('MatDialog', ['open']);
         const matDialogRefSpyObj = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
+        const dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
         await TestBed.configureTestingModule({
             imports: [MapEditorOptionsMenuComponent],
@@ -27,6 +29,7 @@ describe('MapEditorOptionsMenuComponent', () => {
                 { provide: GameMapDataManagerService, useValue: gameMapDataManagerSpy },
                 { provide: MapEditorManagerService, useValue: mapEditorManagerSpy },
                 { provide: MatDialog, useValue: matDialogSpyObj },
+                { provide: MatDialog, useValue: dialogSpy },
             ],
         }).compileComponents();
 
@@ -36,6 +39,7 @@ describe('MapEditorOptionsMenuComponent', () => {
         mapEditorManagerServiceSpy = TestBed.inject(MapEditorManagerService) as jasmine.SpyObj<MapEditorManagerService>;
         matDialogSpy = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
         matDialogRefSpy = matDialogRefSpyObj;
+        dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
 
         matDialogSpy.open.and.returnValue(matDialogRefSpy as MatDialogRef<MapEditorModalComponent>);
     });
@@ -122,5 +126,20 @@ describe('MapEditorOptionsMenuComponent', () => {
 
         expect(matDialogSpy.open).not.toHaveBeenCalled();
         expect(gameMapDataManagerServiceSpy.saveGame).toHaveBeenCalled();
+    });
+
+    it('should call onSaveClick if isSavedPressed is true in the dialog result', () => {
+        // Arrange: Set up a spy for onSaveClick
+        spyOn(component, 'onSaveClick');
+
+        // Simulate the dialog returning a result with isSavedPressed: true
+        const dialogRefSpy = jasmine.createSpyObj({ afterClosed: of({ name: 'New Name', description: 'New Description', isSavedPressed: true }) });
+        dialog.open.and.returnValue(dialogRefSpy);
+
+        // Act: Call onOptionsClick
+        component.onOptionsClick();
+
+        // Assert: Check that onSaveClick was called
+        expect(component.onSaveClick).toHaveBeenCalled();
     });
 });

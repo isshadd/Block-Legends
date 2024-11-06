@@ -49,6 +49,12 @@ describe('VisibleStateComponent', () => {
         expect(color).toBe(VisibleStateColor.DisabledColor);
     });
 
+    it('should return DisabledColor when visibleState is Disabled', () => {
+        component.visibleState = VisibleState.Action;
+        const color = component.colorSelector();
+        expect(color).toBe(VisibleStateColor.ActionColor);
+    });
+
     it('should return NotSelectedColor when visibleState is not matched', () => {
         component.visibleState = VisibleState.NotSelected;
         const color = component.colorSelector();
