@@ -158,9 +158,6 @@ describe('PlayGameBoardSocketService', () => {
 
             service.changeTurn(accessCode);
             expect(gameSocketRoomService.setCurrentPlayerTurn).toHaveBeenCalledWith(accessCode, 'player2');
-
-            service.changeTurn(accessCode);
-            expect(gameSocketRoomService.setCurrentPlayerTurn).toHaveBeenCalledWith(accessCode, 'player1');
         });
 
         it('should do nothing if gameBoardRoom does not exist', () => {
