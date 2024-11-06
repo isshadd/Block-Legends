@@ -526,3 +526,4 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         expect(service.opponentEvasionAttempts).toBe(2); 
     });
 });
+
