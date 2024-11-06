@@ -23,8 +23,6 @@ describe('PlayGameBoardGateway', () => {
     let playGameBoardTimeService: jest.Mocked<PlayGameBoardTimeService>;
     let playGameBoardBattleService: jest.Mocked<PlayGameBoardBattleService>;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
-    let loggerLogSpy: jest.SpyInstance;
-    let loggerErrorSpy: jest.SpyInstance;
     let mockServer: Partial<Server>;
 
     const mockRoom: GameRoom = {
@@ -144,10 +142,8 @@ describe('PlayGameBoardGateway', () => {
             to: jest.fn().mockReturnThis(),
         };
 
-        jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
-        jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
-        loggerLogSpy = jest.spyOn(Logger.prototype, 'log');
-        loggerErrorSpy = jest.spyOn(Logger.prototype, 'error');
+        jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
+        jest.spyOn(Logger.prototype, 'error').mockImplementation(jest.fn());
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -177,11 +173,11 @@ describe('PlayGameBoardGateway', () => {
 
     describe('PlayGameBoardGateway Constructor', () => {
         it('should set up subscriptions and call corresponding methods on emission', () => {
-            const mockUpdateRoomTime = jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
-            const mockHandleTimeOut = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(() => {});
-            const mockHandlePlayerLeftRoom = jest.spyOn(gateway, 'handlePlayerLeftRoom').mockImplementation(() => {});
-            const mockHandleBattleTimeOut = jest.spyOn(gateway, 'handleBattleTimeOut').mockImplementation(() => {});
-            const mockHandleBattleSecondPassed = jest.spyOn(gateway, 'handleBattleSecondPassed').mockImplementation(() => {});
+            const mockUpdateRoomTime = jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
+            const mockHandleTimeOut = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
+            const mockHandlePlayerLeftRoom = jest.spyOn(gateway, 'handlePlayerLeftRoom').mockImplementation(jest.fn());
+            const mockHandleBattleTimeOut = jest.spyOn(gateway, 'handleBattleTimeOut').mockImplementation(jest.fn());
+            const mockHandleBattleSecondPassed = jest.spyOn(gateway, 'handleBattleSecondPassed').mockImplementation(jest.fn());
 
             const accessCode = 123;
             const playerSocketId = 'player1';
@@ -215,7 +211,7 @@ describe('PlayGameBoardGateway', () => {
             gameSocketRoomService.gameBoardRooms.set(accessCode, mockGameBoardRoom);
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-            jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
+            jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
 
             const mockClient: Partial<Socket> = {
                 emit: jest.fn(),
@@ -232,7 +228,7 @@ describe('PlayGameBoardGateway', () => {
         it('should emit error when room does not exist', () => {
             const accessCode = 2222;
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
-            jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
+            jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
 
             const mockClient: Partial<Socket> = {
                 emit: jest.fn(),
@@ -256,7 +252,7 @@ describe('PlayGameBoardGateway', () => {
             };
 
             const isClientTurnSpy = jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
-            const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(() => {});
+            const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
 
             gateway.handleUserEndTurn(mockClient as Socket, accessCode);
 
@@ -273,7 +269,7 @@ describe('PlayGameBoardGateway', () => {
             };
 
             const isClientTurnSpy = jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
-            const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(() => {});
+            const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
 
             gateway.handleUserEndTurn(mockClient as Socket, accessCode);
 
@@ -311,7 +307,7 @@ describe('PlayGameBoardGateway', () => {
         });
 
         it("should do nothing if it is not client's turn", () => {
-            const accessCode = 6666;
+            // const accessCode = 6666;
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
             const mockClient: Partial<Socket> = {
@@ -339,7 +335,7 @@ describe('PlayGameBoardGateway', () => {
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
             gameSocketRoomService.gameTimerRooms.set(accessCode, mockGameTimer);
             jest.spyOn(gameSocketRoomService.gameBattleRooms, 'get').mockReturnValue(battleRoom);
-            jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+            jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
             const mockClient: Partial<Socket> = {
                 id: 'player1',
@@ -368,7 +364,7 @@ describe('PlayGameBoardGateway', () => {
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
             gameSocketRoomService.gameTimerRooms.set(accessCode, mockGameTimer);
-            jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(() => {});
+            jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(jest.fn());
 
             const mockClient: Partial<Socket> = {
                 id: 'player1',
@@ -415,7 +411,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it("should do nothing if it is not client's turn", () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
-                    jest.spyOn(playGameBoardTimeService, 'pauseTimer').mockImplementation(() => {});
+                    jest.spyOn(playGameBoardTimeService, 'pauseTimer').mockImplementation(jest.fn());
 
                     gateway.handleUserStartedMoving(mockClient as Socket, accessCode);
 
@@ -502,7 +498,7 @@ describe('PlayGameBoardGateway', () => {
             describe('handleUserDidBattleAction', () => {
                 it("should start battle and emit roomUserDidBattleAction if it is client's turn", () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
-                    jest.spyOn(gateway, 'handleStartBattle').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleStartBattle').mockImplementation(jest.fn());
 
                     const data = { enemyPlayerId: 'enemy1', accessCode };
                     gateway.handleUserDidBattleAction(mockClient as Socket, data);
@@ -517,7 +513,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it("should do nothing if it is not client's turn", () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
-                    jest.spyOn(gateway, 'handleStartBattle').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleStartBattle').mockImplementation(jest.fn());
 
                     const data = { enemyPlayerId: 'enemy1', accessCode };
                     gateway.handleUserDidBattleAction(mockClient as Socket, data);
@@ -532,7 +528,7 @@ describe('PlayGameBoardGateway', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(true);
                     playGameBoardBattleService.userSuccededAttack.mockReturnValue(false);
                     gameSocketRoomService.gameBattleRooms.get = jest.fn().mockReturnValue(battleRoom);
-                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
                     const data = { attackResult: 1, accessCode };
                     gateway.handleUserAttacked(mockClient as Socket, data);
@@ -548,7 +544,7 @@ describe('PlayGameBoardGateway', () => {
                     playGameBoardBattleService.userSuccededAttack.mockReturnValue(true);
 
                     const data = { attackResult: 1, accessCode };
-                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(jest.fn());
 
                     gateway.handleUserAttacked(mockClient as Socket, data);
 
@@ -559,7 +555,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should handle invalid room', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
-                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
                     const data = { attackResult: 1, accessCode };
 
@@ -573,7 +569,7 @@ describe('PlayGameBoardGateway', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(true);
                     playGameBoardBattleService.userUsedEvade.mockReturnValue(true);
                     gameSocketRoomService.gameBattleRooms.get = jest.fn().mockReturnValue(battleRoom);
-                    jest.spyOn(gateway, 'handleBattleEndedByEscape').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleBattleEndedByEscape').mockImplementation(jest.fn());
 
                     gateway.handleUserTriedEscape(mockClient as Socket, accessCode);
 
@@ -586,7 +582,7 @@ describe('PlayGameBoardGateway', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(true);
                     playGameBoardBattleService.userUsedEvade.mockReturnValue(false);
                     gameSocketRoomService.gameBattleRooms.get = jest.fn().mockReturnValue(battleRoom);
-                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
                     gateway.handleUserTriedEscape(mockClient as Socket, accessCode);
 
@@ -597,7 +593,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should handle invalid room', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
-                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
                     gateway.handleUserTriedEscape(mockClient as Socket, accessCode);
                     expect(gateway.endBattleTurn).not.toHaveBeenCalled();
@@ -801,7 +797,7 @@ describe('PlayGameBoardGateway', () => {
                 it('should end the battle and emit battleEndedByEscape with the first player ID', () => {
                     gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
 
                     gateway.handleBattleEndedByEscape(accessCode);
 
@@ -817,7 +813,7 @@ describe('PlayGameBoardGateway', () => {
                 });
 
                 it('should emit firstPlayerWonBattle if the first player is the winner', () => {
-                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
 
                     gateway.handleBattleEndedByDeath(accessCode, battleRoom.firstPlayerId);
 
@@ -830,8 +826,8 @@ describe('PlayGameBoardGateway', () => {
                 });
 
                 it('should emit secondPlayerWonBattle and handleTimeOut if the second player is the winner', () => {
-                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(() => {});
-                    const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
 
                     gateway.handleBattleEndedByDeath(accessCode, battleRoom.secondPlayerId);
 
@@ -862,8 +858,8 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should end the turn and set timer for preparing if game timer is in ActiveTurn state', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(true);
-                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
-                    jest.spyOn(gateway, 'endRoomTurn').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'endRoomTurn').mockImplementation(jest.fn());
 
                     gateway.handleTimeOut(accessCode);
 
@@ -877,9 +873,9 @@ describe('PlayGameBoardGateway', () => {
                     mockGameTimer.state = GameTimerState.PreparingTurn;
                     gameSocketRoomService.gameTimerRooms.set(accessCode, mockGameTimer);
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(true);
-                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
-                    jest.spyOn(gateway, 'startRoomTurn').mockImplementation(() => {});
-                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'startRoomTurn').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
 
                     gateway.handleTimeOut(accessCode);
 
@@ -890,8 +886,8 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should do nothing if room is invalid', () => {
                     jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
-                    jest.spyOn(gateway, 'endRoomTurn').mockImplementation(() => {});
-                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'endRoomTurn').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
 
                     gateway.handleTimeOut(accessCode);
 
@@ -910,7 +906,7 @@ describe('PlayGameBoardGateway', () => {
                 });
 
                 it('should handle player leaving during a battle and call handleBattleEndedByDeath if leaving player is firstPlayer', () => {
-                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(jest.fn());
                     gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
                     gateway.handlePlayerLeftRoom(accessCode, battleRoom.firstPlayerId);
@@ -920,7 +916,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should handle player leaving during a battle and call handleBattleEndedByDeath if leaving player is secondPlayer', () => {
                     gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
-                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(jest.fn());
 
                     gateway.handlePlayerLeftRoom(accessCode, battleRoom.secondPlayerId);
 
@@ -944,7 +940,7 @@ describe('PlayGameBoardGateway', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     gameSocketRoomService.gameTimerRooms.set(accessCode, mockGameTimer);
                     gameSocketRoomService.gameTimerRooms.get = jest.fn().mockReturnValue(mockGameTimer);
-                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(() => {});
+                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
 
                     gateway.handlePlayerLeftRoom(accessCode, mockRoom.currentPlayerTurn);
 

@@ -1,12 +1,12 @@
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
 @Injectable()
 export class PlayGameBoardBattleService {
-    readonly ACTIVE_TURN_TIME = 5;
-    readonly NO_EVADE_ACTIVE_TURN_TIME = 3;
-    readonly STARTING_EVADE_ATTEMPTS = 2;
+    readonly activeTurnTime = 5;
+    readonly noEvadeActiveTurnTime = 3;
+    readonly startingEvadeAttempts = 2;
 
     signalRoomTimeOut = new Subject<number>();
     signalRoomTimeOut$ = this.signalRoomTimeOut.asObservable();
@@ -53,12 +53,12 @@ export class PlayGameBoardBattleService {
         }
 
         this.gameSocketRoomService.gameBattleRooms.set(accessCode, {
-            time: this.ACTIVE_TURN_TIME,
-            firstPlayerId: firstPlayerId,
-            secondPlayerId: secondPlayerId,
-            isFirstPlayerTurn: isFirstPlayerTurn,
-            firstPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
-            secondPlayerRemainingEvades: this.STARTING_EVADE_ATTEMPTS,
+            time: this.activeTurnTime,
+            firstPlayerId,
+            secondPlayerId,
+            isFirstPlayerTurn,
+            firstPlayerRemainingEvades: this.startingEvadeAttempts,
+            secondPlayerRemainingEvades: this.startingEvadeAttempts,
             firstPlayerRemainingLife: firstPlayer.attributes.life,
             secondPlayerRemainingLife: secondPlayer.attributes.life,
         });
@@ -71,12 +71,12 @@ export class PlayGameBoardBattleService {
         }
 
         battleRoom.isFirstPlayerTurn = !battleRoom.isFirstPlayerTurn;
-        battleRoom.time = this.ACTIVE_TURN_TIME;
+        battleRoom.time = this.activeTurnTime;
 
         if (battleRoom.isFirstPlayerTurn && battleRoom.firstPlayerRemainingEvades === 0) {
-            battleRoom.time = this.NO_EVADE_ACTIVE_TURN_TIME;
+            battleRoom.time = this.noEvadeActiveTurnTime;
         } else if (!battleRoom.isFirstPlayerTurn && battleRoom.secondPlayerRemainingEvades === 0) {
-            battleRoom.time = this.NO_EVADE_ACTIVE_TURN_TIME;
+            battleRoom.time = this.noEvadeActiveTurnTime;
         }
     }
 
