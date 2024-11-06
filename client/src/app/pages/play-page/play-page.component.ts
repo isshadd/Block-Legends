@@ -11,20 +11,18 @@ import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-inf
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
-import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
-import { GameService } from '@app/services/game-services/game.service';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
+import { GameService } from '@app/services/game-services/game.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
+import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 
 @Component({
     selector: 'app-play-page',
@@ -78,7 +76,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     onPlayGameBoardManagerInit() {
         this.actionPoints = this.playGameBoardManagerService.userCurrentActionPoints;
-        this.isBattlePhase = this.playGameBoardManagerService.isBattleOn;
+        this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
         this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();
         console.log('Joueurs:', this.players);
@@ -97,7 +95,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         }
     }
     ngOnInit(): void {
-        // Abonnement à la liste des joueurs
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
             this.updatePlayersList();
@@ -105,7 +102,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
             this.myPlayer = player;
-            console.log('Joueur actuel:', this.myPlayer);
         });
 
         this.totalLifePoints = this.myPlayer.attributes.life;

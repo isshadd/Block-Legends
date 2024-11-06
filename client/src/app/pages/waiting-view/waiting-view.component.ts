@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 //import { ChangeDetectionStrategy } from '@angular/core';
 @Component({
     selector: 'app-waiting-view',
@@ -58,14 +58,14 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    this.gameService.setCurrentPlayer(character);
+                    //this.gameService.setCharacter(character);
                 });
             } else {
                 this.playersCounter++;
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    this.gameService.setCurrentPlayer(character);
+                    //this.gameService.setCharacter(character);
                 });
             }
         });

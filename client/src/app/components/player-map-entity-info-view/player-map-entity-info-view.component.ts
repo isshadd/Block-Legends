@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -19,7 +19,9 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
     @Input() showButton: boolean = true;
     attackDice: string;
     defenseDice: string;
-    constructor() {} //private renderer: Renderer2, //private el: ElementRef,
+
+    constructor(public el: ElementRef) //private renderer: Renderer2,
+    {}
 
     ngOnInit(): void {
         //this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
@@ -31,11 +33,6 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
             this.defenseDice = '(D6)';
         }
     }
-
-    constructor(
-        public el: ElementRef,
-        private renderer: Renderer2,
-    ) {}
 
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);
@@ -51,10 +48,6 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
 
     get attackArray() {
         return new Array(this.playerCharacter.attributes.attack);
-    }
-
-    ngOnInit(): void {
-        this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
     }
 
     closePanel() {
