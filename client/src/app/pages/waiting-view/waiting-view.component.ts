@@ -27,7 +27,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     maxPlayers$ = this.webSocketService.maxPlayers$;
     gameId: string | null;
     size: number;
-    playersCounter = 0;
+    playersCounter = 1;
     isMaxPlayer = false;
     isOrganizer = false;
     maxPlayers: number = 0;
@@ -60,6 +60,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.eventJournalService.setCharacter(character);
 
             if (character.isOrganizer) {
+                this.playersCounter++;
                 this.webSocketService.init();
                 this.webSocketService.createGame(this.gameId, character);
                 this.accessCode$.subscribe((code) => {
@@ -72,6 +73,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     }
                 });
             } else {
+                this.playersCounter++;
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
@@ -85,20 +87,20 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
 
         this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-            this.playersCounter = players.length;
+            players.forEach(() => {
+                this.playersCounter++;
+            });
         });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;
         });
 
-        this.webSocketService.socket.on('organizerLeft', (data: { message: string }) => {
+        this.webSocketService.socket.on('organizerLeft', () => {
             if (!this.isOrganizer) {
                 this.playerLeave();
             }
         });
-
-        console.log(this.accessCode);
     }
 
     addVirtualPlayers(): void {
@@ -115,7 +117,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     playerLeave(): void {
         this.webSocketService.leaveGame();
         this.router.navigate(['/home']).then(() => {
-            location.reload();
+            alert('Le créateur a quitté la partie');
         });
     }
 
@@ -123,7 +125,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         this.webSocketService.leaveGame();
         this.router.navigate(['/home']).then(() => {
             alert('Vous avez quitté la partie');
-            location.reload();
         });
     }
 

@@ -5,14 +5,19 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
+import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 import { GameService } from '@app/services/game-services/game.service';
+import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
@@ -20,6 +25,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { AvatarEnum } from '@common/enums/avatar-enum';
 
 @Component({
     selector: 'app-play-page',
@@ -36,6 +42,9 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
         MapTileInfoComponent,
         PlaceableEntityContainerComponent,
         TimerComponent,
+        InfoPanelComponent,
+        FightViewComponent,
+        WinPanelComponent,
         ContainerComponent,
     ],
     templateUrl: './play-page.component.html',
@@ -55,6 +64,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
+        public battleManagerService: BattleManagerService,
         public router: Router,
         private webSocketService: WebSocketService,
         private gameService: GameService,
@@ -113,7 +123,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     closePlayerInfoPanel(): void {
-        this.playPageMouseHandlerService.discardRightClickSelecterPlayer();
+        this.playPageMouseHandlerService.discardRightClickSelectedPlayer();
     }
 
     closeTileInfoPanel(): void {
@@ -130,6 +140,5 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     leaveGame(): void {
         this.playGameBoardSocketService.leaveGame();
-        this.router.navigate(['/home']);
     }
 }

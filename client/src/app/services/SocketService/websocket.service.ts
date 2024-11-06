@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/member-ordering*/
+
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
@@ -36,6 +38,11 @@ export class WebSocketService {
     isLocked$ = this.isLockedSubject.asObservable();
     maxPlayersSubject = new BehaviorSubject<number>(0);
     maxPlayers$ = this.maxPlayersSubject.asObservable();
+    private takenAvatarsSubject = new BehaviorSubject<string[]>([]);
+    takenAvatars$ = this.takenAvatarsSubject.asObservable();
+    private avatarTakenErrorSubject = new BehaviorSubject<string>('');
+    avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
+
     currentRoom: GameRoom;
     chatRoom: GameRoom;
 
@@ -116,15 +123,36 @@ export class WebSocketService {
             this.isLockedSubject.next(room.isLocked);
         });
 
-        this.socket.on('joinGameResponse', (response: { valid: boolean; message: string; roomId: string; accessCode: number; isLocked: boolean }) => {
-            if (response.valid) {
-                this.gameService.setAccessCode(response.accessCode);
-                this.isLockedSubject.next(response.isLocked);
-                this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
-                this.router.navigate(['/player-create-character'], {
-                    queryParams: { roomId: response.accessCode },
-                });
-            }
+        this.socket.on(
+            'joinGameResponse',
+            (response: {
+                valid: boolean;
+                message: string;
+                roomId: string;
+                accessCode: number;
+                isLocked: boolean;
+                playerName: string;
+                takenAvatars: string[];
+            }) => {
+                if (response.valid) {
+                    this.gameService.setAccessCode(response.accessCode);
+                    this.isLockedSubject.next(response.isLocked);
+                    this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
+                    this.takenAvatarsSubject.next(response.takenAvatars); // Update the list of taken avatars
+                    this.router.navigate(['/player-create-character'], {
+                        queryParams: { roomId: response.accessCode },
+                    });
+                    if (response.playerName) {
+                        this.gameService.updatePlayerName(response.playerName);
+                    }
+                } else {
+                    alert(response.message); // Notify the user that the avatar is already taken
+                }
+            },
+        );
+
+        this.socket.on('avatarTakenError', (data: { message: string }) => {
+            this.avatarTakenErrorSubject.next(data.message);
         });
 
         this.socket.on('joinGameResponseCodeInvalid', (response: { message: string }) => {
@@ -191,12 +219,14 @@ export class WebSocketService {
             this.currentRoom.players.forEach((player) => {
                 if (!player.isOrganizer) {
                     this.leaveGame();
-                    this.router.navigate(['/home']).then(() => {
-                        location.reload();
-                    });
+                    this.router.navigate(['/home']);
                 }
             });
         });
+
+        // this.socket.on('avatarTakenError', (data) => {
+        //     this.avatarTakenErrorSubject.next(data.message);
+        // });
 
         this.socket.on('error', (message: string) => {
             alert(message);

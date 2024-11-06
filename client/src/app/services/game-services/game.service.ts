@@ -25,6 +25,12 @@ export class GameService {
         this.characterSubject.next(character);
     }
 
+    updatePlayerName(name: string) {
+        const character = this.characterSubject.getValue();
+        character.name = name;
+        this.characterSubject.next(character);
+    }
+
     setCurrentPlayer(player: PlayerCharacter) {
         this.currentPlayerSubject.next(player);
     }

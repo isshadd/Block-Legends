@@ -1,8 +1,11 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
+import { Avatar } from '@common/enums/avatar-enum';
 import { MapSize } from '@common/enums/map-size';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { WebSocketServer } from '@nestjs/websockets';
 import { Subject } from 'rxjs';
+import { Server } from 'socket.io';
 
 export class PlayerAttributes {
     life: number;
@@ -12,20 +15,32 @@ export class PlayerAttributes {
 }
 
 export interface PlayerCharacter {
+    avatar: Avatar;
     name: string;
     socketId: string;
     attributes: PlayerAttributes;
 }
 
 export enum GameTimerState {
-    ACTIVE_TURN,
-    PREPARING_TURN,
+    ActiveTurn,
+    PreparingTurn,
 }
 
 export interface GameTimer {
     time: number;
     isPaused: boolean;
     state: GameTimerState;
+}
+
+export interface GameBattle {
+    time: number;
+    firstPlayerId: string;
+    secondPlayerId: string;
+    firstPlayerRemainingEvades: number;
+    secondPlayerRemainingEvades: number;
+    firstPlayerRemainingLife: number;
+    secondPlayerRemainingLife: number;
+    isFirstPlayerTurn: boolean;
 }
 
 export interface GameBoardParameters {
@@ -46,16 +61,16 @@ export interface GameRoom {
 
 @Injectable()
 export class GameSocketRoomService {
-    private readonly logger = new Logger(GameSocketRoomService.name);
-    private rooms: Map<number, GameRoom> = new Map();
+    @WebSocketServer() server: Server;
+    rooms: Map<number, GameRoom> = new Map();
+    signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
+    signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
+    gameBattleRooms: Map<number, GameBattle> = new Map();
 
-    signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
-    signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
-
-    constructor(private readonly gameService: GameService) {}
+    constructor(readonly gameService: GameService) {}
 
     setSpawnCounter(gameSize: MapSize): number {
         const MIN_PLAYERS = 2;
@@ -85,7 +100,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
 
         if (!room) {
-            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
             return;
         }
 
@@ -96,7 +110,7 @@ export class GameSocketRoomService {
 
     setupGameBoardRoom(accessCode: number, game: Game) {
         this.gameBoardRooms.set(accessCode, { game, spawnPlaces: [], turnOrder: [] });
-        let room = this.rooms.get(accessCode);
+        const room = this.rooms.get(accessCode);
         room.maxPlayers = this.setSpawnCounter(game.size);
         this.rooms.set(accessCode, room);
     }
@@ -131,14 +145,8 @@ export class GameSocketRoomService {
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
-        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PREPARING_TURN });
-        this.logger.log(`
-            Jeu crée avec ID: ${gameId},
-            code d'acces: ${accessCode},
-            nb de joueurs max: ${newRoom.maxPlayers}
-            `);
+        this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PreparingTurn });
         this.initRoomGameBoard(accessCode);
-        this.logger.log(`maxPlayers mis à jour à ${newRoom.maxPlayers} pour la salle ${accessCode}`);
         return newRoom;
     }
 
@@ -157,9 +165,21 @@ export class GameSocketRoomService {
     addPlayerToRoom(accessCode: number, player: PlayerCharacter): boolean {
         const room = this.rooms.get(accessCode);
         if (room && !room.isLocked) {
+            const existingAvatars = room.players.map((p) => p.avatar.name);
+            if (existingAvatars.includes(player.avatar.name)) {
+                return;
+            }
+
+            const existingNames = room.players.map((p) => p.name);
+            const baseName = player.name;
+            let suffix = 1;
+            while (existingNames.includes(player.name)) {
+                suffix++;
+                player.name = `${baseName}-${suffix}`;
+            }
+
             room.players.push(player);
             this.playerRooms.set(player.socketId, accessCode);
-            this.logger.log(`Joueur ${player.socketId} ajouté au room ${accessCode}`);
             return true;
         }
         return false;
@@ -175,17 +195,14 @@ export class GameSocketRoomService {
 
                 room.players = room.players.filter((player) => player.socketId !== socketId);
                 this.playerRooms.delete(socketId);
-                this.logger.log(`Joueur ${socketId} enlevé du room ${accessCode}`);
 
                 if (room.players.length === 0) {
                     this.rooms.delete(accessCode);
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
-
-                    this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
+                    this.gameBattleRooms.delete(accessCode);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
-                    this.logger.log(`L'organisateur est parti, le nouveau: ${room.organizer}`);
                 }
             }
         }
@@ -195,7 +212,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId) {
             room.isLocked = true;
-            this.logger.log(`Room ${accessCode} verrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
@@ -205,7 +221,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
-            this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;

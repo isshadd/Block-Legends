@@ -19,7 +19,7 @@ describe('DoorTile', () => {
     });
 
     it('should have the correct description set', () => {
-        const expectedDescription = "Porte fermée. Ne peut être franchie que si elle est ouverte. Cliquez avec une autre porte pour l'ouvrir.";
+        const expectedDescription = 'Ouvrir la porte pour passer';
         expect(doorTile.description).toBe(expectedDescription);
     });
 
