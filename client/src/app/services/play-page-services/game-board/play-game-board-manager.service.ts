@@ -163,24 +163,25 @@ export class PlayGameBoardManagerService {
         let lastTile: WalkableTile | null = null;
         let didPlayerTripped = false;
 
-        for (const tile of path) {
+        for (const pathTile of path) {
             if (lastTile) {
-                this.userCurrentMovePoints -= (tile as WalkableTile).moveCost;
+                this.userCurrentMovePoints -= (pathTile as WalkableTile).moveCost;
                 this.signalUserMoved.next({
                     fromTile: lastTile.coordinates,
-                    toTile: tile.coordinates,
+                    toTile: pathTile.coordinates,
                 });
                 await this.waitInterval(movingTimeInterval);
 
-                if (tile.type === TileType.Ice) {
-                    if (Math.random() < 0.1) {
+                if (pathTile.type === TileType.Ice) {
+                    const result = 0.1;
+                    if (Math.random() < result) {
                         didPlayerTripped = true;
                         break;
                     }
                 }
             }
 
-            lastTile = tile as WalkableTile;
+            lastTile = pathTile as WalkableTile;
         }
 
         this.signalUserFinishedMoving.next();
@@ -320,7 +321,8 @@ export class PlayGameBoardManagerService {
     checkIfPlayerWonGame(playerCharacter: PlayerCharacter) {
         const currentPlayer = this.getCurrentPlayerCharacter();
 
-        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= 3) {
+        const value = 3;
+        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= value) {
             this.signalUserWon.next();
         }
     }

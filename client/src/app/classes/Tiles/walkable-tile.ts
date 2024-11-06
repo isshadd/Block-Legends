@@ -1,5 +1,5 @@
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { TileType } from '@common/enums/tile-type';
-import { PlayerMapEntity } from '../Characters/player-map-entity';
 import { Tile } from './tile';
 
 export class WalkableTile extends Tile {

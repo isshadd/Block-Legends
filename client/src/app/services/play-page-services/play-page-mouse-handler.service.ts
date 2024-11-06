@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
@@ -13,7 +13,7 @@ enum MouseButton {
 @Injectable({
     providedIn: 'root',
 })
-export class PlayPageMouseHandlerService {
+export class PlayPageMouseHandlerService implements OnDestroy {
     private destroy$ = new Subject<void>();
 
     rightClickSelectedPlayerCharacter: PlayerCharacter | null = null;

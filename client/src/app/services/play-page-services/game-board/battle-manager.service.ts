@@ -6,8 +6,8 @@ import { Subject } from 'rxjs';
     providedIn: 'root',
 })
 export class BattleManagerService {
-    readonly STARTING_EVADE_ATTEMPTS = 2;
-    readonly ICE_PENALITY = 2;
+    readonly startingEvadeAttempts = 2;
+    readonly icePenalty = 2;
 
     signalUserAttacked = new Subject<number>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
@@ -36,20 +36,20 @@ export class BattleManagerService {
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
-        this.userEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
-        this.opponentEvasionAttempts = this.STARTING_EVADE_ATTEMPTS;
+        this.userEvasionAttempts = this.startingEvadeAttempts;
+        this.opponentEvasionAttempts = this.startingEvadeAttempts;
         this.userRemainingHealth = currentPlayer.attributes.life;
         this.opponentRemainingHealth = opponentPlayer.attributes.life;
         this.isBattleOn = true;
 
         this.userDefence = currentPlayer.attributes.defense;
         if (currentPlayer.mapEntity.isPlayerOnIce) {
-            this.userDefence -= this.ICE_PENALITY;
+            this.userDefence -= this.icePenalty;
         }
 
         this.opponentDefence = opponentPlayer.attributes.defense;
         if (opponentPlayer.mapEntity.isPlayerOnIce) {
-            this.opponentDefence -= this.ICE_PENALITY;
+            this.opponentDefence -= this.icePenalty;
         }
     }
 
@@ -99,7 +99,7 @@ export class BattleManagerService {
         if (this.currentPlayer) {
             let currentPlayerAttack: number = this.currentPlayer.attributes.attack;
             if (this.currentPlayer.mapEntity.isPlayerOnIce) {
-                currentPlayerAttack -= this.ICE_PENALITY;
+                currentPlayerAttack -= this.icePenalty;
             }
             return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
         }
