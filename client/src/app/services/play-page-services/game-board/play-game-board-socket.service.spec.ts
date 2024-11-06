@@ -11,13 +11,14 @@ import { Socket } from 'socket.io-client';
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;
     let mockSocket: jasmine.SpyObj<Socket>;
-    let mockWebSocketService: unknown;
-    let mockPlayGameBoardManagerService: unknown;
-    let mockPlayPageMouseHandlerService: unknown;
-    let mockBattleManagerService: unknown;
-    let mockRouter: unknown;
+    /* eslint-disable */
+    let mockWebSocketService: any;
+    let mockPlayGameBoardManagerService: any;
+    let mockPlayPageMouseHandlerService: any;
+    let mockBattleManagerService: any;
+    let mockRouter: any;
     let socketCallbacks: { [event: string]: Function };
-
+    /* eslint-disable */
     beforeEach(() => {
         socketCallbacks = {};
 
@@ -207,11 +208,13 @@ describe('PlayGameBoardSocketService', () => {
 
     describe('ngOnDestroy', () => {
         it('should complete destroy$ subject', () => {
-            spyOn((service as unknown).destroy$, 'next').and.callThrough();
-            spyOn((service as unknown).destroy$, 'complete').and.callThrough();
+            /* eslint-disable */
+            spyOn((service as any).destroy$, 'next').and.callThrough();
+            spyOn((service as any).destroy$, 'complete').and.callThrough();
             service.ngOnDestroy();
-            expect((service as unknown).destroy$.next).toHaveBeenCalled();
-            expect((service as unknown).destroy$.complete).toHaveBeenCalled();
+            expect((service as any).destroy$.next).toHaveBeenCalled();
+            expect((service as any).destroy$.complete).toHaveBeenCalled();
+            /* eslint-disable */
         });
     });
 
@@ -239,7 +242,8 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startTurn" event when it is user turn', () => {
             const playerIdTurn = 'user123';
-            (mockSocket as unknown).id = 'user123';
+            // eslint-disable-next-line
+            (mockSocket as any).id = 'user123';
             socketCallbacks['startTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -248,7 +252,8 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startTurn" event when it is not user turn', () => {
             const playerIdTurn = 'otherPlayer';
-            (mockSocket as unknown).id = 'user123';
+            // eslint-disable-next-line
+            (mockSocket as any).id = 'user123';
             socketCallbacks['startTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeFalse();
@@ -288,7 +293,8 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startBattleTurn" event', () => {
             const playerIdTurn = 'playerTurn';
-            (mockSocket as unknown).id = 'playerTurn';
+            // eslint-disable-next-line
+            (mockSocket as any).id = 'playerTurn';
             socketCallbacks['startBattleTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -319,7 +325,8 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "battleEndedByEscape" event', () => {
             const playerIdTurn = 'playerEscape';
-            (mockSocket as unknown).id = 'playerEscape';
+            // eslint-disable-next-line
+            (mockSocket as any).id = 'playerEscape';
             socketCallbacks['battleEndedByEscape'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -329,7 +336,8 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "firstPlayerWonBattle" event', () => {
             const data = { firstPlayer: 'player1', loserPlayer: 'player2' };
-            (mockSocket as unknown).id = 'player1';
+            // eslint-disable-next-line
+            (mockSocket as any).id = 'player1';
             socketCallbacks['firstPlayerWonBattle'](data);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(data.firstPlayer);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();

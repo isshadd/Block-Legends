@@ -172,7 +172,9 @@ export class GameMapDataManagerService {
         visited.add(`${coordinates.x},${coordinates.y}`);
 
         while (queue.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 
             for (const neighbour of neighbours) {
