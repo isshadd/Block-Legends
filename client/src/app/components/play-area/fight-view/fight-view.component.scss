@@ -8,6 +8,8 @@
     background-color: $primary-dark;
     border: 2px solid darken($primary-dark, 10%);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 800px;
 
     .fight-header {
         font-size: 12px;
@@ -20,6 +22,7 @@
         margin-bottom: 10px;
         margin-left: 10px;
         color: $primary-light;
+
         .icon {
             width: 16px;
             height: 16px;
@@ -27,10 +30,46 @@
             vertical-align: middle;
             display: inline-block;
         }
+
         #armor {
             width: 20px;
             height: 20px;
             margin-right: 0px;
+        }
+    }
+    #player-side {
+        font-size: 10px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+        color: $primary-light;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        text-align: right;
+        width: 100%;
+
+        .info-line {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            span {
+                margin-right: 2px;
+            }
+
+            .icon {
+                width: 16px;
+                height: 16px;
+                margin-right: 2px;
+                vertical-align: middle;
+                display: inline-block;
+            }
+
+            #armor {
+                width: 20px;
+                height: 20px;
+                margin-right: 0;
+            }
         }
     }
 
@@ -44,7 +83,6 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         overflow: hidden;
 
-        /* Background Image Layer */
         .layer-1 {
             position: absolute;
             top: 0;
@@ -54,7 +92,6 @@
             z-index: 1;
         }
 
-        /* Character Image Layer */
         .layer-2 {
             position: absolute;
             top: 0;
@@ -66,7 +103,39 @@
             justify-content: center;
             align-items: center;
 
-            /* Base styling for images */
+            .layer-3 {
+                position: absolute;
+                z-index: 3;
+            }
+
+            #dice-result {
+                position: absolute;
+                justify-content: center;
+                font-size: 40px;
+                color: $primary-light;
+                font-weight: bold;
+                opacity: 0;
+
+                &.dice-roll {
+                    animation: dice-roll 0.5s ease infinite;
+                }
+            }
+
+            @keyframes dice-roll {
+                0% {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+                50% {
+                    transform: scale(1.5);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 0;
+                }
+            }
+
             img {
                 width: 100px;
                 height: auto;
@@ -74,33 +143,54 @@
                 transition: transform 0.3s ease;
             }
 
-            /* Player and Opponent positions */
             #player {
                 width: 85px;
                 margin-left: 90px;
+
+                &.hit {
+                    animation: playerHit 0.5s ease forwards;
+                }
+
+                &.escape-player {
+                    animation: playerEscape 0.5s ease forwards;
+                }
             }
 
             #opponent {
                 width: 70px;
                 margin-right: 90px;
+
+                &.hit {
+                    animation: playerHit 0.5s ease forwards;
+                }
+
+                &.escape-opponent {
+                    animation: opponentEscape 0.5s ease forwards;
+                }
             }
 
-            /* Attack animations */
             .attack-player {
                 animation: playerAttack 0.3s ease forwards;
+
+                #player.hit {
+                    animation: playerHit 0.5s ease forwards;
+                }
             }
 
             .attack-opponent {
                 animation: opponentAttack 0.3s ease forwards;
+
+                #player.hit {
+                    animation: playerHit 0.5s ease forwards;
+                }
             }
 
-            /* Keyframes for attack animations */
             @keyframes playerAttack {
                 0% {
                     transform: translateX(0) scale(1);
                 }
                 50% {
-                    transform: translateX(-100px) scale(0.85);
+                    transform: translateX(-200px) scale(0.85);
                 }
                 100% {
                     transform: translateX(0) scale(1);
@@ -112,13 +202,69 @@
                     transform: translateX(0) scale(1);
                 }
                 50% {
-                    transform: translateX(100px) scale(1.2);
+                    transform: translateX(200px) scale(0);
                 }
                 100% {
                     transform: translateX(0) scale(1);
                 }
             }
+
+            @keyframes playerHit {
+                0% {
+                    filter: none;
+                }
+                50% {
+                    filter: hue-rotate(180deg);
+                    transform: rotate(10deg);
+                }
+                100% {
+                    filter: none;
+                }
+            }
+
+            @keyframes playerEscape {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(160px) scale(0.8);
+                }
+                100% {
+                    transform: none;
+                }
+            }
+
+            @keyframes opponentEscape {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(-160px) scale(0.8);
+                }
+                100% {
+                    transform: none;
+                }
+            }
+
+            @keyframes opponentAttack {
+                0% {
+                    transform: none;
+                }
+                50% {
+                    transform: translateX(-100px);
+                }
+                100% {
+                    transform: none;
+                }
+            }
         }
+    }
+
+    .player-info {
+        font-size: 10px;
+        margin-bottom: 10px;
+        margin-left: 10px;
+        color: $primary-light;
     }
 
     .question-section {
@@ -159,6 +305,13 @@
                     &:hover {
                         background-color: darken($primary-light, 20%);
                     }
+
+                    &:disabled {
+                        background-color: lighten(#6c757d, 20%);
+                        cursor: not-allowed;
+                        pointer-events: none;
+                        opacity: 0.6;
+                    }
                 }
 
                 &.secondary {
@@ -166,6 +319,63 @@
 
                     &:hover {
                         background-color: darken($primary-light, 20%);
+                    }
+
+                    &:disabled {
+                        background-color: lighten(#6c757d, 20%);
+                        cursor: not-allowed;
+                        pointer-events: none;
+                        opacity: 0.6;
+                    }
+                }
+            }
+        }
+        @media (max-width: 768px) {
+            padding: 10px 20px;
+
+            .fight-header {
+                font-size: 0.9rem;
+            }
+
+            .fight-info {
+                font-size: 0.8rem;
+                .icon {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+
+            .fight-view {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .question-section {
+                padding: 10px;
+                .question-text {
+                    font-size: 0.9rem;
+                }
+
+                .action-buttons button {
+                    font-size: 0.9rem;
+                    padding: 8px 10px;
+                }
+            }
+        }
+
+        @media (max-width: 480px) {
+            .fight-view {
+                .layer-2 img {
+                    max-width: 60px; // Reduce image size further on small screens
+                }
+            }
+            .question-section {
+                .action-buttons {
+                    flex-direction: column; // Stack buttons vertically
+                    gap: 5px;
+
+                    button {
+                        min-width: 100%; // Make buttons full width on small screens
                     }
                 }
             }

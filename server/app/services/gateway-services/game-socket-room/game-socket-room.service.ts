@@ -2,7 +2,7 @@ import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
 import { Avatar } from '@common/enums/avatar-enum';
 import { MapSize } from '@common/enums/map-size';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Subject } from 'rxjs';
 import { Server } from 'socket.io';
@@ -32,6 +32,17 @@ export interface GameTimer {
     state: GameTimerState;
 }
 
+export interface GameBattle {
+    time: number;
+    firstPlayerId: string;
+    secondPlayerId: string;
+    firstPlayerRemainingEvades: number;
+    secondPlayerRemainingEvades: number;
+    firstPlayerRemainingLife: number;
+    secondPlayerRemainingLife: number;
+    isFirstPlayerTurn: boolean;
+}
+
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
@@ -51,15 +62,15 @@ export interface GameRoom {
 @Injectable()
 export class GameSocketRoomService {
     @WebSocketServer() server: Server;
+    rooms: Map<number, GameRoom> = new Map();
     signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
     signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
-    readonly logger = new Logger(GameSocketRoomService.name);
-    private rooms: Map<number, GameRoom> = new Map();
+    gameBattleRooms: Map<number, GameBattle> = new Map();
 
-    constructor(private readonly gameService: GameService) {}
+    constructor(readonly gameService: GameService) {}
 
     setSpawnCounter(gameSize: MapSize): number {
         const MIN_PLAYERS = 2;
@@ -135,13 +146,7 @@ export class GameSocketRoomService {
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
         this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PreparingTurn });
-        this.logger.log(`
-            Jeu crée avec ID: ${gameId},
-            code d'acces: ${accessCode},
-            nb de joueurs max: ${newRoom.maxPlayers}
-            `);
         this.initRoomGameBoard(accessCode);
-        this.logger.log(`maxPlayers mis à jour à ${newRoom.maxPlayers} pour la salle ${accessCode}`);
         return newRoom;
     }
 
@@ -162,9 +167,7 @@ export class GameSocketRoomService {
         if (room && !room.isLocked) {
             const existingAvatars = room.players.map((p) => p.avatar.name);
             if (existingAvatars.includes(player.avatar.name)) {
-                this.logger.log(`Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`);
-                // this.server.emit('avatarTakenError', { message: 'Avatar already chosen by another player. Please select a different avatar.' });
-                return; // Avatar is already taken
+                return;
             }
 
             const existingNames = room.players.map((p) => p.name);
@@ -177,7 +180,6 @@ export class GameSocketRoomService {
 
             room.players.push(player);
             this.playerRooms.set(player.socketId, accessCode);
-            this.logger.log(`Joueur ${player.socketId} ajouté au room ${accessCode} avec le nom ${player.name}`);
             return true;
         }
         return false;
@@ -193,17 +195,14 @@ export class GameSocketRoomService {
 
                 room.players = room.players.filter((player) => player.socketId !== socketId);
                 this.playerRooms.delete(socketId);
-                this.logger.log(`Joueur ${socketId} enlevé du room ${accessCode}`);
 
                 if (room.players.length === 0) {
                     this.rooms.delete(accessCode);
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
-
-                    this.logger.log(`Room ${accessCode} suprimmé car il n'y a plus de joueurs`);
+                    this.gameBattleRooms.delete(accessCode);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
-                    this.logger.log(`L'organisateur est parti, le nouveau: ${room.organizer}`);
                 }
             }
         }
@@ -213,7 +212,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId) {
             room.isLocked = true;
-            // this.logger.log(`Room ${accessCode} verrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;
@@ -223,7 +221,6 @@ export class GameSocketRoomService {
         const room = this.rooms.get(accessCode);
         if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
-            // this.logger.log(`Room ${accessCode} déverrouillé par organisateur ${clientId}`);
             return true;
         }
         return false;

@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
@@ -13,6 +15,7 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
+import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
 
 @Injectable({
@@ -146,8 +149,70 @@ export class GameMapDataManagerService {
         return tilesWithSpawn;
     }
 
-    getTileAt(coordinates: Vec2): Tile {
+    getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
+        const pathfinder = new Pathfinder(this, movePoints);
+        return pathfinder.findAllReachableTiles(coordinates);
+    }
+
+    getTileAt(coordinates: Vec2): Tile | null {
+        if (coordinates.x < 0 || coordinates.x >= this.currentGrid.length || coordinates.y < 0 || coordinates.y >= this.currentGrid.length)
+            return null;
         return this.currentGrid[coordinates.x][coordinates.y];
+    }
+
+    getClosestWalkableTileWithoutPlayerAt(mapPlayer: PlayerMapEntity): WalkableTile {
+        const coordinates = mapPlayer.spawnCoordinates;
+        const tile = this.getTileAt(coordinates);
+        if (tile && tile.isWalkable() && (!(tile as WalkableTile).hasPlayer() || (tile as WalkableTile).player === mapPlayer)) {
+            return tile as WalkableTile;
+        }
+
+        const queue: Vec2[] = [coordinates];
+        const visited: Set<string> = new Set();
+        visited.add(`${coordinates.x},${coordinates.y}`);
+
+        while (queue.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const current = queue.shift()!;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const neighbours = this.getNeighbours(this.getTileAt(current)!);
+
+            for (const neighbour of neighbours) {
+                const key = `${neighbour.coordinates.x},${neighbour.coordinates.y}`;
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    if (neighbour.isWalkable() && !(neighbour as WalkableTile).hasPlayer()) {
+                        return neighbour as WalkableTile;
+                    }
+                    queue.push(neighbour.coordinates);
+                }
+            }
+        }
+
+        throw new Error('No walkable tile found');
+    }
+
+    setTileAt(coordinates: Vec2, tile: Tile) {
+        this.currentGrid[coordinates.x][coordinates.y] = tile;
+    }
+
+    getNeighbours(tile: Tile): Tile[] {
+        const neighbours: Tile[] = [];
+        const directions: Vec2[] = [
+            { x: 1, y: 0 },
+            { x: -1, y: 0 },
+            { x: 0, y: 1 },
+            { x: 0, y: -1 },
+        ];
+
+        directions.forEach((direction) => {
+            const neighbour = this.getTileAt({ x: tile.coordinates.x + direction.x, y: tile.coordinates.y + direction.y });
+            if (neighbour) {
+                neighbours.push(neighbour);
+            }
+        });
+
+        return neighbours;
     }
 
     setLocalStorageVariables(isNewGame: boolean, game: GameShared) {

@@ -13,6 +13,7 @@ import { GameGateway } from './gateways/gameGateway/game.gateway';
 import { PlayGameBoardGateway } from './gateways/playGameBoard/play-game-board.gateway';
 import { GameValidationService } from './services/game-validation/gameValidation.service';
 import { GameSocketRoomService } from './services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameBoardBattleService } from './services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from './services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from './services/gateway-services/play-game-board-time/play-game-board-time.service';
 
@@ -41,6 +42,7 @@ import { PlayGameBoardTimeService } from './services/gateway-services/play-game-
         PlayGameBoardGateway,
         PlayGameBoardSocketService,
         PlayGameBoardTimeService,
+        PlayGameBoardBattleService,
     ],
 })
 export class AppModule {}

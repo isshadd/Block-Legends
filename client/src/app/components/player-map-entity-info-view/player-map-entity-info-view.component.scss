@@ -1,15 +1,13 @@
 @import 'src/_variables.scss';
 
 #info-view {
-    position: relative; // Allows absolute positioning of the close button
+    position: relative;
     display: flex;
     align-items: flex-start;
     background-color: $primary-dark;
     border: 2px solid darken($primary-dark, 10%);
     padding: 10px;
-    border-radius: 8px;
-    width: auto;
-    max-width: 200px;
+    border-radius: 10px;
 
     .close-button {
         position: absolute;
@@ -43,15 +41,15 @@
 
     .player-info {
         color: $primary-light;
-        font-size: 20px;
+        font-size: 30px;
         line-height: 20px;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
         font-weight: bold;
     }
 
     .player-info-details {
         color: $primary-light;
-        font-size: 10px;
+        font-size: 20px;
         line-height: 1.5;
 
         .icon-container {
@@ -60,15 +58,15 @@
         }
 
         .icon {
-            width: 16px;
-            height: 16px;
+            width: 25px;
+            height: 25px;
             vertical-align: middle;
         }
     }
 
     #player-image {
-        width: 40px;
-        height: 100px;
+        width: 80px;
+        height: 200px;
         margin-left: 10px;
 
         img {

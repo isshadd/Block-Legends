@@ -21,6 +21,10 @@ export class Tile implements PlaceableEntity {
         return false;
     }
 
+    isWalkable(): boolean {
+        return false;
+    }
+
     isDoor(): boolean {
         return false;
     }

@@ -1,33 +1,52 @@
+@if(battleManagerService.currentPlayer && battleManagerService.opponentPlayer) {
 <div class="fight-container">
     <div class="fight-header">
-        <div class="opponent-title">Nom D'Adversaire: {{ opponentCharacter.name }}</div>
+        <div class="opponent-title">Nom D'Adversaire: {{ battleManagerService.opponentPlayer.name }}</div>
         <div class="fight-info">
-            Santé:
-            <span *ngFor="let _ of healthArray">
+            @if(battleManagerService.opponentRemainingHealth > 0){ Santé d'adversaire:
+            <span *ngFor="let _ of opponentPlayerHealthArray">
                 <img src="assets/images/heart.png" alt="Heart" class="icon" />
             </span>
-            <br />
-            Défense:
-            <span *ngFor="let _ of defenseArray">
+            <br />} Défense d'adversaire:
+            <span *ngFor="let _ of opponentPlayerDefenseArray">
                 <img id="armor" src="assets/images/armor.png" alt="Heart" class="icon" />
             </span>
             <br />
+            <span>Nombre de tentative d'evision d'adversaire: {{ battleManagerService.opponentEvasionAttempts }}</span>
         </div>
+
         <div class="fight-view">
             <img src="assets/images/view/Minecraft-Forest.png" class="layer-1" alt="Minecraft Forest Background" />
 
             <div class="layer-2">
-                <img id="opponent" [src]="opponentCharacter.avatar.fullImage" alt="Character Image" />
-                <img id="player" [src]="playerCharacter.avatar.fullImage" alt="Character Image" />
+                <img id="opponent" [src]="battleManagerService.opponentPlayer.avatar.fullImage" alt="Character Image" />
+                <img id="player" [src]="battleManagerService.currentPlayer.avatar.fullImage" alt="Character Image" />
+                <div class="layer-3" id="dice-result">{{ playerDiceResult }}</div>
+            </div>
+        </div>
+        <div id="player-side">
+            <div class="info-line">
+                @if(battleManagerService.userRemainingHealth > 0){<span>Santé:</span>
+                <span *ngFor="let _ of playerHealthArray"> <img src="assets/images/heart.png" alt="Heart" class="icon" /> </span>}
+            </div>
+            <div class="info-line">
+                <span>Défense:</span>
+                <span *ngFor="let _ of playerDefenseArray">
+                    <img id="armor" src="assets/images/armor.png" alt="Armor" class="icon" />
+                </span>
+            </div>
+            <div class="info-line">
+                <span>Nombre de tentative d'évasion: {{ battleManagerService.userEvasionAttempts }}</span>
             </div>
         </div>
 
         <div class="question-section">
             <div class="question-text">Qu'est-ce que tu vas faire?</div>
             <div class="action-buttons">
-                <button (click)="onAttack()" class="primary">Attaquer</button>
-                <button (click)="onEscape()" class="secondary">Fuir</button>
+                <button (click)="onAttack()" class="primary" [disabled]="isAttackDisabled()">Attaquer</button>
+                <button (click)="onEscape()" class="secondary" [disabled]="isEscapeDisabled()">Fuir</button>
             </div>
         </div>
     </div>
 </div>
+}
