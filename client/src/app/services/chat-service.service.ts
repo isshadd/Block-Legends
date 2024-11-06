@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { SocketStateService } from './SocketService/socket-state.service';
 import { WebSocketService } from './SocketService/websocket.service';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 // import { ChangeDetectorRef } from '@angular/core';
 // import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 @Injectable({
@@ -38,7 +38,8 @@ export class ChatService {
     // }
 
     broadcastMessageToAll(roomMessage: string): void {
-        if (roomMessage.length > 200) {
+        const result = 200;
+        if (roomMessage.length > result) {
             alert('Message cannot exceed 200 characters.');
             return;
         }
