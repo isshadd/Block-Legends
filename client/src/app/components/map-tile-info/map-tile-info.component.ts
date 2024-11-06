@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { TileType } from '@common/enums/tile-type';
 
@@ -19,5 +20,12 @@ export class MapTileInfoComponent {
 
     closePanel() {
         this.closeP.emit();
+    }
+
+    tileMovementCost(tile: Tile): number | null {
+        if (tile.isTerrain()) {
+            return (tile as TerrainTile).moveCost;
+        }
+        return null;
     }
 }

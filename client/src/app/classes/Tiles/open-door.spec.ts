@@ -19,7 +19,7 @@ describe('OpenDoor', () => {
     });
 
     it('should have the correct description set', () => {
-        expect(openDoor.description).toBe('Porte ouverte. Vous pouvez maintenant la franchir.');
+        expect(openDoor.description).toBe('Porte ouverte, vous pouvez entrer.');
     });
 
     it('should have the correct imageUrl set', () => {

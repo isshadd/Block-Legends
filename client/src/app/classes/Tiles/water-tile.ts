@@ -7,6 +7,7 @@ import { TileType } from '@common/enums/tile-type';
 })
 export class WaterTile extends TerrainTile {
     type: TileType = TileType.Water;
-    description: string = "Eau. Nager consomme plus d'énergie que marcher.";
+    moveCost: number = 2;
+    description: string = `Eau. Nager consomme ${this.moveCost} movement.`;
     imageUrl: string = 'assets/images/tiles/water.jpg';
 }

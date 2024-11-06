@@ -1,14 +1,14 @@
 @import 'src/_variables.scss';
 
 #info-container {
-    position: relative; // Enables absolute positioning within the container
+    position: relative;
     display: flex;
     align-items: center;
     background-color: $primary-dark;
     border: 2px solid darken($primary-dark, 10%);
     padding: 10px;
     border-radius: 8px;
-    width: 200px;
+    width: 340px;
 
     .close-button {
         position: absolute;
@@ -42,7 +42,7 @@
 
     #type-info {
         color: $primary-light;
-        font-size: 20px;
+        font-size: 15px;
         font-weight: bold;
         margin-bottom: 5px;
     }

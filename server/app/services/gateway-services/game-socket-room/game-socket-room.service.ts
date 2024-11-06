@@ -32,6 +32,17 @@ export interface GameTimer {
     state: GameTimerState;
 }
 
+export interface GameBattle {
+    time: number;
+    firstPlayerId: string;
+    secondPlayerId: string;
+    firstPlayerRemainingEvades: number;
+    secondPlayerRemainingEvades: number;
+    firstPlayerRemainingLife: number;
+    secondPlayerRemainingLife: number;
+    isFirstPlayerTurn: boolean;
+}
+
 export interface GameBoardParameters {
     game: Game;
     spawnPlaces: [number, string][];
@@ -51,12 +62,13 @@ export interface GameRoom {
 @Injectable()
 export class GameSocketRoomService {
     @WebSocketServer() server: Server;
+    rooms: Map<number, GameRoom> = new Map();
     signalPlayerLeftRoom = new Subject<{ accessCode: number; playerSocketId: string }>();
     signalPlayerLeftRoom$ = this.signalPlayerLeftRoom.asObservable();
     playerRooms: Map<string, number> = new Map();
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
-    private rooms: Map<number, GameRoom> = new Map();
+    gameBattleRooms: Map<number, GameBattle> = new Map();
 
     constructor(private readonly gameService: GameService) {}
 
@@ -155,7 +167,7 @@ export class GameSocketRoomService {
         if (room && !room.isLocked) {
             const existingAvatars = room.players.map((p) => p.avatar.name);
             if (existingAvatars.includes(player.avatar.name)) {
-                return; // Avatar is already taken
+                return;
             }
 
             const existingNames = room.players.map((p) => p.name);
@@ -183,11 +195,12 @@ export class GameSocketRoomService {
 
                 room.players = room.players.filter((player) => player.socketId !== socketId);
                 this.playerRooms.delete(socketId);
-                
+
                 if (room.players.length === 0) {
                     this.rooms.delete(accessCode);
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
+                    this.gameBattleRooms.delete(accessCode);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
                 }

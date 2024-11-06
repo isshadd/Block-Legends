@@ -20,7 +20,8 @@
         ></app-placeable-entity>
         @if (tile.isTerrain()) {
         <app-placeable-entity [placeableEntity]="getTerrainItem(tile)" class="layer-2"></app-placeable-entity>
-        <app-placeable-entity [placeableEntity]="getTerrainPlayer(tile)" class="layer-3"></app-placeable-entity>
+        } @if (tile.isWalkable()) {
+        <app-placeable-entity [placeableEntity]="getPlayer(tile)" class="layer-3"></app-placeable-entity>
         }
         <app-visible-state [visibleState]="tile.visibleState" class="layer-4"></app-visible-state>
     </div>

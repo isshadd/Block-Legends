@@ -166,6 +166,7 @@ export class MapEditorManagerService implements OnDestroy {
 
     itemPlacerWithCoordinates(item: Item, coordinates: Vec2): void {
         const selectedTile = this.gameMapDataManagerService.getTileAt(coordinates);
+        if (!selectedTile) return;
         this.itemPlacer(item, selectedTile);
     }
 
