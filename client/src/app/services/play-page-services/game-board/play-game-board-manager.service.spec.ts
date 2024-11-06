@@ -272,7 +272,8 @@ describe('PlayGameBoardManagerService - startTurn', () => {
 
         service.startTurn();
 
-        expect(service.userCurrentMovePoints).toBe(3);
+        const result = 3;
+        expect(service.userCurrentMovePoints).toBe(result);
         expect(service.userCurrentActionPoints).toBe(1);
         expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
     });
@@ -592,7 +593,8 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
         service.isUserTurn = true;
         service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
 
-        spyOn(Math, 'random').and.returnValue(0.05);
+        const value = 0.05;
+        spyOn(Math, 'random').and.returnValue(value);
 
         await service.moveUserPlayer(tile2);
 

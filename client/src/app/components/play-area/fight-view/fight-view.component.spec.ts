@@ -82,7 +82,7 @@ describe('FightViewComponent', () => {
 
     it('should trigger attackAnimation on signalUserAttacked$', () => {
         spyOn(component, 'attackAnimation');
-        let value = 5;
+        const value = 5;
         signalUserAttacked$.next(value);
         expect(component.attackAnimation).toHaveBeenCalledWith(5);
     });
@@ -94,7 +94,7 @@ describe('FightViewComponent', () => {
     });
 
     it('should update playerDiceResult and add dice-roll class in onPlayerRollDice', () => {
-        let riceResult = 6;
+        const riceResult = 6;
         component.onPlayerRollDice(riceResult);
         expect(component.playerDiceResult).toBe(riceResult);
         const diceResult = document.getElementById('dice-result');

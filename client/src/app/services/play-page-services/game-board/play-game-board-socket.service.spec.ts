@@ -1,21 +1,21 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
+import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
-import { BattleManagerService } from './battle-manager.service';
-import { PlayGameBoardManagerService } from './play-game-board-manager.service';
-import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;
     let mockSocket: jasmine.SpyObj<Socket>;
-    let mockWebSocketService: any;
-    let mockPlayGameBoardManagerService: any;
-    let mockPlayPageMouseHandlerService: any;
-    let mockBattleManagerService: any;
-    let mockRouter: any;
+    let mockWebSocketService: unknown;
+    let mockPlayGameBoardManagerService: unknown;
+    let mockPlayPageMouseHandlerService: unknown;
+    let mockBattleManagerService: unknown;
+    let mockRouter: unknown;
     let socketCallbacks: { [event: string]: Function };
 
     beforeEach(() => {
@@ -34,13 +34,13 @@ describe('PlayGameBoardSocketService', () => {
         };
 
         mockPlayGameBoardManagerService = {
-            signalUserMoved$: new Subject<any>(),
-            signalUserRespawned$: new Subject<any>(),
+            signalUserMoved$: new Subject<unknown>(),
+            signalUserRespawned$: new Subject<unknown>(),
             signalUserStartedMoving$: new Subject<void>(),
             signalUserFinishedMoving$: new Subject<void>(),
             signalUserGotTurnEnded$: new Subject<void>(),
-            signalUserDidDoorAction$: new Subject<any>(),
-            signalUserDidBattleAction$: new Subject<any>(),
+            signalUserDidDoorAction$: new Subject<unknown>(),
+            signalUserDidBattleAction$: new Subject<unknown>(),
             signalUserWon$: new Subject<void>(),
             isUserTurn: false,
             currentPlayerIdTurn: '',
@@ -207,11 +207,11 @@ describe('PlayGameBoardSocketService', () => {
 
     describe('ngOnDestroy', () => {
         it('should complete destroy$ subject', () => {
-            spyOn((service as any).destroy$, 'next').and.callThrough();
-            spyOn((service as any).destroy$, 'complete').and.callThrough();
+            spyOn((service as unknown).destroy$, 'next').and.callThrough();
+            spyOn((service as unknown).destroy$, 'complete').and.callThrough();
             service.ngOnDestroy();
-            expect((service as any).destroy$.next).toHaveBeenCalled();
-            expect((service as any).destroy$.complete).toHaveBeenCalled();
+            expect((service as unknown).destroy$.next).toHaveBeenCalled();
+            expect((service as unknown).destroy$.complete).toHaveBeenCalled();
         });
     });
 
@@ -239,7 +239,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startTurn" event when it is user turn', () => {
             const playerIdTurn = 'user123';
-            (mockSocket as any).id = 'user123';
+            (mockSocket as unknown).id = 'user123';
             socketCallbacks['startTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -248,7 +248,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startTurn" event when it is not user turn', () => {
             const playerIdTurn = 'otherPlayer';
-            (mockSocket as any).id = 'user123';
+            (mockSocket as unknown).id = 'user123';
             socketCallbacks['startTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeFalse();
@@ -288,7 +288,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "startBattleTurn" event', () => {
             const playerIdTurn = 'playerTurn';
-            (mockSocket as any).id = 'playerTurn';
+            (mockSocket as unknown).id = 'playerTurn';
             socketCallbacks['startBattleTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -319,7 +319,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "battleEndedByEscape" event', () => {
             const playerIdTurn = 'playerEscape';
-            (mockSocket as any).id = 'playerEscape';
+            (mockSocket as unknown).id = 'playerEscape';
             socketCallbacks['battleEndedByEscape'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
@@ -329,7 +329,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "firstPlayerWonBattle" event', () => {
             const data = { firstPlayer: 'player1', loserPlayer: 'player2' };
-            (mockSocket as any).id = 'player1';
+            (mockSocket as unknown).id = 'player1';
             socketCallbacks['firstPlayerWonBattle'](data);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(data.firstPlayer);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
