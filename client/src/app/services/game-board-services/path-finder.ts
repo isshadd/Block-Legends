@@ -38,8 +38,7 @@ export class Pathfinder {
             const currentNode = priorityQueue.shift()!;
             const currentKey = currentNode.tile;
 
-            const visitedNode = visited.get(currentKey);
-            if (visited.has(currentKey) && visitedNode && visitedNode.cost <= currentNode.cost) {
+            if (visited.has(currentKey) && visited.get(currentKey)!.cost <= currentNode.cost) {
                 continue;
             }
 
@@ -61,10 +60,8 @@ export class Pathfinder {
                     return;
                 }
 
-                const neighborNode = visited.get(neighbor);
-                if (visited.has(neighbor) && neighborNode && neighborNode.cost <= newCost) {
-                const neighborNode = visited.get(neighbor);
-                if (visited.has(neighbor) && neighborNode && neighborNode.cost <= newCost) {
+                const neighborKey = walkableTile;
+                if (visited.has(neighborKey) && visited.get(neighborKey)!.cost <= newCost) {
                     return;
                 }
 
