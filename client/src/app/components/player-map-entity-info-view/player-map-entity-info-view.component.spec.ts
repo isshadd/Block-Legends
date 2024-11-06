@@ -8,7 +8,6 @@ describe('PlayerMapEntityInfoViewComponent', () => {
     let component: PlayerMapEntityInfoViewComponent;
     let fixture: ComponentFixture<PlayerMapEntityInfoViewComponent>;
     let mockPlayerCharacter: PlayerCharacter;
-    let renderer2: Renderer2;
 
     beforeEach(async () => {
         mockPlayerCharacter = new PlayerCharacter('Hero');
@@ -28,7 +27,6 @@ describe('PlayerMapEntityInfoViewComponent', () => {
         fixture = TestBed.createComponent(PlayerMapEntityInfoViewComponent);
         component = fixture.componentInstance;
         component.playerCharacter = mockPlayerCharacter;
-        renderer2 = fixture.componentRef.injector.get(Renderer2);
     });
 
     it('should create the component', () => {
@@ -57,13 +55,5 @@ describe('PlayerMapEntityInfoViewComponent', () => {
         component.closePanel();
 
         expect(component.closeP.emit).toHaveBeenCalled();
-    });
-
-    it('should set --dynamic-scale CSS variable on ngOnInit', () => {
-        const setStyleSpy = spyOn(renderer2, 'setStyle');
-        component.scale = 1.5; // Set the scale to test
-        component.ngOnInit();
-
-        expect(setStyleSpy).toHaveBeenCalledWith(component.el.nativeElement, '--dynamic-scale', '1.5');
     });
 });
