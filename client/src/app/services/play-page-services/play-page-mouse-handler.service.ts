@@ -14,14 +14,14 @@ enum MouseButton {
     providedIn: 'root',
 })
 export class PlayPageMouseHandlerService implements OnDestroy {
-    private destroy$ = new Subject<void>();
-
     rightClickSelectedPlayerCharacter: PlayerCharacter | null = null;
     rightSelectedTile: Tile | null = null;
 
     lastTilePath: Tile[] = [];
     actionTiles: Tile[] = [];
     isActionOpen: boolean = false;
+
+    private destroy$ = new Subject<void>();
 
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
         playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -46,9 +46,9 @@ export class PlayPageMouseHandlerService implements OnDestroy {
         const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
         if (possibleTileMove) {
-            for (const tile of possibleTileMove) {
-                if (!this.actionTiles.includes(tile)) {
-                    tile.visibleState = VisibleState.Selected;
+            for (const possibleTile of possibleTileMove) {
+                if (!this.actionTiles.includes(possibleTile)) {
+                    possibleTile.visibleState = VisibleState.Selected;
                 }
             }
             this.lastTilePath = possibleTileMove;
@@ -59,9 +59,9 @@ export class PlayPageMouseHandlerService implements OnDestroy {
 
     onMapTileMouseLeave(tile: Tile) {
         if (this.lastTilePath.length) {
-            for (const tile of this.lastTilePath) {
-                if (!this.actionTiles.includes(tile)) {
-                    tile.visibleState = VisibleState.Valid;
+            for (const pathTile of this.lastTilePath) {
+                if (!this.actionTiles.includes(pathTile)) {
+                    pathTile.visibleState = VisibleState.Valid;
                 }
             }
             this.lastTilePath = [];
