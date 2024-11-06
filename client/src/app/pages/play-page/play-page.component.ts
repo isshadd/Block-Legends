@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
@@ -5,12 +7,14 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { PlayerInfoComponent } from '@app/components/player-info/player-info.component';
+import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
@@ -21,8 +25,6 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
-import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
-import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 
 @Component({
     selector: 'app-play-page',
@@ -58,6 +60,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     totalLifePoints: number;
 
     private destroy$ = new Subject<void>();
+    // eslint-disable-next-line
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
@@ -79,15 +82,14 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
         this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();
-        console.log('Joueurs:', this.players);
     }
 
     getPlayersTurn(): void {
         let playerName: string;
         let player: PlayerCharacter | null;
+        // eslint-disable-next-line
         for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
             playerName = this.playGameBoardManagerService.turnOrder[i];
-            console.log('Nom du joueur:', playerName);
             player = this.playGameBoardManagerService.findPlayerFromSocketId(playerName);
             if (playerName && player) {
                 this.players.push(player);
