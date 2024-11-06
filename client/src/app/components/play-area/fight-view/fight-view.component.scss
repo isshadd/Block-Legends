@@ -146,43 +146,11 @@
             #player {
                 width: 85px;
                 margin-left: 90px;
-
-                &.hit {
-                    animation: playerHit 0.5s ease forwards;
-                }
-
-                &.escape-player {
-                    animation: playerEscape 0.5s ease forwards;
-                }
             }
 
             #opponent {
                 width: 70px;
                 margin-right: 90px;
-
-                &.hit {
-                    animation: playerHit 0.5s ease forwards;
-                }
-
-                &.escape-opponent {
-                    animation: opponentEscape 0.5s ease forwards;
-                }
-            }
-
-            .attack-player {
-                animation: playerAttack 0.3s ease forwards;
-
-                #player.hit {
-                    animation: playerHit 0.5s ease forwards;
-                }
-            }
-
-            .attack-opponent {
-                animation: opponentAttack 0.3s ease forwards;
-
-                #player.hit {
-                    animation: playerHit 0.5s ease forwards;
-                }
             }
         }
     }
@@ -253,56 +221,6 @@
                         cursor: not-allowed;
                         pointer-events: none;
                         opacity: 0.6;
-                    }
-                }
-            }
-        }
-        @media (max-width: 768px) {
-            padding: 10px 20px;
-
-            .fight-header {
-                font-size: 0.9rem;
-            }
-
-            .fight-info {
-                font-size: 0.8rem;
-                .icon {
-                    width: 14px;
-                    height: 14px;
-                }
-            }
-
-            .fight-view {
-                max-width: 100%;
-                height: auto;
-            }
-
-            .question-section {
-                padding: 10px;
-                .question-text {
-                    font-size: 0.9rem;
-                }
-
-                .action-buttons button {
-                    font-size: 0.9rem;
-                    padding: 8px 10px;
-                }
-            }
-        }
-
-        @media (max-width: 480px) {
-            .fight-view {
-                .layer-2 img {
-                    max-width: 60px; // Reduce image size further on small screens
-                }
-            }
-            .question-section {
-                .action-buttons {
-                    flex-direction: column; // Stack buttons vertically
-                    gap: 5px;
-
-                    button {
-                        min-width: 100%; // Make buttons full width on small screens
                     }
                 }
             }
