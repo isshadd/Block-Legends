@@ -406,7 +406,7 @@ export class PlayGameBoardManagerService {
         this.userCurrentMovePoints = 0;
         this.userCurrentActionPoints = 0;
         this.userCurrentPossibleMoves = new Map();
-        this.turnOrder;
+        this.turnOrder = [];
 
         this.winnerPlayer = null;
     }

@@ -3,9 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { Pathfinder } from '@app/services/game-board-services/path-finder';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMapDataManagerService } from './game-map-data-manager.service';
-import { Pathfinder } from './path-finder';
 
 describe('Pathfinder', () => {
     let pathfinder: Pathfinder;

@@ -383,7 +383,8 @@ describe('BattleManagerService - onSuccessfulAttack', () => {
         service.onSuccessfulAttack();
 
         expect(service.isValidAction).toHaveBeenCalled();
-        expect(service.opponentRemainingHealth).toBe(9);
+        const remainingHealth = 9;
+        expect(service.opponentRemainingHealth).toBe(remainingHealth);
     });
 
     it('should not decrease opponentRemainingHealth if action is invalid', () => {
@@ -392,7 +393,8 @@ describe('BattleManagerService - onSuccessfulAttack', () => {
         service.onSuccessfulAttack();
 
         expect(service.isValidAction).toHaveBeenCalled();
-        expect(service.opponentRemainingHealth).toBe(10);
+        const remainingHealth = 10;
+        expect(service.opponentRemainingHealth).toBe(remainingHealth);
     });
 });
 

@@ -60,8 +60,8 @@ export class Pathfinder {
                     return;
                 }
 
-                const neighborKey = walkableTile;
-                if (visited.has(neighborKey) && visited.get(neighborKey)!.cost <= newCost) {
+                const neighborNode = visited.get(neighbor);
+                if (visited.has(neighbor) && neighborNode && neighborNode.cost <= newCost) {
                     return;
                 }
 
