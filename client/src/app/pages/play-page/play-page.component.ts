@@ -22,10 +22,8 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayerMapEntityInfoViewComponent } from '../../components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 
 @Component({
     selector: 'app-play-page',
@@ -79,7 +77,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     onPlayGameBoardManagerInit() {
         this.actionPoints = this.playGameBoardManagerService.userCurrentActionPoints;
-        this.isBattlePhase = this.playGameBoardManagerService.isBattleOn;
+        this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
         this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();
         console.log('Joueurs:', this.players);
