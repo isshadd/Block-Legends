@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
+// eslint-disable-next-line
 import { HttpClientTestingModule } from '@angular/common/http/testing'; // Ajout de HttpClientTestingModule
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
+// eslint-disable-next-line
 import { RouterTestingModule } from '@angular/router/testing';
 import { CreateGameModalComponent } from '@app/components/administration-page-component/creatGameModal/createGameModal.component';
 import { ListGameComponent } from '@app/components/administration-page-component/listGame.component';
@@ -17,6 +19,7 @@ describe('AdministrationGameComponent', () => {
         dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
         await TestBed.configureTestingModule({
+            /* eslint-disable */
             imports: [
                 AdministrationGameComponent,
                 CommonModule,
@@ -24,6 +27,7 @@ describe('AdministrationGameComponent', () => {
                 HttpClientTestingModule, // Ajout du module de test HTTP
                 ListGameComponent,
             ],
+            /* eslint-disable */
             providers: [{ provide: MatDialog, useValue: dialogSpy }],
         }).compileComponents();
 
