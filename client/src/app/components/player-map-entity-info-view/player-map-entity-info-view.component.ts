@@ -17,11 +17,13 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
     @Output() close = new EventEmitter<void>();
     @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
     @Input() showButton: boolean = true;
+    @Input() isPlayPage: boolean = false;
     attackDice: string;
     defenseDice: string;
 
-    constructor(public el: ElementRef) //private renderer: Renderer2,
-    {}
+    constructor(
+        public el: ElementRef, //private renderer: Renderer2,
+    ) {}
 
     ngOnInit(): void {
         //this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());

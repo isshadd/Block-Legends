@@ -110,7 +110,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     updatePlayersList(): void {
         const allPlayers = this.webSocketService.getTotalPlayers();
 
-        // Met à jour la liste en réglant `isAbsent` sur true pour les joueurs non présents dans `allPlayers`
         this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
             const player = allPlayers.find((p) => p.name === playerName);
             if (player) {

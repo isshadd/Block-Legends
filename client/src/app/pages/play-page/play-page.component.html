@@ -6,7 +6,7 @@
         <app-infos-game [currentPlayer]="this.myPlayer.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
         <app-player-map-entity-info-view
             [showButton]="false"
-            [playerCharacter]="this.myPlayer"
+            [playerCharacter]="this.myPlayer!"
             [actionPoints]="this.actionPoints"
             [totalLife]="totalLifePoints"
         ></app-player-map-entity-info-view>
