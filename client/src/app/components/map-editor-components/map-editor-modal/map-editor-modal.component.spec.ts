@@ -18,22 +18,17 @@ describe('MapEditorModalComponent', () => {
         mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
         await TestBed.configureTestingModule({
-            imports: [
-                MapEditorModalComponent,
-                ReactiveFormsModule,
-                FormsModule,
-                NoopAnimationsModule, 
-            ],
+            imports: [MapEditorModalComponent, ReactiveFormsModule, FormsModule, NoopAnimationsModule],
             providers: [
                 { provide: MatDialogRef, useValue: mockDialogRef },
                 { provide: MAT_DIALOG_DATA, useValue: mockDialogData },
             ],
-            schemas: [NO_ERRORS_SCHEMA], 
+            schemas: [NO_ERRORS_SCHEMA],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapEditorModalComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges(); 
+        fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -102,7 +97,6 @@ describe('MapEditorModalComponent', () => {
         });
     });
 
-
     it('should close the dialog with form data and isSavedPressed: true when onSaveClick is called and form is valid', () => {
         component.infoForm.setValue({
             name: 'Another Name',
@@ -132,7 +126,6 @@ describe('MapEditorModalComponent', () => {
     });
 
     it('should close the dialog when onSaveClick is called even if form is invalid', () => {
-
         component.infoForm.setValue({
             name: '',
             description: '',

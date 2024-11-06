@@ -1,6 +1,6 @@
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { TileType } from '@common/enums/tile-type';
-import { PlayerMapEntity } from '../Characters/player-map-entity';
-import { WalkableTile } from './walkable-tile';
 
 describe('WalkableTile', () => {
     let walkableTile: WalkableTile;

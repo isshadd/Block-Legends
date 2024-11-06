@@ -37,7 +37,7 @@ describe('InfoPanelComponent', () => {
         mockTerrainTile = new TerrainTile();
         mockPlayerCharacter = new PlayerCharacter('test');
         // Mock the 'fullImage' property expected by PlayerMapEntityInfoViewComponent
-        (mockPlayerCharacter as any).fullImage = 'path/to/image.png';
+        (mockPlayerCharacter as PlayerCharacter).avatar.fullImage = AvatarEnum.Alex.fullImage;
         mockItem = new Item();
 
         // Initialize tile with a non-walkable Tile to prevent undefined access during initial change detection
@@ -50,9 +50,9 @@ describe('InfoPanelComponent', () => {
     });
 
     it('should emit close event when closePanel is called', () => {
-        spyOn(component.close, 'emit');
+        spyOn(component.closePanel, 'emit');
         component.closePanel();
-        expect(component.close.emit).toHaveBeenCalled();
+        expect(component.closePanel.emit).toHaveBeenCalled();
     });
 
     it('should return true for isWalkableTile() if tile is an instance of WalkableTile', () => {
@@ -84,7 +84,6 @@ describe('InfoPanelComponent', () => {
 
     it('should return the player if tile is WalkableTile and player is present', () => {
         // Mock a PlayerMapEntity with necessary properties/methods
-        const mockPlayerCharacter = new PlayerCharacter('test');
         mockPlayerCharacter.avatar = AvatarEnum.Alex;
         const mockPlayerMapEntity = new PlayerMapEntity(AvatarEnum.Alex.headImage);
         mockPlayerCharacter.mapEntity = mockPlayerMapEntity;
@@ -95,7 +94,7 @@ describe('InfoPanelComponent', () => {
         fixture.detectChanges(); // Trigger change detection after setting tile
 
         expect(component.getPlayer()).toBe(mockPlayerCharacter);
-        //expect(mockPlayGameBoardManagerService.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockPlayerCharacter.mapEntity);
+        // expect(mockPlayGameBoardManagerService.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockPlayerCharacter.mapEntity);
     });
 
     it('should return null if getPlayer() is called on WalkableTile with no player', () => {

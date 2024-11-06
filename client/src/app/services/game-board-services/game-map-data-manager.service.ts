@@ -161,8 +161,8 @@ export class GameMapDataManagerService {
     }
 
     getClosestWalkableTileWithoutPlayerAt(mapPlayer: PlayerMapEntity): WalkableTile {
-        let coordinates = mapPlayer.spawnCoordinates;
-        let tile = this.getTileAt(coordinates);
+        const coordinates = mapPlayer.spawnCoordinates;
+        const tile = this.getTileAt(coordinates);
         if (tile && tile.isWalkable() && (!(tile as WalkableTile).hasPlayer() || (tile as WalkableTile).player === mapPlayer)) {
             return tile as WalkableTile;
         }
@@ -260,5 +260,4 @@ export class GameMapDataManagerService {
             data: { message },
         });
     }
-    
 }

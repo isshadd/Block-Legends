@@ -34,13 +34,13 @@ describe('BattleManagerService - init', () => {
         expect(service.currentPlayer).toBe(mockCurrentPlayer);
         expect(service.opponentPlayer).toBe(mockOpponentPlayer);
 
-        expect(service.userEvasionAttempts).toBe(service.STARTING_EVADE_ATTEMPTS);
-        expect(service.opponentEvasionAttempts).toBe(service.STARTING_EVADE_ATTEMPTS);
+        expect(service.userEvasionAttempts).toBe(service.startingEvadeAttempts);
+        expect(service.opponentEvasionAttempts).toBe(service.startingEvadeAttempts);
 
         expect(service.userRemainingHealth).toBe(mockCurrentPlayer.attributes.life);
         expect(service.opponentRemainingHealth).toBe(mockOpponentPlayer.attributes.life);
 
-        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.ICE_PENALITY);
+        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.icePenalty);
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense);
     });
 
@@ -51,7 +51,7 @@ describe('BattleManagerService - init', () => {
         service.init(mockCurrentPlayer, mockOpponentPlayer);
 
         expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense);
-        expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.ICE_PENALITY);
+        expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.icePenalty);
     });
 });
 
@@ -299,7 +299,7 @@ describe('BattleManagerService - attackDiceResult', () => {
 
         const result = service.attackDiceResult();
 
-        let expectedResult = 14;
+        const expectedResult = 14;
         expect(result).toBe(expectedResult);
     });
 
@@ -314,7 +314,7 @@ describe('BattleManagerService - attackDiceResult', () => {
 
         const result = service.attackDiceResult();
 
-        let expectedResult = 12;
+        const expectedResult = 12;
         expect(result).toBe(expectedResult);
     });
 
@@ -346,7 +346,7 @@ describe('BattleManagerService - defenseDiceResult', () => {
 
         const result = service.defenseDiceResult();
 
-        let expectedResult = 8;
+        const expectedResult = 8;
         expect(result).toBe(expectedResult);
     });
 
@@ -501,7 +501,7 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         });
         service = TestBed.inject(BattleManagerService);
 
-        service.opponentEvasionAttempts = 2; 
+        service.opponentEvasionAttempts = 2;
     });
 
     it('should return early if currentPlayer is null', () => {
@@ -512,7 +512,7 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         service.onOpponentEscape();
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.opponentEvasionAttempts).toBe(2); 
+        expect(service.opponentEvasionAttempts).toBe(2);
     });
 
     it('should return early if opponentPlayer is null', () => {
@@ -523,7 +523,6 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         service.onOpponentEscape();
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.opponentEvasionAttempts).toBe(2); 
+        expect(service.opponentEvasionAttempts).toBe(2);
     });
 });
-

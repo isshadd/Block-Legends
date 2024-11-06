@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -11,7 +11,7 @@ import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 @Injectable({
     providedIn: 'root',
 })
-export class PlayGameBoardSocketService {
+export class PlayGameBoardSocketService implements OnDestroy {
     private destroy$ = new Subject<void>();
 
     socket: Socket;
