@@ -21,7 +21,8 @@ describe('Pathfinder', () => {
 
         dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
         gameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getNeighbours']);
-        pathfinder = new Pathfinder(gameMapDataManagerService, 3);
+        const movementPoints = 3;
+        pathfinder = new Pathfinder(gameMapDataManagerService, movementPoints);
     });
 
     it('should return an empty map if start tile is not walkable', () => {
@@ -152,7 +153,8 @@ describe('Pathfinder', () => {
 
         const result = pathfinder.findAllReachableTiles(startCoordinates);
 
-        expect(result.size).toBe(4);
+        const expectedReachableTilesCount = 4;
+        expect(result.size).toBe(expectedReachableTilesCount);
 
         expect(result.has(startTile)).toBeTrue();
         expect(result.has(neighbor1)).toBeTrue();
@@ -164,7 +166,8 @@ describe('Pathfinder', () => {
         expect(result.get(neighbor2)).toEqual([startTile, neighbor2]);
         expect(result.get(targetTile)).toEqual([startTile, neighbor1, targetTile]);
 
-        expect(result.get(targetTile)!.length).toBe(3);
+        const expectedPathLength = 3;
+        expect(result.get(targetTile)?.length).toBe(expectedPathLength);
     });
 
     it('should skip non-walkable neighbors', () => {
