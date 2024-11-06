@@ -14,27 +14,14 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
     @Output() closeP = new EventEmitter<void>();
     @Input() actionPoints: number;
     @Input() totalLife: number;
-    @Output() close = new EventEmitter<void>();
+    @Output() closePanelEmit = new EventEmitter<void>();
     @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
     @Input() showButton: boolean = true;
     @Input() isPlayPage: boolean = false;
     attackDice: string;
     defenseDice: string;
 
-    constructor(
-        public el: ElementRef, // private renderer: Renderer2,
-    ) {}
-
-    ngOnInit(): void {
-        // this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
-        if (this.playerCharacter.dice === 'attack') {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D4)';
-        } else {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D6)';
-        }
-    }
+    constructor(public el: ElementRef) {}
 
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);
@@ -50,6 +37,17 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
 
     get attackArray() {
         return new Array(this.playerCharacter.attributes.attack);
+    }
+
+    ngOnInit(): void {
+        // this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+        if (this.playerCharacter.dice === 'attack') {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D4)';
+        } else {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D6)';
+        }
     }
 
     closePanel() {
