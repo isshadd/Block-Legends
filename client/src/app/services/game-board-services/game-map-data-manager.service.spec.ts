@@ -2,10 +2,13 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { Spawn } from '@app/classes/Items/spawn';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { Tile } from '@app/classes/Tiles/tile';
+import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
@@ -13,8 +16,10 @@ import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
+import { Vec2 } from '@common/interfaces/vec2';
 import { of, throwError } from 'rxjs';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
+import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
 
 describe('GameMapDataManagerService', () => {
@@ -625,5 +630,115 @@ describe('GameMapDataManagerService', () => {
         expect(result).toContain(spawnTile1);
         expect(result).toContain(spawnTile2);
         expect(result).not.toContain(nonSpawnTile);
+    });
+
+    it('should call findAllReachableTiles on Pathfinder with the correct coordinates and movePoints', () => {
+        const startCoordinates: Vec2 = { x: 1, y: 1 };
+        const movePoints = 3;
+        const mockResult = new Map<Tile, Tile[]>();
+
+        const pathfinderSpy = spyOn(Pathfinder.prototype, 'findAllReachableTiles').and.returnValue(mockResult);
+
+        const result = service.getPossibleMovementTiles(startCoordinates, movePoints);
+
+        expect(pathfinderSpy).toHaveBeenCalledWith(startCoordinates);
+        expect(result).toBe(mockResult);
+    });
+
+    it('should return null if the coordinates are out of bounds', () => {
+        const outOfBoundsCoordinates: Vec2 = { x: -1, y: -1 };
+        service['currentGrid'] = [[new GrassTile(), new GrassTile()]]; // 1x2 grid for testing
+
+        const result = service.getTileAt(outOfBoundsCoordinates);
+
+        expect(result).toBeNull();
+    });
+
+    it('should start searching from the player’s spawn coordinates', () => {
+        const spawnCoordinates: Vec2 = { x: 3, y: 3 };
+        const mockPlayer = { spawnCoordinates } as PlayerMapEntity;
+
+        const getTileAtSpy = spyOn(service, 'getTileAt').and.returnValue(null);
+
+        try {
+            service.getClosestWalkableTileWithoutPlayerAt(mockPlayer);
+        } catch (e) {}
+        expect(getTileAtSpy).toHaveBeenCalledWith(spawnCoordinates);
+    });
+
+    describe('getClosestWalkableTileWithoutPlayerAt', () => {
+        let mockPlayer: PlayerMapEntity;
+        let spawnCoordinates: Vec2;
+
+        beforeEach(() => {
+            spawnCoordinates = { x: 3, y: 3 };
+            mockPlayer = { spawnCoordinates } as PlayerMapEntity;
+        });
+
+        it('should return the tile if it is walkable and has no player', () => {
+            // Arrange
+            const tile = new WalkableTile();
+            tile.coordinates = spawnCoordinates;
+            spyOn(tile, 'isWalkable').and.returnValue(true);
+            spyOn(tile, 'hasPlayer').and.returnValue(false);
+
+            spyOn(service, 'getTileAt').and.returnValue(tile);
+
+            // Act
+            const result = service.getClosestWalkableTileWithoutPlayerAt(mockPlayer);
+
+            // Assert
+            expect(result).toBe(tile);
+        });
+
+        it('should return the tile if it is walkable and has the same player as mapPlayer', () => {
+            // Arrange
+            const tile = new WalkableTile();
+            tile.coordinates = spawnCoordinates;
+            tile.player = mockPlayer;
+            spyOn(tile, 'isWalkable').and.returnValue(true);
+            spyOn(tile, 'hasPlayer').and.returnValue(true);
+
+            spyOn(service, 'getTileAt').and.returnValue(tile);
+
+            // Act
+            const result = service.getClosestWalkableTileWithoutPlayerAt(mockPlayer);
+
+            // Assert
+            expect(result).toBe(tile);
+        });
+
+        it('should not return the tile if it is walkable but has a different player', () => {
+            // Arrange
+            const tile = new WalkableTile();
+            tile.coordinates = spawnCoordinates;
+            tile.player = {} as PlayerMapEntity; // Different player
+            spyOn(tile, 'isWalkable').and.returnValue(true);
+            spyOn(tile, 'hasPlayer').and.returnValue(true);
+
+            spyOn(service, 'getTileAt').and.returnValue(tile);
+
+            // Act & Assert
+            expect(() => service.getClosestWalkableTileWithoutPlayerAt(mockPlayer)).toThrowError('No walkable tile found');
+        });
+    });
+
+    it('should set the specified tile at the given coordinates in the current grid', () => {
+        // Arrange
+        const coordinates: Vec2 = { x: 1, y: 1 };
+        const newTile = new GrassTile();
+
+        // Initialize a 2x2 grid with placeholder tiles
+        const initialTile = new GrassTile();
+        service['currentGrid'] = [
+            [initialTile, initialTile],
+            [initialTile, initialTile],
+        ];
+
+        // Act
+        service.setTileAt(coordinates, newTile);
+
+        // Assert
+        expect(service['currentGrid'][coordinates.x][coordinates.y]).toBe(newTile);
     });
 });
