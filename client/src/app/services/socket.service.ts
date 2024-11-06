@@ -19,6 +19,7 @@ export class SocketManagerService {
         this.socket.on(event, action);
     }
 
+    // eslint-disable-next-line
     send<T>(event: string, data?: T, callback?: Function): void {
         this.socket.emit(event, ...[data, callback].filter((x) => x));
     }
