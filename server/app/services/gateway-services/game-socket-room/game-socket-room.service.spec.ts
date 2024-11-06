@@ -221,7 +221,7 @@ describe('GameSocketRoomService', () => {
                 },
             };
 
-            const room = service.createGame('game123', playerOrganizer);
+            // const room = service.createGame('game123', playerOrganizer);
             const addedFirstPlayer = service.addPlayerToRoom(accessCode, playerOrganizer);
             expect(addedFirstPlayer).toBeFalsy();
 

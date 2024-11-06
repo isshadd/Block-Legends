@@ -1,5 +1,5 @@
+import { GameBattle, GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameBattle, GameRoom, GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 import { PlayGameBoardBattleService } from './play-game-board-battle.service';
 
 jest.useFakeTimers();
@@ -77,12 +77,12 @@ describe('PlayGameBoardBattleService', () => {
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
             const battleRoom = gameSocketRoomService.gameBattleRooms.get(accessCode);
             expect(battleRoom).toBeDefined();
-            expect(battleRoom.time).toBe(service.ACTIVE_TURN_TIME);
+            expect(battleRoom.time).toBe(service.activeTurnTime);
             expect(battleRoom.firstPlayerId).toBe(firstPlayerId);
             expect(battleRoom.secondPlayerId).toBe(secondPlayerId);
             expect(battleRoom.isFirstPlayerTurn).toBe(true);
-            expect(battleRoom.firstPlayerRemainingEvades).toBe(service.STARTING_EVADE_ATTEMPTS);
-            expect(battleRoom.secondPlayerRemainingEvades).toBe(service.STARTING_EVADE_ATTEMPTS);
+            expect(battleRoom.firstPlayerRemainingEvades).toBe(service.startingEvadeAttempts);
+            expect(battleRoom.secondPlayerRemainingEvades).toBe(service.startingEvadeAttempts);
             expect(battleRoom.firstPlayerRemainingLife).toBe(100);
             expect(battleRoom.secondPlayerRemainingLife).toBe(100);
         });
@@ -201,7 +201,7 @@ describe('PlayGameBoardBattleService', () => {
             service.endBattleTurn(accessCode);
 
             expect(battleRoom.isFirstPlayerTurn).toBe(false);
-            expect(battleRoom.time).toBe(service.ACTIVE_TURN_TIME);
+            expect(battleRoom.time).toBe(service.activeTurnTime);
         });
 
         it('should set time to NO_EVADE_ACTIVE_TURN_TIME if first player has no evades left', () => {
@@ -222,7 +222,7 @@ describe('PlayGameBoardBattleService', () => {
             service.endBattleTurn(accessCode);
 
             expect(battleRoom.isFirstPlayerTurn).toBe(false);
-            expect(battleRoom.time).toBe(service.NO_EVADE_ACTIVE_TURN_TIME);
+            expect(battleRoom.time).toBe(service.noEvadeActiveTurnTime);
         });
 
         it('should set time to NO_EVADE_ACTIVE_TURN_TIME if second player has no evades left', () => {
@@ -243,7 +243,7 @@ describe('PlayGameBoardBattleService', () => {
             service.endBattleTurn(accessCode);
 
             expect(battleRoom.isFirstPlayerTurn).toBe(true);
-            expect(battleRoom.time).toBe(service.NO_EVADE_ACTIVE_TURN_TIME);
+            expect(battleRoom.time).toBe(service.noEvadeActiveTurnTime);
         });
 
         it('should do nothing if battle room does not exist', () => {
@@ -329,7 +329,7 @@ describe('PlayGameBoardBattleService', () => {
         it('should return false if player has no evades left', () => {
             const accessCode = 9;
             const playerId = 'player1';
-            const playerId2 = 'player2';
+            // const playerId2 = 'player2';
             const battleRoom = {
                 time: 2,
                 firstPlayerId: 'player1',
@@ -347,7 +347,7 @@ describe('PlayGameBoardBattleService', () => {
             expect(battleRoom.firstPlayerRemainingEvades).toBe(0);
             expect(result).toBe(false);
 
-            const result2 = service.userUsedEvade(accessCode, playerId2);
+            // const result2 = service.userUsedEvade(accessCode, playerId2);
             expect(battleRoom.secondPlayerRemainingEvades).toBe(0);
             expect(result).toBe(false);
         });
