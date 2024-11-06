@@ -161,8 +161,8 @@ export class GameMapDataManagerService {
     }
 
     getClosestWalkableTileWithoutPlayerAt(mapPlayer: PlayerMapEntity): WalkableTile {
-        let coordinates = mapPlayer.spawnCoordinates;
-        let tile = this.getTileAt(coordinates);
+        const coordinates = mapPlayer.spawnCoordinates;
+        const tile = this.getTileAt(coordinates);
         if (tile && tile.isWalkable() && (!(tile as WalkableTile).hasPlayer() || (tile as WalkableTile).player === mapPlayer)) {
             return tile as WalkableTile;
         }
@@ -172,7 +172,9 @@ export class GameMapDataManagerService {
         visited.add(`${coordinates.x},${coordinates.y}`);
 
         while (queue.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 
             for (const neighbour of neighbours) {
@@ -260,5 +262,4 @@ export class GameMapDataManagerService {
             data: { message },
         });
     }
-    
 }

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -355,7 +356,7 @@ describe('PlayPageMouseHandlerService - clearUI', () => {
         service.actionTiles = [tile1, tile2];
         service.lastTilePath = [tile1];
         service.isActionOpen = true;
-        service.rightClickSelectedPlayerCharacter = {} as any; // Mock player character
+        service.rightClickSelectedPlayerCharacter = {} as PlayerCharacter;
         service.rightSelectedTile = tile1;
 
         service.clearUI();

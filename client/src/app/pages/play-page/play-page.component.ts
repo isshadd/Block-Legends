@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
@@ -18,7 +19,6 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
-import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
 
 @Component({
     selector: 'app-play-page',

@@ -82,8 +82,9 @@ describe('FightViewComponent', () => {
 
     it('should trigger attackAnimation on signalUserAttacked$', () => {
         spyOn(component, 'attackAnimation');
-        signalUserAttacked$.next(5);
-        expect(component.attackAnimation).toHaveBeenCalledWith(5);
+        const value = 5;
+        signalUserAttacked$.next(value);
+        expect(component.attackAnimation).toHaveBeenCalledWith(value);
     });
 
     it('should trigger escapeAnimation on signalUserTriedEscape$', () => {
@@ -93,8 +94,9 @@ describe('FightViewComponent', () => {
     });
 
     it('should update playerDiceResult and add dice-roll class in onPlayerRollDice', () => {
-        component.onPlayerRollDice(6);
-        expect(component.playerDiceResult).toBe(6);
+        const riceResult = 6;
+        component.onPlayerRollDice(riceResult);
+        expect(component.playerDiceResult).toBe(riceResult);
         const diceResult = document.getElementById('dice-result');
         expect(diceResult?.classList).toContain('dice-roll');
     });

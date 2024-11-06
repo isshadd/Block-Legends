@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
@@ -271,7 +272,8 @@ describe('PlayGameBoardManagerService - startTurn', () => {
 
         service.startTurn();
 
-        expect(service.userCurrentMovePoints).toBe(3);
+        const result = 3;
+        expect(service.userCurrentMovePoints).toBe(result);
         expect(service.userCurrentActionPoints).toBe(1);
         expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
     });
@@ -538,7 +540,7 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
     });
 
     it('should move the user along the path without tripping and call setupPossibleMoves at the end', async () => {
-        const mockPlayerCharacter = {} as any;
+        const mockPlayerCharacter = {} as PlayerCharacter;
         const tile1 = new WalkableTile();
         const tile2 = new WalkableTile();
         tile1.coordinates = { x: 0, y: 0 };
@@ -570,7 +572,7 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
     });
 
     it('should end the turn if the player trips on an ice tile', async () => {
-        const mockPlayerCharacter = {} as any;
+        const mockPlayerCharacter = {} as PlayerCharacter;
         const tile1 = new WalkableTile();
         const tile2 = new WalkableTile();
         tile1.coordinates = { x: 0, y: 0 };
@@ -591,7 +593,8 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
         service.isUserTurn = true;
         service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
 
-        spyOn(Math, 'random').and.returnValue(0.05);
+        const value = 0.05;
+        spyOn(Math, 'random').and.returnValue(value);
 
         await service.moveUserPlayer(tile2);
 
@@ -746,7 +749,7 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
 
         service.handlePlayerAction(mockTile);
 
-        expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player!); // Non-null assertion
+        expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player);
         expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith('player1');
         expect(service.hidePossibleMoves).toHaveBeenCalled();
         expect(service.userCurrentActionPoints).toBe(0);
@@ -1148,7 +1151,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
     it('should increment fightWins, call checkIfPlayerWonGame, and emit signalUserRespawned if loser is the current player', () => {
         const winnerPlayer = new PlayerCharacter('winner');
         const loserPlayer = new PlayerCharacter('loser');
-        loserPlayer.mapEntity = { coordinates: { x: 1, y: 1 } } as any;
+        loserPlayer.mapEntity = { coordinates: { x: 1, y: 1 } } as PlayerMapEntity;
 
         const currentTile = new WalkableTile();
         currentTile.coordinates = { x: 1, y: 1 };
@@ -1387,7 +1390,7 @@ describe('PlayGameBoardManagerService - removePlayerFromMap', () => {
         mockPlayerCharacter.mapEntity = {
             coordinates: { x: 1, y: 1 },
             spawnCoordinates: { x: 2, y: 2 },
-        } as any;
+        } as PlayerMapEntity;
 
         const mockCurrentTile = new TerrainTile();
         const mockSpawnTile = new TerrainTile();
@@ -1418,7 +1421,7 @@ describe('PlayGameBoardManagerService - removePlayerFromMap', () => {
         mockPlayerCharacter.mapEntity = {
             coordinates: { x: 1, y: 1 },
             spawnCoordinates: { x: 2, y: 2 },
-        } as any;
+        } as PlayerMapEntity;
 
         const mockCurrentTile = new TerrainTile();
         const mockSpawnTile = new TerrainTile();
@@ -1503,7 +1506,7 @@ describe('PlayGameBoardManagerService - getCurrentPlayerTile', () => {
     it('should return the tile at the player’s coordinates if player is found', () => {
         const mockPlayer = new PlayerCharacter('player1');
         const playerCoordinates: Vec2 = { x: 1, y: 1 };
-        mockPlayer.mapEntity = { coordinates: playerCoordinates } as any;
+        mockPlayer.mapEntity = { coordinates: playerCoordinates } as PlayerMapEntity;
 
         const mockTile = new Tile();
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayer);
@@ -1925,23 +1928,23 @@ describe('PlayGameBoardManagerService - resetManager', () => {
                 imageUrl: '',
                 coordinates: { x: 0, y: 0 } as Vec2,
                 visibleState: VisibleState.NotSelected,
-                isItem: function (): boolean {
+                isItem(): boolean {
                     throw new Error('Function not implemented.');
                 },
-                isTerrain: function (): boolean {
+                isTerrain(): boolean {
                     throw new Error('Function not implemented.');
                 },
-                isWalkable: function (): boolean {
+                isWalkable(): boolean {
                     throw new Error('Function not implemented.');
                 },
-                isDoor: function (): boolean {
+                isDoor(): boolean {
                     throw new Error('Function not implemented.');
                 },
             },
             [],
         );
         service.turnOrder = ['player1', 'player2'];
-        service.winnerPlayer = { name: 'Winner' } as any;
+        service.winnerPlayer = { name: 'Winner' } as PlayerCharacter;
 
         service.resetManager();
 
