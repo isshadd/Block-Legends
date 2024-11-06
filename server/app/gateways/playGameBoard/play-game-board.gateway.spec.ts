@@ -415,6 +415,8 @@ describe('PlayGameBoardGateway', () => {
 
                 it("should do nothing if it is not client's turn", () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
+                    jest.spyOn(playGameBoardTimeService, 'pauseTimer').mockImplementation(() => {});
+
                     gateway.handleUserStartedMoving(mockClient as Socket, accessCode);
 
                     expect(playGameBoardTimeService.pauseTimer).not.toHaveBeenCalled();
@@ -554,6 +556,16 @@ describe('PlayGameBoardGateway', () => {
                     expect(gateway.server.to(data.accessCode.toString()).emit).toHaveBeenCalledWith('successfulAttack');
                     expect(gateway.handleBattleEndedByDeath).toHaveBeenCalledWith(data.accessCode, mockClient.id);
                 });
+
+                it('should handle invalid room', () => {
+                    jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+
+                    const data = { attackResult: 1, accessCode };
+
+                    gateway.handleUserAttacked(mockClient as Socket, data);
+                    expect(gateway.endBattleTurn).not.toHaveBeenCalled();
+                });
             });
 
             describe('handleUserTriedEscape', () => {
@@ -582,6 +594,14 @@ describe('PlayGameBoardGateway', () => {
                     expect(gateway.server.to(accessCode.toString()).emit).toHaveBeenCalledWith('opponentTriedEscape');
                     expect(gateway.endBattleTurn).toHaveBeenCalledWith(accessCode);
                 });
+
+                it('should handle invalid room', () => {
+                    jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
+                    jest.spyOn(gateway, 'endBattleTurn').mockImplementation(() => {});
+
+                    gateway.handleUserTriedEscape(mockClient as Socket, accessCode);
+                    expect(gateway.endBattleTurn).not.toHaveBeenCalled();
+                });
             });
 
             describe('handleUserWon', () => {
@@ -593,6 +613,13 @@ describe('PlayGameBoardGateway', () => {
                     expect(playGameBoardTimeService.pauseTimer).toHaveBeenCalledWith(accessCode);
                     expect(gateway.server.to).toHaveBeenCalledWith(accessCode.toString());
                     expect(gateway.server.to(accessCode.toString()).emit).toHaveBeenCalledWith('gameBoardPlayerWon', mockClient.id);
+                });
+
+                it('should handle invalid room', () => {
+                    jest.spyOn(gateway, 'isValidRoom').mockReturnValue(false);
+
+                    gateway.handleUserWon(mockClient as Socket, accessCode);
+                    expect(playGameBoardTimeService.pauseTimer).not.toHaveBeenCalled();
                 });
             });
         });
