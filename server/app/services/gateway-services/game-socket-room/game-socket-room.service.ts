@@ -70,7 +70,7 @@ export class GameSocketRoomService {
     gameTimerRooms: Map<number, GameTimer> = new Map();
     gameBattleRooms: Map<number, GameBattle> = new Map();
 
-    constructor(private readonly gameService: GameService) {}
+    constructor(readonly gameService: GameService) {}
 
     setSpawnCounter(gameSize: MapSize): number {
         const MIN_PLAYERS = 2;

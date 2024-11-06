@@ -251,7 +251,7 @@ export class PlayGameBoardGateway {
 
         this.handleEndBattle(accessCode);
         if (winnerPlayer === firstPlayer) {
-            this.server.to(accessCode.toString()).emit('firstPlayerWonBattle', { firstPlayer: firstPlayer, loserPlayer: secondPlayer });
+            this.server.to(accessCode.toString()).emit('firstPlayerWonBattle', { firstPlayer, loserPlayer: secondPlayer });
         } else {
             this.server.to(accessCode.toString()).emit('secondPlayerWonBattle', { winnerPlayer: secondPlayer, loserPlayer: firstPlayer });
             this.handleTimeOut(accessCode);

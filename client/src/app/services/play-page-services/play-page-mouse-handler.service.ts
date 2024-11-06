@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
@@ -13,15 +13,15 @@ enum MouseButton {
 @Injectable({
     providedIn: 'root',
 })
-export class PlayPageMouseHandlerService {
-    private destroy$ = new Subject<void>();
-
+export class PlayPageMouseHandlerService implements OnDestroy {
     rightClickSelectedPlayerCharacter: PlayerCharacter | null = null;
     rightSelectedTile: Tile | null = null;
 
     lastTilePath: Tile[] = [];
     actionTiles: Tile[] = [];
     isActionOpen: boolean = false;
+
+    private destroy$ = new Subject<void>();
 
     constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
         playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
@@ -46,9 +46,9 @@ export class PlayPageMouseHandlerService {
         const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
         if (possibleTileMove) {
-            for (const tile of possibleTileMove) {
-                if (!this.actionTiles.includes(tile)) {
-                    tile.visibleState = VisibleState.Selected;
+            for (const possibleTile of possibleTileMove) {
+                if (!this.actionTiles.includes(possibleTile)) {
+                    possibleTile.visibleState = VisibleState.Selected;
                 }
             }
             this.lastTilePath = possibleTileMove;
@@ -59,9 +59,9 @@ export class PlayPageMouseHandlerService {
 
     onMapTileMouseLeave(tile: Tile) {
         if (this.lastTilePath.length) {
-            for (const tile of this.lastTilePath) {
-                if (!this.actionTiles.includes(tile)) {
-                    tile.visibleState = VisibleState.Valid;
+            for (const pathTile of this.lastTilePath) {
+                if (!this.actionTiles.includes(pathTile)) {
+                    pathTile.visibleState = VisibleState.Valid;
                 }
             }
             this.lastTilePath = [];

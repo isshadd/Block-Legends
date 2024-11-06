@@ -18,7 +18,8 @@
             "rules": {
                 "max-lines": "off",
                 "no-magic-numbers": "off",
-                "@typescript-eslint/no-magic-numbers": "off"
+                "@typescript-eslint/no-magic-numbers": "off",
+                "@typescript-eslint/no-explicit-any": "off"
             }
         }
     ],

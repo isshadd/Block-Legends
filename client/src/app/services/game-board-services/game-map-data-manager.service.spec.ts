@@ -662,7 +662,9 @@ describe('GameMapDataManagerService', () => {
 
         try {
             service.getClosestWalkableTileWithoutPlayerAt(mockPlayer);
-        } catch (e) {}
+        } catch (e) {
+            // Handle the error or log it if necessary
+        }
         expect(getTileAtSpy).toHaveBeenCalledWith(spawnCoordinates);
     });
 

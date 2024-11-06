@@ -3,14 +3,14 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
+import { ItemInfoComponent } from '@app/components/item-info/item-info.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
+import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
-import { InfoPanelComponent } from '../../components/info-panel/info-panel.component';
-import { ItemInfoComponent } from '../../components/item-info/item-info.component';
-import { WinPanelComponent } from "../../components/win-panel/win-panel.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,

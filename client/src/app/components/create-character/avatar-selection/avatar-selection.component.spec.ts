@@ -9,7 +9,7 @@ import { AvatarSelectionComponent } from './avatar-selection.component';
 
 // Mock du WebSocketService
 class MockWebSocketService {
-    private takenAvatarsSubject = new Subject<string[]>();
+    takenAvatarsSubject = new Subject<string[]>();
     takenAvatars$ = this.takenAvatarsSubject.asObservable();
 
     emitTakenAvatars(avatars: string[]) {

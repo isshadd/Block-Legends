@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { BattleManagerService } from './battle-manager.service';
@@ -34,13 +35,13 @@ describe('BattleManagerService - init', () => {
         expect(service.currentPlayer).toBe(mockCurrentPlayer);
         expect(service.opponentPlayer).toBe(mockOpponentPlayer);
 
-        expect(service.userEvasionAttempts).toBe(service.STARTING_EVADE_ATTEMPTS);
-        expect(service.opponentEvasionAttempts).toBe(service.STARTING_EVADE_ATTEMPTS);
+        expect(service.userEvasionAttempts).toBe(service.startingEvadeAttempts);
+        expect(service.opponentEvasionAttempts).toBe(service.startingEvadeAttempts);
 
         expect(service.userRemainingHealth).toBe(mockCurrentPlayer.attributes.life);
         expect(service.opponentRemainingHealth).toBe(mockOpponentPlayer.attributes.life);
 
-        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.ICE_PENALITY);
+        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.icePenalty);
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense);
     });
 
@@ -51,7 +52,7 @@ describe('BattleManagerService - init', () => {
         service.init(mockCurrentPlayer, mockOpponentPlayer);
 
         expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense);
-        expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.ICE_PENALITY);
+        expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.icePenalty);
     });
 });
 
@@ -122,16 +123,18 @@ describe('BattleManagerService - onUserAttack', () => {
 
     it('should calculate and emit attack result if action is valid', () => {
         spyOn(service, 'isValidAction').and.returnValue(true);
-        spyOn(service, 'attackDiceResult').and.returnValue(8);
-        spyOn(service, 'defenseDiceResult').and.returnValue(3);
+        const value = 8;
+        const diceResult = 3;
+        spyOn(service, 'attackDiceResult').and.returnValue(value);
+        spyOn(service, 'defenseDiceResult').and.returnValue(diceResult);
         const signalSpy = spyOn(service.signalUserAttacked, 'next');
 
         service.onUserAttack();
-
+        const result = value - diceResult;
         expect(service.isValidAction).toHaveBeenCalled();
         expect(service.attackDiceResult).toHaveBeenCalled();
         expect(service.defenseDiceResult).toHaveBeenCalled();
-        expect(signalSpy).toHaveBeenCalledWith(5);
+        expect(signalSpy).toHaveBeenCalledWith(result);
     });
 
     it('should not emit attack result if action is invalid', () => {
@@ -215,8 +218,8 @@ describe('BattleManagerService - onOpponentAttack', () => {
         const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
 
         service.onOpponentAttack(attackResult);
-
-        expect(service.userRemainingHealth).toBe(9);
+        const result = 9;
+        expect(service.userRemainingHealth).toBe(result);
         expect(signalSpy).toHaveBeenCalledWith(attackResult);
     });
 
@@ -227,7 +230,8 @@ describe('BattleManagerService - onOpponentAttack', () => {
 
         service.onOpponentAttack(attackResult);
 
-        expect(service.userRemainingHealth).toBe(10);
+        const result = 10;
+        expect(service.userRemainingHealth).toBe(result);
         expect(signalSpy).toHaveBeenCalledWith(attackResult);
     });
 
@@ -238,7 +242,8 @@ describe('BattleManagerService - onOpponentAttack', () => {
 
         service.onOpponentAttack(attackResult);
 
-        expect(service.userRemainingHealth).toBe(10);
+        const result = 10;
+        expect(service.userRemainingHealth).toBe(result);
         expect(signalSpy).not.toHaveBeenCalled();
     });
 });
@@ -299,7 +304,7 @@ describe('BattleManagerService - attackDiceResult', () => {
 
         const result = service.attackDiceResult();
 
-        let expectedResult = 14;
+        const expectedResult = 14;
         expect(result).toBe(expectedResult);
     });
 
@@ -314,7 +319,7 @@ describe('BattleManagerService - attackDiceResult', () => {
 
         const result = service.attackDiceResult();
 
-        let expectedResult = 12;
+        const expectedResult = 12;
         expect(result).toBe(expectedResult);
     });
 
@@ -346,7 +351,7 @@ describe('BattleManagerService - defenseDiceResult', () => {
 
         const result = service.defenseDiceResult();
 
-        let expectedResult = 8;
+        const expectedResult = 8;
         expect(result).toBe(expectedResult);
     });
 
@@ -378,7 +383,8 @@ describe('BattleManagerService - onSuccessfulAttack', () => {
         service.onSuccessfulAttack();
 
         expect(service.isValidAction).toHaveBeenCalled();
-        expect(service.opponentRemainingHealth).toBe(9);
+        const remainingHealth = 9;
+        expect(service.opponentRemainingHealth).toBe(remainingHealth);
     });
 
     it('should not decrease opponentRemainingHealth if action is invalid', () => {
@@ -387,7 +393,8 @@ describe('BattleManagerService - onSuccessfulAttack', () => {
         service.onSuccessfulAttack();
 
         expect(service.isValidAction).toHaveBeenCalled();
-        expect(service.opponentRemainingHealth).toBe(10);
+        const remainingHealth = 10;
+        expect(service.opponentRemainingHealth).toBe(remainingHealth);
     });
 });
 
@@ -473,11 +480,12 @@ describe('BattleManagerService - onOpponentAttack early return', () => {
         service.currentPlayer = null;
         service.opponentPlayer = {} as PlayerCharacter;
         const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
-
-        service.onOpponentAttack(5);
+        const attackResult = 5;
+        service.onOpponentAttack(attackResult);
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.userRemainingHealth).toBe(10);
+        const remainingHealth = 10;
+        expect(service.userRemainingHealth).toBe(remainingHealth);
     });
 
     it('should return early if opponentPlayer is null', () => {
@@ -485,10 +493,13 @@ describe('BattleManagerService - onOpponentAttack early return', () => {
         service.opponentPlayer = null;
         const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
 
-        service.onOpponentAttack(5);
+        const attackResult = 5;
+        service.onOpponentAttack(attackResult);
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.userRemainingHealth).toBe(10);
+
+        const remainingHealth = 10;
+        expect(service.userRemainingHealth).toBe(remainingHealth);
     });
 });
 
@@ -501,7 +512,7 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         });
         service = TestBed.inject(BattleManagerService);
 
-        service.opponentEvasionAttempts = 2; 
+        service.opponentEvasionAttempts = 2;
     });
 
     it('should return early if currentPlayer is null', () => {
@@ -512,7 +523,7 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         service.onOpponentEscape();
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.opponentEvasionAttempts).toBe(2); 
+        expect(service.opponentEvasionAttempts).toBe(2);
     });
 
     it('should return early if opponentPlayer is null', () => {
@@ -523,6 +534,6 @@ describe('BattleManagerService - onOpponentEscape early return', () => {
         service.onOpponentEscape();
 
         expect(signalSpy).not.toHaveBeenCalled();
-        expect(service.opponentEvasionAttempts).toBe(2); 
+        expect(service.opponentEvasionAttempts).toBe(2);
     });
 });
