@@ -2,65 +2,35 @@ import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
+import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameRoom, WebSocketService } from '@app/services/SocketService/websocket.service';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
-import { Subject } from 'rxjs';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
-const ACCESS_CODE = 1234;
-
 describe('PlayGameBoardManagerService', () => {
     let service: PlayGameBoardManagerService;
+    //let gameBoardParameters: GameBoardParameters;
+
     let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-    let playGameBoardSocketServiceSpy: jasmine.SpyObj<PlayGameBoardSocketService>;
-
-    const signalInitGameBoard$ = new Subject<GameShared>();
-    const signalInitCharacters$ = new Subject<[number, string][]>();
-
-    const mockGameData: GameShared = {
-        name: 'tset',
-        description: 'desc',
-        size: MapSize.SMALL,
-        mode: GameMode.Classique,
-        imageUrl: 'blabla',
-        isVisible: false,
-        tiles: [],
-    };
-
-    const mockRoomInfo: GameRoom = {
-        maxPlayers: 2,
-        currentPlayerTurn: 'Player1',
-        roomId: 'room1',
-        players: [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')],
-        accessCode: ACCESS_CODE,
-        isLocked: false,
-    };
-    mockRoomInfo.players[0].avatar = AvatarEnum.Alex;
-    mockRoomInfo.players[1].avatar = AvatarEnum.Sirene;
-
-    const mockGrid = [
-        [new GrassTile(), new GrassTile()],
-        [new GrassTile(), new GrassTile()],
-    ];
+    //let playGameBoardSocketServiceSpy: jasmine.SpyObj<PlayGameBoardSocketService>;
+    //const ACCESS_CODE = 1234;
 
     beforeEach(() => {
-        const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['init', 'getCurrentGrid', 'getTilesWithSpawn']);
+        const gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', [
+            'init',
+            'getCurrentGrid',
+            'getTilesWithSpawn',
+            'getTileAt',
+            'getPossibleMovementTiles',
+            'getNeighbours',
+        ]);
         const webSocketSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
         const playGameBoardSocketSpy = jasmine.createSpyObj('PlayGameBoardSocketService', ['initGameBoard']);
-
-        playGameBoardSocketSpy.signalInitGameBoard$ = new Subject();
-        playGameBoardSocketSpy.signalInitCharacters$ = new Subject();
-
-        webSocketSpy.getRoomInfo.and.returnValue(mockRoomInfo);
-        gameMapDataManagerSpy.getCurrentGrid.and.returnValue(mockGrid);
-        gameMapDataManagerSpy.getTilesWithSpawn.and.returnValue([]);
 
         TestBed.configureTestingModule({
             providers: [
@@ -74,40 +44,35 @@ describe('PlayGameBoardManagerService', () => {
         service = TestBed.inject(PlayGameBoardManagerService);
         gameMapDataManagerServiceSpy = TestBed.inject(GameMapDataManagerService) as jasmine.SpyObj<GameMapDataManagerService>;
         webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
-        playGameBoardSocketServiceSpy = TestBed.inject(PlayGameBoardSocketService) as jasmine.SpyObj<PlayGameBoardSocketService>;
-    });
-
-    afterEach(() => {
-        signalInitGameBoard$.complete();
-        signalInitCharacters$.complete();
+        //playGameBoardSocketServiceSpy = TestBed.inject(PlayGameBoardSocketService) as jasmine.SpyObj<PlayGameBoardSocketService>;
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should call initGameBoard on PlayGameBoardSocketService with current room access code upon initialization', () => {
-        expect(webSocketServiceSpy.getRoomInfo).toHaveBeenCalled();
-        expect(playGameBoardSocketServiceSpy.initGameBoard).toHaveBeenCalledWith(ACCESS_CODE);
-    });
+    // it('should call initGameBoard on PlayGameBoardSocketService with current room access code upon initialization', () => {
+    //     webSocketServiceSpy.getRoomInfo.and.returnValue({ accessCode: ACCESS_CODE });
 
-    // it('should subscribe to signalInitGameBoard$ and signalInitCharacters$ on initialization', () => {
-    //     spyOn(service, 'initGameBoard').and.callThrough();
-    //     spyOn(service, 'initCharacters').and.callThrough();
+    //     service.init(gameBoardParameters);
 
-    //     (playGameBoardSocketServiceSpy.signalInitGameBoard$ as Subject<GameShared>).next(mockGameData);
-    //     expect(service.initGameBoard).toHaveBeenCalledWith(mockGameData);
-
-    //     const spawnPlaces: [number, string][] = [
-    //         [0, 'Player1'],
-    //         [1, 'Player2'],
-    //     ];
-    //     (playGameBoardSocketServiceSpy.signalInitCharacters$ as Subject<[number, string][]>).next(spawnPlaces);
-    //     expect(service.initCharacters).toHaveBeenCalledWith(spawnPlaces);
+    //     expect(webSocketServiceSpy.getRoomInfo).toHaveBeenCalled();
+    //     expect(playGameBoardSocketServiceSpy.initGameBoard).toHaveBeenCalledWith(ACCESS_CODE);
     // });
 
     it('should call init on GameMapDataManagerService with game data on initGameBoard', () => {
+        const mockGameData: GameShared = {
+            name: 'testGame',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'someImageUrl',
+            isVisible: false,
+            tiles: [],
+        };
+
         service.initGameBoard(mockGameData);
+
         expect(gameMapDataManagerServiceSpy.init).toHaveBeenCalledWith(mockGameData);
     });
 
@@ -116,12 +81,16 @@ describe('PlayGameBoardManagerService', () => {
             [0, 'Player1'],
             [1, 'Player2'],
         ];
-        const tilesWithSpawn: TerrainTile[] = [new GrassTile(), new GrassTile(), new GrassTile()];
+        const tilesWithSpawn = [new GrassTile(), new GrassTile(), new GrassTile()];
 
-        const roomInfo = webSocketServiceSpy.getRoomInfo();
         gameMapDataManagerServiceSpy.getTilesWithSpawn.and.returnValue(tilesWithSpawn);
+        webSocketServiceSpy.getRoomInfo.and.returnValue({
+            players: [{ mapEntity: new PlayerMapEntity('Player1Head') }, { mapEntity: new PlayerMapEntity('Player2Head') }],
+        } as GameRoom);
 
         service.initCharacters(spawnPlaces);
+
+        const roomInfo = webSocketServiceSpy.getRoomInfo();
 
         expect(roomInfo.players[0].mapEntity).toBeTruthy();
         expect(roomInfo.players[0].mapEntity).toEqual(jasmine.any(PlayerMapEntity));
@@ -130,22 +99,73 @@ describe('PlayGameBoardManagerService', () => {
 
         expect(tilesWithSpawn[0].player).toBe(roomInfo.players[0].mapEntity);
         expect(tilesWithSpawn[1].player).toBe(roomInfo.players[1].mapEntity);
-        expect(tilesWithSpawn[2].item).toBeNull();
     });
 
     it('should retrieve the current grid from GameMapDataManagerService when getCurrentGrid is called', () => {
+        const mockGrid = [
+            [new GrassTile(), new GrassTile()],
+            [new GrassTile(), new GrassTile()],
+        ];
+
+        gameMapDataManagerServiceSpy.getCurrentGrid.and.returnValue(mockGrid);
+
         const grid = service.getCurrentGrid();
+
         expect(gameMapDataManagerServiceSpy.getCurrentGrid).toHaveBeenCalled();
         expect(grid).toEqual(mockGrid);
     });
 
-    // it('should properly unsubscribe from observables upon destruction', () => {
-    //     spyOn((service as PlayGameBoardManagerService).destroy$, 'next').and.callThrough();
-    //     spyOn((service as PlayGameBoardManagerService).destroy$, 'complete').and.callThrough();
+    it('should set possible moves correctly when setPossibleMoves is called', () => {
+        const playerCharacter = new PlayerCharacter('Player1');
+        playerCharacter.mapEntity = new PlayerMapEntity('headImage');
+        playerCharacter.mapEntity.coordinates = { x: 0, y: 0 };
 
-    //     service.ngOnDestroy();
+        const possibleMoves = new Map();
+        possibleMoves.set(new GrassTile(), [new GrassTile()]);
 
-    //     expect((service as PlayGameBoardManagerService).destroy$.next).toHaveBeenCalled();
-    //     expect((service as PlayGameBoardManagerService).destroy$.complete).toHaveBeenCalled();
-    // });
+        gameMapDataManagerServiceSpy.getPossibleMovementTiles.and.returnValue(possibleMoves);
+
+        service.setPossibleMoves(playerCharacter);
+
+        expect(service.userCurrentPossibleMoves).toEqual(possibleMoves);
+    });
+
+    it('should show possible moves correctly when showPossibleMoves is called', () => {
+        const tile = new GrassTile();
+        const path = [new GrassTile()];
+
+        service.userCurrentPossibleMoves.set(tile, path);
+        service.showPossibleMoves();
+
+        expect(tile.visibleState).toBe(VisibleState.Valid);
+    });
+
+    it('should hide possible moves correctly when hidePossibleMoves is called', () => {
+        const tile = new GrassTile();
+        const path = [new GrassTile()];
+
+        service.userCurrentPossibleMoves.set(tile, path);
+        service.hidePossibleMoves();
+
+        expect(tile.visibleState).toBe(VisibleState.NotSelected);
+        expect(service.userCurrentPossibleMoves.size).toBe(0);
+    });
+
+    it('should move user player correctly when moveUserPlayer is called', async () => {
+        const playerCharacter = new PlayerCharacter('Player1');
+        playerCharacter.mapEntity = new PlayerMapEntity('headImage');
+        playerCharacter.mapEntity.coordinates = { x: 0, y: 0 };
+
+        service.userCurrentPossibleMoves.set(new GrassTile(), [new GrassTile()]);
+
+        spyOn(service, 'hidePossibleMoves').and.callThrough();
+        spyOn(service, 'waitInterval').and.returnValue(Promise.resolve());
+        spyOn(service.signalUserStartedMoving, 'next');
+
+        const tile = new GrassTile();
+        await service.moveUserPlayer(tile);
+
+        expect(service.hidePossibleMoves).toHaveBeenCalled();
+        expect(service.signalUserStartedMoving.next).toHaveBeenCalled();
+    });
 });

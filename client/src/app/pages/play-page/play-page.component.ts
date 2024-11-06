@@ -55,7 +55,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
         public router: Router,
-        //private webSocketService: WebSocketService,
+        private webSocketService: WebSocketService,
         private gameService: GameService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {

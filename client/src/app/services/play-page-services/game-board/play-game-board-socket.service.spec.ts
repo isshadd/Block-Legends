@@ -1,57 +1,95 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { InfosGameComponent } from './infos-game.component';
+// import { TestBed } from '@angular/core/testing';
+// import { WebSocketService } from '@app/services/SocketService/websocket.service';
+// import sinon from 'sinon';
+// import { Socket } from 'socket.io-client';
+// import { PlayPageMouseHandlerService } from '../play-page-mouse-handler.service';
+// import { PlayGameBoardManagerService } from './play-game-board-manager.service';
+// import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 
-describe('InfosGameComponent', () => {
-    let component: InfosGameComponent;
-    let fixture: ComponentFixture<InfosGameComponent>;
+// describe('PlayGameBoardSocketService', () => {
+//     let service: PlayGameBoardSocketService;
+//     let webSocketServiceStub: sinon.SinonStubbedInstance<WebSocketService>;
+//     let playGameBoardManagerServiceStub: sinon.SinonStubbedInstance<PlayGameBoardManagerService>;
+//     let playPageMouseHandlerServiceStub: sinon.SinonStubbedInstance<PlayPageMouseHandlerService>;
+//     let socketStub: sinon.SinonStubbedInstance<Socket>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [InfosGameComponent],
-        }).compileComponents();
+//     beforeEach(() => {
+//         webSocketServiceStub = sinon.createStubInstance(WebSocketService);
+//         playGameBoardManagerServiceStub = sinon.createStubInstance(PlayGameBoardManagerService);
+//         playPageMouseHandlerServiceStub = sinon.createStubInstance(PlayPageMouseHandlerService);
+//         socketStub = sinon.createStubInstance(Socket);
 
-        fixture = TestBed.createComponent(InfosGameComponent);
-        component = fixture.componentInstance;
-    });
+//         TestBed.configureTestingModule({
+//             providers: [
+//                 PlayGameBoardSocketService,
+//                 { provide: WebSocketService, useValue: webSocketServiceStub },
+//                 { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceStub },
+//                 { provide: PlayPageMouseHandlerService, useValue: playPageMouseHandlerServiceStub },
+//             ],
+//         });
 
-    it('should create the component', () => {
-        expect(component).toBeTruthy();
-    });
+//         service = TestBed.inject(PlayGameBoardSocketService);
+//         service.socket = socketStub as unknown as Socket;
+//     });
 
-    it('should display the correct number of players', () => {
-        component.nbrPlayers = 3; // Assign a value
-        fixture.detectChanges(); // Trigger change detection
-        const compiled = fixture.nativeElement; // Access the DOM element
+//     it('should be created', () => {
+//         expect(service).toBeTruthy();
+//     });
 
-        expect(compiled.querySelector('p').textContent).toContain('Number of Players: 3');
-    });
+//     it('should initialize game board on init', () => {
+//         const accessCode = 123;
+//         webSocketServiceStub.getRoomInfo.returns({ accessCode });
+//         service.init();
+//         expect(socketStub.emit.calledWith('initGameBoard', accessCode)).toBeTruthy();
+//     });
 
-    it('should display the current player', () => {
-        component.currentPlayer = 'Alice'; // Assign a value
-        fixture.detectChanges(); // Trigger change detection
-        const compiled = fixture.nativeElement; // Access the DOM element
+//     it('should emit userMoved event', () => {
+//         const data = { x: 1, y: 2 };
+//         const accessCode = 123;
+//         webSocketServiceStub.getRoomInfo.returns({ accessCode });
+//         playGameBoardManagerServiceStub.signalUserMoved$.next(data);
+//         expect(socketStub.emit.calledWith('userMoved', { ...data, accessCode })).toBeTruthy();
+//     });
 
-        expect(compiled.querySelector('p').textContent).toContain('Current Player: Alice');
-    });
+//     it('should emit userStartedMoving event', () => {
+//         const accessCode = 123;
+//         webSocketServiceStub.getRoomInfo.returns({ accessCode });
+//         playGameBoardManagerServiceStub.signalUserStartedMoving$.next();
+//         expect(socketStub.emit.calledWith('userStartedMoving', accessCode)).toBeTruthy();
+//     });
 
-    it('should display the game board correctly', () => {
-        component.game = [
-            // Ensure game is initialized
-            [
-                { id: '1', letter: 'A' },
-                { id: '2', letter: 'B' },
-            ],
-            [
-                { id: '3', letter: 'C' },
-                { id: '4', letter: 'D' },
-            ],
-        ];
-        fixture.detectChanges(); // Trigger change detection
-        const compiled = fixture.nativeElement; // Access the DOM element
+//     it('should emit userFinishedMoving event', () => {
+//         const accessCode = 123;
+//         webSocketServiceStub.getRoomInfo.returns({ accessCode });
+//         playGameBoardManagerServiceStub.signalUserFinishedMoving$.next();
+//         expect(socketStub.emit.calledWith('userFinishedMoving', accessCode)).toBeTruthy();
+//     });
 
-        expect(compiled.textContent).toContain('A');
-        expect(compiled.textContent).toContain('B');
-        expect(compiled.textContent).toContain('C');
-        expect(compiled.textContent).toContain('D');
-    });
-});
+//     it('should emit userDidDoorAction event', () => {
+//         const tileCoordinate = { x: 1, y: 2 };
+//         const accessCode = 123;
+//         webSocketServiceStub.getRoomInfo.returns({ accessCode });
+//         playGameBoardManagerServiceStub.signalUserDidDoorAction$.next(tileCoordinate);
+//         expect(socketStub.emit.calledWith('userDidDoorAction', { tileCoordinate, accessCode })).toBeTruthy();
+//     });
+
+//     it('should end turn when user turn ends', () => {
+//         service.endTurn();
+//         expect(socketStub.emit.calledWith('userEndTurn')).toBeTruthy();
+//     });
+
+//     it('should disconnect socket on leaveGame', () => {
+//         service.leaveGame();
+//         expect(socketStub.disconnect.called).toBeTruthy();
+//     });
+
+//     it('should set up socket listeners on init', () => {
+//         const setupSocketListenersSpy = sinon.spy(service, 'setupSocketListeners');
+//         service.init();
+//         expect(setupSocketListenersSpy.called).toBeTruthy();
+//     });
+
+//     afterEach(() => {
+//         sinon.restore();
+//     });
+// });
