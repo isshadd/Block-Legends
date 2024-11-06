@@ -22,11 +22,11 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
     defenseDice: string;
 
     constructor(
-        public el: ElementRef, //private renderer: Renderer2,
+        public el: ElementRef, // private renderer: Renderer2,
     ) {}
 
     ngOnInit(): void {
-        //this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+        // this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
         if (this.playerCharacter.dice === 'attack') {
             this.attackDice = '(D6)';
             this.defenseDice = '(D4)';
