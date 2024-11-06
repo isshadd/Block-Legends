@@ -749,7 +749,7 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
 
         service.handlePlayerAction(mockTile);
 
-        expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player!); // Non-null assertion
+        expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player);
         expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith('player1');
         expect(service.hidePossibleMoves).toHaveBeenCalled();
         expect(service.userCurrentActionPoints).toBe(0);

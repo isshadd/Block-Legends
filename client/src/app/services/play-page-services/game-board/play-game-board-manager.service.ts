@@ -321,7 +321,7 @@ export class PlayGameBoardManagerService {
     checkIfPlayerWonGame(playerCharacter: PlayerCharacter) {
         const currentPlayer = this.getCurrentPlayerCharacter();
 
-        let value = 3;
+        const value = 3;
         if (currentPlayer === playerCharacter && playerCharacter.fightWins >= value) {
             this.signalUserWon.next();
         }

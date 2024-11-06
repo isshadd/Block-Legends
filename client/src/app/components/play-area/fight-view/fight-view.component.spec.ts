@@ -84,7 +84,7 @@ describe('FightViewComponent', () => {
         spyOn(component, 'attackAnimation');
         const value = 5;
         signalUserAttacked$.next(value);
-        expect(component.attackAnimation).toHaveBeenCalledWith(5);
+        expect(component.attackAnimation).toHaveBeenCalledWith(value);
     });
 
     it('should trigger escapeAnimation on signalUserTriedEscape$', () => {
