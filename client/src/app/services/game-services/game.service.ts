@@ -14,7 +14,7 @@ export class GameService {
     accessCode$ = this.accessCodeSubject.asObservable();
     character$ = this.characterSubject.asObservable();
 
-    private currentPlayerSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter(''));
+    currentPlayerSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter(''));
     currentPlayer$ = this.currentPlayerSubject.asObservable();
 
     setAccessCode(code: number) {

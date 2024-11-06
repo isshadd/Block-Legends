@@ -6,8 +6,8 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class SocketStateService {
-    private activeSocket: WebSocketService | null = null;
-    private hasActiveSocket = new BehaviorSubject<boolean>(false);
+    activeSocket: WebSocketService | null = null;
+    hasActiveSocket = new BehaviorSubject<boolean>(false);
     hasActiveSocket$ = this.hasActiveSocket.asObservable();
 
     setActiveSocket(socket: WebSocketService) {

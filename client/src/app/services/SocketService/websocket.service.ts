@@ -3,12 +3,12 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { ChatService } from '@app/services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatService } from '../chat-service.service';
 
 export interface GameRoom {
     roomId: string;
@@ -54,7 +54,7 @@ export class WebSocketService {
         this.setupSocketListeners();
     }
 
-    send<T>(event: string, data?: T, callback?: Function): void {
+    send<T>(event: string, data?: T, callback?: () => void): void {
         this.socket.emit(event, ...[data, callback].filter((x) => x));
     }
 
