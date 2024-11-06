@@ -356,7 +356,7 @@ describe('PlayPageMouseHandlerService - clearUI', () => {
         service.actionTiles = [tile1, tile2];
         service.lastTilePath = [tile1];
         service.isActionOpen = true;
-        service.rightClickSelectedPlayerCharacter = {} as unknown; // Mock player character
+        service.rightClickSelectedPlayerCharacter = {} as PlayerCharacter;
         service.rightSelectedTile = tile1;
 
         service.clearUI();
