@@ -10,7 +10,7 @@ describe('PlayerMapEntityInfoViewComponent', () => {
     let mockPlayerCharacter: PlayerCharacter;
 
     beforeEach(async () => {
-        //let renderer2: Renderer2;
+        // let renderer2: Renderer2;
         mockPlayerCharacter = new PlayerCharacter('Hero');
         mockPlayerCharacter.attributes = {
             life: 5,
