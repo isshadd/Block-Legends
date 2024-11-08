@@ -3,6 +3,7 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
+import { Tile } from '@app/classes/Tiles/tile';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { ItemInfoComponent } from '@app/components/item-info/item-info.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
@@ -10,11 +11,27 @@ import { FightViewComponent } from '@app/components/play-area/fight-view/fight-v
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
+import { InfosGameComponent } from '../../components/infos-game/infos-game.component';
+import { PlayersListComponent } from '../../components/players-list/players-list.component';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
+import { SideViewPlayerInfoComponent } from "../../components/side-view-player-info/side-view-player-info.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
-    imports: [FightViewComponent, PlayerMapEntityInfoViewComponent, MapTileInfoComponent, ItemInfoComponent, InfoPanelComponent, WinPanelComponent],
+    imports: [
+    FightViewComponent,
+    PlayerMapEntityInfoViewComponent,
+    MapTileInfoComponent,
+    ItemInfoComponent,
+    InfoPanelComponent,
+    WinPanelComponent,
+    InfosGameComponent,
+    TabContainerComponent,
+    PlayersListComponent,
+    SideViewPlayerInfoComponent
+],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })
@@ -23,10 +40,21 @@ export class FightViewPageComponent {
     playerCharacter2 = new PlayerCharacter('Player2');
     playerMap = new PlayerMapEntity(AvatarEnum.Sirene.headImage);
     tile = new GrassTile();
+    selectedTile: Tile | null = null;
+    isBattlePhase: boolean = false;
+    myPlayer: PlayerCharacter;
+    currentPlayer: PlayerCharacter | null;
+    players: PlayerCharacter[] = [this.playerCharacter, this.playerCharacter2];
+    actualPlayers: PlayerCharacter[] = [];
+    actionPoints: number;
+    totalLifePoints: number;
 
     item = new DiamondSword();
 
-    constructor(public battleManagerService: BattleManagerService) {
+    constructor(
+        public battleManagerService: BattleManagerService,
+        public playGameBoardManagerService: PlayGameBoardManagerService,
+    ) {
         this.playerCharacter.avatar = AvatarEnum.Sirene;
         this.playerCharacter.assignAttackDice();
         this.playerCharacter.isLifeBonusAssigned = true;
