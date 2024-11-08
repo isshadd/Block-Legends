@@ -1,9 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameBoardParameters } from '@app/interfaces/game-board-parameters';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
-import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';

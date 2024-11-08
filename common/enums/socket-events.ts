@@ -1,0 +1,28 @@
+export const enum SocketEvents {
+    // EMIS
+    CREATE_GAME = 'createGame',
+    JOIN_GAME = 'joinGame',
+    ADD_PLAYER_TO_ROOM = 'addPlayerToRoom',
+    KICK_PLAYER = 'kickPlayer',
+    LEAVE_GAME = 'leaveGame',
+    LOCK_ROOM = 'lockRoom',
+    UNLOCK_ROOM = 'unlockRoom',
+    START_GAME = 'startGame',
+    //RECUS
+    ROOM_STATE = 'roomState',
+    JOIN_GAME_RESPONSE = 'joinGameResponse',
+    AVATAR_TAKEN_ERROR = 'avatarTakenError',
+    JOIN_GAME_RESPONSE_CODE_INVALID = 'joinGameResponseCodeInvalid',
+    JOIN_GAME_RESPONSE_LOCKED_ROOM = 'joinGameResponseLockedRoom',
+    JOIN_GAME_RESPONSE_NO_MORE_EXISTING = 'joinGameResponseNoMoreExisting',
+    JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN = 'joinGameResponseLockedAfterJoin',
+    ROOM_LOCKED = 'roomLocked',
+    ROOM_UNLOCKED = 'roomUnlocked',
+    PLAYER_KICKED = 'playerKicked',
+    PLAYER_LEFT = 'playerLeft',
+    GAME_STARTED = 'gameStarted',
+    ROOM_CLOSED = 'roomClosed',
+    ERROR = 'error',
+    CLOCK = 'clock',
+    MASS_MESSAGE = 'massMessage',
+}
