@@ -17,6 +17,7 @@ import { InfosGameComponent } from '../../components/infos-game/infos-game.compo
 import { PlayersListComponent } from '../../components/players-list/players-list.component';
 import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 import { SideViewPlayerInfoComponent } from "../../components/side-view-player-info/side-view-player-info.component";
+import { PlayGameSideViewBarComponent } from "../../components/play-game-side-view-bar/play-game-side-view-bar.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
@@ -30,7 +31,8 @@ import { SideViewPlayerInfoComponent } from "../../components/side-view-player-i
     InfosGameComponent,
     TabContainerComponent,
     PlayersListComponent,
-    SideViewPlayerInfoComponent
+    SideViewPlayerInfoComponent,
+    PlayGameSideViewBarComponent
 ],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
@@ -44,7 +46,7 @@ export class FightViewPageComponent {
     isBattlePhase: boolean = false;
     myPlayer: PlayerCharacter;
     currentPlayer: PlayerCharacter | null;
-    players: PlayerCharacter[] = [this.playerCharacter, this.playerCharacter2];
+    players: PlayerCharacter[] = [this.playerCharacter, this.playerCharacter2, this.playerCharacter2,this.playerCharacter2];
     actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;

@@ -1,12 +1,9 @@
 <div id="side-menu">
-    <app-side-view-player-info [playerCharacter]="this.playerCharacter"></app-side-view-player-info>
-    <app-infos-game [currentPlayer]="this.playerCharacter.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
-    <app-player-map-entity-info-view
-        [showButton]="false"
+    <app-play-game-side-view-bar
         [playerCharacter]="this.playerCharacter"
         [actionPoints]="this.actionPoints"
         [totalLife]="totalLifePoints"
-    ></app-player-map-entity-info-view>
-    <app-players-list [players]="this.players"></app-players-list>
-    <app-tab-container></app-tab-container>
+        [game]="playGameBoardManagerService.getCurrentGrid()"
+        [players]="this.players">
+    </app-play-game-side-view-bar>
 </div>

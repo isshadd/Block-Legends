@@ -1,0 +1,21 @@
+@import 'src/_variables.scss';
+
+#side-menu {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25%;
+    max-width: 25%;
+    height: 100vb;
+    background-color: $primary-dark;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
+    padding: 5px;
+
+    .division {
+        width: 100vh;
+        height: 2px;
+        background-color: darken($primary-dark, 10%);
+    }
+}
