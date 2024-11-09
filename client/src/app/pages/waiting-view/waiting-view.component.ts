@@ -9,8 +9,6 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';

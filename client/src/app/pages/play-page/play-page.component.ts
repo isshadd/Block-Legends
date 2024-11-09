@@ -28,6 +28,7 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 
 @Component({
     selector: 'app-play-page',
