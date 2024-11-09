@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
 import { ChatService } from './chat-service.service';
 import { SocketStateService } from '../SocketService/socket-state.service';

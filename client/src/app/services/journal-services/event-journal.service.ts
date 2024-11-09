@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';

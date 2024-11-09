@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
 import { SocketStateService } from './socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
@@ -110,7 +111,7 @@ describe('SocketStateService', () => {
         service.hasActiveSocket$.subscribe((hasSocket) => {
             emittedValues.push(hasSocket);
 
-            if (emittedValues.length === 4) {
+            if (emittedValues.length === LONG_EMMITED) {
                 expect(emittedValues).toEqual([false, true, false, true]);
                 expect(service.getActiveSocket()).toBe(mockWebSocketService);
                 done();

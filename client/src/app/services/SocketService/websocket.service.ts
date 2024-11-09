@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/member-ordering*/
-
+/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';

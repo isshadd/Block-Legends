@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { BehaviorSubject } from 'rxjs';
@@ -6,9 +7,9 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root',
 })
 export class SocketStateService {
-    private activeSocket: WebSocketService | null = null;
     hasActiveSocket = new BehaviorSubject<boolean>(false);
     hasActiveSocket$ = this.hasActiveSocket.asObservable();
+    private activeSocket: WebSocketService | null = null;
 
     setActiveSocket(socket: WebSocketService) {
         this.activeSocket = socket;
