@@ -11,12 +11,13 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
 })
 export class PlayerMapEntityInfoViewComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
+    @Output() closeP = new EventEmitter<void>();
     @Input() actionPoints: number;
     @Input() totalLife: number;
-    @Output() close = new EventEmitter<void>();
-    @Output() closeP = new EventEmitter<void>();
+    @Output() closePanelEmit = new EventEmitter<void>();
     @Input() scale: number = 1; // Scale par défaut de 1 (taille normale)
     @Input() showButton: boolean = true;
+    @Input() isPlayPage: boolean = false;
     attackDice: string;
     defenseDice: string;
 
