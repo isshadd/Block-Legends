@@ -5,7 +5,8 @@
     flex-direction: column;
     flex-basis: 25%;
     max-width: 25%;
-    height: 100vb;
+    min-width: 400px;
+    height: 100;
     background-color: $primary-dark;
     overflow-y: auto;
     overflow-x: hidden;
@@ -14,8 +15,12 @@
     padding: 5px;
 
     .division {
-        width: 100vh;
+        width: 100%;
         height: 2px;
         background-color: darken($primary-dark, 10%);
+    }
+
+    app-tab-container {
+        height: 100%;
     }
 }

@@ -1,9 +1,9 @@
 @import 'src/_variables.scss';
 
 #info-container {
-    position: relative; // Allows absolute positioning of the close button
+    position: relative;
     display: flex;
-    justify-content: space-between; // Pushes content to opposite sides
+    justify-content: space-between;
     align-items: flex-start;
     background-color: $primary-dark;
     padding: 10px;
@@ -24,7 +24,7 @@
         line-height: 20px;
         margin-bottom: 15px;
         font-weight: bold;
-        color: $secondary; 
+        color: $secondary;
     }
 
     .player-info-details {
