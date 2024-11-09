@@ -4,7 +4,7 @@ import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, ElementRef } from '@angular/core';
 
 describe('ClavardageComponent', () => {
     let component: ClavardageComponent;
@@ -77,7 +77,7 @@ describe('ClavardageComponent', () => {
         // Set up the component's messagesContainer
         component.messagesContainer = {
             nativeElement: mockElement,
-        } as unknown;
+        } as ElementRef<unknown>;
 
         component.shouldScroll = true;
         component.ngAfterViewChecked();

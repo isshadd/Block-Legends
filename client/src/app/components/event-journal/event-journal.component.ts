@@ -44,10 +44,6 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
     }
 
     private scrollToBottom(): void {
-        try {
-            this.eventsContainer.nativeElement.scrollTop = this.eventsContainer.nativeElement.scrollHeight;
-        } catch (err) {
-            this.eventsContainer.nativeElement.scrollTop = 0;
-        }
+        this.eventsContainer.nativeElement.scrollTop = this.eventsContainer.nativeElement.scrollHeight;
     }
 }

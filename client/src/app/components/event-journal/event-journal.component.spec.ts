@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { EventJournalComponent } from './event-journal.component';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, ElementRef } from '@angular/core';
 import { Subject } from 'rxjs';
 
 describe('EventJournalComponent', () => {
@@ -89,7 +89,7 @@ describe('EventJournalComponent', () => {
                     scrollTop: 0,
                     scrollHeight: 100,
                 },
-            } as unknown;
+            } as unknown as ElementRef<unknown>;
         });
 
         it('should scroll to bottom when shouldScroll is true', fakeAsync(() => {
@@ -153,21 +153,4 @@ describe('EventJournalComponent', () => {
         });
     });
 
-    describe('Error Handling', () => {
-        it('should handle errors in scrollToBottom', () => {
-            component.eventsContainer = {
-                nativeElement: {
-                    get scrollTop() {
-                        throw new Error('Test error');
-                    },
-                    scrollHeight: 100,
-                },
-            } as unknown;
-
-            component.shouldScroll = true;
-            expect(() => {
-                component.ngAfterViewChecked();
-            }).not.toThrow();
-        });
-    });
 });

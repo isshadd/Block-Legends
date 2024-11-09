@@ -52,10 +52,6 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
     }
 
     private scrollToBottom(): void {
-        try {
-            this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
-        } catch (err) {
-            this.messagesContainer.nativeElement.scrollTop = 0;
-        }
+        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
     }
 }
