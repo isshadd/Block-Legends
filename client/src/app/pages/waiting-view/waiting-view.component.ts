@@ -66,7 +66,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    this.gameService.setCurrentPlayer(character);
                     if (this.accessCode !== null) {
                         this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
                         this.eventJournalService.setAccessCode(this.accessCode);
@@ -77,7 +76,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    this.gameService.setCurrentPlayer(character);
                     if (this.accessCode !== null) {
                         this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
                         this.eventJournalService.setAccessCode(this.accessCode);
