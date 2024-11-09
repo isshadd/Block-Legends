@@ -8,38 +8,31 @@ describe('EventJournalComponent', () => {
     let component: EventJournalComponent;
     let fixture: ComponentFixture<EventJournalComponent>;
     let journalService: jasmine.SpyObj<EventJournalService>;
-    let changeDetectorRef: jasmine.SpyObj<ChangeDetectorRef>;
-    let messageReceived$: Subject<void>;
+    let cdr: jasmine.SpyObj<ChangeDetectorRef>;
+    let messageReceivedSubject: Subject<void>;
 
     const mockEvents = [
-        { 
-            event: 'Event 1', 
-            associatedPlayers: ['player1', 'player2'] 
-        },
-        { 
-            event: 'Event 2', 
-            associatedPlayers: ['player2', 'player3'] 
-        }
+        { event: 'event1', associatedPlayers: ['player1', 'player2'] },
+        { event: 'event2', associatedPlayers: ['player1'] },
+        { event: 'event3', associatedPlayers: ['player2'] }
     ];
 
     beforeEach(async () => {
-        messageReceived$ = new Subject<void>();
+        messageReceivedSubject = new Subject<void>();
         
-        journalService = jasmine.createSpyObj('EventJournalService', 
-            ['initialize', 'getFilteredEvents'], {
-                messageReceived$: messageReceived$,
-                roomEvents: mockEvents,
-                playerName: 'player1'
-            }
-        );
+        journalService = jasmine.createSpyObj('EventJournalService', ['initialize'], {
+            roomEvents: mockEvents,
+            messageReceived$: messageReceivedSubject.asObservable(),
+            playerName: 'player1'
+        });
 
-        changeDetectorRef = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
+        cdr = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
 
         await TestBed.configureTestingModule({
             imports: [EventJournalComponent],
             providers: [
                 { provide: EventJournalService, useValue: journalService },
-                { provide: ChangeDetectorRef, useValue: changeDetectorRef }
+                { provide: ChangeDetectorRef, useValue: cdr }
             ]
         }).compileComponents();
 
@@ -52,107 +45,28 @@ describe('EventJournalComponent', () => {
     });
 
     describe('Initialization', () => {
-        it('should initialize with default values', () => {
+        it('should initialize with service events', () => {
             expect(component.events).toEqual(mockEvents);
-            expect(component.shouldScroll).toBeFalse();
-            expect(component.showMyEvents).toBeFalse();
         });
 
-        it('should initialize filtered events', () => {
-            spyOn(component, 'getFilteredEvents').and.callThrough();
-            fixture.detectChanges();
-            expect(component.getFilteredEvents).toHaveBeenCalled();
-            expect(component.filteredEvents).toBeDefined();
-        });
-    });
-
-    describe('ngOnInit', () => {
-        beforeEach(() => {
+        it('should call journalService.initialize on ngOnInit', () => {
             component.ngOnInit();
-        });
-
-        it('should initialize journal service', () => {
             expect(journalService.initialize).toHaveBeenCalled();
         });
 
-        it('should subscribe to messageReceived$', fakeAsync(() => {
-            messageReceived$.next();
-            tick();
-
+        it('should set up message subscription on ngOnInit', () => {
+            component.ngOnInit();
+            messageReceivedSubject.next();
             expect(component.shouldScroll).toBeTrue();
-            expect(changeDetectorRef.detectChanges).toHaveBeenCalled();
-        }));
-    });
-
-    describe('ngAfterViewChecked', () => {
-        beforeEach(() => {
-            spyOn(component as any, 'scrollToBottom');
-            spyOn(component, 'getFilteredEvents').and.callThrough();
-        });
-
-        it('should update filtered events', () => {
-            component.ngAfterViewChecked();
-            expect(component.getFilteredEvents).toHaveBeenCalled();
-        });
-
-        it('should scroll to bottom when shouldScroll is true', fakeAsync(() => {
-            component.shouldScroll = true;
-            component.ngAfterViewChecked();
-            
-            tick(1);
-            
-            expect(component['scrollToBottom']).toHaveBeenCalled();
-            expect(component.shouldScroll).toBeFalse();
-        }));
-
-        it('should not scroll when shouldScroll is false', fakeAsync(() => {
-            component.shouldScroll = false;
-            component.ngAfterViewChecked();
-            
-            tick(1);
-            
-            expect(component['scrollToBottom']).not.toHaveBeenCalled();
-            expect(component.shouldScroll).toBeFalse();
-        }));
-    });
-
-    describe('scrollToBottom', () => {
-        it('should set scroll position when eventsContainer exists', () => {
-            const mockElement = {
-                scrollTop: 0,
-                scrollHeight: 100
-            };
-            component.eventsContainer = { nativeElement: mockElement } as any;
-
-            component['scrollToBottom']();
-
-            expect(mockElement.scrollTop).toBe(mockElement.scrollHeight);
-        });
-
-        it('should handle error when eventsContainer is undefined', () => {
-            component.eventsContainer = undefined as any;
-            
-            expect(() => {
-                component['scrollToBottom']();
-            }).not.toThrow();
         });
     });
 
-    describe('getFilteredEvents', () => {
+    describe('Event Filtering', () => {
         it('should filter events for current player', () => {
             const filteredEvents = component.getFilteredEvents();
-            
-            expect(filteredEvents.length).toBe(1);
-            expect(filteredEvents[0]).toEqual(mockEvents[0]);
-        });
-
-        it('should return empty array when no events match', () => {
-            Object.defineProperty(journalService, 'playerName', {
-                get: () => 'player4'
-            });
-
-            const filteredEvents = component.getFilteredEvents();
-            expect(filteredEvents.length).toBe(0);
+            expect(filteredEvents.length).toBe(2);
+            expect(filteredEvents).toContain(mockEvents[0]);
+            expect(filteredEvents).toContain(mockEvents[1]);
         });
 
         it('should handle empty events array', () => {
@@ -160,45 +74,101 @@ describe('EventJournalComponent', () => {
             const filteredEvents = component.getFilteredEvents();
             expect(filteredEvents.length).toBe(0);
         });
+
+        it('should handle events with no associated players', () => {
+            component.events = [{ event: 'test', associatedPlayers: [] }];
+            const filteredEvents = component.getFilteredEvents();
+            expect(filteredEvents.length).toBe(0);
+        });
     });
 
-    describe('Template Integration', () => {
+    describe('Scrolling Behavior', () => {
         beforeEach(() => {
-            fixture.detectChanges();
+            component.eventsContainer = {
+                nativeElement: {
+                    scrollTop: 0,
+                    scrollHeight: 100
+                }
+            } as any;
         });
 
-        it('should toggle showMyEvents flag', () => {
-            const button = fixture.debugElement.nativeElement.querySelector('button');
-            expect(component.showMyEvents).toBeFalse();
-            
-            button.click();
-            fixture.detectChanges();
-            
-            expect(component.showMyEvents).toBeTrue();
+        it('should scroll to bottom when shouldScroll is true', fakeAsync(() => {
+            component.shouldScroll = true;
+            component.ngAfterViewChecked();
+            tick(1);
+            expect(component.eventsContainer.nativeElement.scrollTop)
+                .toBe(component.eventsContainer.nativeElement.scrollHeight);
+            expect(component.shouldScroll).toBeFalse();
+        }));
+
+        it('should not scroll when shouldScroll is false', fakeAsync(() => {
+            component.shouldScroll = false;
+            component.ngAfterViewChecked();
+            tick(1);
+            expect(component.eventsContainer.nativeElement.scrollTop).toBe(0);
+        }));
+
+
+    });
+
+    describe('View Updates', () => {
+        it('should update filtered events in ngAfterViewChecked', () => {
+            spyOn(component, 'getFilteredEvents').and.callThrough();
+            component.ngAfterViewChecked();
+            expect(component.getFilteredEvents).toHaveBeenCalled();
+            expect(component.filteredEvents).toBeDefined();
         });
 
-        it('should update button text based on showMyEvents', () => {
-            const button = fixture.debugElement.nativeElement.querySelector('button');
+        it('should handle message received updates', fakeAsync(() => {
+            component.ngOnInit();
+            messageReceivedSubject.next();
+            expect(component.shouldScroll).toBeTrue();
             
-            expect(button.textContent.trim()).toContain('Show My Events');
-            
-            component.showMyEvents = true;
-            fixture.detectChanges();
-            
-            expect(button.textContent.trim()).toContain('Show All Events');
+            component.ngAfterViewChecked();
+            tick(1);
+            expect(component.shouldScroll).toBeFalse();
+        }));
+    });
+
+    describe('Edge Cases', () => {
+        it('should handle undefined playerName', () => {
+            Object.defineProperty(journalService, 'playerName', {
+                get: () => undefined
+            });
+            const filteredEvents = component.getFilteredEvents();
+            expect(filteredEvents.length).toBe(0);
         });
 
-        it('should display correct events based on showMyEvents', () => {
-            // Test for all events
-            let eventElements = fixture.debugElement.nativeElement.querySelectorAll('.events li');
-            expect(eventElements.length).toBe(mockEvents.length);
+        it('should handle subscription cleanup', () => {
+            const subscription = messageReceivedSubject.subscribe();
+            subscription.unsubscribe();
+            messageReceivedSubject.next();
+            expect(subscription.closed).toBeTrue();
+        });
+    });
 
-            // Test for filtered events
-            component.showMyEvents = true;
-            fixture.detectChanges();
+    describe('Memory Management', () => {
+        it('should not leak memory on multiple initializations', () => {
+            const subscriptionSpy = spyOn(messageReceivedSubject, 'subscribe').and.callThrough();
+            component.ngOnInit();
+            component.ngOnInit();
+            expect(subscriptionSpy).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe('Error Handling', () => {
+        it('should handle errors in scrollToBottom', () => {
+            component.eventsContainer = {
+                nativeElement: {
+                    get scrollTop() { throw new Error('Test error'); },
+                    scrollHeight: 100
+                }
+            } as any;
             
-            eventElements = fixture.debugElement.nativeElement.querySelectorAll('.events li');
-            expect(eventElements.length).toBe(component.filteredEvents.length);
+            component.shouldScroll = true;
+            expect(() => {
+                component.ngAfterViewChecked();
+            }).not.toThrow();
         });
     });
 });

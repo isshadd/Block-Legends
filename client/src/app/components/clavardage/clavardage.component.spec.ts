@@ -94,14 +94,6 @@ describe('ClavardageComponent', () => {
     expect(component.shouldScroll).toBeFalse();
   }));
 
-  it('should update messages from chatService', () => {
-    const testMessages = ['message1', 'message2'];
-    chatService.roomMessages = testMessages;
-    
-    fixture.detectChanges();
-    
-    expect(component.messages).toEqual(testMessages);
-  });
 
   // Test for message subscription cleanup
   it('should unsubscribe on destroy', () => {

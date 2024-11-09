@@ -4,13 +4,13 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService } from '@app/services/game-services/game.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
-import { ChatService } from '../chat-services/chat-service.service';
 import { environment } from 'src/environments/environment';
-import {RoomMessage} from '@common/interfaces/roomMessage';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { ChatService } from '../chat-services/chat-service.service';
 
 export interface GameRoom {
     roomId: string;
@@ -197,9 +197,6 @@ export class WebSocketService {
                 this.playersSubject.next([]);
                 this.router.navigate(['/home']).then(() => {
                     alert('Vous avez été expulsé de la salle, redirection en cours...');
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
                 });
             }
         });

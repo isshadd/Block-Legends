@@ -6,6 +6,7 @@ import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { MapComponent } from './map.component';
+import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 
 describe('MapComponent', () => {
     let component: MapComponent;
@@ -13,7 +14,7 @@ describe('MapComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [MapComponent],
+            imports: [MapComponent],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MapComponent);

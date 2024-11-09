@@ -1,10 +1,10 @@
+import { ChatEvents } from '@common/enums/chat-events';
+import { RoomMessage } from '@common/interfaces/roomMessage';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID, WORD_MIN_LENGTH } from './chat.gateway.constants';
-import { ChatEvents } from '@common/enums/chat-events';
-import {RoomMessage} from '@common/interfaces/roomMessage';
-import {GameSocketRoomService} from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
+
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -13,18 +13,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private logger = new Logger(ChatGateway.name);
     private readonly room : string = PRIVATE_ROOM_ID;
 
-    constructor(private gameSocketRoomService: GameSocketRoomService,
-    ) {}
+    constructor() {}
 
-    @SubscribeMessage(ChatEvents.Validate)
-    validate(socket: Socket, word: string) {
-        socket.emit(ChatEvents.WordValidated, word?.length > WORD_MIN_LENGTH);
-    }           
-
-    @SubscribeMessage(ChatEvents.ValidateACK)
-    validateWithAck(_: Socket, word: string) {
-        return { isValid: word?.length > WORD_MIN_LENGTH };
-    }
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
     broadcastAll(socket: Socket, message: {time: Date, sender: string, content: string }) {
@@ -63,8 +53,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     handleConnection(socket: Socket) {
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-        // message initial
-        socket.emit(ChatEvents.Hello, 'Hello World!');
     }
 
     handleDisconnect(socket: Socket) {
