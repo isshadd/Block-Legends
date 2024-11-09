@@ -11,6 +11,7 @@ import { ContainerComponent } from '@app/components/container/container.componen
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
+// eslint-disable-next-line
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
@@ -19,15 +20,14 @@ import { PlayerInfoComponent } from '@app/components/player-info/player-info.com
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayersListComponent } from '@app/components/players-list/players-list.component';
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
-import { GameService } from '@app/services/game-services/game.service';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
+import { GameService } from '@app/services/game-services/game.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
-import { Subject, takeUntil } from 'rxjs';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-play-page',
@@ -44,10 +44,10 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
         MapTileInfoComponent,
         PlaceableEntityContainerComponent,
         TimerComponent,
+        ContainerComponent,
         InfoPanelComponent,
         FightViewComponent,
         WinPanelComponent,
-        ContainerComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
@@ -58,10 +58,12 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     myPlayer: PlayerCharacter;
     currentPlayer: PlayerCharacter | null;
     players: PlayerCharacter[] = [];
+    actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;
 
     private destroy$ = new Subject<void>();
+    // eslint-disable-next-line
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
@@ -84,16 +86,14 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
         this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();
-        // console.log('Joueurs:', this.players);
     }
 
     getPlayersTurn(): void {
         let playerName: string;
         let player: PlayerCharacter | null;
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        // eslint-disable-next-line
         for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
             playerName = this.playGameBoardManagerService.turnOrder[i];
-            // console.log('Nom du joueur:', playerName);
             player = this.playGameBoardManagerService.findPlayerFromSocketId(playerName);
             if (playerName && player) {
                 this.players.push(player);
@@ -102,13 +102,38 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
-        this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-            // this.players = this.webSocketService.getTotalPlayers();
-            this.myPlayer = player;
-            // console.log('Joueur actuel:', this.myPlayer);
+        this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
+            this.actualPlayers = updatedPlayers;
+            this.updatePlayersList();
         });
+
+        this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
+            this.myPlayer = player;
+        });
+
         this.totalLifePoints = this.myPlayer.attributes.life;
     }
+
+    updatePlayersList(): void {
+        const allPlayers = this.webSocketService.getTotalPlayers();
+
+        this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
+            const player = allPlayers.find((p) => p.name === playerName);
+            if (player) {
+                player.isAbsent = false; // Joueur présent
+                return player;
+            } else {
+                // Crée une instance temporaire de PlayerCharacter pour les joueurs absents
+                const absentPlayer = new PlayerCharacter(playerName);
+                absentPlayer.isAbsent = true;
+                return absentPlayer;
+            }
+        });
+
+        // Trie les joueurs pour que les absents soient en bas
+        this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
+    }
+
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

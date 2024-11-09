@@ -2,8 +2,8 @@
 
 app-player-map-entity-info-view {
     transform: scale(1.15);
-    margin-top: 20px;
-    margin-left: 20px;
+    width: 100%;
+    margin-left: 5px;
 }
 app-clavardage {
     transform: scale(0.5);
@@ -46,9 +46,9 @@ app-event-journal {
     #side-menu {
         display: flex;
         flex-direction: column;
-        min-width: 23%;
-        max-width: 200px;
-        height: auto;
+        flex-basis: 25%;
+        max-width: 25%;
+        height: 100%;
         background-color: $primary-dark;
         overflow-y: auto;
         scrollbar-width: thin;
@@ -123,6 +123,8 @@ app-event-journal {
         .button-container {
             display: flex;
             margin-left: 300px;
+            display: flex;
+            margin-left: auto;
 
             .action-button {
                 margin-left: 10px;

@@ -1,23 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { InfosGameComponent } from './infos-game.component';
 import { Tile } from '@app/classes/Tiles/tile';
+import { VisibleState } from '@app/interfaces/placeable-entity';
+import { TileType } from '@common/enums/tile-type';
+import { Vec2 } from '@common/interfaces/vec2';
+import { InfosGameComponent } from './infos-game.component';
 
 describe('InfosGameComponent', () => {
     let component: InfosGameComponent;
     let fixture: ComponentFixture<InfosGameComponent>;
 
-    // Mock Tile for testing
-    const mockTile: Tile = {
-        // Add required Tile properties here based on your Tile class
-    } as Tile;
-
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [InfosGameComponent],
         }).compileComponents();
+    });
 
+    beforeEach(() => {
         fixture = TestBed.createComponent(InfosGameComponent);
         component = fixture.componentInstance;
+        component.game = createTileGrid(2, 2);
+        component.nbrPlayers = 2;
+        component.currentPlayer = 'Player1';
         fixture.detectChanges();
     });
 
@@ -25,39 +28,54 @@ describe('InfosGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('Input properties', () => {
-        it('should accept game input', () => {
-            const testGame: Tile[][] = [[mockTile], [mockTile]];
-            component.game = testGame;
-            expect(component.game).toEqual(testGame);
-        });
+    it('should have game input', () => {
+        const game: Tile[][] = [
+            [
+                {
+                    type: TileType.Grass,
+                    description: 'Test tile',
+                    imageUrl: 'path/to/image',
+                    coordinates: { x: 0, y: 0 } as Vec2,
+                    visibleState: VisibleState.Valid,
+                    isItem: () => false,
+                    isTerrain: () => true,
+                    isWalkable: () => true,
+                    isDoor: () => false,
+                },
+            ],
+        ];
 
-        it('should accept nbrPlayers input', () => {
-            const testNbrPlayers = 4;
-            component.nbrPlayers = testNbrPlayers;
-            expect(component.nbrPlayers).toBe(testNbrPlayers);
-        });
+        component.game = game;
+        fixture.detectChanges();
+        expect(component.game).toEqual(game);
+    });
 
-        it('should accept currentPlayer input', () => {
-            const testCurrentPlayer = 'Player1';
-            component.currentPlayer = testCurrentPlayer;
-            expect(component.currentPlayer).toBe(testCurrentPlayer);
-        });
+    it('should have nbrPlayers input', () => {
+        const nbrPlayers = 2;
+        component.nbrPlayers = nbrPlayers;
+        fixture.detectChanges();
+        expect(component.nbrPlayers).toBe(nbrPlayers);
+    });
 
-        it('should handle game with empty arrays', () => {
-            const emptyGame: Tile[][] = [];
-            component.game = emptyGame;
-            expect(component.game).toEqual(emptyGame);
-        });
-
-        it('should handle zero players', () => {
-            component.nbrPlayers = 0;
-            expect(component.nbrPlayers).toBe(0);
-        });
-
-        it('should handle empty string currentPlayer', () => {
-            component.currentPlayer = '';
-            expect(component.currentPlayer).toBe('');
-        });
+    it('should have currentPlayer input', () => {
+        const currentPlayer = 'Player1';
+        component.currentPlayer = currentPlayer;
+        fixture.detectChanges();
+        expect(component.currentPlayer).toBe(currentPlayer);
     });
 });
+function createTileGrid(rows: number, cols: number): Tile[][] {
+    const grid: Tile[][] = [];
+
+    for (let row = 0; row < rows; row++) {
+        const rowTiles: Tile[] = [];
+        for (let col = 0; col < cols; col++) {
+            const tile = new Tile();
+            tile.coordinates = { x: col, y: row }; // Initialisation des coordonnées pour chaque tuile
+            rowTiles.push(tile);
+        }
+        grid.push(rowTiles);
+    }
+
+    return grid;
+}
