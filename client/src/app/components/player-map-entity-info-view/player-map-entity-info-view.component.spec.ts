@@ -1,8 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerMapEntityInfoViewComponent } from './player-map-entity-info-view.component';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { ElementRef } from '@angular/core';
-import { EventEmitter } from '@angular/core';
+import { ElementRef, EventEmitter } from '@angular/core';
 
 describe('PlayerMapEntityInfoViewComponent', () => {
     let component: PlayerMapEntityInfoViewComponent;
@@ -16,8 +15,8 @@ describe('PlayerMapEntityInfoViewComponent', () => {
             life: 3,
             defense: 2,
             speed: 4,
-            attack: 2
-        }
+            attack: 2,
+        },
     } as PlayerCharacter;
 
     const mockPlayerCharacterDefault: PlayerCharacter = {
@@ -26,20 +25,18 @@ describe('PlayerMapEntityInfoViewComponent', () => {
             life: 3,
             defense: 2,
             speed: 4,
-            attack: 2
-        }
+            attack: 2,
+        },
     } as PlayerCharacter;
 
     beforeEach(async () => {
         mockElementRef = jasmine.createSpyObj('ElementRef', [], {
-            nativeElement: document.createElement('div')
+            nativeElement: document.createElement('div'),
         });
 
         await TestBed.configureTestingModule({
             imports: [PlayerMapEntityInfoViewComponent],
-            providers: [
-                { provide: ElementRef, useValue: mockElementRef }
-            ]
+            providers: [{ provide: ElementRef, useValue: mockElementRef }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayerMapEntityInfoViewComponent);
@@ -152,8 +149,8 @@ describe('PlayerMapEntityInfoViewComponent', () => {
                     life: 0,
                     defense: 0,
                     speed: 0,
-                    attack: 0
-                }
+                    attack: 0,
+                },
             } as PlayerCharacter;
 
             component.playerCharacter = zeroPlayerCharacter;

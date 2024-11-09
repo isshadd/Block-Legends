@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-import { EventJournalComponent } from '../event-journal/event-journal.component';
+import { EventJournalComponent } from '@app/components/event-journal/event-journal.component'; // Use absolute import
 
 @Component({
     selector: 'app-tab-container',

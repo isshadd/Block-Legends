@@ -50,27 +50,27 @@ export class WebSocketService {
         private router: Router,
         private gameService: GameService,
         private chatService: ChatService,
-        private eventJournalService: EventJournalService
+        private eventJournalService: EventJournalService,
     ) {}
 
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
     }
-    
+
     createGame(gameId: string, player: PlayerCharacter) {
         this.socket.emit('createGame', { gameId, playerOrganizer: player });
     }
-    
+
     sendMsgToRoom(roomMessage: RoomMessage): void {
         this.socket.emit('roomMessage', roomMessage);
     }
 
-    sendEventToRoom(event: string, players: string[] ): void {
+    sendEventToRoom(event: string, players: string[]): void {
         const time = this.eventJournalService.serverClock;
         const roomID = this.eventJournalService.roomID;
         const content = event;
-        this.socket.emit('eventMessage', {time, content, roomID, associatedPlayers: players});
+        this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
     }
 
     joinGame(accessCode: number) {
@@ -115,7 +115,7 @@ export class WebSocketService {
         return this.currentRoom;
     }
 
-    public setupSocketListeners() {
+    setupSocketListeners() {
         this.socket.on('roomState', (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
@@ -237,7 +237,7 @@ export class WebSocketService {
         this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
-          });
+        });
 
         this.socket.on('roomMessage', (message: string) => {
             this.chatService.roomMessages.push(message);

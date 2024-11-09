@@ -16,14 +16,12 @@ describe('PlayersListComponent', () => {
     beforeEach(async () => {
         // Create spy for the service
         playGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
-            currentPlayerIdTurn: 'test-socket-id'
+            currentPlayerIdTurn: 'test-socket-id',
         });
 
         await TestBed.configureTestingModule({
             imports: [PlayersListComponent],
-            providers: [
-                { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerService }
-            ]
+            providers: [{ provide: PlayGameBoardManagerService, useValue: playGameBoardManagerService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayersListComponent);
@@ -71,7 +69,7 @@ describe('PlayersListComponent', () => {
         it('should handle undefined currentPlayerIdTurn', () => {
             // Reset the currentPlayerIdTurn to undefined
             Object.defineProperty(playGameBoardManagerService, 'currentPlayerIdTurn', {
-                get: () => undefined
+                get: () => undefined,
             });
 
             const player: PlayerCharacter = {

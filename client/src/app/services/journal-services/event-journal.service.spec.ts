@@ -20,17 +20,14 @@ describe('EventJournalService', () => {
 
         // Create mock SocketStateService
         socketStateService = jasmine.createSpyObj('SocketStateService', ['getActiveSocket'], {
-            hasActiveSocket$: hasActiveSocket$
+            hasActiveSocket$,
         });
 
         // Configure getActiveSocket spy
         socketStateService.getActiveSocket.and.returnValue(mockWebSocketService);
 
         TestBed.configureTestingModule({
-            providers: [
-                EventJournalService,
-                { provide: SocketStateService, useValue: socketStateService }
-            ]
+            providers: [EventJournalService, { provide: SocketStateService, useValue: socketStateService }],
         });
 
         service = TestBed.inject(EventJournalService);
@@ -78,7 +75,7 @@ describe('EventJournalService', () => {
     describe('setCharacter', () => {
         it('should set playerName from character', () => {
             const mockCharacter: PlayerCharacter = {
-                name: 'TestPlayer'
+                name: 'TestPlayer',
             } as PlayerCharacter;
 
             service.setCharacter(mockCharacter);
@@ -88,7 +85,7 @@ describe('EventJournalService', () => {
 
         it('should handle character with empty name', () => {
             const mockCharacter: PlayerCharacter = {
-                name: ''
+                name: '',
             } as PlayerCharacter;
 
             service.setCharacter(mockCharacter);
@@ -108,7 +105,7 @@ describe('EventJournalService', () => {
 
         it('should handle zero accessCode', () => {
             service.setAccessCode(0);
-            
+
             expect(service.accessCode).toBe(0);
             expect(service.roomID).toBe('0');
         });
@@ -125,8 +122,7 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom)
-                .toHaveBeenCalledWith(event, players);
+            expect(mockWebSocketService.sendEventToRoom).toHaveBeenCalledWith(event, players);
         });
 
         it('should not send event when socket is null', () => {
@@ -136,8 +132,7 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom)
-                .not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
         });
 
         it('should not send event when event is empty string', () => {
@@ -146,8 +141,7 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom)
-                .not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
         });
 
         it('should not send event when event is empty and socket is null', () => {
@@ -157,8 +151,7 @@ describe('EventJournalService', () => {
 
             service.broadcastEvent(event, players);
 
-            expect(mockWebSocketService.sendEventToRoom)
-                .not.toHaveBeenCalled();
+            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
         });
     });
 
@@ -166,7 +159,7 @@ describe('EventJournalService', () => {
         it('should add event to roomEvents array', () => {
             const eventData = {
                 event: 'test event',
-                associatedPlayers: ['player1', 'player2']
+                associatedPlayers: ['player1', 'player2'],
             };
 
             service.addEvent(eventData);
@@ -178,11 +171,11 @@ describe('EventJournalService', () => {
         it('should maintain order of events', () => {
             const event1 = {
                 event: 'first event',
-                associatedPlayers: ['player1']
+                associatedPlayers: ['player1'],
             };
             const event2 = {
                 event: 'second event',
-                associatedPlayers: ['player2']
+                associatedPlayers: ['player2'],
             };
 
             service.addEvent(event1);
@@ -194,7 +187,7 @@ describe('EventJournalService', () => {
         it('should handle event with empty associatedPlayers', () => {
             const eventData = {
                 event: 'test event',
-                associatedPlayers: []
+                associatedPlayers: [],
             };
 
             service.addEvent(eventData);

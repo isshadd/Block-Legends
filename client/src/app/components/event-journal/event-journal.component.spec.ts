@@ -14,16 +14,16 @@ describe('EventJournalComponent', () => {
     const mockEvents = [
         { event: 'event1', associatedPlayers: ['player1', 'player2'] },
         { event: 'event2', associatedPlayers: ['player1'] },
-        { event: 'event3', associatedPlayers: ['player2'] }
+        { event: 'event3', associatedPlayers: ['player2'] },
     ];
 
     beforeEach(async () => {
         messageReceivedSubject = new Subject<void>();
-        
+
         journalService = jasmine.createSpyObj('EventJournalService', ['initialize'], {
             roomEvents: mockEvents,
             messageReceived$: messageReceivedSubject.asObservable(),
-            playerName: 'player1'
+            playerName: 'player1',
         });
 
         cdr = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
@@ -32,8 +32,8 @@ describe('EventJournalComponent', () => {
             imports: [EventJournalComponent],
             providers: [
                 { provide: EventJournalService, useValue: journalService },
-                { provide: ChangeDetectorRef, useValue: cdr }
-            ]
+                { provide: ChangeDetectorRef, useValue: cdr },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(EventJournalComponent);
@@ -87,17 +87,16 @@ describe('EventJournalComponent', () => {
             component.eventsContainer = {
                 nativeElement: {
                     scrollTop: 0,
-                    scrollHeight: 100
-                }
-            } as any;
+                    scrollHeight: 100,
+                },
+            } as unknown;
         });
 
         it('should scroll to bottom when shouldScroll is true', fakeAsync(() => {
             component.shouldScroll = true;
             component.ngAfterViewChecked();
             tick(1);
-            expect(component.eventsContainer.nativeElement.scrollTop)
-                .toBe(component.eventsContainer.nativeElement.scrollHeight);
+            expect(component.eventsContainer.nativeElement.scrollTop).toBe(component.eventsContainer.nativeElement.scrollHeight);
             expect(component.shouldScroll).toBeFalse();
         }));
 
@@ -107,8 +106,6 @@ describe('EventJournalComponent', () => {
             tick(1);
             expect(component.eventsContainer.nativeElement.scrollTop).toBe(0);
         }));
-
-
     });
 
     describe('View Updates', () => {
@@ -123,7 +120,7 @@ describe('EventJournalComponent', () => {
             component.ngOnInit();
             messageReceivedSubject.next();
             expect(component.shouldScroll).toBeTrue();
-            
+
             component.ngAfterViewChecked();
             tick(1);
             expect(component.shouldScroll).toBeFalse();
@@ -133,7 +130,7 @@ describe('EventJournalComponent', () => {
     describe('Edge Cases', () => {
         it('should handle undefined playerName', () => {
             Object.defineProperty(journalService, 'playerName', {
-                get: () => undefined
+                get: () => undefined,
             });
             const filteredEvents = component.getFilteredEvents();
             expect(filteredEvents.length).toBe(0);
@@ -160,11 +157,13 @@ describe('EventJournalComponent', () => {
         it('should handle errors in scrollToBottom', () => {
             component.eventsContainer = {
                 nativeElement: {
-                    get scrollTop() { throw new Error('Test error'); },
-                    scrollHeight: 100
-                }
-            } as any;
-            
+                    get scrollTop() {
+                        throw new Error('Test error');
+                    },
+                    scrollHeight: 100,
+                },
+            } as unknown;
+
             component.shouldScroll = true;
             expect(() => {
                 component.ngAfterViewChecked();

@@ -3,11 +3,11 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class SocketStateService {
     private activeSocket: WebSocketService | null = null;
-    private hasActiveSocket = new BehaviorSubject<boolean>(false);
+    hasActiveSocket = new BehaviorSubject<boolean>(false);
     hasActiveSocket$ = this.hasActiveSocket.asObservable();
 
     setActiveSocket(socket: WebSocketService) {

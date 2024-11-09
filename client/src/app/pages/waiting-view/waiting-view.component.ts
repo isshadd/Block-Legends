@@ -7,7 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
-//import { ChangeDetectionStrategy } from '@angular/core';
+// import { ChangeDetectionStrategy } from '@angular/core';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
@@ -17,7 +17,7 @@ import { EventJournalService } from '@app/services/journal-services/event-journa
     imports: [CommonModule, ClavardageComponent, EventJournalComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    //changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode$ = this.gameService.accessCode$;
@@ -42,7 +42,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private socketStateService: SocketStateService,
         private chatService: ChatService,
-        private eventJournalService: EventJournalService
+        private eventJournalService: EventJournalService,
     ) {}
 
     ngOnInit(): void {
@@ -162,6 +162,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent("clicked Journal", [`${this.eventJournalService.playerName}`]);
+        this.eventJournalService.broadcastEvent('clicked Journal', [`${this.eventJournalService.playerName}`]);
     }
 }

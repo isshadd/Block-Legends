@@ -3,21 +3,20 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TabContainerComponent } from './tab-container.component';
 
 describe('TabContainerComponent', () => {
-  let component: TabContainerComponent;
-  let fixture: ComponentFixture<TabContainerComponent>;
+    let component: TabContainerComponent;
+    let fixture: ComponentFixture<TabContainerComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TabContainerComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [TabContainerComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(TabContainerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(TabContainerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -20,20 +20,7 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
     attackDice: string;
     defenseDice: string;
 
-    constructor(
-        public el: ElementRef,
-    ) {}
-
-    ngOnInit(): void {
-        //this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
-        if (this.playerCharacter.dice === 'attack') {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D4)';
-        } else {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D6)';
-        }
-    }
+    constructor(public el: ElementRef) {}
 
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);
@@ -49,6 +36,17 @@ export class PlayerMapEntityInfoViewComponent implements OnInit {
 
     get attackArray() {
         return new Array(this.playerCharacter.attributes.attack);
+    }
+
+    ngOnInit(): void {
+        // this.renderer.setStyle(this.el.nativeElement, '--dynamic-scale', this.scale.toString());
+        if (this.playerCharacter.dice === 'attack') {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D4)';
+        } else {
+            this.attackDice = '(D6)';
+            this.defenseDice = '(D6)';
+        }
     }
 
     closePanel() {

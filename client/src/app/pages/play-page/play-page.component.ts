@@ -96,9 +96,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         }
     }
     ngOnInit(): void {
-        this.socketStateService.setActiveSocket(this.webSocketService)
+        this.socketStateService.setActiveSocket(this.webSocketService);
         this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-            //this.players = this.webSocketService.getTotalPlayers();
+            // this.players = this.webSocketService.getTotalPlayers();
             this.myPlayer = player;
             console.log('Joueur actuel:', this.myPlayer);
         });

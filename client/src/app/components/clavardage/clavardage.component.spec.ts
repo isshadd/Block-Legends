@@ -7,105 +7,98 @@ import { Subject } from 'rxjs';
 import { ChangeDetectorRef } from '@angular/core';
 
 describe('ClavardageComponent', () => {
-  let component: ClavardageComponent;
-  let fixture: ComponentFixture<ClavardageComponent>;
-  let chatService: jasmine.SpyObj<ChatService>;
-  let messageReceivedSubject: Subject<void>;
+    let component: ClavardageComponent;
+    let fixture: ComponentFixture<ClavardageComponent>;
+    let chatService: jasmine.SpyObj<ChatService>;
+    let messageReceivedSubject: Subject<void>;
 
-  beforeEach(async () => {
-    messageReceivedSubject = new Subject<void>();
-    
-    const chatServiceSpy = jasmine.createSpyObj('ChatService', [
-      'initialize',
-      'broadcastMessageToAll'
-    ], {
-      roomMessages: [],
-      playerName: 'TestPlayer',
-      messageReceived$: messageReceivedSubject.asObservable()
+    beforeEach(async () => {
+        messageReceivedSubject = new Subject<void>();
+
+        const chatServiceSpy = jasmine.createSpyObj('ChatService', ['initialize', 'broadcastMessageToAll'], {
+            roomMessages: [],
+            playerName: 'TestPlayer',
+            messageReceived$: messageReceivedSubject.asObservable(),
+        });
+
+        await TestBed.configureTestingModule({
+            imports: [FormsModule, CommonModule],
+            declarations: [],
+            providers: [{ provide: ChatService, useValue: chatServiceSpy }, ChangeDetectorRef],
+        }).compileComponents();
+
+        chatService = TestBed.inject(ChatService) as jasmine.SpyObj<ChatService>;
     });
 
-    await TestBed.configureTestingModule({
-      imports: [FormsModule, CommonModule],
-      declarations: [],
-      providers: [
-        { provide: ChatService, useValue: chatServiceSpy },
-        ChangeDetectorRef
-      ]
-    }).compileComponents();
+    beforeEach(() => {
+        fixture = TestBed.createComponent(ClavardageComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-    chatService = TestBed.inject(ChatService) as jasmine.SpyObj<ChatService>;
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(ClavardageComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    it('should initialize chatService and set playerName on init', () => {
+        component.ngOnInit();
+        expect(chatService.initialize).toHaveBeenCalled();
+        expect(component.playerName).toBe('TestPlayer');
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should send message and clear input', () => {
+        component.messageToSend = 'Test message';
+        component.sendMessage();
 
-  it('should initialize chatService and set playerName on init', () => {
-    component.ngOnInit();
-    expect(chatService.initialize).toHaveBeenCalled();
-    expect(component.playerName).toBe('TestPlayer');
-  });
+        expect(chatService.broadcastMessageToAll).toHaveBeenCalledWith('Test message');
+        expect(component.messageToSend).toBe('');
+        expect(component.shouldScroll).toBeTrue();
+    });
 
-  it('should send message and clear input', () => {
-    component.messageToSend = 'Test message';
-    component.sendMessage();
-    
-    expect(chatService.broadcastMessageToAll).toHaveBeenCalledWith('Test message');
-    expect(component.messageToSend).toBe('');
-    expect(component.shouldScroll).toBeTrue();
-  });
+    it('should set shouldScroll to true when message is received', () => {
+        component.ngOnInit();
+        messageReceivedSubject.next();
 
-  it('should set shouldScroll to true when message is received', () => {
-    component.ngOnInit();
-    messageReceivedSubject.next();
-    
-    expect(component.shouldScroll).toBeTrue();
-  });
+        expect(component.shouldScroll).toBeTrue();
+    });
 
-  it('should track by index correctly', () => {
-    const index = 5;
-    expect(component.trackByIndex(index)).toBe(index);
-  });
+    it('should track by index correctly', () => {
+        const index = 5;
+        expect(component.trackByIndex(index)).toBe(index);
+    });
 
-  it('should scroll to bottom after view checked when shouldScroll is true', fakeAsync(() => {
-    // Create a mock element with scrollHeight
-    const mockElement = {
-      scrollTop: 0,
-      scrollHeight: 1000
-    };
-    
-    // Set up the component's messagesContainer
-    component.messagesContainer = {
-      nativeElement: mockElement
-    } as any;
-    
-    component.shouldScroll = true;
-    component.ngAfterViewChecked();
-    
-    tick(1); // Wait for setTimeout
-    
-    expect(mockElement.scrollTop).toBe(mockElement.scrollHeight);
-    expect(component.shouldScroll).toBeFalse();
-  }));
+    it('should scroll to bottom after view checked when shouldScroll is true', fakeAsync(() => {
+        // Create a mock element with scrollHeight
+        const mockElement = {
+            scrollTop: 0,
+            scrollHeight: 1000,
+        };
 
+        // Set up the component's messagesContainer
+        component.messagesContainer = {
+            nativeElement: mockElement,
+        } as unknown;
 
-  // Test for message subscription cleanup
-  it('should unsubscribe on destroy', () => {
-    spyOn(messageReceivedSubject, 'subscribe').and.callThrough();
-    component.ngOnInit();
-    
-    const subscription = messageReceivedSubject.subscribe();
-    
-    // Verify subscription is active
-    expect(subscription.closed).toBeFalse();
-    
-    // Clean up
-    subscription.unsubscribe();
-  });
+        component.shouldScroll = true;
+        component.ngAfterViewChecked();
+
+        tick(1); // Wait for setTimeout
+
+        expect(mockElement.scrollTop).toBe(mockElement.scrollHeight);
+        expect(component.shouldScroll).toBeFalse();
+    }));
+
+    // Test for message subscription cleanup
+    it('should unsubscribe on destroy', () => {
+        spyOn(messageReceivedSubject, 'subscribe').and.callThrough();
+        component.ngOnInit();
+
+        const subscription = messageReceivedSubject.subscribe();
+
+        // Verify subscription is active
+        expect(subscription.closed).toBeFalse();
+
+        // Clean up
+        subscription.unsubscribe();
+    });
 });

@@ -5,44 +5,39 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 
-
 @WebSocketGateway({ cors: true })
 @Injectable()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer() private server: Server;
     private logger = new Logger(ChatGateway.name);
-    private readonly room : string = PRIVATE_ROOM_ID;
-
-    constructor() {}
-
+    private readonly room: string = PRIVATE_ROOM_ID;
 
     @SubscribeMessage(ChatEvents.BroadcastAll)
-    broadcastAll(socket: Socket, message: {time: Date, sender: string, content: string }) {
+    broadcastAll(socket: Socket, message: { time: Date; sender: string; content: string }) {
         this.server.emit(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`);
     }
 
-
     @SubscribeMessage(ChatEvents.RoomMessage)
-    roomMessage(socket: Socket, message : RoomMessage) {
+    roomMessage(socket: Socket, message: RoomMessage) {
         this.logger.log(`Message received in room ${message.room}`);
-      if (socket.rooms.has(message.room)) {
-        const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
-        this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
-      } else {
-        this.logger.warn(`Socket ${socket.id} attempted to send message to room ${message.room} but is not a member.`);
-      }
+        if (socket.rooms.has(message.room)) {
+            const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
+            this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
+        } else {
+            this.logger.warn(`Socket ${socket.id} attempted to send message to room ${message.room} but is not a member.`);
+        }
     }
-    
+
     @SubscribeMessage(ChatEvents.EventMessage)
     eventMessage(socket: Socket, payload: { time: Date; content: string; roomID: string; associatedPlayers: string[] }) {
-        this.logger.log(`Event received`);
-        const { time, content, roomID , associatedPlayers } = payload;
+        this.logger.log('Event received');
+        const { time, content, roomID, associatedPlayers } = payload;
         if (socket.rooms.has(roomID)) {
             const event = `${time} ${content}`;
-            this.server.to(roomID).emit(ChatEvents.EventReceived, {event, associatedPlayers});
-          } else {
+            this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
+        } else {
             this.logger.warn(`Socket ${socket.id} attempted to send message to room ${roomID} but is not a member.`);
-          }
+        }
     }
 
     afterInit() {
