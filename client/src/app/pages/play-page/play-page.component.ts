@@ -26,27 +26,29 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
+import { PlayGameSideViewBarComponent } from "../../components/play-game-side-view-bar/play-game-side-view-bar.component";
 
 @Component({
     selector: 'app-play-page',
     standalone: true,
     imports: [
-        MapComponent,
-        TabContainerComponent,
-        RouterModule,
-        ClavardageComponent,
-        InfosGameComponent,
-        PlayerMapEntityInfoViewComponent,
-        PlayerInfoComponent,
-        PlayersListComponent,
-        MapTileInfoComponent,
-        PlaceableEntityContainerComponent,
-        TimerComponent,
-        ContainerComponent,
-        InfoPanelComponent,
-        FightViewComponent,
-        WinPanelComponent,
-    ],
+    MapComponent,
+    TabContainerComponent,
+    RouterModule,
+    ClavardageComponent,
+    InfosGameComponent,
+    PlayerMapEntityInfoViewComponent,
+    PlayerInfoComponent,
+    PlayersListComponent,
+    MapTileInfoComponent,
+    PlaceableEntityContainerComponent,
+    TimerComponent,
+    ContainerComponent,
+    InfoPanelComponent,
+    FightViewComponent,
+    WinPanelComponent,
+    PlayGameSideViewBarComponent
+],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
 })
