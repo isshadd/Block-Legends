@@ -1,7 +1,7 @@
 /* eslint-disable no-undef*/
 
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { GameService, VP_NUMBER } from './game.service';
 
 const ACCESS_CODE = 5678;

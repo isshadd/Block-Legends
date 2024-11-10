@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -8,8 +7,10 @@ import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
-import { GameBoardParameters, WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { TileType } from '@common/enums/tile-type';
+import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { BattleManagerService } from './battle-manager.service';

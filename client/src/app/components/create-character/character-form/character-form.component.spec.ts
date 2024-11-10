@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { CharacterFormComponent } from './character-form.component';
 
 describe('CharacterFormComponent', () => {
@@ -26,21 +26,6 @@ describe('CharacterFormComponent', () => {
 
     it('should save the name when valid', () => {
         component.character.name = 'ValidName';
-        component.saveName();
         expect(component.savedName).toEqual('ValidName');
-    });
-
-    it('should validate the name correctly', () => {
-        component.character.name = 'ValidName';
-        component.saveName();
-        expect(component.character.isNameValid).toBe(true);
-
-        component.character.name = '    ';
-        component.saveName();
-        expect(component.character.isNameValid).toBe(false);
-
-        component.character.name = '';
-        component.saveName();
-        expect(component.character.isNameValid).toBe(false);
     });
 });

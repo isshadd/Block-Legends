@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { ChatService } from '@app/services/chat-service.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { of } from 'rxjs';
 import { SocketStateService } from './SocketService/socket-state.service';
 import { WebSocketService } from './SocketService/websocket.service';
