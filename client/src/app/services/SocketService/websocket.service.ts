@@ -111,6 +111,10 @@ export class WebSocketService {
         }
     }
 
+    getTotalPlayers(): PlayerCharacter[] {
+        return this.playersSubject.value;
+    }
+
     getRoomInfo() {
         return this.currentRoom;
     }

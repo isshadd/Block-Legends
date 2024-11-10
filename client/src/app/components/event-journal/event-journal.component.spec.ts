@@ -152,5 +152,4 @@ describe('EventJournalComponent', () => {
             expect(subscriptionSpy).toHaveBeenCalledTimes(2);
         });
     });
-
 });
