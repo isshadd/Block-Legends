@@ -103,11 +103,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.updatePlayersList();
         });
 
-        this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-            this.myPlayer = player;
+        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+            this.myPlayer = character;
+            this.totalLifePoints = this.myPlayer.attributes.life;
         });
-
-        this.totalLifePoints = this.myPlayer.attributes.life;
     }
 
     updatePlayersList(): void {
