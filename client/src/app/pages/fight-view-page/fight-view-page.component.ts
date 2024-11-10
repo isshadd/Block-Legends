@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
@@ -10,6 +9,7 @@ import { FightViewComponent } from '@app/components/play-area/fight-view/fight-v
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 @Component({
     selector: 'app-fight-view-page',

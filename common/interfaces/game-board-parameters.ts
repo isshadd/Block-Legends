@@ -1,4 +1,4 @@
-import { GameShared } from '@common/interfaces/game-shared';
+import { GameShared } from './game-shared';
 
 export interface GameBoardParameters {
     game: GameShared;

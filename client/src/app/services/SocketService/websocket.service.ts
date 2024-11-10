@@ -2,11 +2,11 @@
 
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { GameRoom } from '@app/interfaces/game-room';
 import { ChatService } from '@app/services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
-import { SocketEvents } from '@common/enums/socket-events';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { GameRoom } from '@common/interfaces/game-room';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -216,5 +216,13 @@ export class WebSocketService {
         this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
             this.chatService.roomMessages.push(broadcastMessage);
         });
+
+        /*
+        this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
+            if (!this.currentRoom.players.find((player) => player.isOrganizer)) {
+                this.router.navigate(['/home']);
+            }
+        });
+        */
     }
 }
