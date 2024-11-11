@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/member-ordering*/
-
+/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { ChatService } from '@app/services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { ChatService } from '../chat-services/chat-service.service';
 
 export interface GameRoom {
     roomId: string;
@@ -42,11 +44,13 @@ export class WebSocketService {
     avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
 
     currentRoom: GameRoom;
+    chatRoom: GameRoom;
 
     constructor(
-        private chatService: ChatService,
         private router: Router,
-        public gameService: GameService,
+        private gameService: GameService,
+        private chatService: ChatService,
+        private eventJournalService: EventJournalService,
     ) {}
 
     init() {
@@ -54,12 +58,19 @@ export class WebSocketService {
         this.setupSocketListeners();
     }
 
-    send<T>(event: string, data?: T, callback?: () => void): void {
-        this.socket.emit(event, ...[data, callback].filter((x) => x));
-    }
-
     createGame(gameId: string, player: PlayerCharacter) {
         this.socket.emit('createGame', { gameId, playerOrganizer: player });
+    }
+
+    sendMsgToRoom(roomMessage: RoomMessage): void {
+        this.socket.emit('roomMessage', roomMessage);
+    }
+
+    sendEventToRoom(event: string, players: string[]): void {
+        const time = this.eventJournalService.serverClock;
+        const roomID = this.eventJournalService.roomID;
+        const content = event;
+        this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
     }
 
     joinGame(accessCode: number) {
@@ -100,7 +111,6 @@ export class WebSocketService {
         }
     }
 
-    // Ajouté par Nihal
     getTotalPlayers(): PlayerCharacter[] {
         return this.playersSubject.value;
     }
@@ -190,7 +200,7 @@ export class WebSocketService {
                 this.isLockedSubject.next(false);
                 this.playersSubject.next([]);
                 this.router.navigate(['/home']).then(() => {
-                    alert('Vous avez été expulsé de la salle');
+                    alert('Vous avez été expulsé de la salle, redirection en cours...');
                 });
             }
         });
@@ -225,10 +235,17 @@ export class WebSocketService {
 
         this.socket.on('clock', (serverClock: Date) => {
             this.chatService.serverClock = serverClock;
+            this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on('massMessage', (broadcastMessage: string) => {
-            this.chatService.roomMessages.push(broadcastMessage);
+        this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
+            this.eventJournalService.addEvent(data);
+            this.eventJournalService.messageReceivedSubject.next();
+        });
+
+        this.socket.on('roomMessage', (message: string) => {
+            this.chatService.roomMessages.push(message);
+            this.chatService.messageReceivedSubject.next();
         });
     }
 }
