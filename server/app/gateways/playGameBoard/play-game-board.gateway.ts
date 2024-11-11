@@ -39,8 +39,9 @@ export class PlayGameBoardGateway {
     @SubscribeMessage('initGameBoard')
     handleInitGameBoard(client: Socket) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(room.accessCode);
+        if (!room) return;
 
+        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(room.accessCode);
         if (gameBoardParameters) {
             client.emit('initGameBoardParameters', gameBoardParameters);
             this.playGameBoardTimeService.setTimerPreparingTurn(room.accessCode);
@@ -94,6 +95,8 @@ export class PlayGameBoardGateway {
     @SubscribeMessage('userRespawned')
     handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
         this.server.to(room.accessCode.toString()).emit('roomUserRespawned', { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
@@ -121,6 +124,8 @@ export class PlayGameBoardGateway {
     @SubscribeMessage('userAttacked')
     handleUserAttacked(client: Socket, attackResult: number) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
         this.server.to(room.accessCode.toString()).emit('opponentAttacked', attackResult);
 
         if (attackResult > 0) {
@@ -140,6 +145,8 @@ export class PlayGameBoardGateway {
     @SubscribeMessage('userTriedEscape')
     handleUserTriedEscape(client: Socket) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
         this.server.to(room.accessCode.toString()).emit('opponentTriedEscape');
 
         if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, client.id)) {
@@ -153,12 +160,19 @@ export class PlayGameBoardGateway {
     @SubscribeMessage('userWon')
     handleUserWon(client: Socket) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
         this.server.to(room.accessCode.toString()).emit('gameBoardPlayerWon', client.id);
     }
 
     isClientTurn(client: Socket) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+
+        if (!room) {
+            return false;
+        }
+
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(room.accessCode);
 
         if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ActiveTurn) {
@@ -243,8 +257,9 @@ export class PlayGameBoardGateway {
 
     handleTimeOut(accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        if (!room) return;
 
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
         switch (gameTimer.state) {
             case GameTimerState.ActiveTurn:
                 this.endRoomTurn(accessCode);
@@ -265,6 +280,7 @@ export class PlayGameBoardGateway {
         const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
         const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (!room) return;
 
         if (battleRoom) {
             if (battleRoom.firstPlayerId === socketId) {
