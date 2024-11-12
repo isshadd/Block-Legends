@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
+import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
+import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
-import { AttributesComponent } from '../create-character/attributes/attributes.component';
-import { AvatarSelectionComponent } from '../create-character/avatar-selection/avatar-selection.component';
-import { CharacterFormComponent } from '../create-character/character-form/character-form.component';
 
 @Component({
     selector: 'app-character-name-saver',
@@ -13,7 +13,7 @@ import { CharacterFormComponent } from '../create-character/character-form/chara
     templateUrl: './character-name-saver.component.html',
     styleUrl: './character-name-saver.component.scss',
 })
-export class CharacterNameSaverComponent {
+export class CharacterNameSaverComponent implements OnInit {
     character = new PlayerCharacter('');
     characterStatus: string | null;
     gameId: string | null;
