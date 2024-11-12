@@ -22,25 +22,29 @@ describe('SideViewPlayerInfoComponent', () => {
     it('should return correct healthArray based on player life attribute', () => {
         component.playerCharacter = new PlayerCharacter('test');
         fixture.detectChanges();
-        expect(component.healthArray.length).toBe(4);
+        const value = 4;
+        expect(component.healthArray.length).toBe(value);
     });
 
     it('should return correct defenseArray based on player defense attribute', () => {
         component.playerCharacter = new PlayerCharacter('test');
         fixture.detectChanges();
-        expect(component.defenseArray.length).toBe(4);
+        const value = 4;
+        expect(component.defenseArray.length).toBe(value);
     });
 
     it('should return correct speedArray based on player speed attribute', () => {
         component.playerCharacter = new PlayerCharacter('test');
         fixture.detectChanges();
-        expect(component.speedArray.length).toBe(4);
+        const value = 4;
+        expect(component.speedArray.length).toBe(value);
     });
 
     it('should return correct attackArray based on player attack attribute', () => {
         component.playerCharacter = new PlayerCharacter('test');
         fixture.detectChanges();
-        expect(component.attackArray.length).toBe(4);
+        const value = 4;
+        expect(component.attackArray.length).toBe(value);
     });
 
     it('should set correct dice values in ngOnInit based on playerCharacter.dice', () => {

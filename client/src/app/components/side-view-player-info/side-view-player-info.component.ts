@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
 
 @Component({
@@ -9,15 +9,13 @@ import { PlayerCharacter } from '@app/classes/Characters/player-character';
     templateUrl: './side-view-player-info.component.html',
     styleUrl: './side-view-player-info.component.scss',
 })
-export class SideViewPlayerInfoComponent {
+export class SideViewPlayerInfoComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
     @Input() actionPoints: number;
     @Input() totalLife: number;
 
     attackDice: string;
     defenseDice: string;
-
-    constructor() {}
 
     get healthArray() {
         return new Array(this.playerCharacter.attributes.life);
