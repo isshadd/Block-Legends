@@ -4,7 +4,7 @@
       <li *ngFor="let msg of messages; trackBy: trackByIndex">{{ msg }}</li>
     </ul>
   </div>
-  <input [(ngModel)]="messageToSend" (keydown.enter)="sendMessage()" type="text" placeholder="Écrivez votre message..."/>
+  <input [(ngModel)]="messageToSend" (keydown.enter)="sendMessage()" type="text" [placeholder] = "playerName" />
 </div>
 
 

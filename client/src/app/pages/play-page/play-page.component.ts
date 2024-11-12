@@ -1,5 +1,7 @@
-/* eslint-disable max-lines */
-
+/* eslint-disable no-restricted-imports */
+/* eslint-disable max-params */
+/* eslint-disable max-len */
+/* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
@@ -26,6 +28,7 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { PlayGameSideViewBarComponent } from "../../components/play-game-side-view-bar/play-game-side-view-bar.component";
 
 @Component({
@@ -72,6 +75,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public router: Router,
         private webSocketService: WebSocketService,
         private gameService: GameService,
+        private socketStateService: SocketStateService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -100,6 +104,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         }
     }
     ngOnInit(): void {
+        this.socketStateService.setActiveSocket(this.webSocketService);
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
             this.updatePlayersList();
