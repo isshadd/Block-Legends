@@ -1,7 +1,7 @@
 <div class="info-char">
     <div class="name-creation">
         <label class="text-comp" for="name">Nom :</label>
-        <input id="name" [(ngModel)]="character.name" name="name" required maxlength="15" />
+        <input id="name" [(ngModel)]="character.name" name="name" required maxlength="15" placeholder="Nom du personnage" />
         <button class="dark-button" type="button" (click)="saveName()">Enregistrer le nom</button>
         @if(!character.isNameValid){
         <div class="error">Le nom n'est pas valide</div>

@@ -1,0 +1,11 @@
+<form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
+    <app-avatar-selection [character]="character"></app-avatar-selection>
+    <app-attributes [character]="character"></app-attributes>
+    @if(characterStatus) {
+    <div id="message">{{ characterStatus }}</div>
+    }
+    <div class="button-create-character">
+        <button class="dark-button" id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
+        <button class="dark-button" id="create" type="submit">Créer le personnage</button>
+    </div>
+</form>

@@ -1,8 +1,8 @@
 <div class="glob">
-    <h1>Création de personnage</h1>
     <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
         <app-character-form [character]="character"></app-character-form>
         @if(characterStatus) {
         <div id="message">{{ characterStatus }}</div>
         }
     </form>
+</div>
