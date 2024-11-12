@@ -18,22 +18,24 @@ import { WinPanelComponent } from '@app/components/win-panel/win-panel.component
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
+import { CharacterNameSaverComponent } from "../../components/character-name-saver/character-name-saver.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
     imports: [
-        FightViewComponent,
-        PlayerMapEntityInfoViewComponent,
-        MapTileInfoComponent,
-        ItemInfoComponent,
-        InfoPanelComponent,
-        WinPanelComponent,
-        InfosGameComponent,
-        TabContainerComponent,
-        PlayersListComponent,
-        SideViewPlayerInfoComponent,
-        PlayGameSideViewBarComponent,
-    ],
+    FightViewComponent,
+    PlayerMapEntityInfoViewComponent,
+    MapTileInfoComponent,
+    ItemInfoComponent,
+    InfoPanelComponent,
+    WinPanelComponent,
+    InfosGameComponent,
+    TabContainerComponent,
+    PlayersListComponent,
+    SideViewPlayerInfoComponent,
+    PlayGameSideViewBarComponent,
+    CharacterNameSaverComponent
+],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })
