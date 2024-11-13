@@ -230,11 +230,11 @@ export class WebSocketService {
             this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
                 this.chatService.roomMessages.push(broadcastMessage);
             });
+        });
 
-            this.socket.on('roomMessage', (message: string) => {
-                this.chatService.roomMessages.push(message);
-                this.chatService.messageReceivedSubject.next();
-            });
+        this.socket.on('roomMessage', (message: string) => {
+            this.chatService.roomMessages.push(message);
+            this.chatService.messageReceivedSubject.next();
         });
 
         /*
