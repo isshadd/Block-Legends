@@ -2,18 +2,16 @@
 /* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChatService } from '@app/services/chat-service.service';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
-import { GameShared } from '@common/interfaces/game-shared';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatService } from '../chat-services/chat-service.service';
 
 @Injectable({
     providedIn: 'root',
@@ -229,13 +227,14 @@ export class WebSocketService {
         this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
-        this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
-            this.chatService.roomMessages.push(broadcastMessage);
-        });
+            this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
+                this.chatService.roomMessages.push(broadcastMessage);
+            });
 
-        this.socket.on('roomMessage', (message: string) => {
-            this.chatService.roomMessages.push(message);
-            this.chatService.messageReceivedSubject.next();
+            this.socket.on('roomMessage', (message: string) => {
+                this.chatService.roomMessages.push(message);
+                this.chatService.messageReceivedSubject.next();
+            });
         });
 
         /*
