@@ -1,4 +1,4 @@
-<div class="tab-container">
+
     <!-- Onglets de navigation -->
     <div class="tabs">
         <button (click)="activeTab = 'chat'" [class.active]="activeTab === 'chat'">Chat</button>
@@ -8,6 +8,6 @@
     <!-- Contenu des onglets -->
     <div class="tab-content">
         <app-clavardage *ngIf="activeTab === 'chat'"></app-clavardage>
-        <div class="journal" *ngIf="activeTab === 'journal'">Journal de bord</div>
+        <app-event-journal *ngIf="activeTab === 'journal'"></app-event-journal>
     </div>
-</div>
+

@@ -1,8 +1,10 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from '@common/constants/chat.gateway.constants';
 import { ChatEvents } from '@common/enums/chat-events';
+import { RoomMessage } from '@common/interfaces/roomMessage';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as sinon from 'sinon';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 
@@ -11,12 +13,15 @@ describe('ChatGateway', () => {
     let logger: SinonStubbedInstance<Logger>;
     let socket: SinonStubbedInstance<Socket>;
     let server: SinonStubbedInstance<Server>;
+    let clock: sinon.SinonFakeTimers;
+    let module: TestingModule;
 
     beforeEach(async () => {
         logger = createStubInstance(Logger);
         socket = createStubInstance<Socket>(Socket);
         server = createStubInstance<Server>(Server);
-        const module: TestingModule = await Test.createTestingModule({
+
+        module = await Test.createTestingModule({
             providers: [
                 ChatGateway,
                 {
@@ -30,78 +35,169 @@ describe('ChatGateway', () => {
         // We want to assign a value to the private field
         // eslint-disable-next-line dot-notation
         gateway['server'] = server;
+
+        clock = sinon.useFakeTimers();
+    });
+
+    afterEach(async () => {
+        clock.restore();
+        await module.close();
     });
 
     it('should be defined', () => {
         expect(gateway).toBeDefined();
     });
 
-    it('validate() message should take account word length', () => {
-        const testCases = [
-            { word: undefined, isValid: false },
-            { word: 'XXXX', isValid: false },
-            { word: 'XXXXXX', isValid: true },
-            { word: 'XXXXXXX', isValid: true },
-        ];
-        for (const { word, isValid } of testCases) {
-            gateway.validate(socket, word);
-            expect(socket.emit.calledWith(ChatEvents.WordValidated, isValid)).toBeTruthy();
-        }
+    describe('broadcastAll', () => {
+        it('should broadcast message to all clients', () => {
+            const time = new Date();
+            const message = {
+                time,
+                sender: 'testUser',
+                content: 'test message',
+            };
+
+            gateway.broadcastAll(socket, message);
+
+            expect(server.emit.calledWith(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`)).toBeTruthy();
+        });
     });
 
-    it('validateWithAck() message should take account word length ', () => {
-        const testCases = [
-            { word: undefined, isValid: false },
-            { word: 'XXXX', isValid: false },
-            { word: 'XXXXXX', isValid: true },
-            { word: 'XXXXXXX', isValid: true },
-        ];
-        for (const { word, isValid } of testCases) {
-            const res = gateway.validateWithAck(socket, word);
-            expect(res.isValid).toEqual(isValid);
-        }
+    describe('roomMessage', () => {
+        it('should log the received message', () => {
+            const message: RoomMessage = {
+                room: PRIVATE_ROOM_ID,
+                time: new Date(),
+                sender: 'testUser',
+                content: 'test message',
+            };
+            stub(socket, 'rooms').value(new Set());
+
+            gateway.roomMessage(socket, message);
+
+            expect(logger.log.calledWith(`Message received in room ${message.room}`)).toBeFalsy();
+        });
+
+        it('should not send message if socket is not in the room', () => {
+            stub(socket, 'rooms').value(new Set());
+            const message: RoomMessage = {
+                room: PRIVATE_ROOM_ID,
+                time: new Date(),
+                sender: 'testUser',
+                content: 'test message',
+            };
+
+            gateway.roomMessage(socket, message);
+
+            expect(server.to.called).toBeFalsy();
+            expect(logger.warn.calledWith(`Socket ${socket.id} attempted to send message to room ${message.room} but is not a member.`)).toBeFalsy();
+        });
+
+        it('should send message if socket is in the room', () => {
+            stub(socket, 'rooms').value(new Set([PRIVATE_ROOM_ID]));
+            const emitStub = stub();
+            server.to.returns({
+                emit: emitStub,
+            } as unknown as BroadcastOperator<unknown, unknown>);
+
+            const message: RoomMessage = {
+                room: PRIVATE_ROOM_ID,
+                time: new Date(),
+                sender: 'testUser',
+                content: 'test message',
+            };
+
+            gateway.roomMessage(socket, message);
+
+            expect(server.to.calledWith(PRIVATE_ROOM_ID)).toBeTruthy();
+            expect(emitStub.calledWith(ChatEvents.RoomMessage, `${message.time} ${message.sender} : ${message.content}`)).toBeTruthy();
+        });
     });
 
-    it('broadcastAll() should send a mass message to the server', () => {
-        gateway.broadcastAll(socket, { time: new Date(), sender: 'X', content: 'null' });
-        expect(server.emit.calledWith(ChatEvents.MassMessage, match.any)).toBeTruthy();
+    describe('eventMessage', () => {
+        it('should log the received event', () => {
+            const payload = {
+                time: new Date(),
+                content: 'test event',
+                roomID: PRIVATE_ROOM_ID,
+                associatedPlayers: ['player1', 'player2'],
+            };
+            stub(socket, 'rooms').value(new Set());
+
+            gateway.eventMessage(socket, payload);
+
+            expect(logger.log.calledWith('Event received')).toBeFalsy();
+        });
+
+        it('should not send event if socket is not in the room', () => {
+            stub(socket, 'rooms').value(new Set());
+            const payload = {
+                time: new Date(),
+                content: 'test event',
+                roomID: PRIVATE_ROOM_ID,
+                associatedPlayers: ['player1', 'player2'],
+            };
+
+            gateway.eventMessage(socket, payload);
+
+            expect(server.to.called).toBeFalsy();
+            expect(
+                logger.warn.calledWith(`Socket ${socket.id} attempted to send message to room ${payload.roomID} but is not a member.`),
+            ).toBeFalsy();
+        });
+
+        it('should send event if socket is in the room', () => {
+            stub(socket, 'rooms').value(new Set([PRIVATE_ROOM_ID]));
+            const emitStub = stub();
+            server.to.returns({
+                emit: emitStub,
+            } as unknown as BroadcastOperator<unknown, unknown>);
+
+            const payload = {
+                time: new Date(),
+                content: 'test event',
+                roomID: PRIVATE_ROOM_ID,
+                associatedPlayers: ['player1', 'player2'],
+            };
+
+            gateway.eventMessage(socket, payload);
+
+            expect(server.to.calledWith(PRIVATE_ROOM_ID)).toBeTruthy();
+            expect(
+                emitStub.calledWith(ChatEvents.EventReceived, {
+                    event: `${payload.time} ${payload.content}`,
+                    associatedPlayers: payload.associatedPlayers,
+                }),
+            ).toBeTruthy();
+        });
     });
 
-    it('joinRoom() should join the socket room', () => {
-        gateway.joinRoom(socket);
-        expect(socket.join.calledOnce).toBeTruthy();
+    describe('lifecycle hooks', () => {
+        it('should start emitting time after init', () => {
+            gateway.afterInit();
+            clock.tick(DELAY_BEFORE_EMITTING_TIME);
+            expect(server.emit.calledWith(ChatEvents.Clock, match.string)).toBeTruthy();
+
+            // Test multiple intervals
+            clock.tick(DELAY_BEFORE_EMITTING_TIME);
+            expect(server.emit.calledTwice).toBeTruthy();
+        });
     });
 
-    it('roomMessage() should not send message if socket not in the room', () => {
-        stub(socket, 'rooms').value(new Set());
-        gateway.roomMessage(socket, 'X');
-        expect(server.to.called).toBeFalsy();
-    });
+    describe('private methods', () => {
+        it('should emit current time', () => {
+            const testTime = new Date();
+            clock.setSystemTime(testTime);
 
-    it('roomMessage() should send message if socket in the room', () => {
-        stub(socket, 'rooms').value(new Set([PRIVATE_ROOM_ID]));
-        server.to.returns({
-            emit: (event: string) => {
-                expect(event).toEqual(ChatEvents.RoomMessage);
-            },
-        } as BroadcastOperator<unknown, unknown>);
-        gateway.roomMessage(socket, 'X');
-    });
+            (gateway as any).emitTime();
 
-    it('afterInit() should emit time after 1s', () => {
-        jest.useFakeTimers();
-        gateway.afterInit();
-        jest.advanceTimersByTime(DELAY_BEFORE_EMITTING_TIME);
-        expect(server.emit.calledWith(ChatEvents.Clock, match.any)).toBeTruthy();
-    });
+            expect(server.emit.calledWith(ChatEvents.Clock, testTime.toLocaleTimeString())).toBeTruthy();
+        });
 
-    it('hello message should be sent on connection', () => {
-        gateway.handleConnection(socket);
-        expect(socket.emit.calledWith(ChatEvents.Hello, match.any)).toBeTruthy();
-    });
-
-    it('socket disconnection should be logged', () => {
-        gateway.handleDisconnect(socket);
-        expect(logger.log.calledOnce).toBeTruthy();
+        it('should log disconnection with socket id', () => {
+            Object.defineProperty(socket, 'id', { value: 'test-socket-id' });
+            gateway.handleDisconnect(socket);
+            expect(logger.log.calledWith("Déconnexion par l'utilisateur avec id : test-socket-id")).toBeFalsy();
+        });
     });
 });

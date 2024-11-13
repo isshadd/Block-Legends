@@ -31,6 +31,10 @@ export class GameService {
         this.characterSubject.next(character);
     }
 
+    setCurrentPlayer(player: PlayerCharacter) {
+        this.currentPlayerSubject.next(player);
+    }
+
     generateVirtualCharacter(index: number): PlayerCharacter {
         return new PlayerCharacter('Joueur virtuel ' + (index + 1));
     }
