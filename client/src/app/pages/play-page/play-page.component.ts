@@ -29,6 +29,7 @@ import { PlayPageMouseHandlerService } from '@app/services/play-page-services/pl
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
 
 @Component({
     selector: 'app-play-page',
@@ -49,6 +50,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
         InfoPanelComponent,
         FightViewComponent,
         WinPanelComponent,
+        PlayGameSideViewBarComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
