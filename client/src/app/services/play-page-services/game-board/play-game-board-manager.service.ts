@@ -96,7 +96,7 @@ export class PlayGameBoardManagerService {
     }
 
     startTurn() {
-        const userPlayerCharacter = this.findPlayerFromSocketId(this.webSocketService.socket.id);
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
 
         if (!this.isUserTurn || !userPlayerCharacter) {
             return;
@@ -268,14 +268,13 @@ export class PlayGameBoardManagerService {
     }
 
     startBattle(playerId: string, enemyPlayerId: string) {
-        const userId = this.webSocketService.socket.id;
-        if (userId !== playerId && userId !== enemyPlayerId) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) return;
+
+        if (currentPlayer.socketId !== playerId && currentPlayer.socketId !== enemyPlayerId) {
             this.areOtherPlayersInBattle = true;
             return;
         }
-
-        const currentPlayer = this.getCurrentPlayerCharacter();
-        if (!currentPlayer) return;
 
         let opponentPlayer: PlayerCharacter | null;
         if (currentPlayer.socketId === playerId) {
@@ -327,8 +326,8 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    endGame(playerId: string) {
-        this.winnerPlayer = this.findPlayerFromSocketId(playerId);
+    endGame(winnerPlayerId: string) {
+        this.winnerPlayer = this.findPlayerFromSocketId(winnerPlayerId);
     }
 
     getWinnerPlayer(): PlayerCharacter | null {
