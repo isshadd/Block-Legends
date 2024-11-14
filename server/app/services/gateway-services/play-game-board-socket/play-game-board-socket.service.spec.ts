@@ -1,7 +1,10 @@
 import { Game } from '@app/model/database/game';
-import { GameBoardParameters, GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
+import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
+import { GameRoom } from '@common/interfaces/game-room';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayGameBoardSocketService } from './play-game-board-socket.service';
@@ -26,7 +29,7 @@ describe('PlayGameBoardSocketService', () => {
                 },
                 avatar: undefined,
                 name: 'player1',
-            },
+            } as PlayerCharacter,
             {
                 socketId: 'player2',
                 attributes: {
@@ -37,7 +40,7 @@ describe('PlayGameBoardSocketService', () => {
                 },
                 avatar: undefined,
                 name: 'player2',
-            },
+            } as PlayerCharacter,
         ],
         organizer: 'player1',
         isLocked: false,

@@ -130,8 +130,9 @@ describe('WebSocketService', () => {
             isLocked: false,
             maxPlayers: 4,
             currentPlayerTurn: '',
-            roomId: 'room123',
-        } as GameRoom;
+            id: 'room123',
+            organizer: 'socket-id',
+        };
 
         let handler: (room: GameRoom) => void = () => {};
         socketSpy.on.and.callFake(function (event, fn) {

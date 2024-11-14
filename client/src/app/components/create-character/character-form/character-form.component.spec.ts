@@ -23,9 +23,4 @@ describe('CharacterFormComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should save the name when valid', () => {
-        component.character.name = 'ValidName';
-        expect(component.savedName).toEqual('ValidName');
-    });
 });

@@ -224,11 +224,12 @@ describe('PlayGameBoardManagerService - initCharacters', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [mockPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const spawnPlaces: [number, string][] = [[0, 'player1']];
@@ -1630,11 +1631,12 @@ describe('PlayGameBoardManagerService - findPlayerFromPlayerMapEntity', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [mockPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromPlayerMapEntity(playerMapEntity);
@@ -1650,11 +1652,12 @@ describe('PlayGameBoardManagerService - findPlayerFromPlayerMapEntity', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [otherPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromPlayerMapEntity(playerMapEntity);
@@ -1690,11 +1693,12 @@ describe('PlayGameBoardManagerService - findPlayerFromName', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [mockPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromName(playerName);
@@ -1709,11 +1713,12 @@ describe('PlayGameBoardManagerService - findPlayerFromName', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [otherPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromName(playerName);
@@ -1757,11 +1762,12 @@ describe('PlayGameBoardManagerService - findPlayerFromSocketId', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [mockPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromSocketId(socketId);
@@ -1777,11 +1783,12 @@ describe('PlayGameBoardManagerService - findPlayerFromSocketId', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [otherPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.findPlayerFromSocketId(socketId);
@@ -1821,11 +1828,12 @@ describe('PlayGameBoardManagerService - getCurrentPlayerTurnName', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [mockPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.getCurrentPlayerTurnName();
@@ -1843,11 +1851,12 @@ describe('PlayGameBoardManagerService - getCurrentPlayerTurnName', () => {
 
         webSocketServiceSpy.getRoomInfo.and.returnValue({
             players: [otherPlayer],
-            roomId: '',
+            id: '',
             accessCode: 0,
             isLocked: false,
             maxPlayers: 0,
             currentPlayerTurn: '',
+            organizer: '',
         });
 
         const result = service.getCurrentPlayerTurnName();
