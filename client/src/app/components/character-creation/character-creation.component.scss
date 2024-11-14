@@ -1,7 +1,23 @@
-#avatar-selector{
+@import 'src/_variables.scss';
+#avatar-selector {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
-    flex-direction: column;
+
+    #images {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+
+        app-avatar-selection {
+            border: 2px solid darken($primary-dark, 10%);
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+        }
+    }
 }

@@ -1,8 +1,14 @@
 <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
     <div id="avatar-selector">
-        <app-avatar-selection [character]="character"></app-avatar-selection>
-        <app-image-showcase [character]="character"></app-image-showcase>
-        <app-attributes [character]="character"></app-attributes>
+        <div id="images">
+            <app-avatar-selection [character]="character"></app-avatar-selection>
+            <div id="container">
+                <div id="image-container">
+                    <app-image-showcase [character]="character"></app-image-showcase>
+                </div>
+                <app-attributes [character]="character"></app-attributes>
+            </div>
+        </div>
     </div>
     @if(characterStatus) {
     <div id="message">{{ characterStatus }}</div>

@@ -1,57 +1,55 @@
 @import 'src/_variables.scss';
+
 #total-container {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    padding: 10px;
-    border: 2px solid darken($primary-dark, 10);
+    gap: 2vh;
+    width: 100%;
+    border: 0.2vh solid darken($primary-dark, 10%);
     background-color: $primary-dark;
-    width: fit-content;
 }
+
 .attributes {
     display: flex;
     justify-content: space-between;
-    gap: 50px;
+    gap: 5vh;
     color: $primary-light;
     background-color: $primary-dark;
-    padding: 10px;
-    border: 5px solid #000;
+    padding: 1vh;
+    border: 0.5vh solid #000;
+    height: 20vh; /* Set consistent height based on viewport height */
+    width: 45vh; /* Set consistent width based on viewport height */
 
     h3 {
         color: $primary-light;
     }
 }
-.attribute input {
-    width: 70px;
-    text-align: center;
-}
+
 .attribute {
     display: flex;
     flex-direction: column;
     align-items: center;
     color: black;
     background-color: $secondary;
-    padding: 10px;
+    padding: 1vh;
     justify-content: space-around;
+    width: 15vh; /* Adjusted to be viewport height-based */
+    height: 15vh; /* Consistent sizing based on viewport height */
 }
 
 button[disabled] {
     background-color: $secondary;
     cursor: not-allowed;
-    border: 2px solid $secondary;
+    border: 0.2vh solid $secondary;
 }
 
-.large-emojis option {
-    font-size: 1em;
-}
 .large-emojis {
     font-size: 1em;
-    height: auto;
-    width: 200px;
-    height: 40px;
-    margin: 5px;
+    width: 25vh;
+    height: 6vh;
+    margin: 0.8vh;
 }
 
 #description {
@@ -59,8 +57,8 @@ button[disabled] {
     flex-direction: column;
     text-align: center;
     color: black;
-    padding: 10px;
-    border: 1px solid #000;
+    padding: 1vh;
+    border: 0.1vh solid #000;
     justify-content: space-around;
 }
 
@@ -73,40 +71,22 @@ select:hover {
     background-color: darken($primary-dark, 20%);
 }
 
-.life-emoji {
-    width: 30px;
-    height: 30px;
-}
-
-.armour-emoji {
-    width: 40px;
-    height: 40px;
-}
-
-.speed-emoji {
-    width: 40px;
-    height: 40px;
-}
-
-.attack-emoji {
-    width: 40px;
-    height: 40px;
-}
-
 .attributes-container {
     width: fit-content;
     height: fit-content;
     background-color: $primary-dark;
+
     .attribute-container {
         display: flex;
         flex-direction: row;
         background-color: $secondary;
-        padding: 10px;
-        border-radius: 5px;
-        border: 2px solid darken($primary-dark, 10);
+        padding: 1vh;
+        border-radius: 0.5vh;
+        border: 0.2vh solid darken($primary-dark, 10%);
         justify-content: space-between;
         align-items: center;
         width: 55vh;
+
         .container {
             align-items: center;
             color: #000;
@@ -115,24 +95,25 @@ select:hover {
 }
 
 .dark-button {
-    margin: 5px;
-    width: 200px;
-    height: 40px;
+    margin: 0.5vh;
+    width: 25vh;
+    height: 6vh;
 }
+
 .icon-container {
     display: inline-block;
-    margin-right: 2px;
+    margin-right: 0.2vh;
 }
 
 .icon {
-    width: 20px;
-    height: 20px;
+    width: 3vh;
+    height: 3vh;
     vertical-align: middle;
+    margin: 0.2vh;
 }
-
 .small-icon {
-    width: 25px;
-    height: 25px;
+    width: 4vh;
+    height: 4vh;
     vertical-align: middle;
 }
 
@@ -140,4 +121,3 @@ select:hover {
     display: flex;
     flex-direction: column;
 }
-

@@ -5,9 +5,9 @@
     justify-content: center; // Centers the content horizontally
     align-items: center; // Centers the content vertically
     background-color: $primary-dark;
-    border: 2px solid darken($primary-dark, 10%);
-    padding: 15px; // Adds space within the container
     max-width: fit-content; // Adjusts the width to fit its contents
+    height: 100%;
+    padding-right: 15px;
     overflow: hidden;
 }
 .avatar-container {
