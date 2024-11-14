@@ -1,5 +1,15 @@
 @import 'src/_variables.scss';
-
+#total-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px;
+    border: 2px solid darken($primary-dark, 10);
+    background-color: $primary-dark;
+    width: fit-content;
+}
 .attributes {
     display: flex;
     justify-content: space-between;
@@ -39,6 +49,9 @@ button[disabled] {
 .large-emojis {
     font-size: 1em;
     height: auto;
+    width: 200px;
+    height: 40px;
+    margin: 5px;
 }
 
 #description {
@@ -81,8 +94,8 @@ select:hover {
 }
 
 .attributes-container {
-    width: 1000px;
-    height: 1000px;
+    width: fit-content;
+    height: fit-content;
     background-color: $primary-dark;
     .attribute-container {
         display: flex;
@@ -93,15 +106,18 @@ select:hover {
         border: 2px solid darken($primary-dark, 10);
         justify-content: space-between;
         align-items: center;
-        width: fit-content;
+        width: 55vh;
         .container {
             align-items: center;
+            color: #000;
         }
     }
 }
 
 .dark-button {
-    margin: 10px;
+    margin: 5px;
+    width: 200px;
+    height: 40px;
 }
 .icon-container {
     display: inline-block;
@@ -113,3 +129,15 @@ select:hover {
     height: 20px;
     vertical-align: middle;
 }
+
+.small-icon {
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+}
+
+#dice-container {
+    display: flex;
+    flex-direction: column;
+}
+

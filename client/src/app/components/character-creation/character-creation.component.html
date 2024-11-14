@@ -1,6 +1,7 @@
 <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
-    <div>
+    <div id="avatar-selector">
         <app-avatar-selection [character]="character"></app-avatar-selection>
+        <app-image-showcase [character]="character"></app-image-showcase>
         <app-attributes [character]="character"></app-attributes>
     </div>
     @if(characterStatus) {

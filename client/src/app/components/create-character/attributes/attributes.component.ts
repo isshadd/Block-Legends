@@ -50,4 +50,12 @@ export class AttributesComponent {
     get speedArray() {
         return new Array(this.character.attributes.speed);
     }
+
+    get attackArray() {
+        return new Array(this.character.attributes.attack);
+    }
+
+    get defenseArray() {
+        return new Array(this.character.attributes.defense);
+    }
 }

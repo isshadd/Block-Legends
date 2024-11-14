@@ -5,11 +5,12 @@ import { GameService } from '@app/services/game-services/game.service';
 import { AvatarSelectionComponent } from '../create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '../create-character/character-form/character-form.component';
 import { AttributesComponent } from "../create-character/attributes/attributes.component";
+import { ImageShowcaseComponent } from "../image-showcase/image-showcase.component";
 
 @Component({
     selector: 'app-character-creation',
     standalone: true,
-    imports: [CharacterFormComponent, AvatarSelectionComponent, AttributesComponent],
+    imports: [CharacterFormComponent, AvatarSelectionComponent, AttributesComponent, ImageShowcaseComponent],
     templateUrl: './character-creation.component.html',
     styleUrl: './character-creation.component.scss',
 })
