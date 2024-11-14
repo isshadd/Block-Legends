@@ -42,4 +42,12 @@ export class AttributesComponent {
             this.selectedAttackDice = 'dice4';
         }
     }
+
+    get healthArray() {
+        return new Array(this.character.attributes.life);
+    }
+
+    get speedArray() {
+        return new Array(this.character.attributes.speed);
+    }
 }

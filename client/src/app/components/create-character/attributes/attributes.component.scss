@@ -79,3 +79,37 @@ select:hover {
     width: 40px;
     height: 40px;
 }
+
+.attributes-container {
+    width: 1000px;
+    height: 1000px;
+    background-color: $primary-dark;
+    .attribute-container {
+        display: flex;
+        flex-direction: row;
+        background-color: $secondary;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid darken($primary-dark, 10);
+        justify-content: space-between;
+        align-items: center;
+        width: fit-content;
+        .container {
+            align-items: center;
+        }
+    }
+}
+
+.dark-button {
+    margin: 10px;
+}
+.icon-container {
+    display: inline-block;
+    margin-right: 2px;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
