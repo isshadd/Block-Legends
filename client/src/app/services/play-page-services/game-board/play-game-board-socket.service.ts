@@ -15,10 +15,9 @@ import { Socket } from 'socket.io-client';
 })
 export class PlayGameBoardSocketService implements OnDestroy {
     socket: Socket;
-    private destroy$ = new Subject<void>();
-
-    private signalPlayerLeft = new Subject<string>();
+    signalPlayerLeft = new Subject<string>();
     signalPlayerLeft$ = this.signalPlayerLeft.asObservable();
+    private destroy$ = new Subject<void>();
 
     constructor(
         public webSocketService: WebSocketService,
