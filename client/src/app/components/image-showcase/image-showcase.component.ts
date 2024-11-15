@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
 import { GameService } from '@app/services/game-services/game.service';
 import { Avatar } from '@common/enums/avatar-enum';
-
+enum AvatarImages {
+    MineshaftImage,
+    Standing,
+    DogPetting,
+    Lost,
+    Fight,
+}
 @Component({
     selector: 'app-image-showcase',
     standalone: true,
@@ -10,6 +16,7 @@ import { Avatar } from '@common/enums/avatar-enum';
     styleUrl: './image-showcase.component.scss',
 })
 export class ImageShowcaseComponent {
+    currentImage: string;
     constructor(public gameService: GameService) {
         this.gameService.signalAvatarSelected$.subscribe((avatar) => {
             this.setupImage(avatar);
@@ -18,24 +25,23 @@ export class ImageShowcaseComponent {
         this.currentImage = 'assets/images/avatar/wallpaper.jpg';
     }
 
-    currentImage: string;
-
     setupImage(avatar: Avatar) {
         this.currentImage = this.getRandomisedImage(avatar);
     }
 
     getRandomisedImage(avatar: Avatar) {
-        const random = Math.floor(Math.random() * 5) + 1;
+        const random = Math.floor(Math.random() * (Object.keys(AvatarImages).length / 2));
+
         switch (random) {
-            case 1:
+            case AvatarImages.MineshaftImage:
                 return avatar.mineshaftImage;
-            case 2:
+            case AvatarImages.Standing:
                 return avatar.standing;
-            case 3:
+            case AvatarImages.DogPetting:
                 return avatar.dog_petting;
-            case 4:
+            case AvatarImages.Lost:
                 return avatar.lost;
-            case 5:
+            case AvatarImages.Fight:
                 return avatar.fight;
             default:
                 return avatar.standing;

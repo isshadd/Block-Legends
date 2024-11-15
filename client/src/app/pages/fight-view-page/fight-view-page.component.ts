@@ -4,6 +4,7 @@ import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { Tile } from '@app/classes/Tiles/tile';
+import { CharacterCreationComponent } from '@app/components/character-creation/character-creation.component';
 import { CharacterNameSaverComponent } from '@app/components/character-name-saver/character-name-saver.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
@@ -19,25 +20,24 @@ import { WinPanelComponent } from '@app/components/win-panel/win-panel.component
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
-import { CharacterCreationComponent } from "../../components/character-creation/character-creation.component";
 @Component({
     selector: 'app-fight-view-page',
     standalone: true,
     imports: [
-    FightViewComponent,
-    PlayerMapEntityInfoViewComponent,
-    MapTileInfoComponent,
-    ItemInfoComponent,
-    InfoPanelComponent,
-    WinPanelComponent,
-    InfosGameComponent,
-    TabContainerComponent,
-    PlayersListComponent,
-    SideViewPlayerInfoComponent,
-    PlayGameSideViewBarComponent,
-    CharacterNameSaverComponent,
-    CharacterCreationComponent
-],
+        FightViewComponent,
+        PlayerMapEntityInfoViewComponent,
+        MapTileInfoComponent,
+        ItemInfoComponent,
+        InfoPanelComponent,
+        WinPanelComponent,
+        InfosGameComponent,
+        TabContainerComponent,
+        PlayersListComponent,
+        SideViewPlayerInfoComponent,
+        PlayGameSideViewBarComponent,
+        CharacterNameSaverComponent,
+        CharacterCreationComponent,
+    ],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })

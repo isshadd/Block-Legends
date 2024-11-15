@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
+import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
+import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { GameService } from '@app/services/game-services/game.service';
-import { AvatarSelectionComponent } from '../create-character/avatar-selection/avatar-selection.component';
-import { CharacterFormComponent } from '../create-character/character-form/character-form.component';
-import { AttributesComponent } from "../create-character/attributes/attributes.component";
-import { ImageShowcaseComponent } from "../image-showcase/image-showcase.component";
 
 @Component({
     selector: 'app-character-creation',
@@ -14,7 +14,7 @@ import { ImageShowcaseComponent } from "../image-showcase/image-showcase.compone
     templateUrl: './character-creation.component.html',
     styleUrl: './character-creation.component.scss',
 })
-export class CharacterCreationComponent {
+export class CharacterCreationComponent implements OnInit {
     character = new PlayerCharacter('');
     gameId: string | null;
 

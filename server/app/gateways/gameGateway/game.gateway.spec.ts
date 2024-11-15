@@ -515,7 +515,7 @@ describe('GameGateway', () => {
                 id: '9',
                 accessCode,
                 players: [
-                    { name: 'Heidi', socketId: 'client16', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Muffin },
+                    { name: 'Heidi', socketId: 'client16', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Mushroom },
                     { name: 'Ivan', socketId: 'client17', attributes: { life: 3, speed: 3, attack: 3, defense: 3 }, avatar: AvatarEnum.Piglin },
                 ],
                 isLocked: false,
@@ -776,7 +776,7 @@ describe('GameGateway', () => {
                 name: 'Olivia',
                 socketId: 'client33',
                 attributes: { life: 1, speed: 1, attack: 1, defense: 1 },
-                avatar: AvatarEnum.Muffin,
+                avatar: AvatarEnum.Mushroom,
             };
 
             gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
@@ -792,7 +792,7 @@ describe('GameGateway', () => {
             const playerToKick = {
                 name: 'PlayerToKick',
                 socketId: 'socket123',
-                avatar: AvatarEnum.Muffin,
+                avatar: AvatarEnum.Mushroom,
                 attributes: {
                     life: 3,
                     speed: 3,
@@ -809,7 +809,7 @@ describe('GameGateway', () => {
                     {
                         name: 'PlayerToKick',
                         socketId: 'socket123',
-                        avatar: AvatarEnum.Muffin,
+                        avatar: AvatarEnum.Mushroom,
                         attributes: {
                             life: 3,
                             speed: 3,

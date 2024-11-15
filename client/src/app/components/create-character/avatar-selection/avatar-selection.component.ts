@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
-import { CharacterFormComponent } from '../character-form/character-form.component';
 
 @Component({
     selector: 'app-avatar-selection',
