@@ -40,148 +40,150 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.INIT_GAME_BOARD)
-    handleInitGameBoard(client: Socket, accessCode: number) {
-        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+    handleInitGameBoard(client: Socket) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
 
+        const gameBoardParameters: GameBoardParameters = this.gameSocketRoomService.gameBoardRooms.get(room.accessCode);
         if (gameBoardParameters) {
             client.emit(SocketEvents.INIT_GAME_BOARD_PARAMETERS, gameBoardParameters);
-            this.playGameBoardTimeService.setTimerPreparingTurn(accessCode);
-            this.updateRoomTime(accessCode);
-            this.playGameBoardTimeService.resumeTimer(accessCode);
+            this.playGameBoardTimeService.setTimerPreparingTurn(room.accessCode);
+            this.updateRoomTime(room.accessCode);
+            this.playGameBoardTimeService.resumeTimer(room.accessCode);
         } else {
             client.emit(SocketEvents.ERROR, { message: 'Room pas trouvé' });
         }
     }
 
     @SubscribeMessage(SocketEvents.USER_END_TURN)
-    handleUserEndTurn(client: Socket, accessCode: number) {
-        if (!this.isClientTurn(client, accessCode)) {
+    handleUserEndTurn(client: Socket) {
+        if (!this.isClientTurn(client)) {
             return;
         }
-        this.handleTimeOut(accessCode);
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        this.handleTimeOut(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_STARTED_MOVING)
-    handleUserStartedMoving(client: Socket, accessCode: number) {
-        if (!this.isClientTurn(client, accessCode)) {
+    handleUserStartedMoving(client: Socket) {
+        if (!this.isClientTurn(client)) {
             return;
         }
-        this.playGameBoardTimeService.pauseTimer(accessCode);
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        this.playGameBoardTimeService.pauseTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_FINISHED_MOVING)
-    handleUserFinishedMoving(client: Socket, accessCode: number) {
-        if (!this.isClientTurn(client, accessCode)) {
+    handleUserFinishedMoving(client: Socket) {
+        if (!this.isClientTurn(client)) {
             return;
         }
-        this.playGameBoardTimeService.resumeTimer(accessCode);
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        this.playGameBoardTimeService.resumeTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_MOVED)
-    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
-        if (!this.isClientTurn(client, data.accessCode)) {
+    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
+        if (!this.isClientTurn(client)) {
             return;
         }
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.server
-            .to(data.accessCode.toString())
+            .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
-    handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2; accessCode: number }) {
+    handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
         this.server
-            .to(data.accessCode.toString())
+            .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_RESPAWNED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_DOOR_ACTION)
-    handleUserDidDoorAction(client: Socket, data: { tileCoordinate: Vec2; accessCode: number }) {
-        if (!this.isClientTurn(client, data.accessCode)) {
+    handleUserDidDoorAction(client: Socket, tileCoordinate: Vec2) {
+        if (!this.isClientTurn(client)) {
             return;
         }
-        this.server.to(data.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, data.tileCoordinate);
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, tileCoordinate);
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)
-    handleUserDidBattleAction(client: Socket, data: { enemyPlayerId: string; accessCode: number }) {
-        if (!this.isClientTurn(client, data.accessCode)) {
+    handleUserDidBattleAction(client: Socket, enemyPlayerId: string) {
+        if (!this.isClientTurn(client)) {
             return;
         }
-        this.handleStartBattle(data.accessCode, client.id, data.enemyPlayerId);
-        this.server
-            .to(data.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId: data.enemyPlayerId });
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        this.handleStartBattle(room.accessCode, client.id, enemyPlayerId);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId });
     }
 
     @SubscribeMessage(SocketEvents.USER_ATTACKED)
-    handleUserAttacked(client: Socket, data: { attackResult: number; accessCode: number }) {
-        if (!this.isValidRoom(data.accessCode)) {
-            return;
-        }
+    handleUserAttacked(client: Socket, attackResult: number) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
 
-        this.server.to(data.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, data.attackResult);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, attackResult);
 
-        if (data.attackResult > 0) {
-            const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(data.accessCode);
+        if (attackResult > 0) {
+            const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(room.accessCode);
 
-            this.server.to(data.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
+            this.server.to(room.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
 
             if (isPlayerDead) {
-                this.handleBattleEndedByDeath(data.accessCode, client.id);
+                this.handleBattleEndedByDeath(room.accessCode, client.id);
                 return;
             }
         }
 
-        this.endBattleTurn(data.accessCode);
+        this.endBattleTurn(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_TRIED_ESCAPE)
-    handleUserTriedEscape(client: Socket, accessCode: number) {
-        if (!this.isValidRoom(accessCode)) {
+    handleUserTriedEscape(client: Socket) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_TRIED_ESCAPE);
+
+        if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, client.id)) {
+            this.handleBattleEndedByEscape(room.accessCode);
             return;
         }
 
-        this.server.to(accessCode.toString()).emit(SocketEvents.OPPONENT_TRIED_ESCAPE);
-
-        if (this.playGameBoardBattleService.userUsedEvade(accessCode, client.id)) {
-            this.handleBattleEndedByEscape(accessCode);
-            return;
-        }
-
-        this.endBattleTurn(accessCode);
+        this.endBattleTurn(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_WON)
-    handleUserWon(client: Socket, accessCode: number) {
-        if (!this.isValidRoom(accessCode)) {
-            return;
-        }
+    handleUserWon(client: Socket) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
 
-        this.playGameBoardTimeService.pauseTimer(accessCode);
-        this.server.to(accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, client.id);
+        this.playGameBoardTimeService.pauseTimer(room.accessCode);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, client.id);
     }
 
-    isClientTurn(client: Socket, accessCode: number) {
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+    isClientTurn(client: Socket) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
 
-        if (!this.isValidRoom(accessCode)) {
+        if (!room) {
             return false;
         }
+
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(room.accessCode);
 
         if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ActiveTurn) {
             this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
-            return false;
-        }
-
-        return true;
-    }
-
-    isValidRoom(accessCode: number) {
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-
-        if (!room) {
-            this.logger.error(`Room pas trouvé pour code: ${accessCode}`);
             return false;
         }
 
@@ -210,10 +212,6 @@ export class PlayGameBoardGateway {
     }
 
     handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
-        if (!this.isValidRoom(accessCode)) {
-            return;
-        }
-
         this.playGameBoardTimeService.pauseTimer(accessCode);
         this.playGameBoardBattleService.createBattleTimer(accessCode, playerId, enemyPlayerId);
 
@@ -226,18 +224,10 @@ export class PlayGameBoardGateway {
     }
 
     handleBattleTimeOut(accessCode: number) {
-        if (!this.isValidRoom(accessCode)) {
-            return;
-        }
-
         this.server.to(accessCode.toString()).emit(SocketEvents.AUTOMATIC_ATTACK);
     }
 
     endBattleTurn(accessCode: number) {
-        if (!this.isValidRoom(accessCode)) {
-            return;
-        }
-
         this.playGameBoardBattleService.endBattleTurn(accessCode);
         this.handleBattleSecondPassed(accessCode);
 
@@ -275,13 +265,10 @@ export class PlayGameBoardGateway {
     }
 
     handleTimeOut(accessCode: number) {
-        if (!this.isValidRoom(accessCode)) {
-            return;
-        }
-
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
+        if (!room) return;
 
+        const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(accessCode);
         switch (gameTimer.state) {
             case GameTimerState.ActiveTurn:
                 this.endRoomTurn(accessCode);
@@ -302,6 +289,7 @@ export class PlayGameBoardGateway {
         const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
         const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (!room) return;
 
         if (battleRoom) {
             if (battleRoom.firstPlayerId === socketId) {

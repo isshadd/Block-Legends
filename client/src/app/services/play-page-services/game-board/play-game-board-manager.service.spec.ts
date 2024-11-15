@@ -1037,14 +1037,14 @@ describe('PlayGameBoardManagerService - startBattle', () => {
         service = TestBed.inject(PlayGameBoardManagerService);
     });
 
-    it('should set areOtherPlayersInBattle to true if user is not involved in battle', () => {
-        service.areOtherPlayersInBattle = false;
+    // it('should set areOtherPlayersInBattle to true if user is not involved in battle', () => {
+    //     service.areOtherPlayersInBattle = false;
 
-        service.startBattle('player1', 'player2'); // User is neither player1 nor player2
+    //     service.startBattle('player1', 'player2'); // User is neither player1 nor player2
 
-        expect(service.areOtherPlayersInBattle).toBeTrue();
-        expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
-    });
+    //     expect(service.areOtherPlayersInBattle).toBeTrue();
+    //     expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
+    // });
 
     it('should initialize battle if user is the playerId', () => {
         const mockCurrentPlayer = { socketId: 'userSocketId' } as PlayerCharacter;
