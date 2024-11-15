@@ -112,23 +112,23 @@ describe('PlayGameBoardSocketService', () => {
         it('should subscribe to signalUserMoved$ and emit "userMoved"', () => {
             const data = { x: 1, y: 2 };
             mockPlayGameBoardManagerService.signalUserMoved$.next(data);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userMoved', { ...data, accessCode: 1234 });
+            expect(mockSocket.emit).toHaveBeenCalledWith('userMoved', data);
         });
 
         it('should subscribe to signalUserRespawned$ and emit "userRespawned"', () => {
             const data = { x: 3, y: 4 };
             mockPlayGameBoardManagerService.signalUserRespawned$.next(data);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userRespawned', { ...data, accessCode: 1234 });
+            expect(mockSocket.emit).toHaveBeenCalledWith('userRespawned', data);
         });
 
         it('should subscribe to signalUserStartedMoving$ and emit "userStartedMoving"', () => {
             mockPlayGameBoardManagerService.signalUserStartedMoving$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userStartedMoving', 1234);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userStartedMoving');
         });
 
         it('should subscribe to signalUserFinishedMoving$ and emit "userFinishedMoving"', () => {
             mockPlayGameBoardManagerService.signalUserFinishedMoving$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userFinishedMoving', 1234);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userFinishedMoving');
         });
 
         it('should subscribe to signalUserGotTurnEnded$ and call endTurn', () => {
@@ -140,44 +140,29 @@ describe('PlayGameBoardSocketService', () => {
         it('should subscribe to signalUserDidDoorAction$ and emit "userDidDoorAction"', () => {
             const tileCoordinate = { x: 5, y: 6 };
             mockPlayGameBoardManagerService.signalUserDidDoorAction$.next(tileCoordinate);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userDidDoorAction', { tileCoordinate, accessCode: 1234 });
+            expect(mockSocket.emit).toHaveBeenCalledWith('userDidDoorAction', tileCoordinate);
         });
 
         it('should subscribe to signalUserDidBattleAction$ and emit "userDidBattleAction"', () => {
             const enemyPlayerId = 'enemy123';
             mockPlayGameBoardManagerService.signalUserDidBattleAction$.next(enemyPlayerId);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userDidBattleAction', { enemyPlayerId, accessCode: 1234 });
+            expect(mockSocket.emit).toHaveBeenCalledWith('userDidBattleAction', enemyPlayerId);
         });
 
         it('should subscribe to signalUserWon$ and emit "userWon"', () => {
             mockPlayGameBoardManagerService.signalUserWon$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userWon', 1234);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userWon');
         });
 
         it('should subscribe to battleManagerService.signalUserAttacked$ and emit "userAttacked"', () => {
             const attackResult = 50;
             mockBattleManagerService.signalUserAttacked$.next(attackResult);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userAttacked', { attackResult, accessCode: 1234 });
+            expect(mockSocket.emit).toHaveBeenCalledWith('userAttacked', attackResult);
         });
 
         it('should subscribe to battleManagerService.signalUserTriedEscape$ and emit "userTriedEscape"', () => {
             mockBattleManagerService.signalUserTriedEscape$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userTriedEscape', 1234);
-        });
-    });
-
-    describe('init', () => {
-        it('should call initGameBoard with accessCode', () => {
-            spyOn(service, 'initGameBoard');
-            service.init();
-            expect(service.initGameBoard).toHaveBeenCalledWith(1234);
-        });
-    });
-
-    describe('initGameBoard', () => {
-        it('should emit "initGameBoard" with accessCode', () => {
-            service.initGameBoard(5678);
-            expect(mockSocket.emit).toHaveBeenCalledWith('initGameBoard', 5678);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userTriedEscape');
         });
     });
 
@@ -185,13 +170,13 @@ describe('PlayGameBoardSocketService', () => {
         it('should emit "userEndTurn" if isUserTurn is true', () => {
             mockPlayGameBoardManagerService.isUserTurn = true;
             service.endTurn();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userEndTurn', 1234);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userEndTurn');
         });
 
         it('should not emit "userEndTurn" if isUserTurn is false', () => {
             mockPlayGameBoardManagerService.isUserTurn = false;
             service.endTurn();
-            expect(mockSocket.emit).not.toHaveBeenCalledWith('userEndTurn', 1234);
+            expect(mockSocket.emit).not.toHaveBeenCalledWith('userEndTurn');
         });
     });
 

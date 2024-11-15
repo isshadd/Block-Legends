@@ -27,35 +27,35 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket = this.webSocketService.socket;
         this.setupSocketListeners();
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_MOVED, { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
+            this.socket.emit(SocketEvents.USER_MOVED, data);
         });
         this.playGameBoardManagerService.signalUserRespawned$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_RESPAWNED, { ...data, accessCode: this.webSocketService.getRoomInfo().accessCode });
+            this.socket.emit(SocketEvents.USER_RESPAWNED, data);
         });
         this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_STARTED_MOVING, this.webSocketService.getRoomInfo().accessCode);
+            this.socket.emit(SocketEvents.USER_STARTED_MOVING);
         });
         this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_FINISHED_MOVING, this.webSocketService.getRoomInfo().accessCode);
+            this.socket.emit(SocketEvents.USER_FINISHED_MOVING);
         });
         this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.endTurn();
         });
         this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((tileCoordinate) => {
-            this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, { tileCoordinate, accessCode: this.webSocketService.getRoomInfo().accessCode });
+            this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, tileCoordinate);
         });
         this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
-            this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, { enemyPlayerId, accessCode: this.webSocketService.getRoomInfo().accessCode });
+            this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, enemyPlayerId);
         });
         this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_WON, this.webSocketService.getRoomInfo().accessCode);
+            this.socket.emit(SocketEvents.USER_WON);
         });
 
         this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
-            this.socket.emit(SocketEvents.USER_ATTACKED, { attackResult, accessCode: this.webSocketService.getRoomInfo().accessCode });
+            this.socket.emit(SocketEvents.USER_ATTACKED, attackResult);
         });
         this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_TRIED_ESCAPE, this.webSocketService.getRoomInfo().accessCode);
+            this.socket.emit(SocketEvents.USER_TRIED_ESCAPE);
         });
     }
 
@@ -65,16 +65,12 @@ export class PlayGameBoardSocketService implements OnDestroy {
     }
 
     init() {
-        this.initGameBoard(this.webSocketService.getRoomInfo().accessCode);
-    }
-
-    initGameBoard(accessCode: number): void {
-        this.socket.emit(SocketEvents.INIT_GAME_BOARD, accessCode);
+        this.socket.emit(SocketEvents.INIT_GAME_BOARD);
     }
 
     endTurn(): void {
         if (this.playGameBoardManagerService.isUserTurn) {
-            this.socket.emit(SocketEvents.USER_END_TURN, this.webSocketService.getRoomInfo().accessCode);
+            this.socket.emit(SocketEvents.USER_END_TURN);
         }
     }
 
