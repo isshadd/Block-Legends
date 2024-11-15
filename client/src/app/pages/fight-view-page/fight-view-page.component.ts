@@ -7,6 +7,7 @@ import { InfoPanelComponent } from '@app/components/info-panel/info-panel.compon
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
 import { ItemInfoComponent } from '@app/components/item-info/item-info.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
+import { ModalOneOptionComponent } from '@app/components/modal-one-option/modal-one-option.component';
 import { FightViewComponent } from '@app/components/play-area/fight-view/fight-view.component';
 import { PlayGameSideViewBarComponent } from '@app/components/play-game-side-view-bar/play-game-side-view-bar.component';
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
@@ -33,6 +34,7 @@ import { AvatarEnum } from '@common/enums/avatar-enum';
         PlayersListComponent,
         SideViewPlayerInfoComponent,
         PlayGameSideViewBarComponent,
+        ModalOneOptionComponent,
     ],
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
