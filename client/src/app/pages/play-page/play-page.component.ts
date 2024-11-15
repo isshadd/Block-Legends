@@ -100,7 +100,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
-            this.updatePlayersList();
+            //this.updatePlayersList();
         });
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
@@ -109,25 +109,22 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
     }
 
-    updatePlayersList(): void {
-        const allPlayers = this.webSocketService.getTotalPlayers();
+    // updatePlayersList(): void {
+    //     const allPlayers = this.webSocketService.getTotalPlayers();
 
-        this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
-            const player = allPlayers.find((p) => p.name === playerName);
-            if (player) {
-                player.isAbsent = false; // Joueur présent
-                return player;
-            } else {
-                // Crée une instance temporaire de PlayerCharacter pour les joueurs absents
-                const absentPlayer = new PlayerCharacter(playerName);
-                absentPlayer.isAbsent = true;
-                return absentPlayer;
-            }
-        });
+    //     this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
+    //         const player = allPlayers.find((p) => p.name === playerName);
+    //         if (player) {
+    //             return player;
+    //         } else {
+    //             const absentPlayer = new PlayerCharacter(playerName);
+    //             absentPlayer.isAbsent = true;
+    //             return absentPlayer;
+    //         }
+    //     });
 
-        // Trie les joueurs pour que les absents soient en bas
-        this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
-    }
+    //     this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
+    // }
 
     ngOnDestroy(): void {
         this.destroy$.next();
@@ -162,6 +159,16 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     leaveGame(): void {
+        this.myPlayer.isAbsent = true;
+        this.handlePlayerAbandon();
         this.playGameBoardSocketService.leaveGame();
+    }
+
+    handlePlayerAbandon(): void {
+        // Mettez à jour la liste des joueurs pour mettre le joueur absent en bas
+        this.players = [
+            ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
+            this.myPlayer,
+        ]; // Ajouter le joueur absent en bas
     }
 }

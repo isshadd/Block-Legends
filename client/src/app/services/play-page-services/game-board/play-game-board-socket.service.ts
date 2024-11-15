@@ -77,6 +77,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
     }
 
     leaveGame(): void {
+        const player = this.playGameBoardManagerService.findPlayerFromSocketId(this.socket.id);
+        if (player) {
+            player.isAbsent = true;
+        }
         this.socket.disconnect();
         this.battleManagerService.clearBattle();
         this.playGameBoardManagerService.resetManager();
