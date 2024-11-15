@@ -35,7 +35,13 @@ export class EventJournalService {
         this.playerName = character.name;
     }
 
-    setAccessCode(code: number) {
+    setAccessCode(code: number | undefined) {
+        if (!code) {
+            this.accessCode = 0;
+            this.roomID = '';
+            return;
+        }
+
         this.accessCode = code;
         this.roomID = this.accessCode.toString();
     }
