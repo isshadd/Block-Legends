@@ -8,11 +8,12 @@ import { AvatarSelectionComponent } from '@app/components/create-character/avata
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
+import { CharacterCreationComponent } from "../../components/character-creation/character-creation.component";
 
 @Component({
     selector: 'app-create-character',
     standalone: true,
-    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
+    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent, CharacterCreationComponent],
     templateUrl: './create-character.component.html',
     styleUrl: './create-character.component.scss',
 })
