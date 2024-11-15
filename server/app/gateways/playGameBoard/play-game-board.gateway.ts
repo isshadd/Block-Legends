@@ -125,9 +125,7 @@ export class PlayGameBoardGateway {
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.handleStartBattle(room.accessCode, client.id, enemyPlayerId);
-        this.server
-            .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId: enemyPlayerId });
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId });
     }
 
     @SubscribeMessage(SocketEvents.USER_ATTACKED)

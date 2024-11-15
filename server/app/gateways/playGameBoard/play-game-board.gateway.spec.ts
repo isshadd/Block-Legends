@@ -225,7 +225,6 @@ describe('PlayGameBoardGateway', () => {
         });
 
         it('should emit error when room does not exist', () => {
-            const accessCode = 2222;
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
             jest.spyOn(gateway, 'updateRoomTime').mockImplementation(jest.fn());
 
@@ -496,7 +495,7 @@ describe('PlayGameBoardGateway', () => {
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('roomUserDidBattleAction', {
                         playerId: mockClient.id,
-                        enemyPlayerId: enemyPlayerId,
+                        enemyPlayerId,
                     });
                 });
 
