@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 
 @Component({

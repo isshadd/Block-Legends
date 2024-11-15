@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { BehaviorSubject } from 'rxjs';
-import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
 
 export const VP_NUMBER = 5;
 

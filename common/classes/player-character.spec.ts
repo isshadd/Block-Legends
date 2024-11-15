@@ -15,32 +15,32 @@ describe('PlayerCharacter', () => {
         component.assignLifeBonus();
         expect(component.attributes.life).toBe(BONUS);
         expect(component.attributes.speed).toBe(BASE_STATS);
-        expect(component.isLifeBonusAssigned).toBeTrue();
-        expect(component.isSpeedBonusAssigned).toBeTrue();
+        expect(component.isLifeBonusAssigned).toBe(true);
+        expect(component.isSpeedBonusAssigned).toBe(true);
     });
 
     it('should assign bonus to speed', () => {
         component.assignSpeedBonus();
         expect(component.attributes.speed).toBe(BONUS);
         expect(component.attributes.life).toBe(BASE_STATS);
-        expect(component.isLifeBonusAssigned).toBeTrue();
-        expect(component.isSpeedBonusAssigned).toBeTrue();
+        expect(component.isLifeBonusAssigned).toBe(true);
+        expect(component.isSpeedBonusAssigned).toBe(true);
     });
 
     it('should assign a dice to attack', () => {
         component.assignAttackDice();
-        expect(component.isAttackBonusAssigned).toBeTrue();
-        expect(component.isDefenseBonusAssigned).toBeTrue();
+        expect(component.isAttackBonusAssigned).toBe(true);
+        expect(component.isDefenseBonusAssigned).toBe(true);
     });
 
     it('should assign a dice to defense', () => {
         component.assignDefenseDice();
-        expect(component.isAttackBonusAssigned).toBeTrue();
-        expect(component.isDefenseBonusAssigned).toBeTrue();
+        expect(component.isAttackBonusAssigned).toBe(true);
+        expect(component.isDefenseBonusAssigned).toBe(true);
     });
 
     it('should set organizer', () => {
         component.setOrganizer();
-        expect(component.isOrganizer).toBeTrue();
+        expect(component.isOrganizer).toBe(true);
     });
 });

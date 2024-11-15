@@ -1,12 +1,12 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'; // Import NO_ERRORS_SCHEMA to ignore unknown elements
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { InfoPanelComponent } from './info-panel.component';
 

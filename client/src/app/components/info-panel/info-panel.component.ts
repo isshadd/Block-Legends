@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
@@ -8,6 +7,7 @@ import { ItemInfoComponent } from '@app/components/item-info/item-info.component
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
 import { PlayerMapEntityInfoViewComponent } from '@app/components/player-map-entity-info-view/player-map-entity-info-view.component';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-info-panel',

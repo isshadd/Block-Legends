@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';
 import { AvatarSelectionComponent } from './avatar-selection.component';
