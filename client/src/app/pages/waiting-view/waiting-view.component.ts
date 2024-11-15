@@ -54,13 +54,13 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
-            if (!this.gameId) return;
-
             this.isOrganizer = character.isOrganizer;
             this.chatService.setCharacter(character);
             this.eventJournalService.setCharacter(character);
 
             if (character.isOrganizer) {
+                if (!this.gameId) return;
+
                 this.playersCounter++;
                 this.webSocketService.init();
                 this.webSocketService.createGame(this.gameId, character);

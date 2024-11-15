@@ -95,8 +95,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
         if (added) {
-            client.emit(SocketEvents.JOIN_WAITING_ROOM_SUCCESS);
             this.updateRoomState(accessCode);
+            client.emit(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, player);
 
             const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
             if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {

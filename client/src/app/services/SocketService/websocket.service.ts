@@ -142,7 +142,8 @@ export class WebSocketService {
             },
         );
 
-        this.socket.on(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, () => {
+        this.socket.on(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, (player: PlayerCharacter) => {
+            this.gameService.setCharacter(player);
             this.router.navigate(['/waiting-view']);
         });
 

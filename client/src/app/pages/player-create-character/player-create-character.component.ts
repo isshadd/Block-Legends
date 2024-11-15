@@ -7,7 +7,6 @@ import { AvatarSelectionComponent } from '@app/components/create-character/avata
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
-import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/player-character';
 
@@ -36,7 +35,6 @@ export class PlayerCreateCharacterComponent {
 
     constructor(
         private router: Router,
-        private gameService: GameService,
         private route: ActivatedRoute,
         private webSocketService: WebSocketService,
     ) {}
@@ -68,7 +66,6 @@ export class PlayerCreateCharacterComponent {
         if (missingFields.length > 0) {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
         } else {
-            this.gameService.setCharacter(this.character);
             this.webSocketService.addPlayerToRoom(parseInt(this.gameId as string, 10), this.character);
         }
     }
