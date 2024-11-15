@@ -92,7 +92,9 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
@@ -100,7 +102,9 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         if (!room) return;
 
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_RESPAWNED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_RESPAWNED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_DOOR_ACTION)
@@ -121,10 +125,12 @@ export class PlayGameBoardGateway {
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.handleStartBattle(room.accessCode, client.id, enemyPlayerId);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId: enemyPlayerId });
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId: enemyPlayerId });
     }
 
-    @SubscribeMessage(ocketEvents.USER_ATTACKED)
+    @SubscribeMessage(SocketEvents.USER_ATTACKED)
     handleUserAttacked(client: Socket, attackResult: number) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         if (!room) return;
