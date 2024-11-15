@@ -1,4 +1,7 @@
-import { GameBattle, GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { GameRoom } from '@common/interfaces/game-room';
+import { GameBattle } from '@common/interfaces/game.battle';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayGameBoardBattleService } from './play-game-board-battle.service';
 
@@ -22,7 +25,7 @@ describe('PlayGameBoardBattleService', () => {
                 },
                 avatar: undefined,
                 name: 'player1',
-            },
+            } as PlayerCharacter,
             {
                 socketId: 'player2',
                 attributes: {
@@ -33,7 +36,7 @@ describe('PlayGameBoardBattleService', () => {
                 },
                 avatar: undefined,
                 name: 'player2',
-            },
+            } as PlayerCharacter,
         ],
         organizer: 'player1',
         isLocked: false,

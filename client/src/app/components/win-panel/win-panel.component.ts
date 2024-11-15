@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-win-panel',

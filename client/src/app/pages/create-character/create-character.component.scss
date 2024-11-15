@@ -1,56 +1,43 @@
 @import 'src/_variables.scss';
-
-h1 {
-    text-align: center;
-}
-
-form {
+#app-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
-    gap: 10px;
 }
-
-#life,
-#speed {
-    height: 55px;
-    width: 100px;
-}
-
-.info-char {
+#avatar-selector {
     display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    color: $primary-light;
-    background-color: $primary-dark;
-    border-radius: 5px;
-    padding: 10px;
-}
+    justify-content: center;
+    align-items: center;
+    margin-top: 3vh;
+    margin-bottom: 3vh;
 
-#message {
-    color: rgb(182, 16, 16);
-}
+    #images {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        border: 10px solid darken($primary-dark, 10);
+        background-color: $primary-dark;
+        padding: 10px;
 
-#label {
-    color: $primary-light;
-    background-color: $primary-dark;
-    border-radius: 5px;
-    padding: 10px;
-}
+        app-avatar-selection {
+            padding-right: 10px;
+        }
 
-#select {
-    padding: 5px;
-}
-
-#bonus {
-    background-color: whitesmoke;
-    border-radius: 5px;
-    padding: 10px;
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    }
 }
 
 .button-create-character {
-    width: 50%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+
+    .dark-button {
+        margin: 1vh;
+        width: 25vh;
+        height: 6vh;
+    }
 }

@@ -1,4 +1,5 @@
-import { GameSocketRoomService, GameTimerState } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameTimerState } from '@common/enums/game.timer.state';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
 

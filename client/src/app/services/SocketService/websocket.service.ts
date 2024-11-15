@@ -2,30 +2,16 @@
 /* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
-import { GameShared } from '@common/interfaces/game-shared';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { GameRoom } from '@common/interfaces/game-room';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatService } from '../chat-services/chat-service.service';
-
-export interface GameRoom {
-    roomId: string;
-    accessCode: number;
-    players: PlayerCharacter[];
-    isLocked: boolean;
-    maxPlayers: number;
-    currentPlayerTurn: string;
-}
-
-export interface GameBoardParameters {
-    game: GameShared;
-    spawnPlaces: [number, string][];
-    turnOrder: string[];
-}
 
 @Injectable({
     providedIn: 'root',
@@ -59,7 +45,7 @@ export class WebSocketService {
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
-        this.socket.emit('createGame', { gameId, playerOrganizer: player });
+        this.socket.emit(SocketEvents.CREATE_GAME, { gameId, playerOrganizer: player });
     }
 
     sendMsgToRoom(roomMessage: RoomMessage): void {
@@ -74,20 +60,20 @@ export class WebSocketService {
     }
 
     joinGame(accessCode: number) {
-        this.socket.emit('joinGame', accessCode);
+        this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
-        this.socket.emit('addPlayerToRoom', { accessCode, player });
+        this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
 
     kickPlayer(player: PlayerCharacter) {
-        this.socket.emit('kickPlayer', player);
+        this.socket.emit(SocketEvents.KICK_PLAYER, player);
     }
 
     leaveGame() {
         if (this.currentRoom.accessCode) {
-            this.socket.emit('leaveGame', this.currentRoom.accessCode);
+            this.socket.emit(SocketEvents.LEAVE_GAME, this.currentRoom.accessCode);
         }
         this.gameService.clearGame();
         this.isLockedSubject.next(false);
@@ -95,19 +81,19 @@ export class WebSocketService {
 
     lockRoom() {
         if (this.currentRoom.accessCode) {
-            this.socket.emit('lockRoom', this.currentRoom.accessCode);
+            this.socket.emit(SocketEvents.LOCK_ROOM, this.currentRoom.accessCode);
         }
     }
 
     unlockRoom() {
         if (this.currentRoom.accessCode) {
-            this.socket.emit('unlockRoom', this.currentRoom.accessCode);
+            this.socket.emit(SocketEvents.UNLOCK_ROOM, this.currentRoom.accessCode);
         }
     }
 
     startGame() {
         if (this.currentRoom.accessCode) {
-            this.socket.emit('startGame', this.currentRoom.accessCode);
+            this.socket.emit(SocketEvents.START_GAME, this.currentRoom.accessCode);
         }
     }
 
@@ -125,7 +111,7 @@ export class WebSocketService {
     }
 
     setupSocketListeners() {
-        this.socket.on('roomState', (room: GameRoom) => {
+        this.socket.on(SocketEvents.ROOM_STATE, (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
@@ -133,7 +119,7 @@ export class WebSocketService {
         });
 
         this.socket.on(
-            'joinGameResponse',
+            SocketEvents.JOIN_GAME_RESPONSE,
             (response: {
                 valid: boolean;
                 message: string;
@@ -160,38 +146,38 @@ export class WebSocketService {
             },
         );
 
-        this.socket.on('avatarTakenError', (data: { message: string }) => {
+        this.socket.on(SocketEvents.AVATAR_TAKEN_ERROR, (data: { message: string }) => {
             this.avatarTakenErrorSubject.next(data.message);
         });
 
-        this.socket.on('joinGameResponseCodeInvalid', (response: { message: string }) => {
+        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_CODE_INVALID, (response: { message: string }) => {
             alert(response.message);
         });
 
-        this.socket.on('joinGameResponseLockedRoom', (response: { message: string }) => {
+        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_ROOM, (response: { message: string }) => {
             alert(response.message);
         });
 
-        this.socket.on('joinGameResponseNoMoreExisting', (response: { message: string }) => {
+        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, (response: { message: string }) => {
             alert(response.message);
         });
 
-        this.socket.on('joinGameResponseLockedAfterJoin', (response: { message: string }) => {
+        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, (response: { message: string }) => {
             alert(response.message);
         });
 
-        this.socket.on('roomLocked', (data: { message: string; isLocked: boolean }) => {
+        this.socket.on(SocketEvents.ROOM_LOCKED, (data: { message: string; isLocked: boolean }) => {
             this.isLockedSubject.next(data.isLocked);
             this.maxPlayersSubject.next(this.maxPlayersSubject.value);
             alert(data.message);
         });
 
-        this.socket.on('roomUnlocked', (data: { message: string; isLocked: boolean }) => {
+        this.socket.on(SocketEvents.ROOM_UNLOCKED, (data: { message: string; isLocked: boolean }) => {
             this.isLockedSubject.next(data.isLocked);
             alert(data.message);
         });
 
-        this.socket.on('playerKicked', async (data: { message: string; kickedPlayerId: string }) => {
+        this.socket.on(SocketEvents.PLAYER_KICKED, async (data: { message: string; kickedPlayerId: string }) => {
             if (data.kickedPlayerId === this.socket.id) {
                 await new Promise((resolve) => {
                     window.alert(data.message);
@@ -199,7 +185,7 @@ export class WebSocketService {
                 });
 
                 if (this.currentRoom.accessCode) {
-                    this.socket.emit('leaveGame', this.currentRoom.accessCode);
+                    this.socket.emit(SocketEvents.LEAVE_GAME, this.currentRoom.accessCode);
                 }
                 this.gameService.clearGame();
                 this.isLockedSubject.next(false);
@@ -210,18 +196,18 @@ export class WebSocketService {
             }
         });
 
-        this.socket.on('playerLeft', () => {
+        this.socket.on(SocketEvents.PLAYER_LEFT, () => {
             this.gameService.clearGame();
             this.isLockedSubject.next(false);
             this.playersSubject.next([]);
             this.socket.disconnect();
         });
 
-        this.socket.on('gameStarted', () => {
+        this.socket.on(SocketEvents.GAME_STARTED, () => {
             this.router.navigate(['/play-page']);
         });
 
-        this.socket.on('roomClosed', () => {
+        this.socket.on(SocketEvents.ROOM_CLOSED, () => {
             this.currentRoom.players.forEach((player) => {
                 if (!player.isOrganizer) {
                     this.leaveGame();
@@ -234,11 +220,11 @@ export class WebSocketService {
         //     this.avatarTakenErrorSubject.next(data.message);
         // });
 
-        this.socket.on('error', (message: string) => {
+        this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);
         });
 
-        this.socket.on('clock', (serverClock: Date) => {
+        this.socket.on(SocketEvents.CLOCK, (serverClock: Date) => {
             this.chatService.serverClock = serverClock;
             this.eventJournalService.serverClock = serverClock;
         });
@@ -246,11 +232,22 @@ export class WebSocketService {
         this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
+            this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
+                this.chatService.roomMessages.push(broadcastMessage);
+            });
         });
 
         this.socket.on('roomMessage', (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });
+
+        /*
+        this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
+            if (!this.currentRoom.players.find((player) => player.isOrganizer)) {
+                this.router.navigate(['/home']);
+            }
+        });
+        */
     }
 }
