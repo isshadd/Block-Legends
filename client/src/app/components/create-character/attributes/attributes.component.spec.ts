@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerAttributes } from '@app/classes/Characters/player-attributes';
-import { BASE_STATS, PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerAttributes } from '@common/classes/player-attributes';
+import { BASE_STATS, PlayerCharacter } from '@common/classes/player-character';
 import { AttributesComponent } from './attributes.component';
 
 describe('AttributesComponent', () => {

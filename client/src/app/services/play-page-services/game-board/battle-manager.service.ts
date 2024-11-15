@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { Subject } from 'rxjs';
 
 @Injectable({

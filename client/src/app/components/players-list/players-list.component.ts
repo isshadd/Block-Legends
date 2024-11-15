@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-players-list',

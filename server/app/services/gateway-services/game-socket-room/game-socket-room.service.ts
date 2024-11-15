@@ -1,63 +1,16 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
-import { Avatar } from '@common/enums/avatar-enum';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
+import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
+import { GameRoom } from '@common/interfaces/game-room';
+import { GameBattle } from '@common/interfaces/game.battle';
+import { GameTimer } from '@common/interfaces/game.timer';
 import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Subject } from 'rxjs';
 import { Server } from 'socket.io';
-
-export class PlayerAttributes {
-    life: number;
-    speed: number;
-    attack: number;
-    defense: number;
-}
-
-export interface PlayerCharacter {
-    avatar: Avatar;
-    name: string;
-    socketId: string;
-    attributes: PlayerAttributes;
-}
-
-export enum GameTimerState {
-    ActiveTurn,
-    PreparingTurn,
-}
-
-export interface GameTimer {
-    time: number;
-    isPaused: boolean;
-    state: GameTimerState;
-}
-
-export interface GameBattle {
-    time: number;
-    firstPlayerId: string;
-    secondPlayerId: string;
-    firstPlayerRemainingEvades: number;
-    secondPlayerRemainingEvades: number;
-    firstPlayerRemainingLife: number;
-    secondPlayerRemainingLife: number;
-    isFirstPlayerTurn: boolean;
-}
-
-export interface GameBoardParameters {
-    game: Game;
-    spawnPlaces: [number, string][];
-    turnOrder: string[];
-}
-
-export interface GameRoom {
-    id: string;
-    accessCode: number;
-    players: PlayerCharacter[];
-    organizer: string;
-    isLocked: boolean;
-    maxPlayers: number;
-    currentPlayerTurn: string;
-}
 
 @Injectable()
 export class GameSocketRoomService {
