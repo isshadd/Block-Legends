@@ -5,17 +5,25 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
-import { ImageShowcaseComponent } from "../../components/image-showcase/image-showcase.component";
 
 @Component({
     selector: 'app-player-create-character',
     standalone: true,
-    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent, ImageShowcaseComponent],
+    imports: [
+        FormsModule,
+        CommonModule,
+        AttributesComponent,
+        AvatarSelectionComponent,
+        CharacterFormComponent,
+        ModalComponent,
+        ImageShowcaseComponent,
+    ],
     templateUrl: './player-create-character.component.html',
     styleUrl: './player-create-character.component.scss',
 })
