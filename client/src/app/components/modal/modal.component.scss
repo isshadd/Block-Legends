@@ -11,36 +11,74 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
-    background-color: $background;
+    background-color: $primary-dark;
+    color: $primary-light;
     margin: auto;
     padding: 20px;
-    border: 1px solid #000000;
-    width: 80%;
+    border-radius: 8px;
+    width: 90%;
     max-width: 500px;
     text-align: center;
-    border-radius: 5px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-content h2 {
+    font-size: 1.5em;
+    margin-bottom: 1em;
+}
+
+.modal-content p {
+    font-size: 1.1em;
+    margin-bottom: 1.5em;
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
+    color: lighten($primary-dark, 40%);
+    font-size: 1.5em;
     font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
     cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: $primary-light;
+    }
 }
 
-.modal-buttons{
+.modal-buttons {
     display: flex;
-    justify-content: space-evenly;
+    gap: 15px;
+    justify-content: center;
+}
+
+.modal-buttons button {
+    background-color: $secondary;
+    color: $primary-light;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: darken($secondary, 10%);
+    }
+
+    &:last-child {
+        background-color: $primary-light;
+        color: $primary-dark;
+
+        &:hover {
+            background-color: darken($primary-light, 10%);
+        }
+    }
 }
