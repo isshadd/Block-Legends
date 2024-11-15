@@ -28,6 +28,8 @@
         </div>
     </div>
     <div id="player-image">
+        @if(playerCharacter.avatar) {
         <img [src]="playerCharacter.avatar.fullImage" alt="Player" />
+        }
     </div>
 </div>

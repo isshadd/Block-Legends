@@ -1,9 +1,16 @@
-<div class="glob">
-    <h1>Création de personnage</h1>
-    <form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
-        <app-character-form [character]="character"></app-character-form>
-        <app-avatar-selection [character]="character"></app-avatar-selection>
-        <app-attributes [character]="character"></app-attributes>
+<form (ngSubmit)="createCharacter()" (keydown.enter)="$event.preventDefault()">
+    <div id="app-container">
+        <div id="avatar-selector">
+            <div id="images">
+                <app-avatar-selection [character]="character"></app-avatar-selection>
+                <div id="container">
+                    <div id="image-container">
+                        <app-image-showcase></app-image-showcase>
+                    </div>
+                    <app-attributes [character]="character"></app-attributes>
+                </div>
+            </div>
+        </div>
         @if(characterStatus) {
         <div id="message">{{ characterStatus }}</div>
         }
@@ -11,15 +18,15 @@
             <button class="dark-button" id="back" type="button" (click)="openModal()">Retour à la sélection de jeu</button>
             <button class="dark-button" id="create" type="submit">Créer le personnage</button>
         </div>
-    </form>
-    @if(isModalOpen) {
-    <app-modal
-        [title]="'Êtes-vous sûr de vouloir retourner à la sélection de jeu ?'"
-        [message]="'(la création de votre avatar sera perdu)'"
-        [confirmText]="'Oui'"
-        [cancelText]="'Non'"
-        (confirm)="confirmBack()"
-        (cancel)="closeModal()"
-    ></app-modal>
-    }
-</div>
+    </div>
+</form>
+@if(isModalOpen) {
+<app-modal
+    [title]="'Êtes-vous sûr de vouloir retourner à la sélection de jeu ?'"
+    [message]="'(la création de votre avatar sera perdu)'"
+    [confirmText]="'Oui'"
+    [cancelText]="'Non'"
+    (confirm)="confirmBack()"
+    (cancel)="closeModal()"
+></app-modal>
+}
