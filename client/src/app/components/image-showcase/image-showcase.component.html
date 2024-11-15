@@ -1,3 +1,5 @@
 <div id="container">
-    <img [src]="character.avatar.mineshaftImage" alt="Alex Mineshaft" />
+    @if(currentImage) {
+    <img [src]="currentImage" alt="Alex Mineshaft" />
+    }
 </div>

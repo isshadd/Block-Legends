@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
-import { CharacterFormComponent } from "../character-form/character-form.component";
+import { CharacterFormComponent } from '../character-form/character-form.component';
 
 @Component({
     selector: 'app-avatar-selection',
@@ -17,7 +18,10 @@ export class AvatarSelectionComponent implements OnInit {
     avatarList: Avatar[] = [];
     takenAvatars: string[] = [];
 
-    constructor(private webSocketService: WebSocketService) {
+    constructor(
+        private webSocketService: WebSocketService,
+        private gameService: GameService,
+    ) {
         this.setAvatars();
     }
 
@@ -42,5 +46,6 @@ export class AvatarSelectionComponent implements OnInit {
 
     selectAvatar(avatar: Avatar) {
         this.character.avatar = avatar;
+        this.gameService.setSelectedAvatar(avatar);
     }
 }
