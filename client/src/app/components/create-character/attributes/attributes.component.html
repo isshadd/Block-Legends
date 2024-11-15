@@ -1,52 +1,60 @@
 <div id="total-container">
     <div class="attributes-container">
-        <div class="attribute-container" id="life" matTooltip="le nombre de points de vie du personnage">
-            <div class="container">
-                Santé:
-                <span *ngFor="let _ of healthArray" class="icon-container">
-                    <img src="assets/images/heart.png" alt="Vie" class="icon" />
-                </span>
+        <div class="block-container">
+            <div class="attribute-container" id="life" matTooltip="le nombre de points de vie du personnage">
+                <div class="container">
+                    Santé:
+                    <span *ngFor="let _ of healthArray" class="icon-container">
+                        <img src="assets/images/heart.png" alt="Vie" class="icon" />
+                    </span>
+                </div>
+            </div>
+            <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2</button>
+        </div>
+        <div class="block-container">
+            <div class="attribute-container" id="life" matTooltip="le nombre de points de vie du personnage">
+                <div class="container">
+                    Vitesse:
+                    <span *ngFor="let _ of speedArray" class="icon-container">
+                        <img src="assets/images/view/boots.png" alt="Vitesse" class="small-icon" />
+                    </span>
+                </div>
+            </div>
+            <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2</button>
+        </div>
+        <div class="block-container">
+            <div class="attribute-container" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">
+                <div class="container">
+                    Attaque: @for(attack of attackArray; track attack){
+                    <span class="icon-container">
+                        <img src="assets/images/item/diamond-sword.png" alt="Attaque" class="small-icon" />
+                    </span>
+                    }
+                </div>
+            </div>
+            <div class="dice-container">
+                <select [(ngModel)]="selectedAttackDice" (change)="assignAttackDice($event)" class="large-emojis">
+                    <option value="dice6">🎲 dé à 6 faces</option>
+                    <option value="dice4">🎲 dé à 4 faces</option>
+                </select>
             </div>
         </div>
-        <div class="attribute-container" id="life" matTooltip="le nombre de points de vie du personnage">
-            <div class="container">
-                Vitesse:
-                <span *ngFor="let _ of speedArray" class="icon-container">
-                    <img src="assets/images/view/boots.png" alt="Vitesse" class="small-icon" />
-                </span>
+        <div class="block-container">
+            <div class="attribute-container" id="attack" matTooltip="représente la capacité à bloquer l’attaque d’un adversaire">
+                <div class="container">
+                    Defense: @for(defense of defenseArray; track defense){
+                    <span class="icon-container">
+                        <img src="assets/images/item/chestplate.png" alt="Defense" class="small-icon" />
+                    </span>
+                    }
+                </div>
             </div>
-        </div>
-        <div class="attribute-container" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">
-            <div class="container">
-                Attaque: @for(attack of attackArray; track attack){
-                <span class="icon-container">
-                    <img src="assets/images/item/diamond-sword.png" alt="Attaque" class="small-icon" />
-                </span>
-                }
+            <div class="dice-container">
+                <select [(ngModel)]="selectedDefenseDice" (change)="assignDefenseDice($event)" class="large-emojis">
+                    <option value="dice6">🎲 dé à 6 faces</option>
+                    <option value="dice4">🎲 dé à 4 faces</option>
+                </select>
             </div>
-        </div>
-        <div class="attribute-container" id="attack" matTooltip="représente la capacité à bloquer l’attaque d’un adversaire">
-            <div class="container">
-                Defense: @for(defense of defenseArray; track defense){
-                <span class="icon-container">
-                    <img src="assets/images/item/chestplate.png" alt="Defense" class="small-icon" />
-                </span>
-                }
-            </div>
-        </div>
-    </div>
-    <div id="buttons-container">
-        <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2</button>
-        <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2</button>
-        <div id="dice-container">
-            <select [(ngModel)]="selectedAttackDice" (change)="assignAttackDice($event)" class="large-emojis">
-                <option value="dice6">🎲 dé à 6 faces</option>
-                <option value="dice4">🎲 dé à 4 faces</option>
-            </select>
-            <select [(ngModel)]="selectedDefenseDice" (change)="assignDefenseDice($event)" class="large-emojis">
-                <option value="dice6">🎲 dé à 6 faces</option>
-                <option value="dice4">🎲 dé à 4 faces</option>
-            </select>
         </div>
     </div>
 </div>

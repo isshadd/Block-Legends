@@ -39,6 +39,11 @@
     height: 15vh; /* Consistent sizing based on viewport height */
 }
 
+.block-container {
+    display: flex;
+    flex-direction: row;
+}
+
 button[disabled] {
     background-color: $secondary;
     cursor: not-allowed;
@@ -47,6 +52,7 @@ button[disabled] {
 
 .large-emojis {
     font-size: 1em;
+    align-items: center;
     width: 25vh;
     height: 6vh;
     margin: 0.8vh;
@@ -117,7 +123,7 @@ select:hover {
     vertical-align: middle;
 }
 
-#dice-container {
+.dice-container {
     display: flex;
     flex-direction: column;
 }
