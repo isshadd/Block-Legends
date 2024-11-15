@@ -10,7 +10,6 @@ import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/player-character';
-import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 
 @Component({
     selector: 'app-player-create-character',
@@ -70,23 +69,6 @@ export class PlayerCreateCharacterComponent {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
         } else {
             this.gameService.setCharacter(this.character);
-
-            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, () => {
-                this.router.navigate(['join-game']);
-            });
-
-            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, () => {
-                this.router.navigate(['join-game']);
-            });
-
-            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE, (response: { valid: boolean }) => {
-                // joinGameResponseCanJoin
-                if (response.valid) {
-                    this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
-                } else {
-                    this.router.navigate(['join-game']);
-                }
-            });
             this.webSocketService.addPlayerToRoom(parseInt(this.gameId as string, 10), this.character);
         }
     }
