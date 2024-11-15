@@ -18,7 +18,7 @@ enum AvatarImages {
 export class ImageShowcaseComponent {
     currentImage: string;
     constructor(public gameService: GameService) {
-        this.gameService.signalAvatarSelected$.subscribe((avatar) => {
+        this.gameService.signalAvatarSelected$.subscribe((avatar: Avatar) => {
             this.setupImage(avatar);
         });
 
