@@ -25,12 +25,18 @@ export class ImageShowcaseComponent {
     }
 
     getRandomisedImage(avatar: Avatar) {
-        const random = Math.floor(Math.random() * 2) + 1;
+        const random = Math.floor(Math.random() * 5) + 1;
         switch (random) {
             case 1:
                 return avatar.mineshaftImage;
             case 2:
                 return avatar.standing;
+            case 3:
+                return avatar.dog_petting;
+            case 4:
+                return avatar.lost;
+            case 5:
+                return avatar.fight;
             default:
                 return avatar.standing;
         }
