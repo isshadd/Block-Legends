@@ -10,11 +10,12 @@ import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ImageShowcaseComponent } from "../../components/image-showcase/image-showcase.component";
 
 @Component({
     selector: 'app-player-create-character',
     standalone: true,
-    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
+    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent, ImageShowcaseComponent],
     templateUrl: './player-create-character.component.html',
     styleUrl: './player-create-character.component.scss',
 })
