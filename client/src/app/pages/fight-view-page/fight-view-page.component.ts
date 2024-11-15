@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { DiamondSword } from '@app/classes/Items/diamond-sword';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
@@ -18,6 +17,7 @@ import { SideViewPlayerInfoComponent } from '@app/components/side-view-player-in
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 @Component({

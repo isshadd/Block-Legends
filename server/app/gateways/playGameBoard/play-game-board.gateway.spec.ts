@@ -1,17 +1,16 @@
 import { Game } from '@app/model/database/game';
-import {
-    GameBattle,
-    GameBoardParameters,
-    GameRoom,
-    GameSocketRoomService,
-    GameTimer,
-    GameTimerState,
-} from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { GameMode } from '@common/enums/game-mode';
+import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
+import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
+import { GameRoom } from '@common/interfaces/game-room';
+import { GameBattle } from '@common/interfaces/game.battle';
+import { GameTimer } from '@common/interfaces/game.timer';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Server, Socket } from 'socket.io';
@@ -39,7 +38,7 @@ describe('PlayGameBoardGateway', () => {
                 },
                 avatar: undefined,
                 name: 'player1',
-            },
+            } as PlayerCharacter,
             {
                 socketId: 'player2',
                 attributes: {
@@ -50,7 +49,7 @@ describe('PlayGameBoardGateway', () => {
                 },
                 avatar: undefined,
                 name: 'player2',
-            },
+            } as PlayerCharacter,
         ],
         organizer: 'player1',
         isLocked: false,

@@ -4,14 +4,15 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
+import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
@@ -94,7 +95,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.maxPlayers = max;
         });
 
-        this.webSocketService.socket.on('organizerLeft', () => {
+        this.webSocketService.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
             if (!this.isOrganizer) {
                 this.playerLeave();
             }

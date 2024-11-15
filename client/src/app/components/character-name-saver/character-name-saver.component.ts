@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-character-name-saver',
@@ -53,8 +53,6 @@ export class CharacterNameSaverComponent implements OnInit {
         });
         if (missingFields.length > 0) {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
-        } else if (!this.character.isNameValid) {
-            this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
             // this.character.name += ' ♔';
             this.character.setOrganizer();

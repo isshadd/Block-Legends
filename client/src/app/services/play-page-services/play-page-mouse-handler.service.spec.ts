@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
 import { VisibleState } from '@app/interfaces/placeable-entity';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { of, Subject } from 'rxjs';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from './play-page-mouse-handler.service';

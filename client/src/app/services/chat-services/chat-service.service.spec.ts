@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
-import { ChatService } from './chat-service.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
-import { Subject } from 'rxjs';
+import { ChatService } from './chat-service.service';
 
 const ACCESS_CODE = 12345;
 

@@ -7,10 +7,11 @@
 
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { GameService } from '@app/services/game-services/game.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { GameRoom } from '@common/interfaces/game-room';
 import { Socket } from 'socket.io-client';
-import { GameRoom, WebSocketService } from './websocket.service';
+import { WebSocketService } from './websocket.service';
 
 const ACCESS_CODE = 1234;
 
@@ -129,8 +130,9 @@ describe('WebSocketService', () => {
             isLocked: false,
             maxPlayers: 4,
             currentPlayerTurn: '',
-            roomId: 'room123',
-        } as GameRoom;
+            id: 'room123',
+            organizer: 'socket-id',
+        };
 
         let handler: (room: GameRoom) => void = () => {};
         socketSpy.on.and.callFake(function (event, fn) {

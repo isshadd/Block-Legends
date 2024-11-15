@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Avatar } from '@common/enums/avatar-enum';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { BehaviorSubject } from 'rxjs';
 
 export const VP_NUMBER = 5;
 
