@@ -25,11 +25,10 @@
         <div class="block-container">
             <div class="attribute-container" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">
                 <div class="container">
-                    Attaque: @for(attack of attackArray; track attack){
-                    <span class="icon-container">
+                    Attaque:
+                    <span *ngFor="let _ of attackArray" class="icon-container">
                         <img src="assets/images/item/diamond-sword.png" alt="Attaque" class="small-icon" />
                     </span>
-                    }
                 </div>
             </div>
             <div class="dice-container">
@@ -42,11 +41,10 @@
         <div class="block-container">
             <div class="attribute-container" id="attack" matTooltip="représente la capacité à bloquer l’attaque d’un adversaire">
                 <div class="container">
-                    Defense: @for(defense of defenseArray; track defense){
-                    <span class="icon-container">
+                    Defense:
+                    <span *ngFor="let _ of speedArray" class="icon-container">
                         <img src="assets/images/item/chestplate.png" alt="Defense" class="small-icon" />
                     </span>
-                    }
                 </div>
             </div>
             <div class="dice-container">
