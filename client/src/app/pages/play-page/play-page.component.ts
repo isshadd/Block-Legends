@@ -26,9 +26,9 @@ import { BattleManagerService } from '@app/services/play-page-services/game-boar
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
 
 @Component({
@@ -82,6 +82,15 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.playGameBoardSocketService.init();
+        this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
+            const abandonPlayer = this.players.find((p) => p.socketId === socketId);
+            if (!abandonPlayer) throw new Error('Player not found');
+            abandonPlayer.isAbsent = true;
+            this.players = [
+                ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
+                abandonPlayer,
+            ];
+        });
     }
 
     onPlayGameBoardManagerInit() {

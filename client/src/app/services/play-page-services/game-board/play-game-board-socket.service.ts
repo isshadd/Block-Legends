@@ -15,6 +15,9 @@ export class PlayGameBoardSocketService implements OnDestroy {
     socket: Socket;
     private destroy$ = new Subject<void>();
 
+    private signalPlayerLeft = new Subject<string>();
+    signalPlayerLeft$ = this.signalPlayerLeft.asObservable();
+
     constructor(
         public webSocketService: WebSocketService,
         public playGameBoardManagerService: PlayGameBoardManagerService,
@@ -77,10 +80,6 @@ export class PlayGameBoardSocketService implements OnDestroy {
     }
 
     leaveGame(): void {
-        const player = this.playGameBoardManagerService.findPlayerFromSocketId(this.socket.id);
-        if (player) {
-            player.isAbsent = true;
-        }
         this.socket.disconnect();
         this.battleManagerService.clearBattle();
         this.playGameBoardManagerService.resetManager();
@@ -116,6 +115,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on('gameBoardPlayerLeft', (playerId: string) => {
             this.playGameBoardManagerService.removePlayerFromMap(playerId);
+            this.signalPlayerLeft.next(playerId);
         });
 
         this.socket.on('roomUserMoved', (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
