@@ -517,7 +517,7 @@ describe('GameGateway', () => {
                         name: 'Heidi',
                         socketId: 'client16',
                         attributes: { life: 3, speed: 3, attack: 3, defense: 3 },
-                        avatar: AvatarEnum.Muffin,
+                        avatar: AvatarEnum.Mushroom,
                     } as PlayerCharacter,
                     {
                         name: 'Ivan',
@@ -827,7 +827,7 @@ describe('GameGateway', () => {
             const playerToKick = {
                 name: 'PlayerToKick',
                 socketId: 'socket123',
-                avatar: AvatarEnum.Muffin,
+                avatar: AvatarEnum.Mushroom,
                 attributes: {
                     life: 3,
                     speed: 3,
@@ -844,7 +844,7 @@ describe('GameGateway', () => {
                     {
                         name: 'PlayerToKick',
                         socketId: 'socket123',
-                        avatar: AvatarEnum.Muffin,
+                        avatar: AvatarEnum.Mushroom,
                         attributes: {
                             life: 3,
                             speed: 3,

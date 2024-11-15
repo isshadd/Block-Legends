@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/player-character';
-import { BehaviorSubject } from 'rxjs';
+import { Avatar } from '@common/enums/avatar-enum';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export const VP_NUMBER = 5;
 
@@ -16,6 +17,9 @@ export class GameService {
 
     currentPlayerSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter(''));
     currentPlayer$ = this.currentPlayerSubject.asObservable();
+
+    signalAvatarSelected = new Subject<Avatar>();
+    signalAvatarSelected$ = this.signalAvatarSelected.asObservable();
 
     setAccessCode(code: number) {
         this.accessCodeSubject.next(code);
@@ -42,5 +46,9 @@ export class GameService {
     clearGame(): void {
         this.accessCodeSubject.next(null);
         this.characterSubject.next(new PlayerCharacter(''));
+    }
+
+    setSelectedAvatar(avatar: Avatar) {
+        this.signalAvatarSelected.next(avatar);
     }
 }
