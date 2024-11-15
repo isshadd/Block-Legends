@@ -10,6 +10,11 @@ app-clavardage {
     margin-left: 3px;
 }
 
+app-event-journal {
+    transform: scale(0.5);
+    margin-left: 3px;
+}
+
 #page-container {
     position: relative;
     display: flex;
@@ -39,20 +44,20 @@ app-clavardage {
     }
 
     #side-menu {
-        display: flex;
-        flex-direction: column;
-        flex-basis: 25%;
-        max-width: 25%;
+        // display: flex;
+        // flex-direction: column;
+        // flex-basis: 25%;
+        // max-width: 25%;
         height: 100%;
-        background-color: $primary-dark;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
-        padding: 5px;
+        // background-color: $primary-dark;
+        // overflow-y: auto;
+        // scrollbar-width: thin;
+        // scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
+        // padding: 5px;
 
-        .dark-button {
-            font-size: 150%;
-        }
+        // .dark-button {
+        //     font-size: 150%;
+        // }
     }
 
     #map-wrapper {

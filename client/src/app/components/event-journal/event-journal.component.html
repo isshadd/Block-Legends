@@ -1,0 +1,38 @@
+<div class="journal">
+  <h3>Event Journal</h3>
+  <button (click)="showMyEvents = !showMyEvents">
+      @if (showMyEvents) {
+          Show All Events
+      } @else {
+          Show My Events
+      }
+  </button>
+
+  <div class="journal-container" #journalEvents>
+    <ul class="events">
+    @if (showMyEvents) {
+    @for (event of filteredEvents; track event) {
+      <li>
+        <div>{{ event.event }}</div>
+          <ul>
+          @for (player of event.associatedPlayers; track player) {
+            <li>{{ player }}</li>
+            }
+          </ul>
+      </li>
+    }
+    } @else {
+    @for (event of events; track event) {
+    <li>
+      <div>{{ event.event }}</div>
+        <ul>
+        @for (player of event.associatedPlayers; track player) {
+          <li>{{ player }}</li>
+        }
+        </ul>
+    </li>
+      }
+    }
+    </ul>
+  </div>
+</div>

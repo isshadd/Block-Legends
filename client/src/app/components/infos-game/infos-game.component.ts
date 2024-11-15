@@ -9,7 +9,7 @@ import { Tile } from '@app/classes/Tiles/tile';
     styleUrl: './infos-game.component.scss',
 })
 export class InfosGameComponent {
-    @Input() game: Tile[][];
-    @Input() nbrPlayers: number;
-    @Input() currentPlayer: string;
+    @Input() game: Tile[][] = [];
+    @Input() nbrPlayers: number = 0;
+    @Input() currentPlayer: string = '';
 }

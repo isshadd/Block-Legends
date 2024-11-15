@@ -1,8 +1,7 @@
-// clavardage.component.ts
-import { CommonModule } from '@angular/common';
-import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ChatService } from '@app/services/chat-service.service';
+import { CommonModule } from '@angular/common';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 
 @Component({
     selector: 'app-clavardage',
@@ -13,22 +12,33 @@ import { ChatService } from '@app/services/chat-service.service';
 })
 export class ClavardageComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatMessages') messagesContainer: ElementRef;
-    serverClock: Date;
+
     messageToSend: string = '';
     messages = this.chatService.roomMessages;
-    playerName: string;
+    playerName: string = '';
+    shouldScroll: boolean = false;
 
     constructor(
         private chatService: ChatService,
-        public cdr: ChangeDetectorRef,
+        private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {
         this.chatService.initialize();
+        this.playerName = this.chatService.playerName;
+        this.chatService.messageReceived$.subscribe(() => {
+            this.shouldScroll = true;
+            this.cdr.detectChanges();
+        });
     }
 
     ngAfterViewChecked() {
-        this.scrollToBottom();
+        if (this.shouldScroll) {
+            setTimeout(() => {
+                this.scrollToBottom();
+                this.shouldScroll = false;
+            }, 1);
+        }
     }
 
     trackByIndex(index: number): number {
@@ -38,13 +48,10 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
     sendMessage() {
         this.chatService.broadcastMessageToAll(this.messageToSend);
         this.messageToSend = '';
+        this.shouldScroll = true;
     }
 
     private scrollToBottom(): void {
-        try {
-            this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
-        } catch (err) {
-            // eslint-disable-line
-        }
+        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
     }
 }

@@ -3,15 +3,15 @@
     <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
     }
     <div id="side-menu">
-        <app-infos-game [currentPlayer]="this.myPlayer.name!" [game]="playGameBoardManagerService.getCurrentGrid()"></app-infos-game>
-        <app-player-map-entity-info-view
-            [showButton]="false"
+        <app-play-game-side-view-bar
+            id="side"
             [playerCharacter]="this.myPlayer!"
             [actionPoints]="this.actionPoints"
             [totalLife]="totalLifePoints"
-        ></app-player-map-entity-info-view>
-        <app-players-list [players]="this.players"></app-players-list>
-        <app-tab-container></app-tab-container>
+            [game]="playGameBoardManagerService.getCurrentGrid()"
+            [players]="this.players"
+        >
+        </app-play-game-side-view-bar>
     </div>
     <div id="map-wrapper">
         @if(battleManagerService.opponentPlayer) {

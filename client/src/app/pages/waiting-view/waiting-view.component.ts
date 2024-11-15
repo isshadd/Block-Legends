@@ -1,3 +1,5 @@
+/* eslint-disable max-params */
+/* eslint-disable no-restricted-imports */
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,14 +9,15 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayerCharacter } from 'src/app/classes/Characters/player-character';
-// import { ChangeDetectionStrategy } from '@angular/core';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
+import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
-    imports: [CommonModule, ClavardageComponent],
+    imports: [CommonModule, ClavardageComponent, EventJournalComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
-    // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WaitingViewComponent implements OnInit, OnDestroy {
     accessCode$ = this.gameService.accessCode$;
@@ -28,6 +31,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     isMaxPlayer = false;
     isOrganizer = false;
     maxPlayers: number = 0;
+    showClavardage = true;
 
     private destroy$ = new Subject<void>();
 
@@ -37,6 +41,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         private webSocketService: WebSocketService,
         private route: ActivatedRoute,
         private socketStateService: SocketStateService,
+        private chatService: ChatService,
+        private eventJournalService: EventJournalService,
     ) {}
 
     ngOnInit(): void {
@@ -50,6 +56,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             if (!this.gameId) return;
 
             this.isOrganizer = character.isOrganizer;
+            this.chatService.setCharacter(character);
+            this.eventJournalService.setCharacter(character);
 
             if (character.isOrganizer) {
                 this.playersCounter++;
@@ -58,12 +66,20 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
+                    if (this.accessCode !== null) {
+                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.eventJournalService.setAccessCode(this.accessCode);
+                    }
                 });
             } else {
                 this.playersCounter++;
                 this.accessCode$.subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
+                    if (this.accessCode !== null) {
+                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.eventJournalService.setAccessCode(this.accessCode);
+                    }
                 });
             }
         });
@@ -111,6 +127,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.socketStateService.clearSocket();
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -142,5 +159,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 replaceUrl: true,
             });
         }
+    }
+    toggleView(): void {
+        this.showClavardage = !this.showClavardage;
+        this.eventJournalService.broadcastEvent('clicked Journal', [`${this.eventJournalService.playerName}`]);
     }
 }
