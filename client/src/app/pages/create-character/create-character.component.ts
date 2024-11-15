@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { PlayerCharacter } from '@common/classes/player-character';
@@ -12,7 +13,15 @@ import { PlayerCharacter } from '@common/classes/player-character';
 @Component({
     selector: 'app-create-character',
     standalone: true,
-    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
+    imports: [
+        FormsModule,
+        CommonModule,
+        AttributesComponent,
+        AvatarSelectionComponent,
+        CharacterFormComponent,
+        ModalComponent,
+        ImageShowcaseComponent,
+    ],
     templateUrl: './create-character.component.html',
     styleUrl: './create-character.component.scss',
 })
