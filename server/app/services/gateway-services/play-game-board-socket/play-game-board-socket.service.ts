@@ -1,5 +1,6 @@
 import { Game } from '@app/model/database/game';
-import { GameRoom, GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()

@@ -1,15 +1,22 @@
-<div class="glob">
-    <h1>Création de personnage: JOUEUR</h1>
-    <form (ngSubmit)="createPlayerCharacter()" (keydown.enter)="$event.preventDefault()">
-        <app-character-form [character]="character"></app-character-form>
-        <app-avatar-selection [character]="character"></app-avatar-selection>
-        <app-attributes [character]="character"></app-attributes>
+<form (ngSubmit)="createPlayerCharacter()" (keydown.enter)="$event.preventDefault()">
+    <div id="app-container">
+        <div id="avatar-selector">
+            <div id="images">
+                <app-avatar-selection [character]="character"></app-avatar-selection>
+                <div id="container">
+                    <div id="image-container">
+                        <app-image-showcase></app-image-showcase>
+                    </div>
+                    <app-attributes [character]="character"></app-attributes>
+                </div>
+            </div>
+        </div>
         @if(characterStatus) {
         <div id="message">{{ characterStatus }}</div>
         }
         <div class="button-create-character">
-            <button class="dark-button" id="back" type="button" (click)="quitToHome()">Retour à la page principale</button>
+            <button class="dark-button" id="back" type="button" (click)="quitToHome()">Retour à la sélection de jeu</button>
             <button class="dark-button" id="create" type="submit">Créer le personnage</button>
         </div>
-    </form>
-</div>
+    </div>
+</form>

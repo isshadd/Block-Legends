@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-player-map-entity-info-view',

@@ -1,5 +1,5 @@
-import { VisibleState } from '@app/interfaces/placeable-entity';
-import { Vec2 } from '@common/interfaces/vec2';
+import { VisibleState } from '../../common/interfaces/placeable-entity';
+import { Vec2 } from '../../common/interfaces/vec2';
 import { PlayerMapEntity } from './player-map-entity'; // Adjust the import path as necessary
 
 describe('PlayerMapEntity', () => {

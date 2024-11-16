@@ -1,13 +1,16 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
+import { PlayerCharacter } from '@common/classes/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { GameMode } from '@common/enums/game-mode';
+import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
+import { GameRoom } from '@common/interfaces/game-room';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { GameRoom, GameSocketRoomService, GameTimerState, PlayerCharacter } from './game-socket-room.service';
+import { GameSocketRoomService } from './game-socket-room.service';
 
 const mockGameService = {
     getGame: jest.fn(),
@@ -105,7 +108,7 @@ describe('GameSocketRoomService', () => {
                 tiles: [],
             } as Game);
 
-            const player: PlayerCharacter = {
+            const player = {
                 avatar: 'WARRIOR' as unknown as Avatar,
                 name: 'Player1',
                 socketId: 'socket1',
@@ -115,7 +118,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             jest.spyOn(service, 'generateAccessCode').mockReturnValue(1111);
 
@@ -173,7 +176,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player2 = {
                 avatar: 'MAGE' as unknown as Avatar,
@@ -185,7 +188,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player3 = {
                 avatar: 'WARRIOR' as unknown as Avatar,
@@ -197,7 +200,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
         });
 
         it('should add a player to a non-locked room without avatar conflicts', () => {
@@ -209,7 +212,7 @@ describe('GameSocketRoomService', () => {
 
         it('addPlayerToRoom() should return false and log when avatar is already taken', () => {
             const accessCode = 5678;
-            const playerOrganizer: PlayerCharacter = {
+            const playerOrganizer = {
                 avatar: AvatarEnum.Arlina,
                 name: 'Organizer',
                 socketId: 'socket1',
@@ -219,14 +222,14 @@ describe('GameSocketRoomService', () => {
                     attack: 20,
                     defense: 15,
                 },
-            };
+            } as PlayerCharacter;
 
             // const room = service.createGame('game123', playerOrganizer);
             const addedFirstPlayer = service.addPlayerToRoom(accessCode, playerOrganizer);
             expect(addedFirstPlayer).toBeFalsy();
 
             // Définir le joueur à ajouter avec le même avatar
-            const playerDuplicateAvatar: PlayerCharacter = {
+            const playerDuplicateAvatar = {
                 avatar: AvatarEnum.Alex, // Même avatar que l'organisateur
                 name: 'Player2',
                 socketId: 'socket2',
@@ -236,7 +239,7 @@ describe('GameSocketRoomService', () => {
                     attack: 18,
                     defense: 14,
                 },
-            };
+            } as PlayerCharacter;
 
             const result = service.addPlayerToRoom(accessCode, playerDuplicateAvatar);
             expect(result).toBeFalsy();
@@ -244,7 +247,7 @@ describe('GameSocketRoomService', () => {
 
         it('addPlayerToRoom() should return false if avatar is already taken', () => {
             const accessCode = 5678;
-            const playerOrganizer: PlayerCharacter = {
+            const playerOrganizer = {
                 avatar: AvatarEnum.Alex,
                 name: 'Organizer',
                 socketId: 'socket1',
@@ -254,11 +257,11 @@ describe('GameSocketRoomService', () => {
                     attack: 20,
                     defense: 15,
                 },
-            };
+            } as PlayerCharacter;
 
             service.createGame('game123', playerOrganizer);
 
-            const playerDuplicateAvatar: PlayerCharacter = {
+            const playerDuplicateAvatar = {
                 avatar: AvatarEnum.Arlina,
                 name: 'Player2',
                 socketId: 'socket2',
@@ -268,7 +271,7 @@ describe('GameSocketRoomService', () => {
                     attack: 18,
                     defense: 14,
                 },
-            };
+            } as PlayerCharacter;
 
             const result = service.addPlayerToRoom(accessCode, playerDuplicateAvatar);
             expect(result).toBeFalsy();
@@ -283,7 +286,7 @@ describe('GameSocketRoomService', () => {
         });
 
         it('should append suffix to player name if name already exists', () => {
-            const duplicateNamePlayer: PlayerCharacter = {
+            const duplicateNamePlayer = {
                 avatar: 'ARCHER' as unknown as Avatar,
                 name: 'Player1',
                 socketId: 'socket4',
@@ -293,7 +296,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             service.addPlayerToRoom(2222, player1);
             const result = service.addPlayerToRoom(2222, duplicateNamePlayer);
@@ -341,7 +344,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player2 = {
                 avatar: 'MAGE' as unknown as Avatar,
@@ -353,7 +356,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             room.players.push(player1, player2);
             service['playerRooms'].set('socket1', 3333);
@@ -408,7 +411,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player = {
                 avatar: 'MAGE' as unknown as Avatar,
@@ -420,7 +423,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             room.players.push(organizer, player);
             service['playerRooms'].set('socket1', 4444);
@@ -489,7 +492,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player = {
                 avatar: 'MAGE' as unknown as Avatar,
@@ -501,7 +504,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             room.players.push(organizer, player);
             service['playerRooms'].set('socket1', 5555);
@@ -549,7 +552,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             player2 = {
                 avatar: 'MAGE' as unknown as Avatar,
@@ -561,7 +564,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             room.players.push(player1, player2);
             service['playerRooms'].set('socket1', 6666);
@@ -614,7 +617,7 @@ describe('GameSocketRoomService', () => {
                     attack: 4,
                     defense: 4,
                 },
-            };
+            } as PlayerCharacter;
 
             room.players.push(player);
             service['playerRooms'].set('socket1', 7777);

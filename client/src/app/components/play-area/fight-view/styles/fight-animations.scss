@@ -1,0 +1,188 @@
+@import 'src/_variables.scss';
+
+.fight-view {
+    position: relative;
+    border: 4px solid #333;
+    width: 520px;
+    height: 200px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+
+    .layer-1 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .layer-2 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .layer-3 {
+            position: absolute;
+            z-index: 3;
+        }
+
+        #dice-result {
+            position: absolute;
+            justify-content: center;
+            font-size: 40px;
+            color: $primary-light;
+            font-weight: bold;
+            opacity: 0;
+
+            &.dice-roll {
+                animation: dice-roll 0.5s ease infinite;
+            }
+        }
+
+        @keyframes dice-roll {
+            0% {
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        img {
+            width: 100px;
+            height: auto;
+            margin: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        #player {
+            width: 85px;
+            margin-left: 90px;
+
+            &.hit {
+                animation: playerHit 0.5s ease forwards;
+            }
+
+            &.escape-player {
+                animation: playerEscape 0.5s ease forwards;
+            }
+        }
+
+        #opponent {
+            width: 70px;
+            margin-right: 90px;
+
+            &.hit {
+                animation: playerHit 0.5s ease forwards;
+            }
+
+            &.escape-opponent {
+                animation: opponentEscape 0.5s ease forwards;
+            }
+        }
+
+        .attack-player {
+            animation: playerAttack 0.3s ease forwards;
+
+            #player.hit {
+                animation: playerHit 0.5s ease forwards;
+            }
+        }
+
+        .attack-opponent {
+            animation: opponentAttack 0.3s ease forwards;
+
+            #player.hit {
+                animation: playerHit 0.5s ease forwards;
+            }
+        }
+
+        @keyframes playerAttack {
+            0% {
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                transform: translateX(-200px) scale(0.85);
+            }
+            100% {
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes opponentAttack {
+            0% {
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                transform: translateX(200px) scale(0);
+            }
+            100% {
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes playerHit {
+            0% {
+                filter: none;
+            }
+            50% {
+                filter: hue-rotate(180deg);
+                transform: rotate(10deg);
+            }
+            100% {
+                filter: none;
+            }
+        }
+
+        @keyframes playerEscape {
+            0% {
+                transform: none;
+            }
+            50% {
+                transform: translateX(160px) scale(0.8);
+            }
+            100% {
+                transform: none;
+            }
+        }
+
+        @keyframes opponentEscape {
+            0% {
+                transform: none;
+            }
+            50% {
+                transform: translateX(-160px) scale(0.8);
+            }
+            100% {
+                transform: none;
+            }
+        }
+
+        @keyframes opponentAttack {
+            0% {
+                transform: none;
+            }
+            50% {
+                transform: translateX(-100px);
+            }
+            100% {
+                transform: none;
+            }
+        }
+    }
+}

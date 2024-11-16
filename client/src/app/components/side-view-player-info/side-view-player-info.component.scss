@@ -1,0 +1,59 @@
+@import 'src/_variables.scss';
+
+#info-container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: $primary-dark;
+    padding: 10px;
+    width: auto;
+    max-width: 100vh;
+
+    .info-content {
+        display: flex;
+        flex-direction: column;
+        margin-right: 10px;
+    }
+
+    .player-info {
+        color: $primary-light;
+        font-size: 20px;
+        line-height: 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: $secondary;
+    }
+
+    .player-info-details {
+        color: $primary-light;
+        font-size: 15px;
+        line-height: 1.5;
+
+        .icon-container {
+            display: inline-block;
+            margin-right: 2px;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+        }
+    }
+
+    #player-image {
+        width: 55px;
+        height: 140px;
+        margin-left: auto;
+        background-color: $primary-light;
+        padding: 10px;
+        border: 5px solid darken($primary-dark, 10%);
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+}

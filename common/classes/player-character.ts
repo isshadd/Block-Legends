@@ -1,11 +1,12 @@
-import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
-import { PlayerAttributes } from './player-attributes';
-import { PlayerMapEntity } from './player-map-entity';
+import { PlayerAttributes } from '../../common/classes/player-attributes';
+import { PlayerMapEntity } from '../../common/classes/player-map-entity';
+import { Avatar } from '../../common/enums/avatar-enum';
+import { Character } from '../../common/interfaces/character';
 
 export const BONUS = 6;
 export const BASE_STATS = 4;
 
-export class PlayerCharacter {
+export class PlayerCharacter implements Character {
     isLifeBonusAssigned: boolean = false;
     isSpeedBonusAssigned: boolean = false;
     isAttackBonusAssigned: boolean = true;
@@ -16,8 +17,7 @@ export class PlayerCharacter {
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
     fightWins: number = 0;
-    isNameValid: boolean = false;
-    avatar: Avatar = AvatarEnum.Alex;
+    avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;

@@ -1,4 +1,5 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
+import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from '@common/constants/chat.gateway.constants';
 import { ChatEvents } from '@common/enums/chat-events';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { Logger } from '@nestjs/common';
@@ -6,7 +7,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as sinon from 'sinon';
 import { SinonStubbedInstance, createStubInstance, match, stub } from 'sinon';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
-import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from './chat.gateway.constants';
 
 describe('ChatGateway', () => {
     let gateway: ChatGateway;

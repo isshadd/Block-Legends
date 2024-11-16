@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { PlayerCharacter } from '@common/classes/player-character';
 
 @Component({
     selector: 'app-attributes',
@@ -19,6 +19,21 @@ export class AttributesComponent {
     selectedAttackDice: string = 'dice6';
     selectedDefenseDice: string = 'dice4';
 
+    get healthArray() {
+        return new Array(this.character.attributes.life);
+    }
+
+    get speedArray() {
+        return new Array(this.character.attributes.speed);
+    }
+
+    get attackArray() {
+        return new Array(this.character.attributes.attack);
+    }
+
+    get defenseArray() {
+        return new Array(this.character.attributes.defense);
+    }
     assignAttackDice(event: Event): void {
         const target = event.target as HTMLSelectElement;
         const dice = target.value;

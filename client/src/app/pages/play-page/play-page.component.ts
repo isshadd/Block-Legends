@@ -4,13 +4,13 @@
 /* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { Tile } from '@app/classes/Tiles/tile';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { InfosGameComponent } from '@app/components/infos-game/infos-game.component';
+import { PlayerCharacter } from '@common/classes/player-character';
 // eslint-disable-next-line
 import { PlaceableEntityContainerComponent } from '@app/components/map-editor-components/placeable-entity-container/placeable-entity-container.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
@@ -26,9 +26,10 @@ import { BattleManagerService } from '@app/services/play-page-services/game-boar
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
 
 @Component({
     selector: 'app-play-page',
@@ -49,6 +50,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
         InfoPanelComponent,
         FightViewComponent,
         WinPanelComponent,
+        PlayGameSideViewBarComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
@@ -80,6 +82,15 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.playGameBoardSocketService.init();
+        this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
+            const abandonPlayer = this.players.find((p) => p.socketId === socketId);
+            if (!abandonPlayer) throw new Error('Player not found');
+            abandonPlayer.isAbsent = true;
+            this.players = [
+                ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
+                abandonPlayer,
+            ];
+        });
     }
 
     onPlayGameBoardManagerInit() {
@@ -105,35 +116,31 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.socketStateService.setActiveSocket(this.webSocketService);
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
-            this.updatePlayersList();
+            // this.updatePlayersList();
         });
 
-        this.gameService.currentPlayer$.pipe(takeUntil(this.destroy$)).subscribe((player) => {
-            this.myPlayer = player;
+        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+            this.myPlayer = character;
+            this.totalLifePoints = this.myPlayer.attributes.life;
         });
-
-        this.totalLifePoints = this.myPlayer.attributes.life;
     }
 
-    updatePlayersList(): void {
-        const allPlayers = this.webSocketService.getTotalPlayers();
+    // updatePlayersList(): void {
+    //     const allPlayers = this.webSocketService.getTotalPlayers();
 
-        this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
-            const player = allPlayers.find((p) => p.name === playerName);
-            if (player) {
-                player.isAbsent = false; // Joueur présent
-                return player;
-            } else {
-                // Crée une instance temporaire de PlayerCharacter pour les joueurs absents
-                const absentPlayer = new PlayerCharacter(playerName);
-                absentPlayer.isAbsent = true;
-                return absentPlayer;
-            }
-        });
+    //     this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
+    //         const player = allPlayers.find((p) => p.name === playerName);
+    //         if (player) {
+    //             return player;
+    //         } else {
+    //             const absentPlayer = new PlayerCharacter(playerName);
+    //             absentPlayer.isAbsent = true;
+    //             return absentPlayer;
+    //         }
+    //     });
 
-        // Trie les joueurs pour que les absents soient en bas
-        this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
-    }
+    //     this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
+    // }
 
     ngOnDestroy(): void {
         this.destroy$.next();
@@ -168,6 +175,16 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     leaveGame(): void {
+        this.myPlayer.isAbsent = true;
+        this.handlePlayerAbandon();
         this.playGameBoardSocketService.leaveGame();
+    }
+
+    handlePlayerAbandon(): void {
+        // Mettez à jour la liste des joueurs pour mettre le joueur absent en bas
+        this.players = [
+            ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
+            this.myPlayer,
+        ]; // Ajouter le joueur absent en bas
     }
 }

@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
-import { EventJournalService } from './event-journal.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
-import { Subject } from 'rxjs';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
+import { EventJournalService } from './event-journal.service';
 
 const NUMBER_OF_CALLS = 3;
 

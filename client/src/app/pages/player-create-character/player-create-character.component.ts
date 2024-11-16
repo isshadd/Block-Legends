@@ -2,18 +2,28 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlayerCharacter } from '@app/classes/Characters/player-character';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 
 @Component({
     selector: 'app-player-create-character',
     standalone: true,
-    imports: [FormsModule, CommonModule, AttributesComponent, AvatarSelectionComponent, CharacterFormComponent, ModalComponent],
+    imports: [
+        FormsModule,
+        CommonModule,
+        AttributesComponent,
+        AvatarSelectionComponent,
+        CharacterFormComponent,
+        ModalComponent,
+        ImageShowcaseComponent,
+    ],
     templateUrl: './player-create-character.component.html',
     styleUrl: './player-create-character.component.scss',
 })
@@ -58,20 +68,19 @@ export class PlayerCreateCharacterComponent {
         });
         if (missingFields.length > 0) {
             this.characterStatus = `Le formulaire de création de personnage n'est pas valide ! Manquants: ${missingFields.join(', ')}.`;
-        } else if (!this.character.isNameValid) {
-            this.characterStatus = 'Le nom du personnage est invalide !';
         } else {
             this.gameService.setCharacter(this.character);
 
-            this.webSocketService.socket.on('joinGameResponseNoMoreExisting', () => {
+            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, () => {
                 this.router.navigate(['join-game']);
             });
 
-            this.webSocketService.socket.on('joinGameResponseLockedAfterJoin', () => {
+            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, () => {
                 this.router.navigate(['join-game']);
             });
 
-            this.webSocketService.socket.on('joinGameResponseCanJoin', (response: { valid: boolean }) => {
+            this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE, (response: { valid: boolean }) => {
+                // joinGameResponseCanJoin
                 if (response.valid) {
                     this.router.navigate(['/waiting-view'], { queryParams: { roomId: this.gameId } });
                 } else {
