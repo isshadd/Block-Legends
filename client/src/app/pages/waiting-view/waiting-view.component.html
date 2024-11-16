@@ -1,53 +1,65 @@
-<div class="waiting-room">
-    <h1>Salle d'attente - BLOCK LEGENDS</h1>
+<div id="page-container">
+    <div class="waiting-room">
+        <h1>Salle d'attente - BLOCK LEGENDS</h1>
 
-    <h2>Code d'accès : {{ accessCode$ | async }}</h2>
-    @if (isLocked$ | async) { ::: 🔒 Salle verrouillée ::: } @else { ::: 🔓 Salle déverrouillée ::: }
+        <h2>Code d'accès : {{ accessCode$ | async }}</h2>
+        @if (isLocked$ | async) { ::: 🔒 Salle verrouillée ::: } @else { ::: 🔓 Salle déverrouillée ::: }
 
-    <div class="players-list">
-        <h3>Joueurs :</h3>
-        <ul>
-            @for(player of players$ | async; track player.name) {
-            <li [ngClass]="{ organizer: player.isOrganizer }">
-                <img [src]="player.avatar.headImage" alt="Avatar" />
-                <span>{{ player.name }}</span>
-                @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {
-                <button class="dark-button" type="button" (click)="kickPlayer(player)">Expulser</button>
+        <div class="players-list">
+            <h3>Joueurs :</h3>
+            <ul id="player-container">
+                @for(player of players$ | async; track player.name) {
+                <li [ngClass]="{ organizer: player.isOrganizer }">
+                    <img [src]="player.avatar.headImage" alt="Avatar" />
+                    <span class="player-name">{{ player.name }}</span>
+                    @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {
+                    <button class="dark-button" type="button" (click)="kickPlayer(player)">Expulser</button>
+                    }
+                </li>
                 }
-            </li>
-            }
-        </ul>
+            </ul>
+        </div>
+        @if((this.gameService.character$ | async)?.isOrganizer) {
+        <div class="admin-buttons">
+            <div class="button-container">
+                <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
+                <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
+            </div>
+            <div class="button-container">
+                <button
+                    class="dark-button"
+                    type="button"
+                    (click)="unlockRoom()"
+                    [disabled]="(isLocked$ | async) === false || playersCounter === maxPlayers"
+                >
+                    Deverouiller la salle
+                </button>
+                <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
+            </div>
+        </div>
+        } @if(isMaxPlayer) {
+        <div class="error">Le nombre maximum de joueurs est atteint !</div>
+        } @if((this.gameService.character$ | async)?.isOrganizer) {
+        <div>
+            <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
+        </div>
+        } @else {
+        <div>
+            <button class="dark-button" type="button" (click)="playerNonOrgLeave()">Quitter la partie</button>
+        </div>
+        }
     </div>
-    @if((this.gameService.character$ | async)?.isOrganizer) {
-    <div class="admin-buttons">
-        <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
-        <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
-        <button class="dark-button" type="button" (click)="unlockRoom()" [disabled]="(isLocked$ | async) === false || playersCounter === maxPlayers">
-            Deverouiller la salle
+    <div id="chat-journal-container">
+        <button class="chat-button" (click)="toggleView()">
+            {{ showClavardage ? 'Show Event Journal' : 'Show Clavardage' }}
         </button>
-        <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
+        <div id="app-container">
+            <div *ngIf="showClavardage">
+                <app-clavardage></app-clavardage>
+            </div>
+            <div *ngIf="!showClavardage">
+                <app-event-journal></app-event-journal>
+            </div>
+        </div>
     </div>
-    } @if(isMaxPlayer) {
-    <div class="error">Le nombre maximum de joueurs est atteint !</div>
-    } @if((this.gameService.character$ | async)?.isOrganizer) {
-    <div>
-        <button class="dark-button" type="button" (click)="playerLeave()">Quitter la partie</button>
-    </div>
-    } @else {
-    <div>
-        <button class="dark-button" type="button" (click)="playerNonOrgLeave()">Quitter la partie</button>
-    </div>
-    }
-    <div class="toggle-container">
-        <button class="toggle-button" (click)="toggleView()">
-          {{ showClavardage ? 'Show Event Journal' : 'Show Clavardage' }}
-        </button>
-      </div>
-      
-      <div *ngIf="showClavardage">
-        <app-clavardage></app-clavardage>
-      </div>
-      <div *ngIf="!showClavardage">
-        <app-event-journal></app-event-journal>
-      </div>
 </div>
