@@ -108,6 +108,7 @@ export class WebSocketService {
     setupSocketListeners() {
         this.socket.on(SocketEvents.ROOM_STATE, (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
+            this.chatService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
             this.isLockedSubject.next(room.isLocked);

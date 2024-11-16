@@ -47,7 +47,7 @@ export class ChatService {
         }
 
         this.accessCode = code;
-        this.roomID = this.accessCode.toString();
+        this.roomID = code.toString();
     }
 
     broadcastMessageToAll(roomMessage: string): void {
@@ -57,6 +57,7 @@ export class ChatService {
         }
         if (this.socket && roomMessage.trim()) {
             const message = { room: this.roomID, time: this.serverClock, sender: this.playerName, content: roomMessage };
+            console.log(message);
             this.socket.sendMsgToRoom(message);
         }
     }
