@@ -15,6 +15,8 @@ import { Socket } from 'socket.io-client';
 })
 export class PlayGameBoardSocketService implements OnDestroy {
     socket: Socket;
+    signalPlayerLeft = new Subject<string>();
+    signalPlayerLeft$ = this.signalPlayerLeft.asObservable();
     private destroy$ = new Subject<void>();
 
     constructor(
@@ -110,6 +112,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on(SocketEvents.GAME_BOARD_PLAYER_LEFT, (playerId: string) => {
             this.playGameBoardManagerService.removePlayerFromMap(playerId);
+            this.signalPlayerLeft.next(playerId);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_MOVED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
