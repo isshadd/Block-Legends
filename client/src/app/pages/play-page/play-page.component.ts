@@ -120,6 +120,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+            if (!character) return;
             this.myPlayer = character;
             this.totalLifePoints = this.myPlayer.attributes.life;
         });
