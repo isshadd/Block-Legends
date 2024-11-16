@@ -50,12 +50,9 @@
         }
     </div>
     <div id="chat-journal-container">
-        <div class="toggle-container">
-            <button class="toggle-button" (click)="toggleView()">
-                {{ showClavardage ? 'Show Event Journal' : 'Show Clavardage' }}
-            </button>
-        </div>
-
+        <button class="chat-button" (click)="toggleView()">
+            {{ showClavardage ? 'Show Event Journal' : 'Show Clavardage' }}
+        </button>
         <div id="app-container">
             <div *ngIf="showClavardage">
                 <app-clavardage></app-clavardage>
