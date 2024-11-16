@@ -57,7 +57,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             if (!character) return;
             this.isOrganizer = character.isOrganizer;
             this.chatService.setCharacter(character);
-            console.log('character', character);
             this.eventJournalService.setCharacter(character);
             if (!this.gameId) return;
 

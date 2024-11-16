@@ -57,7 +57,6 @@ export class ChatService {
         }
         if (this.socket && roomMessage.trim()) {
             const message = { room: this.roomID, time: this.serverClock, sender: this.playerName, content: roomMessage };
-            console.log(message);
             this.socket.sendMsgToRoom(message);
         }
     }
