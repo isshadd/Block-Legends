@@ -1,11 +1,25 @@
 @import 'src/_variables.scss';
-.waiting-room {
+#page-container {
+    display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    gap: 2vh;
+}
+.waiting-room {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+    padding: 2vh;
+    background-color: $primary-dark;
+    border: 0.5vh solid darken($primary-dark, 10%);
+    border-radius: 1vh;
+    width: 90vw;
+    max-width: 60vh;
 }
 h1 {
     text-align: center;
@@ -148,4 +162,40 @@ h2 {
 .button-container {
     display: flex;
     flex-direction: column;
+}
+#chat-journal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2vh;
+    background-color: $primary-dark;
+    border: 0.5vh solid darken($primary-dark, 10%);
+    border-radius: 1vh;
+    width: fit-content;
+    max-width: fit-content;
+
+    .chat-button {
+        background-color: darken($secondary, 10%);
+        color: black;
+        padding: 1vh 2vh;
+        border-radius: 0.5vh;
+        font-size: 1.5vh;
+        cursor: pointer;
+        border: 0.2vh solid transparent;
+        transition: border-color 0.3s ease;
+        margin-bottom: 1vh;
+        width: fit-content;
+        height: fit-content;
+
+        &:hover {
+            border-color: $primary-light;
+            background-color: lighten($secondary, 10%);
+        }
+    }
+
+    #app-container {
+        width: 40vh;
+        height: fit-content;
+    }
 }
