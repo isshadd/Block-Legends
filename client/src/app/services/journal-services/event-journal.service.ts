@@ -25,6 +25,7 @@ export class EventJournalService {
         this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
             if (hasSocket) {
                 this.socket = this.socketStateService.getActiveSocket();
+                this.socket?.registerPlayer(this.playerName);
             } else {
                 this.socket = null;
             }
@@ -48,5 +49,9 @@ export class EventJournalService {
 
     addEvent(sentEvent: { event: string; associatedPlayers: string[] }): void {
         this.roomEvents.push(sentEvent);
+    }
+
+    getFilteredEvents(): { event: string; associatedPlayers: string[] }[] {
+        return this.roomEvents.filter((event) => event.associatedPlayers.includes(this.playerName));
     }
 }

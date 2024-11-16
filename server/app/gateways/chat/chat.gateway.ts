@@ -12,6 +12,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     private logger = new Logger(ChatGateway.name);
     private readonly room: string = PRIVATE_ROOM_ID;
 
+    private playerSocketIdMap: { [key: string]: string } = {};
+
     @SubscribeMessage(ChatEvents.BroadcastAll)
     broadcastAll(socket: Socket, message: { time: Date; sender: string; content: string }) {
         this.server.emit(ChatEvents.MassMessage, `${message.time} ${message.sender} : ${message.content}`);
@@ -30,13 +32,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.EventMessage)
     eventMessage(socket: Socket, payload: { time: Date; content: string; roomID: string; associatedPlayers: string[] }) {
-        this.logger.log('Event received');
         const { time, content, roomID, associatedPlayers } = payload;
-        if (socket.rooms.has(roomID)) {
-            const event = `${time} ${content}`;
-            this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
+        const event = `${time} ${content}`;
+        if (content === 'attack' || content === 'fuir') {
+            this.sendMessageToPlayers(event, associatedPlayers);
         } else {
-            this.logger.warn(`Socket ${socket.id} attempted to send message to room ${roomID} but is not a member.`);
+            if (socket.rooms.has(roomID)) {
+                this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
+            } else {
+                this.logger.warn(`Socket ${socket.id} attempted to send message to room ${roomID} but is not a member.`);
+            }
         }
     }
 
@@ -47,11 +52,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     handleConnection(socket: Socket) {
+        socket.on('registerPlayer', (playerName: string) => {
+            this.playerSocketIdMap[playerName] = socket.id;
+            this.logger.log(`Player ${playerName} connected with socket ID ${socket.id}`);
+        });
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
     }
 
     handleDisconnect(socket: Socket) {
+        for (const playerName in this.playerSocketIdMap) {
+            if (this.playerSocketIdMap[playerName] === socket.id) {
+                delete this.playerSocketIdMap[playerName];
+                this.logger.log(`Player ${playerName} disconnected`);
+                break;
+            }
+        }
         this.logger.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+    }
+
+    private sendMessageToPlayers(event: string, playerNames: string[]): void {
+        playerNames.forEach((playerName) => {
+            const playerSocketId = this.playerSocketIdMap[playerName];
+            if (playerSocketId) {
+                const playerSocket = this.server.sockets.sockets.get(playerSocketId);
+                if (playerSocket) {
+                    playerSocket.emit(ChatEvents.EventReceived, { event, associatedPlayers: playerNames });
+                } else {
+                    this.logger.warn(`Player ${playerName} not found or not connected.`);
+                }
+            } else {
+                this.logger.warn(`Player ${playerName} not found or not connected.`);
+            }
+        });
     }
 
     private emitTime() {

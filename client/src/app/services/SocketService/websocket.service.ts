@@ -73,8 +73,18 @@ export class WebSocketService {
         this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
     }
 
+    sendEventToPlayers(event: string, players: string[]): void {
+        const time = this.eventJournalService.serverClock;
+        const content = event;
+        this.socket.emit('eventMessage', { time, content, associatedPlayers: players });
+    }
+
     joinGame(accessCode: number) {
         this.socket.emit('joinGame', accessCode);
+    }
+
+    registerPlayer(playerName: string): void {
+        this.socket.emit('registerPlayer', playerName);
     }
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {

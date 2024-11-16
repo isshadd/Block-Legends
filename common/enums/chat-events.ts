@@ -5,6 +5,7 @@ export enum ChatEvents {
     JoinRoom = 'joinRoom',
     RoomMessage = 'roomMessage',
     EventMessage = 'eventMessage',
+    TwoPlayerEvent = 'twoPlayerEvent',
 
     WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
