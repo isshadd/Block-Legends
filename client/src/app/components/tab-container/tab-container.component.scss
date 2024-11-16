@@ -13,10 +13,6 @@
     display: flex;
     width: 90%;
 }
-app-event-journal {
-    transform: scale(0.5);
-    margin-left: 3px;
-}
 
 button {
     margin-top: 20px;
@@ -34,7 +30,8 @@ button {
     align-items: center;
     height: 100%;
 
-    app-clavardage {
+    app-clavardage,
+    app-event-journal {
         width: 100%;
         height: 100%;
         margin-left: 20px;
