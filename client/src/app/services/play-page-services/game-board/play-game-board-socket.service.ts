@@ -26,8 +26,6 @@ export class PlayGameBoardSocketService implements OnDestroy {
         public battleManagerService: BattleManagerService,
         public router: Router,
     ) {
-        this.socket = this.webSocketService.socket;
-        this.setupSocketListeners();
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_MOVED, data);
         });
@@ -67,6 +65,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
     }
 
     init() {
+        this.socket = this.webSocketService.socket;
+        this.setupSocketListeners();
         this.socket.emit(SocketEvents.INIT_GAME_BOARD);
     }
 
