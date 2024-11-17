@@ -11,7 +11,7 @@ import { EventJournalService } from '@app/services/journal-services/event-journa
     templateUrl: './clavardage.component.html',
     styleUrl: './clavardage.component.scss',
 })
-export class ClavardageComponent implements OnInit, AfterViewChecked {
+export class ClavardageComponent implements OnInit, AfterViewChecked{
     @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     messageToSend: string = '';
@@ -43,6 +43,7 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
             }, 1);
         }
     }
+
 
     trackByIndex(index: number): number {
         return index;

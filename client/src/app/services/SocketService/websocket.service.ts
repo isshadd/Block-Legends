@@ -211,6 +211,7 @@ export class WebSocketService {
             this.isLockedSubject.next(false);
             this.playersSubject.next([]);
             this.socket.disconnect();
+            this.chatService.clearMessages();
         });
 
         this.socket.on(SocketEvents.GAME_STARTED, () => {
