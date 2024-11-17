@@ -305,4 +305,13 @@ describe('WaitingViewComponent', () => {
             expect(component.playersCounter).toBe(1);
         }));
     });
+
+    describe('tooggleView', () => {
+        it('should toggle showClavardage', () => {
+            component.showClavardage = true;
+            component.toggleView();
+
+            expect(component.showClavardage).toBeFalse();
+        });
+    });
 });
