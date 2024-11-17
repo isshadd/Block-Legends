@@ -49,16 +49,20 @@ export class GameSocketRoomService {
         return accessCode;
     }
 
-    initRoomGameBoard(accessCode: number) {
+    async initRoomGameBoard(accessCode: number) {
         const room = this.rooms.get(accessCode);
 
         if (!room) {
             return;
         }
 
-        this.gameService.getGame(room.id).then((game) => {
-            this.setupGameBoardRoom(room.accessCode, game);
-        });
+        try {
+            await this.gameService.getGame(room.id).then((game) => {
+                this.setupGameBoardRoom(room.accessCode, game);
+            });
+        } catch (error) {
+            console.error(`Failed to get game: ${error}`);
+        }
     }
 
     setupGameBoardRoom(accessCode: number, game: Game) {
