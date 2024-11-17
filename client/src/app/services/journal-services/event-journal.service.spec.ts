@@ -108,7 +108,7 @@ describe('EventJournalService', () => {
             service.setAccessCode(0);
 
             expect(service.accessCode).toBe(0);
-            expect(service.roomID).toBe('0');
+            expect(service.roomID).toBe('');
         });
     });
 

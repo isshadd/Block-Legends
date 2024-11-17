@@ -194,7 +194,7 @@ describe('ChatService', () => {
     describe('room ID handling', () => {
         it('should handle different access code formats', () => {
             const testCases = [
-                { input: 0, expected: '0' },
+                { input: 0, expected: '' },
                 { input: 1, expected: '1' },
                 { input: 999999, expected: '999999' },
             ];

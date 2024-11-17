@@ -99,7 +99,6 @@ export class GameSocketRoomService {
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
         this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PreparingTurn });
-        this.initRoomGameBoard(accessCode);
         return newRoom;
     }
 
