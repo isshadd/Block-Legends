@@ -50,6 +50,10 @@ export class ChatService {
         this.roomID = code.toString();
     }
 
+    clearMessages() {
+        this.roomMessages = [];
+    }
+
     broadcastMessageToAll(roomMessage: string): void {
         if (roomMessage.length > MAX_STRING_LENGTH) {
             alert('Message cannot exceed 200 characters.');
