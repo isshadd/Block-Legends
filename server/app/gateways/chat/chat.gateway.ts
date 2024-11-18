@@ -24,7 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         if (socket.rooms.has(message.room)) {
             const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
             this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
-        } 
+        }
     }
 
     @SubscribeMessage(ChatEvents.EventMessage)
@@ -36,7 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else {
             if (socket.rooms.has(roomID)) {
                 this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
-            } 
+            }
         }
     }
 
@@ -70,8 +70,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 const playerSocket = this.server.sockets.sockets.get(playerSocketId);
                 if (playerSocket) {
                     playerSocket.emit(ChatEvents.EventReceived, { event, associatedPlayers: playerNames });
-                }   
-            } 
+                }
+            }
         });
     }
 

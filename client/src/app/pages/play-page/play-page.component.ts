@@ -181,7 +181,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.chatService.clearMessages();
         this.handlePlayerAbandon();
         this.playGameBoardSocketService.leaveGame();
-    
     }
 
     handlePlayerAbandon(): void {

@@ -161,21 +161,16 @@ export class GameValidationService {
         const normalizedName = game.name.trim();
         const existingGame = await this.gameService.getGameByName(normalizedName);
 
-        // Check if no game exists with the same name, or if updating the same game
         if (!existingGame || (game._id && game._id === existingGame._id)) {
             return true; // Name is unique
         }
 
-        return false; // Name is not unique
+        return false;
     }
     async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
         const normalizedName = game.name.trim();
         const foundGame = await this.gameService.getGameByName(normalizedName);
-        // console.log('found game id', JSON.stringify(foundGame._id));
-        // console.log('Found game', foundGame);
-        // console.log('Game id', id);
-        // console.log('foundGame._id ', foundGame._id);
-        // console.log('foundGame._id === id', foundGame._id === id);
+
         if (foundGame) {
             const valid = JSON.stringify(foundGame._id) === JSON.stringify(id);
             return valid;
@@ -225,7 +220,6 @@ export class GameValidationService {
                 const tile = game.tiles[i][j];
 
                 if (tile.type === TileType.Door) {
-                    // Check if the door is not on the edges of the grid
                     if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
                         return false;
                     }
@@ -243,7 +237,6 @@ export class GameValidationService {
     }
 
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
-        // Ensure we're not accessing out of bounds
         if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
             return false;
         }
@@ -257,16 +250,15 @@ export class GameValidationService {
     }
 
     async isVerticalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
-        // Ensure we're not accessing out of bounds
         if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
             return false;
         }
 
         return (
-            (await this.isTileWall(game.tiles[i][j + 1])) && // Wall below
-            (await this.isTileWall(game.tiles[i][j - 1])) && // Wall above
-            (await this.isTileTerrain(game.tiles[i + 1][j])) && // Terrain on the right
-            (await this.isTileTerrain(game.tiles[i - 1][j])) // Terrain on the left
+            (await this.isTileWall(game.tiles[i][j + 1])) &&
+            (await this.isTileWall(game.tiles[i][j - 1])) &&
+            (await this.isTileTerrain(game.tiles[i + 1][j])) &&
+            (await this.isTileTerrain(game.tiles[i - 1][j]))
         );
     }
 }

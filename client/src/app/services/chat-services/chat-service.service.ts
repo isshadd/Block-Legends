@@ -46,7 +46,7 @@ export class ChatService {
 
     clearMessages() {
         this.roomMessages = [];
-      }
+    }
 
     broadcastMessageToAll(roomMessage: string): void {
         if (roomMessage.length > MAX_STRING_LENGTH) {

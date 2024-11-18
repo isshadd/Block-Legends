@@ -1,6 +1,6 @@
 import { ChatGateway } from '@app/gateways/chat/chat.gateway';
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from '@common/constants/chat.gateway.constants';
-import { ChatEvents } from '@common/enums/chat-events';
+import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';

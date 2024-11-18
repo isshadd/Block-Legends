@@ -12,7 +12,7 @@ import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatEvents} from '@common/enums/gateway-events/chat-events';
+import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 
 @Injectable({
     providedIn: 'root',
