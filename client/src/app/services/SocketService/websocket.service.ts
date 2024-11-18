@@ -12,6 +12,7 @@ import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { ChatEvents} from '@common/enums/gateway-events/chat-events';
 
 @Injectable({
     providedIn: 'root',
@@ -59,11 +60,11 @@ export class WebSocketService {
         this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
     }
 
-    sendEventToPlayers(event: string, players: string[]): void {
-        const time = this.eventJournalService.serverClock;
-        const content = event;
-        this.socket.emit('eventMessage', { time, content, associatedPlayers: players });
-    }
+    // sendEventToPlayers(event: string, players: string[]): void {
+    //     const time = this.eventJournalService.serverClock;
+    //     const content = event;
+    //     this.socket.emit('eventMessage', { time, content, associatedPlayers: players });
+    // }
 
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
@@ -248,7 +249,7 @@ export class WebSocketService {
             });
         });
 
-        this.socket.on('roomMessage', (message: string) => {
+        this.socket.on(ChatEvents.RoomMessage, (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });

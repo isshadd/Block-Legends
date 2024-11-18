@@ -1,5 +1,5 @@
 import { DELAY_BEFORE_EMITTING_TIME, PRIVATE_ROOM_ID } from '@common/constants/chat.gateway.constants';
-import { ChatEvents } from '@common/enums/chat-events';
+import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';

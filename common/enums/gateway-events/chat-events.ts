@@ -1,12 +1,10 @@
 export enum ChatEvents {
-    Validate = 'validate',
-    ValidateACK = 'validateWithAck',
     BroadcastAll = 'broadcastAll',
-    JoinRoom = 'joinRoom',
     RoomMessage = 'roomMessage',
+    EventMessage = 'eventMessage',
 
     WordValidated = 'wordValidated',
     MassMessage = 'massMessage',
-    Hello = 'hello',
+    EventReceived = 'eventReceived',
     Clock = 'clock',
 }
