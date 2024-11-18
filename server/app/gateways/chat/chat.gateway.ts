@@ -21,13 +21,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage(ChatEvents.RoomMessage)
     roomMessage(socket: Socket, message: RoomMessage) {
-        this.logger.log(`Message received in room ${message.room}`);
         if (socket.rooms.has(message.room)) {
             const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
             this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
-        } else {
-            this.logger.warn(`Socket ${socket.id} attempted to send message to room ${message.room} but is not a member.`);
-        }
+        } 
     }
 
     @SubscribeMessage(ChatEvents.EventMessage)
@@ -39,9 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else {
             if (socket.rooms.has(roomID)) {
                 this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
-            } else {
-                this.logger.warn(`Socket ${socket.id} attempted to send message to room ${roomID} but is not a member.`);
-            }
+            } 
         }
     }
 
@@ -52,9 +47,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     handleConnection(socket: Socket) {
-        socket.on('registerPlayer', (playerName: string) => {
+        socket.on(ChatEvents.RegisterPlayer, (playerName: string) => {
             this.playerSocketIdMap[playerName] = socket.id;
-            this.logger.log(`Player ${playerName} connected with socket ID ${socket.id}`);
         });
         this.logger.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
     }
@@ -63,7 +57,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         for (const playerName in this.playerSocketIdMap) {
             if (this.playerSocketIdMap[playerName] === socket.id) {
                 delete this.playerSocketIdMap[playerName];
-                this.logger.log(`Player ${playerName} disconnected`);
                 break;
             }
         }
@@ -77,12 +70,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                 const playerSocket = this.server.sockets.sockets.get(playerSocketId);
                 if (playerSocket) {
                     playerSocket.emit(ChatEvents.EventReceived, { event, associatedPlayers: playerNames });
-                } else {
-                    this.logger.warn(`Player ${playerName} not found or not connected.`);
-                }
-            } else {
-                this.logger.warn(`Player ${playerName} not found or not connected.`);
-            }
+                }   
+            } 
         });
     }
 

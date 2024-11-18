@@ -50,28 +50,22 @@ export class WebSocketService {
     }
 
     sendMsgToRoom(roomMessage: RoomMessage): void {
-        this.socket.emit('roomMessage', roomMessage);
+        this.socket.emit(ChatEvents.RoomMessage, roomMessage);
     }
 
     sendEventToRoom(event: string, players: string[]): void {
         const time = this.eventJournalService.serverClock;
         const roomID = this.eventJournalService.roomID;
         const content = event;
-        this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
+        this.socket.emit(ChatEvents.EventMessage, { time, content, roomID, associatedPlayers: players });
     }
-
-    // sendEventToPlayers(event: string, players: string[]): void {
-    //     const time = this.eventJournalService.serverClock;
-    //     const content = event;
-    //     this.socket.emit('eventMessage', { time, content, associatedPlayers: players });
-    // }
 
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
 
     registerPlayer(playerName: string): void {
-        this.socket.emit('registerPlayer', playerName);
+        this.socket.emit(ChatEvents.RegisterPlayer, playerName);
     }
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
@@ -241,7 +235,7 @@ export class WebSocketService {
             this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
+        this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
             this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
