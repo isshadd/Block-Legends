@@ -86,6 +86,13 @@ describe('EventJournalService', () => {
             expect(service.accessCode).toBe(code);
             expect(service.roomID).toBe(code.toString());
         });
+
+        it('should handle zero accessCode', () => {
+            service.setAccessCode(0);
+
+            expect(service.accessCode).toBe(0);
+            expect(service.roomID).toBe('');
+        });
     });
 
     describe('broadcastEvent', () => {

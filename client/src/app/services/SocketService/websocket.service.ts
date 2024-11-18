@@ -118,6 +118,7 @@ export class WebSocketService {
     setupSocketListeners() {
         this.socket.on(SocketEvents.ROOM_STATE, (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
+            this.chatService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
             this.isLockedSubject.next(room.isLocked);
@@ -138,7 +139,7 @@ export class WebSocketService {
                     this.gameService.setAccessCode(response.accessCode);
                     this.isLockedSubject.next(response.isLocked);
                     this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
-                    this.takenAvatarsSubject.next(response.takenAvatars); // Update the list of taken avatars
+                    this.takenAvatarsSubject.next(response.takenAvatars);
                     this.router.navigate(['/player-create-character'], {
                         queryParams: { roomId: response.accessCode },
                     });
@@ -146,10 +147,16 @@ export class WebSocketService {
                         this.gameService.updatePlayerName(response.playerName);
                     }
                 } else {
-                    alert(response.message); // Notify the user that the avatar is already taken
+                    alert(response.message);
+                    this.router.navigate(['join-game']);
                 }
             },
         );
+
+        this.socket.on(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, (player: PlayerCharacter) => {
+            this.gameService.setCharacter(player);
+            this.router.navigate(['/waiting-view']);
+        });
 
         this.socket.on(SocketEvents.AVATAR_TAKEN_ERROR, (data: { message: string }) => {
             this.avatarTakenErrorSubject.next(data.message);
@@ -165,10 +172,12 @@ export class WebSocketService {
 
         this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, (response: { message: string }) => {
             alert(response.message);
+            this.router.navigate(['join-game']);
         });
 
         this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, (response: { message: string }) => {
             alert(response.message);
+            this.router.navigate(['join-game']);
         });
 
         this.socket.on(SocketEvents.ROOM_LOCKED, (data: { message: string; isLocked: boolean }) => {

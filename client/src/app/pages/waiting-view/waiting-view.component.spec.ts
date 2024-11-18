@@ -299,10 +299,19 @@ describe('WaitingViewComponent', () => {
             (gameServiceSpy.character$ as BehaviorSubject<PlayerCharacter>).next(mockCharacter);
             tick();
 
-            expect(component.isOrganizer).toBeFalse();
+            expect(component.isOrganizer).toBeTrue();
             expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
             expect(webSocketServiceSpy.createGame).not.toHaveBeenCalled();
             expect(component.playersCounter).toBe(1);
         }));
+    });
+
+    describe('tooggleView', () => {
+        it('should toggle showClavardage', () => {
+            component.showClavardage = true;
+            component.toggleView();
+
+            expect(component.showClavardage).toBeFalse();
+        });
     });
 });

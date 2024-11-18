@@ -26,6 +26,7 @@ export const enum SocketEvents {
     // RECUS
     ROOM_STATE = 'roomState',
     JOIN_GAME_RESPONSE = 'joinGameResponse',
+    JOIN_WAITING_ROOM_SUCCESS = 'joinWaitingRoomSuccess',
     AVATAR_TAKEN_ERROR = 'avatarTakenError',
     JOIN_GAME_RESPONSE_CODE_INVALID = 'joinGameResponseCodeInvalid',
     JOIN_GAME_RESPONSE_LOCKED_ROOM = 'joinGameResponseLockedRoom',

@@ -300,12 +300,16 @@ describe('GameGateway', () => {
             expect(payload.player.socketId).toBe(client.id);
             expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(payload.accessCode);
             expect(gameSocketRoomService.addPlayerToRoom).toHaveBeenCalledWith(payload.accessCode, payload.player);
-            expect(client.emit).toHaveBeenCalledWith('joinGameResponse', {
-                valid: true,
-                message: 'Rejoint avec succès',
-                playerName: 'Charlie',
-                playerAvatar: AvatarEnum.Alex,
-                takenAvatars: [],
+            expect(client.emit).toHaveBeenCalledWith('joinWaitingRoomSuccess', {
+                attributes: {
+                    attack: 3,
+                    defense: 3,
+                    life: 3,
+                    speed: 3,
+                },
+                name: 'Charlie',
+                avatar: AvatarEnum.Alex,
+                socketId: 'client8',
             });
         });
 

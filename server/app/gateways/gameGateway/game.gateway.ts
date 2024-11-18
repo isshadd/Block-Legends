@@ -95,15 +95,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
         if (added) {
-            client.emit(SocketEvents.JOIN_GAME_RESPONSE, {
-                // joinGameResponseCanJoin
-                valid: true,
-                message: 'Rejoint avec succès',
-                playerName: player.name,
-                playerAvatar: player.avatar,
-                takenAvatars: room.players.map((p) => p.avatar.name), // Send the list of taken avatars
-            });
             this.updateRoomState(accessCode);
+            client.emit(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, player);
 
             const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
             if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {
@@ -115,12 +108,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                     });
                 }
             }
-        } else if (room.isLocked) {
-            client.emit(SocketEvents.JOIN_GAME_RESPONSE, {
-                // joinGameResponseCanJoin
-                valid: false,
-                message: "Cette salle est verrouillée et n'accepte plus de nouveaux joueurs",
-            });
         } else {
             client.emit(SocketEvents.AVATAR_TAKEN_ERROR, {
                 message: `Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`,

@@ -51,6 +51,7 @@ describe('GameService', () => {
         service.setCharacter(new PlayerCharacter('Hero'));
         service.updatePlayerName('New Hero');
         service.character$.subscribe((char) => {
+            if (!char) return;
             expect(char.name).toBe('New Hero');
             done();
         });
@@ -71,7 +72,7 @@ describe('GameService', () => {
         service.accessCode$.subscribe((code) => {
             expect(code).toBeNull();
             service.character$.subscribe((character) => {
-                expect(character).toEqual(new PlayerCharacter(''));
+                expect(character).toEqual(null);
                 done();
             });
         });

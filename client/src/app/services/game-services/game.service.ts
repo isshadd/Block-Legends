@@ -10,7 +10,7 @@ export const VP_NUMBER = 5;
 })
 export class GameService {
     accessCodeSubject = new BehaviorSubject<number | null>(null);
-    characterSubject = new BehaviorSubject<PlayerCharacter>(new PlayerCharacter(''));
+    characterSubject = new BehaviorSubject<PlayerCharacter | null>(new PlayerCharacter(''));
 
     accessCode$ = this.accessCodeSubject.asObservable();
     character$ = this.characterSubject.asObservable();
@@ -30,7 +30,7 @@ export class GameService {
     }
 
     updatePlayerName(name: string) {
-        const character = this.characterSubject.getValue();
+        const character = this.characterSubject.getValue() as PlayerCharacter;
         character.name = name;
         this.characterSubject.next(character);
     }
@@ -45,7 +45,7 @@ export class GameService {
 
     clearGame(): void {
         this.accessCodeSubject.next(null);
-        this.characterSubject.next(new PlayerCharacter(''));
+        this.characterSubject.next(null);
     }
 
     setSelectedAvatar(avatar: Avatar) {
