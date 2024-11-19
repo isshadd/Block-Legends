@@ -57,14 +57,15 @@ export class CreateCharacterComponent implements OnInit {
         ];
 
         fieldsToCheck.forEach((item) => {
-            switch (item.field) {
-                case undefined:
-                case '':
-                case false:
-                    missingFields.push(item.label);
-                    break;
-                default:
-                    break;
+            const { field, label } = item;
+
+            if (
+                field === undefined ||
+                field === null ||
+                (typeof field === 'string' && field.trim() === '') ||
+                (typeof field === 'boolean' && field === false)
+            ) {
+                missingFields.push(label);
             }
         });
         if (missingFields.length > 0) {
