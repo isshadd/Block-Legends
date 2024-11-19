@@ -1,6 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';

@@ -4,11 +4,11 @@
 /* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Tile } from '@app/classes/Tiles/tile';
 import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Tile } from '@common/classes/Tiles/tile';
 // eslint-disable-next-line
 import { FightViewComponent } from '@app/components/play-page-components/fight-view/fight-view.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';

@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
+import { Tile } from '@common/classes/Tiles/tile';
 // eslint-disable-next-line max-len
 import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
 // eslint-disable-next-line max-len

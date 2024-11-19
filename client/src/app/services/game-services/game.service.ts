@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar } from '@common/enums/avatar-enum';
 import { BehaviorSubject, Subject } from 'rxjs';
 

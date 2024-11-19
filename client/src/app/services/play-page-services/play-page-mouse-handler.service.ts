@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Tile } from '@app/classes/Tiles/tile';
-import { VisibleState } from '@app/interfaces/placeable-entity';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Tile } from '@common/classes/Tiles/tile';
+import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 

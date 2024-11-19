@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
