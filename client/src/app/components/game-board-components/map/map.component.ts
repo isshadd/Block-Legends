@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { Item } from '@app/classes/Items/item';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
+import { PlayerMapEntity } from '@common/classes/player-map-entity';
 
 @Component({
     selector: 'app-map',

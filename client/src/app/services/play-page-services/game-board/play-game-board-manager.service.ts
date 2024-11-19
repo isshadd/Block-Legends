@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
@@ -8,6 +7,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerMapEntity } from '@common/classes/player-map-entity';
 import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';

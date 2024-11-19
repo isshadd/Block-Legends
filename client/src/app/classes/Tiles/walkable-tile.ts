@@ -1,4 +1,4 @@
-import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
+import { PlayerMapEntity } from '@common/classes/player-map-entity';
 import { TileType } from '@common/enums/tile-type';
 import { Tile } from './tile';
 

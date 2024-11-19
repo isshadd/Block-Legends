@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 import { GrassTile } from '@app/classes/Tiles/grass-tile';
 import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
 import { Tile } from '@app/classes/Tiles/tile';
 import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { PlayerMapEntity } from '@common/classes/player-map-entity';
 import { GameMode } from '@common/enums/game-mode';
 import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
