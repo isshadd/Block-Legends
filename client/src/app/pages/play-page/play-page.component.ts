@@ -11,6 +11,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 // eslint-disable-next-line
 import { FightViewComponent } from '@app/components/play-page-components/fight-view/fight-view.component';
+import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
@@ -36,6 +37,7 @@ import { PlayGameSideViewBarComponent } from '../../components/play-game-side-vi
         FightViewComponent,
         WinPanelComponent,
         PlayGameSideViewBarComponent,
+        ItemListContainerComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',

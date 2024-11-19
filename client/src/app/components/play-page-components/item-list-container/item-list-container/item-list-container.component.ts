@@ -14,7 +14,7 @@ import { VisibleState } from '@common/interfaces/placeable-entity';
     styleUrl: './item-list-container.component.scss',
 })
 export class ItemListContainerComponent {
-    @Input() containerItems: Item[];
+    @Input() containerItems: Item[] | undefined;
     @Output() itemClicked: EventEmitter<Item> = new EventEmitter<Item>();
 
     emptySlot = new EmptyItem();

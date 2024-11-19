@@ -119,13 +119,15 @@ app-event-journal {
     .action-container {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         margin-top: 10px;
+
+        app-item-list-container {
+            width: 190px;
+        }
 
         .button-container {
             display: flex;
-            margin-left: 300px;
-            display: flex;
-            margin-left: auto;
 
             .action-button {
                 margin-left: 10px;

@@ -37,7 +37,9 @@
         }
 
         <div class="action-container">
-            <app-container></app-container>
+            <app-item-list-container
+                [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory?.items"
+            ></app-item-list-container>
 
             <div class="button-container">
                 @if(this.playGameBoardManagerService.isUserTurn) {
