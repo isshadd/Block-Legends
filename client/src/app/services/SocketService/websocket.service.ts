@@ -6,13 +6,13 @@ import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/player-character';
+import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
 import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 
 @Injectable({
     providedIn: 'root',
@@ -80,8 +80,14 @@ export class WebSocketService {
         if (this.currentRoom.accessCode) {
             this.socket.emit(SocketEvents.LEAVE_GAME, this.currentRoom.accessCode);
         }
+    }
+
+    resetValues() {
         this.gameService.clearGame();
         this.isLockedSubject.next(false);
+        this.playersSubject.next([]);
+        this.socket.disconnect();
+        this.chatService.clearMessages();
     }
 
     lockRoom() {
@@ -211,11 +217,7 @@ export class WebSocketService {
         });
 
         this.socket.on(SocketEvents.PLAYER_LEFT, () => {
-            this.gameService.clearGame();
-            this.isLockedSubject.next(false);
-            this.playersSubject.next([]);
-            this.socket.disconnect();
-            this.chatService.clearMessages();
+            this.resetValues();
         });
 
         this.socket.on(SocketEvents.GAME_STARTED, () => {

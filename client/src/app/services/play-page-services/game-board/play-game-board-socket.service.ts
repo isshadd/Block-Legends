@@ -77,7 +77,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
     }
 
     leaveGame(): void {
-        this.socket.disconnect();
+        this.webSocketService.resetValues();
         this.battleManagerService.clearBattle();
         this.playGameBoardManagerService.resetManager();
         this.playPageMouseHandlerService.clearUI();
