@@ -21,6 +21,7 @@ app-event-journal {
     flex-direction: row;
     height: 100vh;
     width: 100vw;
+    overflow: hidden;
 
     #win-panel {
         position: absolute;

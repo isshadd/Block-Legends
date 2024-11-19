@@ -1,6 +1,6 @@
 import { Renderer2 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { PlayerMapEntityInfoViewComponent } from './player-map-entity-info-view.component';
 

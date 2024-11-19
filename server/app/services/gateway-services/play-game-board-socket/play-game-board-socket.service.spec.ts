@@ -1,6 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';

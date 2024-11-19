@@ -1,5 +1,5 @@
 import { Avatar } from '../../common/enums/avatar-enum';
-import { Attributes } from '../classes/attributes';
+import { Attributes } from '../classes/Player/attributes';
 
 export interface Character {
     avatar: Avatar;

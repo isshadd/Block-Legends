@@ -1,4 +1,4 @@
-import { PlayerCharacter } from '../../common/classes/player-character';
+import { PlayerCharacter } from '../classes/Player/player-character';
 
 export interface GameRoom {
     id: string;

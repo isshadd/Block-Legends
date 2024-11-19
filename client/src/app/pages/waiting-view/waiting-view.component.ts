@@ -10,7 +10,7 @@ import { GameService, VP_NUMBER } from '@app/services/game-services/game.service
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Subject, takeUntil } from 'rxjs';
 @Component({

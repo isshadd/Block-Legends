@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { BattleManagerService } from './battle-manager.service';
 describe('BattleManagerService - init', () => {
     let service: BattleManagerService;

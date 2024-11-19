@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { Tile } from '@app/classes/Tiles/tile';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { ModalOneOptionComponent } from '@app/components/modal-one-option/modal-one-option.component';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { Tile } from '@common/classes/Tiles/tile';
 import { GameMode } from '@common/enums/game-mode';
 import { GameShared } from '@common/interfaces/game-shared';
 

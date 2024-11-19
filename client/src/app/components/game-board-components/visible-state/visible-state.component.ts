@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { VisibleState } from '@app/interfaces/placeable-entity';
+import { VisibleState } from '@common/interfaces/placeable-entity';
 export enum VisibleStateColor {
     HoveredColor = 'rgba(255, 255, 255, 0.3)',
     SelectedColor = 'rgba(255, 255, 0, 0.3)',

@@ -1,5 +1,5 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { GameBattle } from '@common/interfaces/game.battle';
 import { Test, TestingModule } from '@nestjs/testing';

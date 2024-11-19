@@ -3,7 +3,7 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameMode } from '@common/enums/game-mode';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';

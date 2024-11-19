@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Tile } from '@app/classes/Tiles/tile';
-import { VisibleState } from '@app/interfaces/placeable-entity';
+import { Tile } from '@common/classes/Tiles/tile';
 import { TileType } from '@common/enums/tile-type';
+import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { InfosGameComponent } from './infos-game.component';
 
