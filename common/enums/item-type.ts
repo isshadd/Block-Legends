@@ -8,4 +8,5 @@ export enum ItemType {
     Flag = 'Flag',
     Spawn = 'Spawn',
     Random = 'Random',
+    EmptyItem = 'EmptyItem',
 }

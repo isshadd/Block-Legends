@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
+import { EmptyItem } from '@common/classes/Items/empty-item';
 import { Item } from '@common/classes/Items/item';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 
@@ -15,6 +16,8 @@ import { VisibleState } from '@common/interfaces/placeable-entity';
 export class ItemListContainerComponent {
     @Input() containerItems: Item[];
     @Output() itemClicked: EventEmitter<Item> = new EventEmitter<Item>();
+
+    emptySlot = new EmptyItem();
 
     onMouseEnter(item: Item) {
         item.visibleState = VisibleState.Hovered;
