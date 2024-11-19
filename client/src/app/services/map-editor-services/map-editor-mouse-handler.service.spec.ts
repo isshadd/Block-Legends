@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { MouseButton } from '@app/services/map-editor-services/map-editor-mouse-handler.service';
 import { Item } from '@common/classes/Items/item';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
@@ -11,7 +10,7 @@ import { WaterTile } from '@common/classes/Tiles/water-tile';
 import { ItemType } from '@common/enums/item-type';
 import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
-import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
+import { MapEditorMouseHandlerService, MouseButton } from './map-editor-mouse-handler.service';
 
 describe('MapEditorMouseHandlerService', () => {
     let service: MapEditorMouseHandlerService;

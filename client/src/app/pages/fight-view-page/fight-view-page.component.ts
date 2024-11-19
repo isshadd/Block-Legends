@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
     templateUrl: './fight-view-page.component.html',
     styleUrl: './fight-view-page.component.scss',
 })
-export class FightViewPageComponent {
-    constructor() {}
-}
+export class FightViewPageComponent {}
