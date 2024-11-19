@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { Tile } from '@app/classes/Tiles/tile';
+import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
+import { Tile } from '@common/classes/Tiles/tile';
 import { TileType } from '@common/enums/tile-type';
 import { MapTileInfoComponent } from './map-tile-info.component';
 

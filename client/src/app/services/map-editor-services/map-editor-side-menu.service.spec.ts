@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { Flag } from '@app/classes/Items/flag';
-import { Item } from '@app/classes/Items/item';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { Flag } from '@common/classes/Items/flag';
+import { Item } from '@common/classes/Items/item';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
+import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { MapEditorSideMenuService } from './map-editor-side-menu.service';
 
 describe('MapEditorSideMenuService', () => {

@@ -1,6 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { GameMode } from '@common/enums/game-mode';
 import { GameTimerState } from '@common/enums/game.timer.state';

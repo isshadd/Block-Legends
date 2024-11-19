@@ -10,7 +10,7 @@ import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-enti
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 
-enum MouseButton {
+export enum MouseButton {
     Left = 0,
     Right = 2,
 }

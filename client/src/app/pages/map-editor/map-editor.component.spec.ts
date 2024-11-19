@@ -1,12 +1,12 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { WallTile } from '@app/classes/Tiles/wall-tile';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
+import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';

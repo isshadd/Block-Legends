@@ -1,15 +1,15 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Item } from '@app/classes/Items/item';
-import { DoorTile } from '@app/classes/Tiles/door-tile';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { OpenDoor } from '@app/classes/Tiles/open-door';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { Tile } from '@app/classes/Tiles/tile';
-import { WaterTile } from '@app/classes/Tiles/water-tile';
-import { MouseButton } from '@app/components/play-area/play-area.component';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
+import { MouseButton } from '@app/services/map-editor-services/map-editor-mouse-handler.service';
+import { Item } from '@common/classes/Items/item';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
+import { OpenDoor } from '@common/classes/Tiles/open-door';
+import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
+import { Tile } from '@common/classes/Tiles/tile';
+import { WaterTile } from '@common/classes/Tiles/water-tile';
 import { ItemType } from '@common/enums/item-type';
+import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
 
