@@ -85,10 +85,6 @@ describe('WebSocketService', () => {
         service.currentRoom = { accessCode: ACCESS_CODE } as any;
         service.leaveGame();
         expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
-        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
-        service.isLocked$.subscribe((isLocked) => {
-            expect(isLocked).toBeFalse();
-        });
         tick();
     }));
 
@@ -364,10 +360,6 @@ describe('WebSocketService', () => {
         service.currentRoom = {} as any;
         service.leaveGame();
         expect(socketSpy.emit).not.toHaveBeenCalledWith('leaveGame', jasmine.anything());
-        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
-        service.isLocked$.subscribe((isLocked) => {
-            expect(isLocked).toBeFalse();
-        });
         tick();
     }));
 

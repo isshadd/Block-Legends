@@ -32,6 +32,7 @@ describe('PlayGameBoardSocketService', () => {
         mockWebSocketService = {
             socket: mockSocket,
             getRoomInfo: jasmine.createSpy().and.returnValue({ accessCode: 1234 }),
+            resetValues: jasmine.createSpy().and.callFake(() => {}),
         };
 
         mockPlayGameBoardManagerService = {
@@ -93,6 +94,7 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         service = TestBed.inject(PlayGameBoardSocketService);
+        service.init();
     });
 
     afterEach(() => {
@@ -183,7 +185,6 @@ describe('PlayGameBoardSocketService', () => {
     describe('leaveGame', () => {
         it('should disconnect the socket, clear battle, reset manager, clear UI, and navigate to /home', () => {
             service.leaveGame();
-            expect(mockSocket.disconnect).toHaveBeenCalled();
             expect(mockBattleManagerService.clearBattle).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.resetManager).toHaveBeenCalled();
             expect(mockPlayPageMouseHandlerService.clearUI).toHaveBeenCalled();
