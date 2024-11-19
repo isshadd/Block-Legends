@@ -30,6 +30,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 
 @Component({
     selector: 'app-play-page',
@@ -76,6 +77,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private webSocketService: WebSocketService,
         private gameService: GameService,
         private socketStateService: SocketStateService,
+        private chatService: ChatService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -177,6 +179,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     leaveGame(): void {
         this.myPlayer.isAbsent = true;
+        this.chatService.clearMessages();
         this.handlePlayerAbandon();
         this.playGameBoardSocketService.leaveGame();
     }

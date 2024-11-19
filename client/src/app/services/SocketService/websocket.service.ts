@@ -6,6 +6,7 @@ import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/player-character';
+import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
 import { RoomMessage } from '@common/interfaces/roomMessage';
@@ -49,18 +50,22 @@ export class WebSocketService {
     }
 
     sendMsgToRoom(roomMessage: RoomMessage): void {
-        this.socket.emit('roomMessage', roomMessage);
+        this.socket.emit(ChatEvents.RoomMessage, roomMessage);
     }
 
     sendEventToRoom(event: string, players: string[]): void {
         const time = this.eventJournalService.serverClock;
         const roomID = this.eventJournalService.roomID;
         const content = event;
-        this.socket.emit('eventMessage', { time, content, roomID, associatedPlayers: players });
+        this.socket.emit(ChatEvents.EventMessage, { time, content, roomID, associatedPlayers: players });
     }
 
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
+    }
+
+    registerPlayer(playerName: string): void {
+        this.socket.emit(ChatEvents.RegisterPlayer, playerName);
     }
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
@@ -75,8 +80,14 @@ export class WebSocketService {
         if (this.currentRoom.accessCode) {
             this.socket.emit(SocketEvents.LEAVE_GAME, this.currentRoom.accessCode);
         }
+    }
+
+    resetValues() {
         this.gameService.clearGame();
         this.isLockedSubject.next(false);
+        this.playersSubject.next([]);
+        this.socket.disconnect();
+        this.chatService.clearMessages();
     }
 
     lockRoom() {
@@ -206,10 +217,7 @@ export class WebSocketService {
         });
 
         this.socket.on(SocketEvents.PLAYER_LEFT, () => {
-            this.gameService.clearGame();
-            this.isLockedSubject.next(false);
-            this.playersSubject.next([]);
-            this.socket.disconnect();
+            this.resetValues();
         });
 
         this.socket.on(SocketEvents.GAME_STARTED, () => {
@@ -238,7 +246,7 @@ export class WebSocketService {
             this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on('eventReceived', (data: { event: string; associatedPlayers: string[] }) => {
+        this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
             this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
@@ -246,7 +254,7 @@ export class WebSocketService {
             });
         });
 
-        this.socket.on('roomMessage', (message: string) => {
+        this.socket.on(ChatEvents.RoomMessage, (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });
