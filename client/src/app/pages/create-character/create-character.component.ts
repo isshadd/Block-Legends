@@ -49,7 +49,7 @@ export class CreateCharacterComponent implements OnInit {
         const missingFields: string[] = [];
         const fieldsToCheck = [
             { field: this.character.name, label: 'Nom' },
-            { field: this.character.avatar, label: 'Avatar' },
+            { field: this.character.avatar?.name, label: 'Avatar' },
             { field: this.character.isAttackBonusAssigned, label: "Bonus d'attaque" },
             { field: this.character.isDefenseBonusAssigned, label: 'Bonus de défense' },
             { field: this.character.isLifeBonusAssigned, label: 'Bonus de vie' },
@@ -57,13 +57,15 @@ export class CreateCharacterComponent implements OnInit {
         ];
 
         fieldsToCheck.forEach((item) => {
-            switch (item.field) {
-                case '':
-                case false:
-                    missingFields.push(item.label);
-                    break;
-                default:
-                    break;
+            const { field, label } = item;
+
+            if (
+                field === undefined ||
+                field === null ||
+                (typeof field === 'string' && field.trim() === '') ||
+                (typeof field === 'boolean' && field === false)
+            ) {
+                missingFields.push(label);
             }
         });
         if (missingFields.length > 0) {

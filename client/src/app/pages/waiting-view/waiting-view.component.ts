@@ -64,7 +64,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.playersCounter++;
                 this.webSocketService.init();
                 this.webSocketService.createGame(this.gameId, character);
-                this.accessCode$.subscribe((code) => {
+                this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                     if (this.accessCode !== null && this.accessCode !== undefined) {
@@ -74,7 +74,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 });
             } else {
                 this.playersCounter++;
-                this.accessCode$.subscribe((code) => {
+                this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                     if (this.accessCode !== null) {
