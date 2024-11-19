@@ -1,0 +1,16 @@
+<div class="list-container">
+    @for (item of containerItems; track item){
+    <div class="entity-container">
+        <app-placeable-entity
+            class="layer-1"
+            [placeableEntity]="item"
+            [matTooltip]="item.description"
+            (mouseenter)="onMouseEnter(item)"
+            (mouseleave)="onMouseLeave(item)"
+            (mousedown)="onMouseDown($event, item)"
+        >
+        </app-placeable-entity>
+        <app-visible-state [visibleState]="item.visibleState" class="layer-2"></app-visible-state>
+    </div>
+    }
+</div>
