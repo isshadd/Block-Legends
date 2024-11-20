@@ -136,7 +136,7 @@ export class PlayGameBoardGateway {
         this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, attackResult);
 
         if (attackResult > 0) {
-            const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(room.accessCode);
+            const isPlayerDead = this.playGameBoardBattleService.userSucceededAttack(room.accessCode);
 
             this.server.to(room.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
 

@@ -112,7 +112,7 @@ export class PlayGameBoardBattleService {
         return Math.random() < 0.4;
     }
 
-    userSuccededAttack(accessCode: number): boolean {
+    userSucceededAttack(accessCode: number): boolean {
         const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
         if (!battleRoom) {
             return false;

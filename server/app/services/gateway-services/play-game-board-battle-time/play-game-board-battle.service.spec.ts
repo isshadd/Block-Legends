@@ -425,7 +425,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode);
             expect(battleRoom.secondPlayerRemainingLife).toBe(0);
             expect(result).toBe(true);
         });
@@ -445,7 +445,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode);
             expect(battleRoom.firstPlayerRemainingLife).toBe(0);
             expect(result).toBe(true);
         });
@@ -465,7 +465,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode);
             expect(battleRoom.secondPlayerRemainingLife).toBe(49);
             expect(result).toBeUndefined();
         });
@@ -473,7 +473,7 @@ describe('PlayGameBoardBattleService', () => {
         it('should return false if battle room does not exist', () => {
             const accessCode = 9999;
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode);
             expect(result).toBe(false);
         });
     });
