@@ -4,7 +4,6 @@
 /* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { ContainerComponent } from '@app/components/container/container.component';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -32,7 +31,6 @@ import { PlayGameSideViewBarComponent } from '../../components/play-game-side-vi
         MapComponent,
         RouterModule,
         TimerComponent,
-        ContainerComponent,
         InfoPanelComponent,
         FightViewComponent,
         WinPanelComponent,

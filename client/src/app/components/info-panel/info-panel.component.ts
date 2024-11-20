@@ -8,11 +8,12 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { ItemListContainerComponent } from '../play-page-components/item-list-container/item-list-container/item-list-container.component';
 
 @Component({
     selector: 'app-info-panel',
     standalone: true,
-    imports: [MapTileInfoComponent, PlayerMapEntityInfoViewComponent, ItemInfoComponent],
+    imports: [MapTileInfoComponent, PlayerMapEntityInfoViewComponent, ItemInfoComponent, ItemListContainerComponent],
     templateUrl: './info-panel.component.html',
     styleUrl: './info-panel.component.scss',
 })

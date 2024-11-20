@@ -3,6 +3,7 @@
     <app-map-tile-info [tile]="tile"></app-map-tile-info>
     @if(getPlayer()){
     <app-player-map-entity-info-view [playerCharacter]="getPlayer()!"></app-player-map-entity-info-view>
+    <app-item-list-container [containerItems]="getPlayer()?.inventory?.items"></app-item-list-container>
     }@if(getItem()){
     <app-item-info [item]="getItem()!"></app-item-info>
     }
