@@ -18,4 +18,8 @@ export class Item implements PlaceableEntity {
     setCoordinates(coordinates: Vec2) {
         this.coordinates = coordinates;
     }
+
+    isGrabbable(): boolean {
+        return true;
+    }
 }
