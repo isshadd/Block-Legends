@@ -45,7 +45,7 @@ export class PlayGameBoardManagerService {
     signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
-    signalUserGrabbedItem = new Subject<ItemType>();
+    signalUserGrabbedItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2 }>();
     signalUserGrabbedItem$ = this.signalUserGrabbedItem.asObservable();
 
     signalUserWon = new Subject<void>();
@@ -226,11 +226,11 @@ export class PlayGameBoardManagerService {
 
         const terrainTile = tile as TerrainTile;
         if (terrainTile.item?.isGrabbable()) {
-            this.signalUserGrabbedItem.next(terrainTile.item.type);
+            this.signalUserGrabbedItem.next({ itemType: terrainTile.item.type, tileCoordinates: terrainTile.coordinates });
         }
     }
 
-    grabItem(player: string, itemType: ItemType) {
+    grabItem(player: string, itemType: ItemType, tileCoordinate: Vec2) {
         const actionPlayer = this.findPlayerFromSocketId(player);
 
         if (!actionPlayer) {
@@ -240,6 +240,11 @@ export class PlayGameBoardManagerService {
         for (let i = 0; i < actionPlayer.inventory.length; i++) {
             if (actionPlayer.inventory[i].type === ItemType.EmptyItem) {
                 actionPlayer.inventory[i] = this.itemFactoryService.createItem(itemType);
+
+                const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
+                if (tile?.isTerrain()) {
+                    (tile as TerrainTile).removeItem();
+                }
                 break;
             }
         }

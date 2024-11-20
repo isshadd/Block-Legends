@@ -99,11 +99,13 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)
-    handleUserGrabbedItem(client: Socket, itemType: ItemType) {
+    handleUserGrabbedItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         if (!room) return;
 
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType });
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
     }
 
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
