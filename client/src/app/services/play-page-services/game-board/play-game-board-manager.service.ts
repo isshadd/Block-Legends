@@ -343,6 +343,7 @@ export class PlayGameBoardManagerService {
 
         if (winnerPlayerCharacter && loserPlayerCharacter) {
             winnerPlayerCharacter.fightWins++;
+            loserPlayerCharacter.fightLoses++;
             this.checkIfPlayerWonGame(winnerPlayerCharacter);
 
             if (loserPlayerCharacter === this.getCurrentPlayerCharacter()) {

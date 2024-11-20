@@ -19,6 +19,7 @@ export class PlayerCharacter implements Character {
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
     fightWins: number = 0;
+    fightLoses: number = 0;
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
