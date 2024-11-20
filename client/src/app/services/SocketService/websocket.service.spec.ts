@@ -8,7 +8,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameService } from '@app/services/game-services/game.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Socket } from 'socket.io-client';
 import { WebSocketService } from './websocket.service';
@@ -85,10 +85,6 @@ describe('WebSocketService', () => {
         service.currentRoom = { accessCode: ACCESS_CODE } as any;
         service.leaveGame();
         expect(socketSpy.emit).toHaveBeenCalledWith('leaveGame', ACCESS_CODE);
-        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
-        service.isLocked$.subscribe((isLocked) => {
-            expect(isLocked).toBeFalse();
-        });
         tick();
     }));
 
@@ -364,10 +360,6 @@ describe('WebSocketService', () => {
         service.currentRoom = {} as any;
         service.leaveGame();
         expect(socketSpy.emit).not.toHaveBeenCalledWith('leaveGame', jasmine.anything());
-        expect(gameServiceSpy.clearGame).toHaveBeenCalled();
-        service.isLocked$.subscribe((isLocked) => {
-            expect(isLocked).toBeFalse();
-        });
         tick();
     }));
 

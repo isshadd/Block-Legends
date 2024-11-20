@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Item } from '@app/classes/Items/item';
+import { Item } from '@common/classes/Items/item';
 
 @Component({
     selector: 'app-item-info',

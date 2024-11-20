@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 
 export const NAME_MAX_LENGTH = 15;
 

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { BehaviorSubject, of } from 'rxjs';
 import { WaitingViewComponent } from './waiting-view.component';
 

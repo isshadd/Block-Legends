@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Item } from '@app/classes/Items/item';
-import { PlaceableEntity } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu.service';
+import { Item } from '@common/classes/Items/item';
+import { PlaceableEntity } from '@common/interfaces/placeable-entity';
 import { PlaceableEntityContainerComponent } from './placeable-entity-container.component';
 
 describe('PlaceableEntityContainerComponent', () => {

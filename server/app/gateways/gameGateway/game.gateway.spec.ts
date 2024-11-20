@@ -1,6 +1,6 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { GameMode } from '@common/enums/game-mode';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';

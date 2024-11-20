@@ -20,7 +20,11 @@ export class GameService {
     }
 
     async getGame(id: string): Promise<Game> {
-        return await this.gameModel.findOne({ _id: id });
+        try {
+            return await this.gameModel.findOne({ _id: id });
+        } catch (error) {
+            throw new Error(`Failed to find game: ${error}`);
+        }
     }
 
     async getGameByName(name: string): Promise<Game | null> {

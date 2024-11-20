@@ -12,7 +12,7 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
     @ViewChild('journalEvents') eventsContainer: ElementRef;
 
     events: { event: string; associatedPlayers: string[] }[] = this.journalService.roomEvents;
-    filteredEvents: { event: string; associatedPlayers: string[] }[] = this.getFilteredEvents();
+    filteredEvents: { event: string; associatedPlayers: string[] }[] = this.journalService.getFilteredEvents();
     shouldScroll: boolean = false;
     showMyEvents: boolean = false;
 
@@ -22,7 +22,6 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
     ) {}
 
     ngOnInit() {
-        this.journalService.initialize();
         this.journalService.messageReceived$.subscribe(() => {
             this.shouldScroll = true;
             this.cdr.detectChanges();
@@ -30,7 +29,7 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
     }
 
     ngAfterViewChecked() {
-        this.filteredEvents = this.getFilteredEvents();
+        this.filteredEvents = this.journalService.getFilteredEvents();
         if (this.shouldScroll) {
             setTimeout(() => {
                 this.scrollToBottom();
@@ -39,8 +38,8 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
         }
     }
 
-    getFilteredEvents(): { event: string; associatedPlayers: string[] }[] {
-        return this.events.filter((event) => event.associatedPlayers.includes(this.journalService.playerName));
+    addEvent(event: string, associatedPlayers: string[]): void {
+        this.events.push({ event, associatedPlayers });
     }
 
     private scrollToBottom(): void {

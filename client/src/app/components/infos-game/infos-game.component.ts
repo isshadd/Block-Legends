@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Tile } from '@app/classes/Tiles/tile';
+import { Tile } from '@common/classes/Tiles/tile';
 
 @Component({
     selector: 'app-infos-game',

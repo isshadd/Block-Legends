@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Chestplate } from '@app/classes/Items/chestplate';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { Elytra } from '@app/classes/Items/elytra';
-import { EnchantedBook } from '@app/classes/Items/enchanted-book';
-import { Flag } from '@app/classes/Items/flag';
-import { Item } from '@app/classes/Items/item';
-import { Potion } from '@app/classes/Items/potion';
-import { RandomItem } from '@app/classes/Items/random-item';
-import { Spawn } from '@app/classes/Items/spawn';
-import { Totem } from '@app/classes/Items/totem';
+import { Chestplate } from '@common/classes/Items/chestplate';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { Elytra } from '@common/classes/Items/elytra';
+import { EnchantedBook } from '@common/classes/Items/enchanted-book';
+import { Flag } from '@common/classes/Items/flag';
+import { Item } from '@common/classes/Items/item';
+import { Potion } from '@common/classes/Items/potion';
+import { RandomItem } from '@common/classes/Items/random-item';
+import { Spawn } from '@common/classes/Items/spawn';
+import { Totem } from '@common/classes/Items/totem';
 import { ItemType } from '@common/enums/item-type';
 
 @Injectable({

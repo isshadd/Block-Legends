@@ -1,6 +1,6 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';

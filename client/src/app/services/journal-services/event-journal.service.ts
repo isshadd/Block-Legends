@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
@@ -25,6 +25,7 @@ export class EventJournalService {
         this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
             if (hasSocket) {
                 this.socket = this.socketStateService.getActiveSocket();
+                this.socket?.registerPlayer(this.playerName);
             } else {
                 this.socket = null;
             }
@@ -54,5 +55,9 @@ export class EventJournalService {
 
     addEvent(sentEvent: { event: string; associatedPlayers: string[] }): void {
         this.roomEvents.push(sentEvent);
+    }
+
+    getFilteredEvents(): { event: string; associatedPlayers: string[] }[] {
+        return this.roomEvents.filter((event) => event.associatedPlayers.includes(this.playerName));
     }
 }

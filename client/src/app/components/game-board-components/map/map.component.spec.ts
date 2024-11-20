@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { Tile } from '@app/classes/Tiles/tile';
-import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
-import { WallTile } from '@app/classes/Tiles/wall-tile';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
+import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
+import { Tile } from '@common/classes/Tiles/tile';
+import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { MapComponent } from './map.component';
-import { PlayerMapEntity } from '@app/classes/Characters/player-map-entity';
 
 describe('MapComponent', () => {
     let component: MapComponent;
