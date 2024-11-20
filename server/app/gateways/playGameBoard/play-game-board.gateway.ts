@@ -4,6 +4,7 @@ import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
@@ -95,6 +96,14 @@ export class PlayGameBoardGateway {
         this.server
             .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+    }
+
+    @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)
+    handleUserGrabbedItem(client: Socket, itemType: ItemType) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType });
     }
 
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)

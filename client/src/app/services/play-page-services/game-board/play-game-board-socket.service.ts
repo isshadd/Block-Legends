@@ -5,6 +5,7 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
@@ -49,6 +50,9 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
         this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_WON);
+        });
+        this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((itemType: ItemType) => {
+            this.socket.emit(SocketEvents.USER_GRABBED_ITEM, itemType);
         });
 
         this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
@@ -117,6 +121,11 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on(SocketEvents.ROOM_USER_MOVED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+        });
+
+        this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType }) => {
+            console.log(data);
+            this.playGameBoardManagerService.grabItem(data.playerId, data.itemType);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_RESPAWNED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {

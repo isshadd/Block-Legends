@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -44,6 +45,9 @@ export class PlayGameBoardManagerService {
     signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
+    signalUserGrabbedItem = new Subject<ItemType>();
+    signalUserGrabbedItem$ = this.signalUserGrabbedItem.asObservable();
+
     signalUserWon = new Subject<void>();
     signalUserWon$ = this.signalUserWon.asObservable();
 
@@ -63,6 +67,7 @@ export class PlayGameBoardManagerService {
         public webSocketService: WebSocketService,
         public tileFactoryService: TileFactoryService,
         public battleManagerService: BattleManagerService,
+        public itemFactoryService: ItemFactoryService,
     ) {}
 
     init(gameBoardParameters: GameBoardParameters) {
@@ -221,11 +226,21 @@ export class PlayGameBoardManagerService {
 
         const terrainTile = tile as TerrainTile;
         if (terrainTile.item?.isGrabbable()) {
-            for (let i = 0; i < currentPlayer.inventory.length; i++) {
-                if (currentPlayer.inventory[i].type === ItemType.EmptyItem) {
-                    currentPlayer.inventory[i] = terrainTile.item;
-                    break;
-                }
+            this.signalUserGrabbedItem.next(terrainTile.item.type);
+        }
+    }
+
+    grabItem(player: string, itemType: ItemType) {
+        const actionPlayer = this.findPlayerFromSocketId(player);
+
+        if (!actionPlayer) {
+            return;
+        }
+
+        for (let i = 0; i < actionPlayer.inventory.length; i++) {
+            if (actionPlayer.inventory[i].type === ItemType.EmptyItem) {
+                actionPlayer.inventory[i] = this.itemFactoryService.createItem(itemType);
+                break;
             }
         }
     }
