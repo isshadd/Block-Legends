@@ -240,7 +240,8 @@ export class GameMapDataManagerService {
         return this.databaseGame.mode === GameMode.CTF;
     }
 
-    gameSize(): MapSize {
+    gameSize(): MapSize | undefined {
+        if (!this.databaseGame) return undefined;
         return this.databaseGame.size;
     }
 
@@ -251,7 +252,7 @@ export class GameMapDataManagerService {
             [MapSize.LARGE]: 6,
         };
 
-        return ITEM_LIMITS[this.gameSize()];
+        return ITEM_LIMITS[this.gameSize() || MapSize.SMALL];
     }
 
     openErrorModal(message: string | string[]) {

@@ -6,9 +6,10 @@
         <app-play-game-side-view-bar
             id="side"
             [playerCharacter]="this.myPlayer!"
+            [currentPlayerName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
             [actionPoints]="playGameBoardManagerService.userCurrentActionPoints"
             [movementPoints]="playGameBoardManagerService.userCurrentMovePoints"
-            [game]="playGameBoardManagerService.getCurrentGrid()"
+            [gameSize]="gameMapDataManagerService.gameSize()"
             [players]="this.players"
         >
         </app-play-game-side-view-bar>

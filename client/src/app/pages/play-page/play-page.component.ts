@@ -14,6 +14,7 @@ import { ItemListContainerComponent } from '@app/components/play-page-components
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
@@ -56,6 +57,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public playGameBoardSocketService: PlayGameBoardSocketService,
+        public gameMapDataManagerService: GameMapDataManagerService,
         public battleManagerService: BattleManagerService,
         public router: Router,
         private webSocketService: WebSocketService,
@@ -80,8 +82,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     onPlayGameBoardManagerInit() {
-        this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
-        this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();
     }
 
