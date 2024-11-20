@@ -7,6 +7,7 @@ import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -171,6 +172,7 @@ export class PlayGameBoardManagerService {
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
                 });
+                this.handleTileItem(pathTile);
                 await this.waitInterval(movingTimeInterval);
 
                 if (pathTile.type === TileType.Ice) {
@@ -208,6 +210,24 @@ export class PlayGameBoardManagerService {
 
         const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
+    }
+
+    handleTileItem(tile: Tile) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (!tile.isTerrain() || !currentPlayer) {
+            return;
+        }
+
+        const terrainTile = tile as TerrainTile;
+        if (terrainTile.item?.isGrabbable()) {
+            for (let i = 0; i < currentPlayer.inventory.length; i++) {
+                if (currentPlayer.inventory[i].type === ItemType.EmptyItem) {
+                    currentPlayer.inventory[i] = terrainTile.item;
+                    break;
+                }
+            }
+        }
     }
 
     async waitInterval(ms: number) {

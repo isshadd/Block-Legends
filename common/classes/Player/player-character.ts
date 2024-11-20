@@ -1,6 +1,7 @@
 import { Avatar } from '../../enums/avatar-enum';
 import { Character } from '../../interfaces/character';
-import { Inventory } from './inventory';
+import { EmptyItem } from '../Items/empty-item';
+import { Item } from '../Items/item';
 import { PlayerAttributes } from './player-attributes';
 import { PlayerMapEntity } from './player-map-entity';
 
@@ -22,7 +23,7 @@ export class PlayerCharacter implements Character {
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
-    inventory: Inventory = new Inventory();
+    inventory: Item[] = [new EmptyItem(), new EmptyItem()];
 
     constructor(public name: string) {}
 
