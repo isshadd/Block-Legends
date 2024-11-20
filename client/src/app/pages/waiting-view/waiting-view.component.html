@@ -22,7 +22,12 @@
         @if((this.gameService.character$ | async)?.isOrganizer) {
         <div class="admin-buttons">
             <div class="button-container">
-                <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
+                <button class="dark-button" type="button" (click)="addVirtualPlayer('aggressive')" [disabled]="isLocked$ | async">
+                    Ajouter un joueur virtuel agressif
+                </button>
+                <button class="dark-button" type="button" (click)="addVirtualPlayer('defensive')" [disabled]="isLocked$ | async">
+                    Ajouter un joueur virtuel défensif
+                </button>
                 <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
             </div>
             <div class="button-container">

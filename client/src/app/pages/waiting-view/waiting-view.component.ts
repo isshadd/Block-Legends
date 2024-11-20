@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
@@ -59,7 +59,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.chatService.setCharacter(character);
             this.eventJournalService.setCharacter(character);
             if (!this.gameId) return;
-
             if (character.isOrganizer) {
                 this.playersCounter++;
                 this.webSocketService.init();
@@ -102,13 +101,14 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    addVirtualPlayers(): void {
-        if (this.playersCounter >= VP_NUMBER) {
+    addVirtualPlayer(profile: 'aggressive' | 'defensive'): void {
+        if (this.playersCounter <= this.maxPlayers) {
             this.isMaxPlayer = true;
             return;
+        } else {
+            this.isMaxPlayer = false;
         }
-
-        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter);
+        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
         this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
         this.playersCounter++;
     }

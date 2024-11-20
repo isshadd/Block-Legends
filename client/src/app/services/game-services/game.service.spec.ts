@@ -59,8 +59,8 @@ describe('GameService', () => {
 
     it('should generate virtual character correctly', () => {
         const index = 2;
-        const virtualCharacter = service.generateVirtualCharacter(index);
-        expect(virtualCharacter.name).toBe('Joueur virtuel 3');
+        const virtualCharacter = service.generateVirtualCharacter(index, 'aggressive');
+        expect(virtualCharacter.isVirtual).toBeTrue();
     });
 
     it('should clear game correctly', (done: DoneFn) => {

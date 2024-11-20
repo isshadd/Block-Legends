@@ -68,6 +68,9 @@ export class WebSocketService {
     }
 
     kickPlayer(player: PlayerCharacter) {
+        if (player.isVirtual) {
+            this.gameService.releaseVirtualPlayerName(player.name);
+        }
         this.socket.emit(SocketEvents.KICK_PLAYER, player);
     }
 
@@ -149,7 +152,9 @@ export class WebSocketService {
         );
 
         this.socket.on(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, (player: PlayerCharacter) => {
-            this.gameService.setCharacter(player);
+            if (!player.isVirtual) {
+                this.gameService.setCharacter(player);
+            }
             this.router.navigate(['/waiting-view']);
         });
 

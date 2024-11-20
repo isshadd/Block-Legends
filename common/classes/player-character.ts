@@ -22,6 +22,11 @@ export class PlayerCharacter implements Character {
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
 
+    // Pour JV:
+
+    isVirtual: boolean = false;
+    profile: 'aggressive' | 'defensive' | null = null;
+
     constructor(public name: string) {}
 
     assignAttackDice() {
