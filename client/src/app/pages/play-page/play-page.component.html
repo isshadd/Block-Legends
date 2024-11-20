@@ -6,8 +6,8 @@
         <app-play-game-side-view-bar
             id="side"
             [playerCharacter]="this.myPlayer!"
-            [actionPoints]="this.actionPoints"
-            [totalLife]="totalLifePoints"
+            [actionPoints]="playGameBoardManagerService.userCurrentActionPoints"
+            [movementPoints]="playGameBoardManagerService.userCurrentMovePoints"
             [game]="playGameBoardManagerService.getCurrentGrid()"
             [players]="this.players"
         >

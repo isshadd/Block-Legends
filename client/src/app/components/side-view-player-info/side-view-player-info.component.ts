@@ -12,7 +12,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 export class SideViewPlayerInfoComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
     @Input() actionPoints: number;
-    @Input() totalLife: number;
+    @Input() movementPoints: number;
 
     attackDice: string;
     defenseDice: string;
@@ -35,11 +35,11 @@ export class SideViewPlayerInfoComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.playerCharacter.dice === 'attack') {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D4)';
+            this.attackDice = 'D6';
+            this.defenseDice = 'D4';
         } else {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D6)';
+            this.attackDice = 'D6';
+            this.defenseDice = 'D6';
         }
     }
 }

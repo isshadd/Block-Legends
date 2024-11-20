@@ -80,7 +80,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     onPlayGameBoardManagerInit() {
-        this.actionPoints = this.playGameBoardManagerService.userCurrentActionPoints;
         this.isBattlePhase = this.playGameBoardManagerService.areOtherPlayersInBattle;
         this.currentPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(this.playGameBoardManagerService.currentPlayerIdTurn);
         this.getPlayersTurn();

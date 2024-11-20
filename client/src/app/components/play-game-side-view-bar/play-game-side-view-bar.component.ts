@@ -17,7 +17,7 @@ import { Tile } from '@common/classes/Tiles/tile';
 export class PlayGameSideViewBarComponent {
     @Input() playerCharacter: PlayerCharacter;
     @Input() actionPoints: number;
-    @Input() totalLife: number;
+    @Input() movementPoints: number;
     @Input() game: Tile[][];
     @Input() players: PlayerCharacter[] = [];
 
