@@ -22,6 +22,7 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
 import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
 
@@ -173,5 +174,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
             this.myPlayer,
         ]; // Ajouter le joueur absent en bas
+    }
+
+    itemThrow(item: Item): void {
+        this.playGameBoardManagerService.userThrewItem(item);
     }
 }

@@ -54,6 +54,9 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_GRABBED_ITEM, data);
         });
+        this.playGameBoardManagerService.signalUserThrewItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_THREW_ITEM, data);
+        });
 
         this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
             this.socket.emit(SocketEvents.USER_ATTACKED, attackResult);
@@ -124,7 +127,14 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
+            console.log(data);
             this.playGameBoardManagerService.grabItem(data.playerId, data.itemType, data.tileCoordinate);
+        });
+
+        this.socket.on(SocketEvents.ROOM_USER_THREW_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
+            console.log(data);
+
+            this.playGameBoardManagerService.throwItem(data.playerId, data.itemType, data.tileCoordinate);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_RESPAWNED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {

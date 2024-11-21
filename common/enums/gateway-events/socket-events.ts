@@ -23,6 +23,7 @@ export const enum SocketEvents {
     USER_TRIED_ESCAPE = 'userTriedEscape',
     USER_WON = 'userWon',
     USER_GRABBED_ITEM = 'userGrabbedItem',
+    USER_THREW_ITEM = 'userThrewItem',
 
     // RECUS
     ROOM_STATE = 'roomState',
@@ -67,4 +68,5 @@ export const enum SocketEvents {
     END_TURN = 'endTurn',
     START_BATTLE_TURN = 'startBattleTurn',
     ROOM_USER_GRABBED_ITEM = 'roomUserGrabbedItem',
+    ROOM_USER_THREW_ITEM = 'roomUserThrewItem',
 }

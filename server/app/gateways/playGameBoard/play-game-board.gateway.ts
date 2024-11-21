@@ -108,6 +108,16 @@ export class PlayGameBoardGateway {
             .emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
     }
 
+    @SubscribeMessage(SocketEvents.USER_THREW_ITEM)
+    handleUserThrewItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_THREW_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
+    }
+
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
     handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
