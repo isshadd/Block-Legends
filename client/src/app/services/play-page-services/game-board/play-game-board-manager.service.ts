@@ -3,6 +3,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
@@ -59,6 +60,8 @@ export class PlayGameBoardManagerService {
     userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[] = [];
+
+    possibleItems: Item[] = [];
 
     winnerPlayer: PlayerCharacter | null = null;
 
@@ -144,6 +147,7 @@ export class PlayGameBoardManagerService {
         }
 
         this.userCurrentMovePoints = 0;
+        this.possibleItems = [];
         this.hidePossibleMoves();
     }
 
@@ -177,7 +181,7 @@ export class PlayGameBoardManagerService {
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
                 });
-                this.handleTileItem(pathTile);
+                const didGrabItem = this.handleTileItem(pathTile);
                 await this.waitInterval(movingTimeInterval);
 
                 if (pathTile.type === TileType.Ice) {
@@ -186,6 +190,10 @@ export class PlayGameBoardManagerService {
                         didPlayerTripped = true;
                         break;
                     }
+                }
+
+                if (didGrabItem) {
+                    break;
                 }
             }
 
@@ -217,17 +225,26 @@ export class PlayGameBoardManagerService {
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
     }
 
-    handleTileItem(tile: Tile) {
+    handleTileItem(tile: Tile): boolean {
         const currentPlayer = this.getCurrentPlayerCharacter();
 
         if (!tile.isTerrain() || !currentPlayer) {
-            return;
+            return false;
         }
 
         const terrainTile = tile as TerrainTile;
         if (terrainTile.item?.isGrabbable()) {
-            this.signalUserGrabbedItem.next({ itemType: terrainTile.item.type, tileCoordinates: terrainTile.coordinates });
+            if (currentPlayer.inventory.some((item) => item.type === ItemType.EmptyItem)) {
+                this.signalUserGrabbedItem.next({ itemType: terrainTile.item.type, tileCoordinates: terrainTile.coordinates });
+            } else {
+                for (const item of currentPlayer.inventory) {
+                    this.possibleItems.push(item);
+                }
+                this.possibleItems.push(terrainTile.item);
+            }
+            return true;
         }
+        return false;
     }
 
     grabItem(player: string, itemType: ItemType, tileCoordinate: Vec2) {
@@ -448,6 +465,7 @@ export class PlayGameBoardManagerService {
         this.userCurrentActionPoints = 0;
         this.userCurrentPossibleMoves = new Map();
         this.turnOrder = [];
+        this.possibleItems = [];
 
         this.winnerPlayer = null;
     }

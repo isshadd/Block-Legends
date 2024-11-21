@@ -48,5 +48,9 @@
                 <button class="action-button" (click)="leaveGame()">Abandon</button>
             </div>
         </div>
+
+        @if(playGameBoardManagerService.possibleItems.length > 0) {
+        <app-item-list-container [containerItems]="playGameBoardManagerService.possibleItems"></app-item-list-container>
+        }
     </div>
 </div>
