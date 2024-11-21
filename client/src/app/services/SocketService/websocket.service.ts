@@ -13,6 +13,7 @@ import { RoomMessage } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { AvatarService } from '../avatar.service';
 
 @Injectable({
     providedIn: 'root',
@@ -25,7 +26,7 @@ export class WebSocketService {
     isLocked$ = this.isLockedSubject.asObservable();
     maxPlayersSubject = new BehaviorSubject<number>(0);
     maxPlayers$ = this.maxPlayersSubject.asObservable();
-    private takenAvatarsSubject = new BehaviorSubject<string[]>([]);
+    takenAvatarsSubject = new BehaviorSubject<string[]>([]);
     takenAvatars$ = this.takenAvatarsSubject.asObservable();
     private avatarTakenErrorSubject = new BehaviorSubject<string>('');
     avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
@@ -38,6 +39,7 @@ export class WebSocketService {
         private gameService: GameService,
         private chatService: ChatService,
         private eventJournalService: EventJournalService,
+        private avatarService: AvatarService,
     ) {}
 
     init() {
@@ -131,6 +133,9 @@ export class WebSocketService {
             this.playersSubject.next(room.players);
             this.currentRoom = room;
             this.isLockedSubject.next(room.isLocked);
+
+            const takenAvatars = room.players.map((player) => player.avatar.name);
+            this.avatarService.updateTakenAvatars(takenAvatars);
         });
 
         this.socket.on(

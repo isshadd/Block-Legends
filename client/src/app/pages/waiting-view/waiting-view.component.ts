@@ -15,6 +15,8 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Profile, ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
 
+const FIVE = 5;
+
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
@@ -37,6 +39,10 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     showClavardage = true;
     profileAggressive = ProfileEnum.agressive;
     profileDefensive = ProfileEnum.defensive;
+    lastVirtualPlayerProfile: Profile | null = null;
+    maxVirtualPlayerRetries = FIVE;
+    lastVirtualPlayerSocketId: string | null = null;
+    virtualPlayerRetryCount = 0;
 
     private destroy$ = new Subject<void>();
 
@@ -88,11 +94,11 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-            players.forEach(() => {
-                this.playersCounter++;
-            });
-        });
+        // this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+        //     players.forEach(() => {
+        //         this.playersCounter++;
+        //     });
+        // });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;
@@ -101,6 +107,27 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         this.webSocketService.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
             if (!this.isOrganizer) {
                 this.playerLeave();
+            }
+        });
+
+        this.webSocketService.avatarTakenError$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            if (this.lastVirtualPlayerProfile && this.virtualPlayerRetryCount < this.maxVirtualPlayerRetries) {
+                this.virtualPlayerRetryCount++;
+                this.addVirtualPlayer(this.lastVirtualPlayerProfile);
+            } else {
+                this.lastVirtualPlayerProfile = null;
+                this.virtualPlayerRetryCount = 0;
+            }
+        });
+
+        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+            this.playersCounter = players.length;
+            if (this.lastVirtualPlayerProfile) {
+                const virtualPlayer = players.find((p) => p.socketId === this.lastVirtualPlayerSocketId);
+                if (virtualPlayer) {
+                    this.lastVirtualPlayerProfile = null;
+                    this.virtualPlayerRetryCount = 0;
+                }
             }
         });
     }
