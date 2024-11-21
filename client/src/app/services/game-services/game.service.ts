@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { Profile } from '@common/enums/profile';
-import { VIRTUAL_PLAYER_NAMES } from '@common/enums/virtual-player-names';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 export const VP_NUMBER = 5;
@@ -52,13 +51,10 @@ export class GameService {
         const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
         virtualPlayer.avatar = randomAvatar;
 
-        const availableNames = VIRTUAL_PLAYER_NAMES.filter((name) => !this.usedNames.has(name));
         // if (availableNames.length === 0) {
         //     throw new Error('No more unique names available for virtual players');
         // }
-        const selectedName = availableNames[Math.floor(Math.random() * availableNames.length)];
-        virtualPlayer.name = selectedName;
-        this.usedNames.add(selectedName);
+        virtualPlayer.name = randomAvatar.name;
 
         const bonusOptions = ['attack', 'defense', 'life', 'speed'];
         const bonusAttribute = bonusOptions[Math.floor(Math.random() * bonusOptions.length)];
