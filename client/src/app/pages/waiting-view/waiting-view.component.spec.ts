@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, of } from 'rxjs';
 import { WaitingViewComponent } from './waiting-view.component';
 
@@ -127,7 +128,7 @@ describe('WaitingViewComponent', () => {
             gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
             component.playersCounter = 1;
 
-            component.addVirtualPlayer('aggressive');
+            component.addVirtualPlayer(ProfileEnum.agressive);
 
             expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalled();
             expect(component.playersCounter).toBe(2);
@@ -136,7 +137,7 @@ describe('WaitingViewComponent', () => {
         it('should not add player when at max', () => {
             component.playersCounter = PLAYER4;
 
-            component.addVirtualPlayer('aggressive');
+            component.addVirtualPlayer(ProfileEnum.agressive);
 
             expect(component.isMaxPlayer).toBeFalse();
             expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalled();
@@ -249,7 +250,7 @@ describe('WaitingViewComponent', () => {
             const virtualPlayer = {} as PlayerCharacter;
             gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
 
-            component.addVirtualPlayer('aggressive');
+            component.addVirtualPlayer(ProfileEnum.agressive);
 
             expect(component.isMaxPlayer).toBeFalse();
             expect(gameServiceSpy.generateVirtualCharacter).toHaveBeenCalled();
@@ -263,7 +264,7 @@ describe('WaitingViewComponent', () => {
             const virtualPlayer = {} as PlayerCharacter;
             gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
 
-            component.addVirtualPlayer('aggressive');
+            component.addVirtualPlayer(ProfileEnum.agressive);
 
             expect(component.isMaxPlayer).toBeFalse();
             expect(gameServiceSpy.generateVirtualCharacter).toHaveBeenCalled();

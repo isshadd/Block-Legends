@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
+import { Profile } from '@common/enums/profile';
 import { VIRTUAL_PLAYER_NAMES } from '@common/enums/virtual-player-names';
 import { BehaviorSubject, Subject } from 'rxjs';
 
@@ -42,7 +43,7 @@ export class GameService {
         this.currentPlayerSubject.next(player);
     }
 
-    generateVirtualCharacter(index: number, profile: 'aggressive' | 'defensive'): PlayerCharacter {
+    generateVirtualCharacter(index: number, profile: Profile): PlayerCharacter {
         const virtualPlayer = new PlayerCharacter('');
         virtualPlayer.isVirtual = true;
         virtualPlayer.profile = profile;

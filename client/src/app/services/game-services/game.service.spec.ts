@@ -2,6 +2,7 @@
 
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ProfileEnum } from '@common/enums/profile';
 import { GameService, VP_NUMBER } from './game.service';
 
 const ACCESS_CODE = 5678;
@@ -59,7 +60,7 @@ describe('GameService', () => {
 
     it('should generate virtual character correctly', () => {
         const index = 2;
-        const virtualCharacter = service.generateVirtualCharacter(index, 'aggressive');
+        const virtualCharacter = service.generateVirtualCharacter(index, ProfileEnum.agressive);
         expect(virtualCharacter.isVirtual).toBeTrue();
     });
 

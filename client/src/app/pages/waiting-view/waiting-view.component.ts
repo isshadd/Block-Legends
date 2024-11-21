@@ -12,7 +12,9 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { Profile, ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
+
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
@@ -33,6 +35,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     isOrganizer = false;
     maxPlayers: number = 0;
     showClavardage = true;
+    profileAggressive = ProfileEnum.agressive;
+    profileDefensive = ProfileEnum.defensive;
 
     private destroy$ = new Subject<void>();
 
@@ -101,7 +105,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    addVirtualPlayer(profile: 'aggressive' | 'defensive'): void {
+    addVirtualPlayer(profile: Profile): void {
         if (this.playersCounter <= this.maxPlayers) {
             this.isMaxPlayer = true;
             return;
