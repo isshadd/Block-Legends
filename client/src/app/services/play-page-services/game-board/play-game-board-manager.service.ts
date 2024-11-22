@@ -444,7 +444,8 @@ export class PlayGameBoardManagerService {
     userDropAllItems(startTile: Tile, loserPlayerCharacter: PlayerCharacter) {
         for (let i = 0; i < loserPlayerCharacter.inventory.length; i++) {
             if (loserPlayerCharacter.inventory[i].type !== ItemType.EmptyItem) {
-                this.throwItem(loserPlayerCharacter.socketId, loserPlayerCharacter.inventory[i].type, startTile.coordinates);
+                const closestTerrainTileWithoutItem = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
+                this.throwItem(loserPlayerCharacter.socketId, loserPlayerCharacter.inventory[i].type, closestTerrainTileWithoutItem.coordinates);
             }
         }
     }
