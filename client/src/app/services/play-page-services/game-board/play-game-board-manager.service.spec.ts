@@ -1179,7 +1179,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         service.endBattleByDeath('winner', 'loser');
 
         expect(winnerPlayer.fightWins).toBe(1);
-        expect(service.checkIfPlayerWonGame).toHaveBeenCalledWith(winnerPlayer);
+        expect(service.checkIfPlayerWonClassicGame).toHaveBeenCalledWith(winnerPlayer);
         expect(service.signalUserRespawned.next).toHaveBeenCalledWith({
             fromTile: currentTile.coordinates,
             toTile: spawnTile.coordinates,
@@ -1203,7 +1203,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         service.endBattleByDeath('winner', 'loser');
 
         expect(winnerPlayer.fightWins).toBe(1);
-        expect(service.checkIfPlayerWonGame).toHaveBeenCalledWith(winnerPlayer);
+        expect(service.checkIfPlayerWonClassicGame).toHaveBeenCalledWith(winnerPlayer);
         expect(service.signalUserRespawned.next).not.toHaveBeenCalled();
     });
 
@@ -1220,7 +1220,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
 
         service.endBattleByDeath('winner', 'loser');
 
-        expect(service.checkIfPlayerWonGame).not.toHaveBeenCalled();
+        expect(service.checkIfPlayerWonClassicGame).not.toHaveBeenCalled();
         expect(service.signalUserRespawned.next).not.toHaveBeenCalled();
     });
 
@@ -1237,7 +1237,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
 
         service.endBattleByDeath('winner', 'loser');
 
-        expect(service.checkIfPlayerWonGame).not.toHaveBeenCalled();
+        expect(service.checkIfPlayerWonClassicGame).not.toHaveBeenCalled();
         expect(service.signalUserRespawned.next).not.toHaveBeenCalled();
     });
 });
@@ -1266,7 +1266,7 @@ describe('PlayGameBoardManagerService - checkIfPlayerWonGame', () => {
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
         spyOn(service.signalUserWon, 'next');
 
-        service.checkIfPlayerWonGame(mockPlayerCharacter);
+        service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
 
         expect(service.signalUserWon.next).toHaveBeenCalled();
     });
@@ -1278,7 +1278,7 @@ describe('PlayGameBoardManagerService - checkIfPlayerWonGame', () => {
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
         spyOn(service.signalUserWon, 'next');
 
-        service.checkIfPlayerWonGame(mockPlayerCharacter);
+        service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
 
         expect(service.signalUserWon.next).not.toHaveBeenCalled();
     });
@@ -1291,7 +1291,7 @@ describe('PlayGameBoardManagerService - checkIfPlayerWonGame', () => {
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(differentPlayer);
         spyOn(service.signalUserWon, 'next');
 
-        service.checkIfPlayerWonGame(mockPlayerCharacter);
+        service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
 
         expect(service.signalUserWon.next).not.toHaveBeenCalled();
     });

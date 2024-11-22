@@ -424,7 +424,7 @@ export class PlayGameBoardManagerService {
         if (winnerPlayerCharacter && loserPlayerCharacter) {
             winnerPlayerCharacter.fightWins++;
             loserPlayerCharacter.fightLoses++;
-            this.checkIfPlayerWonGame(winnerPlayerCharacter);
+            this.checkIfPlayerWonClassicGame(winnerPlayerCharacter);
 
             const currentLoserTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
                 loserPlayerCharacter.mapEntity.coordinates,
@@ -450,11 +450,31 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    checkIfPlayerWonGame(playerCharacter: PlayerCharacter) {
+    checkIfPlayerWonClassicGame(playerCharacter: PlayerCharacter) {
+        if (this.gameMapDataManagerService.isGameModeCTF()) {
+            return;
+        }
+
         const currentPlayer = this.getCurrentPlayerCharacter();
 
         const value = 3;
         if (currentPlayer === playerCharacter && playerCharacter.fightWins >= value) {
+            this.signalUserWon.next();
+        }
+    }
+
+    checkIfPlayerWonCTFGame(playerCharacter: PlayerCharacter) {
+        if (!this.gameMapDataManagerService.isGameModeCTF()) {
+            return;
+        }
+
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (
+            currentPlayer === playerCharacter &&
+            playerCharacter.mapEntity.isOnSpawn() &&
+            this.doesPlayerHaveItem(playerCharacter.socketId, ItemType.Flag)
+        ) {
             this.signalUserWon.next();
         }
     }
@@ -485,6 +505,16 @@ export class PlayGameBoardManagerService {
         if (!this.battleManagerService.isBattleOn) {
             this.continueTurn();
         }
+    }
+
+    doesPlayerHaveItem(playerId: string, itemType: ItemType): boolean {
+        const playerCharacter = this.findPlayerFromSocketId(playerId);
+
+        if (!playerCharacter) {
+            return false;
+        }
+
+        return playerCharacter.inventory.some((item) => item.type === itemType);
     }
 
     getCurrentGrid(): Tile[][] {
