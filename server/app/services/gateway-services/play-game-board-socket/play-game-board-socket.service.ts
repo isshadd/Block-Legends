@@ -1,5 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
 
@@ -18,12 +19,40 @@ export class PlayGameBoardSocketService {
             return;
         }
 
+        this.setupRandomItems(gameBoardRoom.game);
         const spawnPlaces: [number, string][] = this.setupSpawnPoints(room, gameBoardRoom.game);
         const turnOrder: string[] = this.setupTurnOrder(room);
         this.gameSocketRoomService.setCurrentPlayerTurn(accessCode, turnOrder[0]);
 
         this.gameSocketRoomService.gameBoardRooms.set(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
         this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
+    }
+
+    setupRandomItems(game: Game) {
+        const prohibitedTypes = new Set([ItemType.EmptyItem, ItemType.Random, ItemType.Spawn, ItemType.Flag]);
+        const existingTypes = new Set<ItemType>();
+
+        game.tiles.forEach((row) => {
+            row.forEach((tile) => {
+                if (tile.item && !prohibitedTypes.has(tile.item.type)) {
+                    existingTypes.add(tile.item.type);
+                }
+            });
+        });
+
+        game.tiles.forEach((row) => {
+            row.forEach((tile) => {
+                if (tile.item && tile.item.type === ItemType.Random) {
+                    let newType: ItemType;
+                    do {
+                        newType = Object.values(ItemType)[Math.floor(Math.random() * Object.values(ItemType).length)];
+                    } while (existingTypes.has(newType) || prohibitedTypes.has(newType));
+
+                    tile.item.type = newType;
+                    existingTypes.add(newType);
+                }
+            });
+        });
     }
 
     setupSpawnPoints(room: GameRoom, game: Game): [number, string][] {
