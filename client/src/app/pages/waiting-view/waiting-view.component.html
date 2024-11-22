@@ -9,7 +9,7 @@
             <h3>Joueurs :</h3>
             <ul id="player-container">
                 @for(player of players$ | async; track player.name) {
-                <li [ngClass]="{ organizer: player.isOrganizer }">
+                <li [ngClass]="{ organizer: player.isOrganizer, virtual: player.isVirtual }">
                     <img [src]="player.avatar.headImage" alt="Avatar" />
                     <span class="player-name">{{ player.name }}</span>
                     @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {

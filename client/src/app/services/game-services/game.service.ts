@@ -67,19 +67,22 @@ export class GameService {
         virtualPlayer.avatar = randomAvatar;
         virtualPlayer.name = randomAvatar.name;
 
-        // Générer un socketId unique pour le joueur virtuel
         virtualPlayer.socketId = `${Math.random().toString(THIRTY_SIX).substr(1, NINE)}_${Math.random().toString(THIRTY_SIX).substr(2, NINE)}`;
 
-        // Assigner un bonus aléatoire
-        const bonusOptions = ['attack', 'defense', 'life', 'speed'];
-        const bonusAttribute = bonusOptions[Math.floor(Math.random() * bonusOptions.length)];
-        switch (bonusAttribute) {
+        const diceOptions = ['attack', 'defense'];
+        const bonusDice = diceOptions[Math.floor(Math.random() * diceOptions.length)];
+        switch (bonusDice) {
             case 'attack':
                 virtualPlayer.assignAttackDice();
                 break;
             case 'defense':
                 virtualPlayer.assignDefenseDice();
                 break;
+        }
+
+        const attributesOption = ['life', 'speed'];
+        const bonusAttributes = attributesOption[Math.floor(Math.random() * attributesOption.length)];
+        switch (bonusAttributes) {
             case 'life':
                 virtualPlayer.assignLifeBonus();
                 break;
