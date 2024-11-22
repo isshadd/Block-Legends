@@ -260,6 +260,7 @@ export class PlayGameBoardManagerService {
         for (let i = 0; i < actionPlayer.inventory.length; i++) {
             if (actionPlayer.inventory[i].type === ItemType.EmptyItem) {
                 actionPlayer.inventory[i] = this.itemFactoryService.createItem(itemType);
+                this.addItemEffect(actionPlayer, actionPlayer.inventory[i]);
 
                 const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
                 if (tile?.isTerrain() && (tile as TerrainTile).item?.type === itemType) {
@@ -279,6 +280,7 @@ export class PlayGameBoardManagerService {
 
         for (let i = 0; i < actionPlayer.inventory.length; i++) {
             if (actionPlayer.inventory[i].type === itemType) {
+                this.removeItemEffect(actionPlayer, actionPlayer.inventory[i]);
                 actionPlayer.inventory[i] = this.itemFactoryService.createItem(ItemType.EmptyItem);
 
                 const item = this.itemFactoryService.createItem(itemType);
@@ -318,6 +320,36 @@ export class PlayGameBoardManagerService {
 
         this.checkIfPLayerDidEverything();
         this.setupPossibleMoves(currentPlayer);
+    }
+
+    addItemEffect(player: PlayerCharacter, item: Item) {
+        switch (item.type) {
+            case ItemType.Sword:
+                player.attributes.attack += 2;
+                player.attributes.defense -= 1;
+                break;
+            case ItemType.Chestplate:
+                player.attributes.defense += 2;
+                player.attributes.speed -= 1;
+                break;
+            default:
+                break;
+        }
+    }
+
+    removeItemEffect(player: PlayerCharacter, item: Item) {
+        switch (item.type) {
+            case ItemType.Sword:
+                player.attributes.attack -= 2;
+                player.attributes.defense += 1;
+                break;
+            case ItemType.Chestplate:
+                player.attributes.defense -= 2;
+                player.attributes.speed += 1;
+                break;
+            default:
+                break;
+        }
     }
 
     didPlayerTripped(tileType: TileType): boolean {
