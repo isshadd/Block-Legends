@@ -127,13 +127,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
-            console.log(data);
             this.playGameBoardManagerService.grabItem(data.playerId, data.itemType, data.tileCoordinate);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_THREW_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
-            console.log(data);
-
             this.playGameBoardManagerService.throwItem(data.playerId, data.itemType, data.tileCoordinate);
         });
 

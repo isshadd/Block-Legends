@@ -435,6 +435,21 @@ export class PlayGameBoardManagerService {
                     fromTile: currentTile.coordinates,
                     toTile: spawnTile.coordinates,
                 });
+                this.userDropAllItems(currentTile);
+            }
+        }
+    }
+
+    userDropAllItems(startTile: Tile) {
+        let currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) {
+            return;
+        }
+        for (let i = 0; i < currentPlayer.inventory.length; i++) {
+            if (currentPlayer.inventory[i].type !== ItemType.EmptyItem) {
+                if (startTile.isTerrain()) {
+                    this.signalUserThrewItem.next({ itemType: currentPlayer.inventory[i].type, tileCoordinates: startTile.coordinates });
+                }
             }
         }
     }
