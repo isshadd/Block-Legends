@@ -15,7 +15,12 @@
         <tbody>
             @for (player of players; track player.socketId) {
             <tr [ngClass]="{ CurrentPlayer: isTurn(player) }" [class.absent]="player.isAbsent">
-                <td><img src="{{ player.avatar.headImage }}" />{{ player.name }}</td>
+                <td>
+                    <img src="{{ player.avatar.headImage }}" />{{ player.name }}
+                    @if (this.hasFlag(player)) {
+                    <img src="assets/images/item/flag.png" />
+                    }
+                </td>
                 <td>{{ player.fightWins }}</td>
                 <td>{{ player.fightLoses }}</td>
             </tr>

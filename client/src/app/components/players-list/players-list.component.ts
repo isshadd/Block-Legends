@@ -20,4 +20,13 @@ export class PlayersListComponent {
         }
         return false;
     }
+
+    hasFlag(player: PlayerCharacter): boolean {
+        for (const item of player.inventory) {
+            if (item.type === 'Flag') {
+                return true;
+            }
+        }
+        return false;
+    }
 }
