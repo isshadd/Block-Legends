@@ -1,3 +1,4 @@
+import { Profile } from '@common/enums/profile';
 import { Avatar } from '../../enums/avatar-enum';
 import { Character } from '../../interfaces/character';
 import { EmptyItem } from '../Items/empty-item';
@@ -25,6 +26,11 @@ export class PlayerCharacter implements Character {
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
     inventory: Item[] = [new EmptyItem(), new EmptyItem()];
+
+    // Pour JV:
+
+    isVirtual: boolean = false;
+    profile: Profile | null = null;
 
     constructor(public name: string) {}
 
