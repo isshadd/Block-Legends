@@ -441,11 +441,11 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    userDropAllItems(startTile: Tile, loserPlayerCharacter: PlayerCharacter) {
-        for (let i = 0; i < loserPlayerCharacter.inventory.length; i++) {
-            if (loserPlayerCharacter.inventory[i].type !== ItemType.EmptyItem) {
+    userDropAllItems(startTile: Tile, player: PlayerCharacter) {
+        for (let i = 0; i < player.inventory.length; i++) {
+            if (player.inventory[i].type !== ItemType.EmptyItem) {
                 const closestTerrainTileWithoutItem = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
-                this.throwItem(loserPlayerCharacter.socketId, loserPlayerCharacter.inventory[i].type, closestTerrainTileWithoutItem.coordinates);
+                this.throwItem(player.socketId, player.inventory[i].type, closestTerrainTileWithoutItem.coordinates);
             }
         }
     }
@@ -478,6 +478,8 @@ export class PlayGameBoardManagerService {
 
             const spawnTile: TerrainTile = this.gameMapDataManagerService.getTileAt(playerMapEntity.spawnCoordinates) as TerrainTile;
             spawnTile.removeItem();
+
+            this.userDropAllItems(tile, playerCharacter);
         }
 
         if (!this.battleManagerService.isBattleOn) {
