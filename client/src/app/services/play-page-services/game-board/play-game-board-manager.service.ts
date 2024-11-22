@@ -226,6 +226,8 @@ export class PlayGameBoardManagerService {
 
         const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
+
+        this.checkIfPlayerWonCTFGame(userPlayerCharacter);
     }
 
     handleTileItem(tile: Tile): boolean {
