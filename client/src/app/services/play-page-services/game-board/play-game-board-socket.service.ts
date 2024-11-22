@@ -173,6 +173,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.BATTLE_ENDED_BY_ESCAPE, (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.continueTurn();
         });
@@ -180,11 +181,13 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.FIRST_PLAYER_WON_BATTLE, (data: { firstPlayer: string; loserPlayer: string }) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = data.firstPlayer;
             this.playGameBoardManagerService.isUserTurn = data.firstPlayer === this.socket.id;
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.firstPlayer, data.loserPlayer);
         });
 
         this.socket.on(SocketEvents.SECOND_PLAYER_WON_BATTLE, (data: { winnerPlayer: string; loserPlayer: string }) => {
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.winnerPlayer, data.loserPlayer);
         });
