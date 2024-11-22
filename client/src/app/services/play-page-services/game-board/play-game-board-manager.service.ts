@@ -426,30 +426,25 @@ export class PlayGameBoardManagerService {
             loserPlayerCharacter.fightLoses++;
             this.checkIfPlayerWonGame(winnerPlayerCharacter);
 
+            const currentLoserTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
+                loserPlayerCharacter.mapEntity.coordinates,
+            ) as WalkableTile;
             if (loserPlayerCharacter === this.getCurrentPlayerCharacter()) {
-                const currentTile: WalkableTile = this.gameMapDataManagerService.getTileAt(
-                    loserPlayerCharacter.mapEntity.coordinates,
-                ) as WalkableTile;
                 const spawnTile: WalkableTile = this.gameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt(loserPlayerCharacter.mapEntity);
                 this.signalUserRespawned.next({
-                    fromTile: currentTile.coordinates,
+                    fromTile: currentLoserTile.coordinates,
                     toTile: spawnTile.coordinates,
                 });
-                this.userDropAllItems(currentTile);
             }
+
+            this.userDropAllItems(currentLoserTile, loserPlayerCharacter);
         }
     }
 
-    userDropAllItems(startTile: Tile) {
-        let currentPlayer = this.getCurrentPlayerCharacter();
-        if (!currentPlayer) {
-            return;
-        }
-        for (let i = 0; i < currentPlayer.inventory.length; i++) {
-            if (currentPlayer.inventory[i].type !== ItemType.EmptyItem) {
-                if (startTile.isTerrain()) {
-                    this.signalUserThrewItem.next({ itemType: currentPlayer.inventory[i].type, tileCoordinates: startTile.coordinates });
-                }
+    userDropAllItems(startTile: Tile, loserPlayerCharacter: PlayerCharacter) {
+        for (let i = 0; i < loserPlayerCharacter.inventory.length; i++) {
+            if (loserPlayerCharacter.inventory[i].type !== ItemType.EmptyItem) {
+                this.throwItem(loserPlayerCharacter.socketId, loserPlayerCharacter.inventory[i].type, startTile.coordinates);
             }
         }
     }
