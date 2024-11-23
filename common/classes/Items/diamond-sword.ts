@@ -3,6 +3,6 @@ import { Item } from './item';
 
 export class DiamondSword extends Item {
     type: ItemType = ItemType.Sword;
-    description: string = 'Épée.\n +2 Attaque, -1 Défense.';
+    description: string = 'Épée. +2 Attaque, -1 Défense.';
     imageUrl: string = 'assets/images/item/diamond-sword.png';
 }
