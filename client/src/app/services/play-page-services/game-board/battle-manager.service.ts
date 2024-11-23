@@ -63,7 +63,7 @@ export class BattleManagerService {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
             const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
 
-            this.signalUserAttacked.next({ attackResult: attackResult, playerHasTotem: playerHasTotem });
+            this.signalUserAttacked.next({ attackResult, playerHasTotem });
         }
     }
 

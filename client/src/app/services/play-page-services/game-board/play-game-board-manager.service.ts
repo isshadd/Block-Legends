@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
@@ -524,10 +525,10 @@ export class PlayGameBoardManagerService {
     }
 
     userDropAllItems(startTile: Tile, player: PlayerCharacter) {
-        for (let i = 0; i < player.inventory.length; i++) {
-            if (player.inventory[i].type !== ItemType.EmptyItem) {
+        for (const item of player.inventory) {
+            if (item.type !== ItemType.EmptyItem) {
                 const closestTerrainTileWithoutItem = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
-                this.throwItem(player.socketId, player.inventory[i].type, closestTerrainTileWithoutItem.coordinates);
+                this.throwItem(player.socketId, item.type, closestTerrainTileWithoutItem.coordinates);
             }
         }
     }

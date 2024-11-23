@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ItemListContainerComponent } from '../play-page-components/item-list-container/item-list-container/item-list-container.component';
+/* eslint-disable max-len */
+import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { Item } from '@common/classes/Items/item';
 
 @Component({

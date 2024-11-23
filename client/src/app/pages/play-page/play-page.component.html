@@ -50,12 +50,5 @@
                 <button class="action-button" (click)="leaveGame()">Abandon</button>
             </div>
         </div>
-
-        @if(playGameBoardManagerService.possibleItems.length > 0) {
-        <app-item-list-container
-            [containerItems]="playGameBoardManagerService.possibleItems"
-            (itemClicked)="itemThrow($event)"
-        ></app-item-list-container>
-        }
     </div>
 </div>
