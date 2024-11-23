@@ -613,7 +613,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
     let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
     beforeEach(() => {
-        gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt']);
+        gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'isGameModeCTF']);
 
         TestBed.configureTestingModule({
             providers: [
@@ -626,6 +626,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
         });
 
         service = TestBed.inject(PlayGameBoardManagerService);
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should move player from one tile to another if player is found', () => {
@@ -648,6 +649,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
         });
         spyOn(fromTileInstance, 'removePlayer');
         spyOn(toTileInstance, 'setPlayer');
+        gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
 
         service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates);
 
@@ -662,6 +664,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
         const toTileCoordinates: Vec2 = { x: 1, y: 1 };
 
         spyOn(service, 'findPlayerFromSocketId').and.returnValue(null);
+        gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
 
         service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates);
 
@@ -730,9 +733,12 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
 
     it('should handle battle action when user has action points and it is user’s turn', () => {
         const mockTile = new WalkableTile();
-        const mockPlayerCharacter = new PlayerCharacter('player1');
-        mockPlayerCharacter.currentActionPoints = 1;
+        const mockActionPlayer = new PlayerCharacter('player1');
+        mockActionPlayer.currentActionPoints = 1;
+        const mockPlayerCharacter = new PlayerCharacter('player2');
+        mockPlayerCharacter.socketId = 'player2';
         mockTile.player = new PlayerMapEntity('avatar.png'); // Ensure player is defined
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockActionPlayer);
         spyOn(service, 'findPlayerFromPlayerMapEntity').and.returnValue(mockPlayerCharacter);
         spyOn(service.signalUserDidBattleAction, 'next');
         spyOn(service, 'hidePossibleMoves');
@@ -743,7 +749,7 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
         service.handlePlayerAction(mockTile);
 
         expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player);
-        expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith('player1');
+        expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith('player2');
         expect(service.hidePossibleMoves).toHaveBeenCalled();
     });
 });
@@ -1179,6 +1185,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
     it('should not emit signalUserRespawned if loser is not the current player', () => {
         const winnerPlayer = new PlayerCharacter('winner');
         const loserPlayer = new PlayerCharacter('loser');
+        loserPlayer.mapEntity = { coordinates: { x: 1, y: 1 } } as PlayerMapEntity;
 
         spyOn(service, 'findPlayerFromSocketId').and.callFake((id) => {
             if (id === 'winner') return winnerPlayer;
@@ -1234,12 +1241,19 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
 
 describe('PlayGameBoardManagerService - checkIfPlayerWonClassicGame', () => {
     let service: PlayGameBoardManagerService;
+    let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
     beforeEach(() => {
+        gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', [
+            'getTileAt',
+            'getClosestWalkableTileWithoutPlayerAt',
+            'isGameModeCTF',
+        ]);
+
         TestBed.configureTestingModule({
             providers: [
                 PlayGameBoardManagerService,
-                { provide: GameMapDataManagerService, useValue: {} },
+                { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
                 { provide: TileFactoryService, useValue: {} },
                 { provide: WebSocketService, useValue: {} },
                 { provide: BattleManagerService, useValue: {} },
@@ -1247,6 +1261,7 @@ describe('PlayGameBoardManagerService - checkIfPlayerWonClassicGame', () => {
         });
 
         service = TestBed.inject(PlayGameBoardManagerService);
+        gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
     });
 
     it('should emit signalUserWon if playerCharacter is current player and has fightWins >= 3', () => {
@@ -1280,6 +1295,7 @@ describe('PlayGameBoardManagerService - checkIfPlayerWonClassicGame', () => {
 
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(differentPlayer);
         spyOn(service.signalUserWon, 'next');
+        gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
 
         service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
 

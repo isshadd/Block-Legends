@@ -43,6 +43,8 @@ describe('PlayGameBoardSocketService', () => {
             signalUserGotTurnEnded$: new Subject<void>(),
             signalUserDidDoorAction$: new Subject<unknown>(),
             signalUserDidBattleAction$: new Subject<unknown>(),
+            signalUserGrabbedItem$: new Subject<unknown>(),
+            signalUserThrewItem$: new Subject<unknown>(),
             signalUserWon$: new Subject<void>(),
             isUserTurn: false,
             currentPlayerIdTurn: '',
@@ -58,6 +60,7 @@ describe('PlayGameBoardSocketService', () => {
             resetManager: jasmine.createSpy('resetManager'),
             continueTurn: jasmine.createSpy('continueTurn'),
             removePlayerFromMap: jasmine.createSpy('removePlayerFromMap'),
+            playerUsedAction: jasmine.createSpy('playerUsedAction'),
         };
 
         mockPlayPageMouseHandlerService = {
@@ -243,7 +246,7 @@ describe('PlayGameBoardSocketService', () => {
             socketCallbacks['startTurn'](playerIdTurn);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeFalse();
-            expect(mockPlayGameBoardManagerService.startTurn).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.startTurn).toHaveBeenCalled();
         });
 
         it('should handle "gameBoardPlayerLeft" event', () => {
@@ -267,7 +270,7 @@ describe('PlayGameBoardSocketService', () => {
 
         it('should handle "roomUserDidDoorAction" event', () => {
             const tileCoordinate = { x: 4, y: 4 };
-            socketCallbacks['roomUserDidDoorAction'](tileCoordinate);
+            socketCallbacks['roomUserDidDoorAction']({ tileCoordinate: tileCoordinate, playerId: 'player1' });
             expect(mockPlayGameBoardManagerService.toggleDoor).toHaveBeenCalledWith(tileCoordinate);
         });
 
