@@ -135,9 +135,7 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        this.server
-            .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate: tileCoordinate, playerId: client.id });
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate, playerId: client.id });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)
