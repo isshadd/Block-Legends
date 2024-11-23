@@ -128,7 +128,7 @@ describe('PlayPageMouseHandlerService - onMapTileMouseLeave', () => {
     beforeEach(() => {
         const signalUserStartedMovingSubject = new Subject<void>();
 
-        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['getCurrentPlayerCharacter'], {
             signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
             userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
         });
@@ -290,7 +290,9 @@ describe('PlayPageMouseHandlerService - toggleAction', () => {
     });
 
     it('should set isActionOpen to false if user has no action points', () => {
-        playGameBoardManagerServiceSpy.userCurrentActionPoints = 0;
+        const player = new PlayerCharacter('test');
+        player.currentActionPoints = 0;
+        playGameBoardManagerServiceSpy.getCurrentPlayerCharacter.and.returnValue(player);
 
         service.toggleAction();
 

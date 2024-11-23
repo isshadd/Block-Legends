@@ -127,6 +127,7 @@ describe('BattleManagerService - onUserAttack', () => {
         const diceResult = 3;
         spyOn(service, 'attackDiceResult').and.returnValue(value);
         spyOn(service, 'defenseDiceResult').and.returnValue(diceResult);
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
         const signalSpy = spyOn(service.signalUserAttacked, 'next');
 
         service.onUserAttack();
@@ -134,7 +135,7 @@ describe('BattleManagerService - onUserAttack', () => {
         expect(service.isValidAction).toHaveBeenCalled();
         expect(service.attackDiceResult).toHaveBeenCalled();
         expect(service.defenseDiceResult).toHaveBeenCalled();
-        expect(signalSpy).toHaveBeenCalledWith(result);
+        expect(signalSpy).toHaveBeenCalledWith({ attackResult: result, playerHasTotem: false });
     });
 
     it('should not emit attack result if action is invalid', () => {

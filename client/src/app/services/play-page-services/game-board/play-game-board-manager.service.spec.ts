@@ -5,6 +5,8 @@ import { TileFactoryService } from '@app/services/game-board-services/tile-facto
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
+import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
@@ -277,20 +279,25 @@ describe('PlayGameBoardManagerService - startTurn', () => {
         service.startTurn();
 
         const result = 3;
-        expect(service.userCurrentMovePoints).toBe(result);
-        expect(service.userCurrentActionPoints).toBe(1);
+        expect(mockPlayerCharacter.currentMovePoints).toBe(result);
+        expect(mockPlayerCharacter.currentActionPoints).toBe(1);
         expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
     });
 
-    it('should not set move points, action points, or call setupPossibleMoves if it is not the user’s turn', () => {
+    it('should not call setupPossibleMoves if it is not the user’s turn', () => {
+        const mockPlayerCharacter = {
+            attributes: { speed: 3 },
+        } as PlayerCharacter;
+
         service.isUserTurn = false;
-        spyOn(service, 'findPlayerFromSocketId');
+        spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayerCharacter);
         spyOn(service, 'setupPossibleMoves');
 
         service.startTurn();
 
-        expect(service.userCurrentMovePoints).toBe(0);
-        expect(service.userCurrentActionPoints).toBe(0);
+        const result = 3;
+        expect(mockPlayerCharacter.currentMovePoints).toBe(result);
+        expect(mockPlayerCharacter.currentActionPoints).toBe(1);
         expect(service.setupPossibleMoves).not.toHaveBeenCalled();
     });
 
@@ -301,8 +308,6 @@ describe('PlayGameBoardManagerService - startTurn', () => {
 
         service.startTurn();
 
-        expect(service.userCurrentMovePoints).toBe(0);
-        expect(service.userCurrentActionPoints).toBe(0);
         expect(service.setupPossibleMoves).not.toHaveBeenCalled();
     });
 });
@@ -325,9 +330,9 @@ describe('PlayGameBoardManagerService - setupPossibleMoves', () => {
     });
 
     it('should call setPossibleMoves and showPossibleMoves if move points are available and it is user’s turn', () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentMovePoints = 2;
 
-        service.userCurrentMovePoints = 2;
         service.isUserTurn = true;
         spyOn(service, 'setPossibleMoves');
         spyOn(service, 'showPossibleMoves');
@@ -339,9 +344,9 @@ describe('PlayGameBoardManagerService - setupPossibleMoves', () => {
     });
 
     it('should not call setPossibleMoves or showPossibleMoves if userCurrentMovePoints is 0', () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentMovePoints = 0;
 
-        service.userCurrentMovePoints = 0;
         service.isUserTurn = true;
         spyOn(service, 'setPossibleMoves');
         spyOn(service, 'showPossibleMoves');
@@ -353,9 +358,9 @@ describe('PlayGameBoardManagerService - setupPossibleMoves', () => {
     });
 
     it('should not call setPossibleMoves or showPossibleMoves if it is not the user’s turn', () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentMovePoints = 2;
 
-        service.userCurrentMovePoints = 2;
         service.isUserTurn = false;
         spyOn(service, 'setPossibleMoves');
         spyOn(service, 'showPossibleMoves');
@@ -392,15 +397,14 @@ describe('PlayGameBoardManagerService - setPossibleMoves', () => {
         const mockPlayerCharacter = {
             mapEntity: { coordinates: playerCoordinates },
         } as PlayerCharacter;
+        mockPlayerCharacter.currentMovePoints = 3;
 
         const mockPossibleMoves = new Map<Tile, Tile[]>();
         gameMapDataManagerServiceSpy.getPossibleMovementTiles.and.returnValue(mockPossibleMoves);
 
-        service.userCurrentMovePoints = 3;
-
         service.setPossibleMoves(mockPlayerCharacter);
 
-        expect(gameMapDataManagerServiceSpy.getPossibleMovementTiles).toHaveBeenCalledWith(playerCoordinates, service.userCurrentMovePoints);
+        expect(gameMapDataManagerServiceSpy.getPossibleMovementTiles).toHaveBeenCalledWith(playerCoordinates, mockPlayerCharacter.currentMovePoints);
         expect(service.userCurrentPossibleMoves).toBe(mockPossibleMoves);
     });
 });
@@ -456,37 +460,38 @@ describe('PlayGameBoardManagerService - endTurn', () => {
     });
 
     it('should set userCurrentMovePoints to 0 and call hidePossibleMoves if it is the user’s turn and player is found', () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
+        const mockPlayerCharacter = new PlayerCharacter('player1');
 
         service.isUserTurn = true;
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+        spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayerCharacter);
         spyOn(service, 'hidePossibleMoves');
 
         service.endTurn();
 
-        expect(service.userCurrentMovePoints).toBe(0);
+        expect(mockPlayerCharacter.currentMovePoints).toBe(0);
+        expect(mockPlayerCharacter.currentActionPoints).toBe(0);
         expect(service.hidePossibleMoves).toHaveBeenCalled();
     });
 
-    it('should not set userCurrentMovePoints or call hidePossibleMoves if it is not the user’s turn', () => {
+    it('should  call hidePossibleMoves if it is not the user’s turn', () => {
+        const mockPlayerCharacter = new PlayerCharacter('player1');
         service.isUserTurn = false;
-        spyOn(service, 'getCurrentPlayerCharacter');
+        spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayerCharacter);
         spyOn(service, 'hidePossibleMoves');
 
         service.endTurn();
 
-        expect(service.userCurrentMovePoints).toBe(0);
+        expect(mockPlayerCharacter.currentMovePoints).toBe(0);
         expect(service.hidePossibleMoves).not.toHaveBeenCalled();
     });
 
     it('should not set userCurrentMovePoints or call hidePossibleMoves if player is not found', () => {
         service.isUserTurn = true;
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(null);
+        spyOn(service, 'findPlayerFromSocketId').and.returnValue(null);
         spyOn(service, 'hidePossibleMoves');
 
         service.endTurn();
 
-        expect(service.userCurrentMovePoints).toBe(0);
         expect(service.hidePossibleMoves).not.toHaveBeenCalled();
     });
 });
@@ -544,13 +549,11 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
     });
 
     it('should move the user along the path without tripping and call setupPossibleMoves at the end', async () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
-        const tile1 = new WalkableTile();
-        const tile2 = new WalkableTile();
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        const tile1 = new GrassTile();
+        const tile2 = new GrassTile();
         tile1.coordinates = { x: 0, y: 0 };
         tile2.coordinates = { x: 1, y: 1 };
-        tile1.moveCost = 1;
-        tile2.moveCost = 1;
 
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
         spyOn(service, 'hidePossibleMoves');
@@ -560,7 +563,6 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
         spyOn(service, 'checkIfPLayerDidEverything');
         spyOn(service, 'setupPossibleMoves');
 
-        service.userCurrentMovePoints = 3;
         service.isUserTurn = true;
         service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
 
@@ -572,18 +574,14 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
         expect(service.signalUserFinishedMoving.next).toHaveBeenCalled();
         expect(service.checkIfPLayerDidEverything).toHaveBeenCalled();
         expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
-        expect(service.userCurrentMovePoints).toBe(2);
     });
 
     it('should end the turn if the player trips on an ice tile', async () => {
-        const mockPlayerCharacter = {} as PlayerCharacter;
-        const tile1 = new WalkableTile();
-        const tile2 = new WalkableTile();
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        const tile1 = new GrassTile();
+        const tile2 = new IceTile();
         tile1.coordinates = { x: 0, y: 0 };
         tile2.coordinates = { x: 1, y: 1 };
-        tile1.moveCost = 1;
-        tile2.moveCost = 1;
-        tile2.type = TileType.Ice;
 
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
         spyOn(service, 'hidePossibleMoves');
@@ -593,7 +591,6 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
         spyOn(service.signalUserFinishedMoving, 'next');
         spyOn(service, 'setupPossibleMoves');
 
-        service.userCurrentMovePoints = 3;
         service.isUserTurn = true;
         service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
 
@@ -733,22 +730,14 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
 
     it('should handle battle action when user has action points and it is user’s turn', () => {
         const mockTile = new WalkableTile();
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentActionPoints = 1;
         mockTile.player = new PlayerMapEntity('avatar.png'); // Ensure player is defined
-        spyOn(service, 'findPlayerFromPlayerMapEntity').and.returnValue({
-            socketId: 'player1',
-            isLifeBonusAssigned: false,
-            isSpeedBonusAssigned: false,
-            isAttackBonusAssigned: false,
-            isDefenseBonusAssigned: false,
-            attributes: { life: 0, speed: 0, attack: 0, defense: 0 },
-            avatar: { headImage: 'avatar.png' },
-            mapEntity: null,
-        } as unknown as PlayerCharacter);
+        spyOn(service, 'findPlayerFromPlayerMapEntity').and.returnValue(mockPlayerCharacter);
         spyOn(service.signalUserDidBattleAction, 'next');
         spyOn(service, 'hidePossibleMoves');
 
         service.isUserTurn = true;
-        service.userCurrentActionPoints = 1;
         mockTile.hasPlayer = () => true;
 
         service.handlePlayerAction(mockTile);
@@ -756,7 +745,6 @@ describe('PlayGameBoardManagerService - handlePlayerAction', () => {
         expect(service.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockTile.player);
         expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith('player1');
         expect(service.hidePossibleMoves).toHaveBeenCalled();
-        expect(service.userCurrentActionPoints).toBe(0);
     });
 });
 describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
@@ -789,9 +777,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should emit signalUserGotTurnEnded if no move points and no action points are available', () => {
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 0;
+
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 0;
         spyOn(service.signalUserGotTurnEnded, 'next');
 
         service.checkIfPLayerDidEverything();
@@ -800,10 +789,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should emit signalUserGotTurnEnded if no move points and no adjacent action tiles are available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
 
         const mockTile = new Tile();
         spyOn(service, 'getCurrentPlayerTile').and.returnValue(mockTile);
@@ -816,10 +805,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should not emit signalUserGotTurnEnded if move points are available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 1;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 1;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
         spyOn(service.signalUserGotTurnEnded, 'next');
 
         service.checkIfPLayerDidEverything();
@@ -828,10 +817,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should not emit signalUserGotTurnEnded if there are adjacent action tiles available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
 
         const mockTile = new Tile();
         spyOn(service, 'getCurrentPlayerTile').and.returnValue(mockTile);
@@ -873,9 +862,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should emit signalUserGotTurnEnded if no move points and no action points are available', () => {
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 0;
+
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 0;
         spyOn(service.signalUserGotTurnEnded, 'next');
 
         service.checkIfPLayerDidEverything();
@@ -884,10 +874,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should emit signalUserGotTurnEnded if no move points and no adjacent action tiles are available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
 
         const mockTile = new Tile();
         spyOn(service, 'getCurrentPlayerTile').and.returnValue(mockTile);
@@ -900,10 +890,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should not emit signalUserGotTurnEnded if move points are available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 1;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 1;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
         spyOn(service.signalUserGotTurnEnded, 'next');
 
         service.checkIfPLayerDidEverything();
@@ -912,10 +902,10 @@ describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
     });
 
     it('should not emit signalUserGotTurnEnded if there are adjacent action tiles available', () => {
-        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
+        player1.currentMovePoints = 0;
+        player1.currentActionPoints = 1;
 
-        service.userCurrentMovePoints = 0;
-        service.userCurrentActionPoints = 1;
+        spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(player1);
 
         const mockTile = new Tile();
         spyOn(service, 'getCurrentPlayerTile').and.returnValue(mockTile);
@@ -1170,7 +1160,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         });
 
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(loserPlayer);
-        spyOn(service, 'checkIfPlayerWonGame');
+        spyOn(service, 'checkIfPlayerWonClassicGame');
         spyOn(service.signalUserRespawned, 'next');
 
         gameMapDataManagerServiceSpy.getTileAt.and.returnValue(currentTile);
@@ -1197,7 +1187,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         });
 
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(new PlayerCharacter('anotherPlayer'));
-        spyOn(service, 'checkIfPlayerWonGame');
+        spyOn(service, 'checkIfPlayerWonClassicGame');
         spyOn(service.signalUserRespawned, 'next');
 
         service.endBattleByDeath('winner', 'loser');
@@ -1216,7 +1206,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         });
 
         spyOn(service.signalUserRespawned, 'next');
-        spyOn(service, 'checkIfPlayerWonGame');
+        spyOn(service, 'checkIfPlayerWonClassicGame');
 
         service.endBattleByDeath('winner', 'loser');
 
@@ -1233,7 +1223,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
         });
 
         spyOn(service.signalUserRespawned, 'next');
-        spyOn(service, 'checkIfPlayerWonGame');
+        spyOn(service, 'checkIfPlayerWonClassicGame');
 
         service.endBattleByDeath('winner', 'loser');
 
@@ -1242,7 +1232,7 @@ describe('PlayGameBoardManagerService - endBattleByDeath', () => {
     });
 });
 
-describe('PlayGameBoardManagerService - checkIfPlayerWonGame', () => {
+describe('PlayGameBoardManagerService - checkIfPlayerWonClassicGame', () => {
     let service: PlayGameBoardManagerService;
 
     beforeEach(() => {
@@ -1931,30 +1921,7 @@ describe('PlayGameBoardManagerService - resetManager', () => {
         service.areOtherPlayersInBattle = true;
         service.currentPlayerIdTurn = 'player1';
         service.isUserTurn = true;
-        service.userCurrentMovePoints = 5;
-        service.userCurrentActionPoints = 2;
-        service.userCurrentPossibleMoves.set(
-            {
-                type: TileType.Grass,
-                description: '',
-                imageUrl: '',
-                coordinates: { x: 0, y: 0 } as Vec2,
-                visibleState: VisibleState.NotSelected,
-                isItem(): boolean {
-                    throw new Error('Function not implemented.');
-                },
-                isTerrain(): boolean {
-                    throw new Error('Function not implemented.');
-                },
-                isWalkable(): boolean {
-                    throw new Error('Function not implemented.');
-                },
-                isDoor(): boolean {
-                    throw new Error('Function not implemented.');
-                },
-            },
-            [],
-        );
+        service.userCurrentPossibleMoves.set(new GrassTile(), []);
         service.turnOrder = ['player1', 'player2'];
         service.winnerPlayer = { name: 'Winner' } as PlayerCharacter;
 
@@ -1964,8 +1931,6 @@ describe('PlayGameBoardManagerService - resetManager', () => {
         expect(service.areOtherPlayersInBattle).toBe(false);
         expect(service.currentPlayerIdTurn).toBe('');
         expect(service.isUserTurn).toBe(false);
-        expect(service.userCurrentMovePoints).toBe(0);
-        expect(service.userCurrentActionPoints).toBe(0);
         expect(service.userCurrentPossibleMoves.size).toBe(0);
         expect(service.winnerPlayer).toBeNull();
     });
