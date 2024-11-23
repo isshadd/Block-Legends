@@ -193,7 +193,7 @@ export class PlayGameBoardManagerService {
 
                 await this.waitInterval(movingTimeInterval);
 
-                didPlayerTripped = this.didPlayerTripped(pathTile.type);
+                didPlayerTripped = this.didPlayerTripped(pathTile.type, userPlayerCharacter);
 
                 if (didGrabItem) {
                     break;
@@ -314,7 +314,7 @@ export class PlayGameBoardManagerService {
 
         this.possibleItems = [];
 
-        const didPlayerTripped = this.didPlayerTripped(terrainTile.type);
+        const didPlayerTripped = this.didPlayerTripped(terrainTile.type, currentPlayer);
         if (didPlayerTripped) {
             this.signalUserGotTurnEnded.next();
             return;
@@ -337,6 +337,9 @@ export class PlayGameBoardManagerService {
             case ItemType.Totem:
                 player.attributes.defense -= 2;
                 break;
+            case ItemType.Elytra:
+                player.attributes.speed += 1;
+                break;
             default:
                 break;
         }
@@ -355,12 +358,19 @@ export class PlayGameBoardManagerService {
             case ItemType.Totem:
                 player.attributes.defense += 2;
                 break;
+            case ItemType.Elytra:
+                player.attributes.speed -= 1;
+                break;
             default:
                 break;
         }
     }
 
-    didPlayerTripped(tileType: TileType): boolean {
+    didPlayerTripped(tileType: TileType, player: PlayerCharacter): boolean {
+        if (this.doesPlayerHaveItem(player, ItemType.Elytra)) {
+            return false;
+        }
+
         if (tileType === TileType.Ice) {
             const result = 0.1;
             if (Math.random() < result) {
@@ -510,11 +520,7 @@ export class PlayGameBoardManagerService {
 
         const currentPlayer = this.getCurrentPlayerCharacter();
 
-        if (
-            currentPlayer === playerCharacter &&
-            playerCharacter.mapEntity.isOnSpawn() &&
-            this.doesPlayerHaveItem(playerCharacter, ItemType.Flag)
-        ) {
+        if (currentPlayer === playerCharacter && playerCharacter.mapEntity.isOnSpawn() && this.doesPlayerHaveItem(playerCharacter, ItemType.Flag)) {
             this.signalUserWon.next();
         }
     }

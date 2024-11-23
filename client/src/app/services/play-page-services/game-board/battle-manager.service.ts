@@ -44,12 +44,12 @@ export class BattleManagerService {
         this.isBattleOn = true;
 
         this.userDefence = currentPlayer.attributes.defense;
-        if (currentPlayer.mapEntity.isPlayerOnIce) {
+        if (currentPlayer.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(currentPlayer, ItemType.Elytra)) {
             this.userDefence -= this.icePenalty;
         }
 
         this.opponentDefence = opponentPlayer.attributes.defense;
-        if (opponentPlayer.mapEntity.isPlayerOnIce) {
+        if (opponentPlayer.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(opponentPlayer, ItemType.Elytra)) {
             this.opponentDefence -= this.icePenalty;
         }
     }
