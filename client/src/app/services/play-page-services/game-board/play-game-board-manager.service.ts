@@ -6,6 +6,7 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
@@ -223,11 +224,25 @@ export class PlayGameBoardManagerService {
 
         const fromTileInstance = this.gameMapDataManagerService.getTileAt(fromTile) as WalkableTile;
         fromTileInstance.removePlayer();
+        if (this.doesPlayerHaveItem(userPlayerCharacter, ItemType.EnchantedBook)) {
+            this.convertTileToIce(fromTileInstance);
+        }
 
         const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
 
         this.checkIfPlayerWonCTFGame(userPlayerCharacter);
+    }
+
+    convertTileToIce(tile: Tile) {
+        if (tile.isTerrain()) {
+            const iceTile = this.tileFactoryService.createTile(TileType.Ice) as IceTile;
+            iceTile.coordinates = tile.coordinates;
+            if ((tile as TerrainTile).item) {
+                iceTile.item = (tile as TerrainTile).item;
+            }
+            this.gameMapDataManagerService.setTileAt(tile.coordinates, iceTile);
+        }
     }
 
     handleTileItem(tile: Tile): boolean {
