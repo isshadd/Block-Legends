@@ -334,6 +334,9 @@ export class PlayGameBoardManagerService {
                 player.attributes.defense += 2;
                 player.attributes.speed -= 1;
                 break;
+            case ItemType.Totem:
+                player.attributes.defense -= 2;
+                break;
             default:
                 break;
         }
@@ -348,6 +351,9 @@ export class PlayGameBoardManagerService {
             case ItemType.Chestplate:
                 player.attributes.defense -= 2;
                 player.attributes.speed += 1;
+                break;
+            case ItemType.Totem:
+                player.attributes.defense += 2;
                 break;
             default:
                 break;
@@ -507,7 +513,7 @@ export class PlayGameBoardManagerService {
         if (
             currentPlayer === playerCharacter &&
             playerCharacter.mapEntity.isOnSpawn() &&
-            this.doesPlayerHaveItem(playerCharacter.socketId, ItemType.Flag)
+            this.doesPlayerHaveItem(playerCharacter, ItemType.Flag)
         ) {
             this.signalUserWon.next();
         }
@@ -541,14 +547,8 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    doesPlayerHaveItem(playerId: string, itemType: ItemType): boolean {
-        const playerCharacter = this.findPlayerFromSocketId(playerId);
-
-        if (!playerCharacter) {
-            return false;
-        }
-
-        return playerCharacter.inventory.some((item) => item.type === itemType);
+    doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
+        return player.inventory.some((item) => item.type === itemType);
     }
 
     getCurrentGrid(): Tile[][] {

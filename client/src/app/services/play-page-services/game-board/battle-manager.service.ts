@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -108,6 +109,12 @@ export class BattleManagerService {
 
     defenseDiceResult(): number {
         if (this.opponentPlayer) {
+            if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Potion) && this.opponentRemainingHealth === 1) {
+                const potionDefenseBoost = 100;
+                if (Math.random() < 0.5) {
+                    return potionDefenseBoost;
+                }
+            }
             return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }
         return 0;
@@ -140,5 +147,9 @@ export class BattleManagerService {
         this.userDefence = 0;
         this.opponentDefence = 0;
         this.isBattleOn = false;
+    }
+
+    doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
+        return player.inventory.some((item) => item.type === itemType);
     }
 }
