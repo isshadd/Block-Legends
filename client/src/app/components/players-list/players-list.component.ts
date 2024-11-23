@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ItemType } from '@common/enums/item-type';
 
 @Component({
     selector: 'app-players-list',
@@ -23,7 +24,7 @@ export class PlayersListComponent {
 
     hasFlag(player: PlayerCharacter): boolean {
         for (const item of player.inventory) {
-            if (item.type === 'Flag') {
+            if (item.type === ItemType.Flag) {
                 return true;
             }
         }
