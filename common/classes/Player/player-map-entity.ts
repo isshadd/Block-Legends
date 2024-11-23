@@ -25,4 +25,8 @@ export class PlayerMapEntity implements PlaceableEntity {
     setSpawnCoordinates(spawnCoordinates: Vec2) {
         this.spawnCoordinates = spawnCoordinates;
     }
+
+    isOnSpawn(): boolean {
+        return this.coordinates.x === this.spawnCoordinates.x && this.coordinates.y === this.spawnCoordinates.y;
+    }
 }

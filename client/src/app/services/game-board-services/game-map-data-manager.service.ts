@@ -192,6 +192,36 @@ export class GameMapDataManagerService {
         throw new Error('No walkable tile found');
     }
 
+    getClosestTerrainTileWithoutItemAt(startTile: Tile): TerrainTile {
+        if (startTile && startTile.isTerrain() && !(startTile as TerrainTile).item) {
+            return startTile as TerrainTile;
+        }
+
+        const queue: Vec2[] = [startTile.coordinates];
+        const visited: Set<string> = new Set();
+        visited.add(`${startTile.coordinates.x},${startTile.coordinates.y}`);
+
+        while (queue.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const current = queue.shift()!;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const neighbours = this.getNeighbours(this.getTileAt(current)!);
+
+            for (const neighbour of neighbours) {
+                const key = `${neighbour.coordinates.x},${neighbour.coordinates.y}`;
+                if (!visited.has(key)) {
+                    visited.add(key);
+                    if (neighbour.isTerrain() && !(neighbour as TerrainTile).item && !(neighbour as TerrainTile).hasPlayer()) {
+                        return neighbour as TerrainTile;
+                    }
+                    queue.push(neighbour.coordinates);
+                }
+            }
+        }
+
+        throw new Error('No terrain tile found');
+    }
+
     setTileAt(coordinates: Vec2, tile: Tile) {
         this.currentGrid[coordinates.x][coordinates.y] = tile;
     }
@@ -240,7 +270,8 @@ export class GameMapDataManagerService {
         return this.databaseGame.mode === GameMode.CTF;
     }
 
-    gameSize(): MapSize {
+    gameSize(): MapSize | undefined {
+        if (!this.databaseGame) return undefined;
         return this.databaseGame.size;
     }
 
@@ -251,7 +282,7 @@ export class GameMapDataManagerService {
             [MapSize.LARGE]: 6,
         };
 
-        return ITEM_LIMITS[this.gameSize()];
+        return ITEM_LIMITS[this.gameSize() || MapSize.SMALL];
     }
 
     openErrorModal(message: string | string[]) {

@@ -98,7 +98,8 @@ export class PlayPageMouseHandlerService implements OnDestroy {
         if (this.playGameBoardManagerService.isUserTurn) {
             this.isActionOpen = !this.isActionOpen;
 
-            if (this.playGameBoardManagerService.userCurrentActionPoints <= 0) {
+            const userPlayer = this.playGameBoardManagerService.getCurrentPlayerCharacter();
+            if (userPlayer && userPlayer.currentActionPoints <= 0) {
                 this.isActionOpen = false;
             }
 

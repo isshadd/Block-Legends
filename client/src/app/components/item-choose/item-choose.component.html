@@ -1,0 +1,8 @@
+<div id="container">
+    <div id="header">
+        <h1>Choisissez un objet à jeter</h1>
+    </div>
+    <div id="app-container">
+        <app-item-list-container [containerItems]="containerItems" (itemClicked)="itemClickedHandler($event)"></app-item-list-container>
+    </div>
+</div>
