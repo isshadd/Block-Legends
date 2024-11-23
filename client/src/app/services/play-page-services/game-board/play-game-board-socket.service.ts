@@ -101,10 +101,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.END_TURN, () => {
-            if (this.playGameBoardManagerService.isUserTurn) {
-                this.playGameBoardManagerService.endTurn();
-                this.playPageMouseHandlerService.endTurn();
-            }
+            this.playGameBoardManagerService.endTurn();
+            this.playPageMouseHandlerService.endTurn();
             this.playGameBoardManagerService.currentPlayerIdTurn = '';
             this.playGameBoardManagerService.isUserTurn = false;
         });
@@ -112,7 +110,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.START_TURN, (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
-            if (this.playGameBoardManagerService.isUserTurn && !this.playGameBoardManagerService.winnerPlayer) {
+            if (!this.playGameBoardManagerService.winnerPlayer) {
                 this.playGameBoardManagerService.startTurn();
             }
         });
@@ -139,11 +137,13 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.playGameBoardManagerService.continueTurn();
         });
 
-        this.socket.on(SocketEvents.ROOM_USER_DID_DOOR_ACTION, (tileCoordinate: Vec2) => {
-            this.playGameBoardManagerService.toggleDoor(tileCoordinate);
+        this.socket.on(SocketEvents.ROOM_USER_DID_DOOR_ACTION, (data: { tileCoordinate: Vec2; playerId: string }) => {
+            this.playGameBoardManagerService.playerUsedAction(data.playerId);
+            this.playGameBoardManagerService.toggleDoor(data.tileCoordinate);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, (data: { playerId: string; enemyPlayerId: string }) => {
+            this.playGameBoardManagerService.playerUsedAction(data.playerId);
             this.playGameBoardManagerService.startBattle(data.playerId, data.enemyPlayerId);
         });
 

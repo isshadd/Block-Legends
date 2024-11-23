@@ -108,16 +108,20 @@ export class PlayGameBoardManagerService {
     }
 
     startTurn() {
-        const userPlayerCharacter = this.getCurrentPlayerCharacter();
+        const player = this.findPlayerFromSocketId(this.currentPlayerIdTurn);
 
-        if (!this.isUserTurn || !userPlayerCharacter) {
+        if (!player) {
             return;
         }
 
-        userPlayerCharacter.currentMovePoints = userPlayerCharacter.attributes.speed;
-        userPlayerCharacter.currentActionPoints = 1;
+        player.currentMovePoints = player.attributes.speed;
+        player.currentActionPoints = 1;
 
-        this.setupPossibleMoves(userPlayerCharacter);
+        if (!this.isUserTurn) {
+            return;
+        }
+
+        this.setupPossibleMoves(player);
     }
 
     setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
@@ -142,14 +146,19 @@ export class PlayGameBoardManagerService {
     }
 
     endTurn() {
-        const userPlayerCharacter = this.getCurrentPlayerCharacter();
+        const player = this.findPlayerFromSocketId(this.currentPlayerIdTurn);
 
-        if (!this.isUserTurn || !userPlayerCharacter) {
+        if (!player) {
             return;
         }
 
-        userPlayerCharacter.currentMovePoints = 0;
-        userPlayerCharacter.currentActionPoints = 0;
+        player.currentMovePoints = 0;
+        player.currentActionPoints = 0;
+
+        if (!this.isUserTurn) {
+            return;
+        }
+
         this.possibleItems = [];
         this.hidePossibleMoves();
     }
@@ -179,7 +188,6 @@ export class PlayGameBoardManagerService {
 
         for (const pathTile of path) {
             if (lastTile) {
-                userPlayerCharacter.currentMovePoints -= (pathTile as WalkableTile).moveCost;
                 this.signalUserMoved.next({
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
@@ -229,6 +237,7 @@ export class PlayGameBoardManagerService {
 
         const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
+        userPlayerCharacter.currentMovePoints -= toTileInstance.moveCost;
 
         this.checkIfPlayerWonCTFGame(userPlayerCharacter);
     }
@@ -410,7 +419,6 @@ export class PlayGameBoardManagerService {
             if (playerCharacter?.socketId) {
                 this.signalUserDidBattleAction.next(playerCharacter.socketId);
                 this.hidePossibleMoves();
-                currentPlayer.currentActionPoints -= 1;
             }
             return;
         }
@@ -418,7 +426,6 @@ export class PlayGameBoardManagerService {
         if (tile.isDoor()) {
             this.hidePossibleMoves();
             this.signalUserDidDoorAction.next(tile.coordinates);
-            currentPlayer.currentActionPoints -= 1;
             this.checkIfPLayerDidEverything();
             return;
         }
@@ -475,6 +482,13 @@ export class PlayGameBoardManagerService {
         if (!opponentPlayer) return;
 
         this.battleManagerService.init(currentPlayer, opponentPlayer);
+    }
+
+    playerUsedAction(playerId: string) {
+        const player = this.findPlayerFromSocketId(playerId);
+        if (player) {
+            player.currentActionPoints -= 1;
+        }
     }
 
     continueTurn() {
