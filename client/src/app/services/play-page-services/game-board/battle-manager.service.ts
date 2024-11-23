@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -9,7 +10,7 @@ export class BattleManagerService {
     readonly startingEvadeAttempts = 2;
     readonly icePenalty = 2;
 
-    signalUserAttacked = new Subject<number>();
+    signalUserAttacked = new Subject<{ attackResult: number; playerHasTotem: boolean }>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
 
     signalUserTriedEscape = new Subject<void>();
@@ -43,12 +44,12 @@ export class BattleManagerService {
         this.isBattleOn = true;
 
         this.userDefence = currentPlayer.attributes.defense;
-        if (currentPlayer.mapEntity.isPlayerOnIce) {
+        if (this.hasIcePenalty(currentPlayer)) {
             this.userDefence -= this.icePenalty;
         }
 
         this.opponentDefence = opponentPlayer.attributes.defense;
-        if (opponentPlayer.mapEntity.isPlayerOnIce) {
+        if (this.hasIcePenalty(opponentPlayer)) {
             this.opponentDefence -= this.icePenalty;
         }
     }
@@ -60,7 +61,9 @@ export class BattleManagerService {
     onUserAttack() {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
-            this.signalUserAttacked.next(attackResult);
+            const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
+
+            this.signalUserAttacked.next({ attackResult, playerHasTotem });
         }
     }
 
@@ -78,6 +81,10 @@ export class BattleManagerService {
 
         if (!this.isUserTurn) {
             if (attackResult > 0) {
+                if (this.opponentPlayer && this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem)) {
+                    this.opponentRemainingHealth++;
+                }
+
                 this.userRemainingHealth--;
             }
             this.signalOpponentAttacked.next(attackResult);
@@ -98,7 +105,7 @@ export class BattleManagerService {
     attackDiceResult(): number {
         if (this.currentPlayer) {
             let currentPlayerAttack: number = this.currentPlayer.attributes.attack;
-            if (this.currentPlayer.mapEntity.isPlayerOnIce) {
+            if (this.hasIcePenalty(this.currentPlayer)) {
                 currentPlayerAttack -= this.icePenalty;
             }
             return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
@@ -108,6 +115,12 @@ export class BattleManagerService {
 
     defenseDiceResult(): number {
         if (this.opponentPlayer) {
+            if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.MagicShield) && this.opponentRemainingHealth === 1) {
+                const potionDefenseBoost = 100;
+                if (Math.random() < 0.5) {
+                    return potionDefenseBoost;
+                }
+            }
             return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }
         return 0;
@@ -118,6 +131,10 @@ export class BattleManagerService {
             return;
         }
 
+        if (this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem)) {
+            this.userRemainingHealth++;
+        }
+
         this.opponentRemainingHealth--;
     }
 
@@ -126,6 +143,14 @@ export class BattleManagerService {
         setTimeout(() => {
             this.clearBattle();
         }, 1000);
+    }
+
+    doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
+        return player.inventory.some((item) => item.type === itemType);
+    }
+
+    hasIcePenalty(player: PlayerCharacter): boolean {
+        return player.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(player, ItemType.Elytra);
     }
 
     clearBattle() {

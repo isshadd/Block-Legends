@@ -3,6 +3,6 @@ import { Item } from './item';
 
 export class EnchantedBook extends Item {
     type: ItemType = ItemType.EnchantedBook;
-    description: string = 'Livre enchanté. Une magie puissante vous attend.';
+    description: string = 'Livre de glace. Quand tu te déplaces, la dernière case de ton mouvement est gelée.';
     imageUrl: string = 'assets/images/item/enchanted-book.png';
 }

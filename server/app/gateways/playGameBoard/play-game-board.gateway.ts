@@ -4,6 +4,7 @@ import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
@@ -97,6 +98,26 @@ export class PlayGameBoardGateway {
             .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
     }
 
+    @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)
+    handleUserGrabbedItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
+    }
+
+    @SubscribeMessage(SocketEvents.USER_THREW_ITEM)
+    handleUserThrewItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_THREW_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
+    }
+
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
     handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
@@ -114,7 +135,7 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, tileCoordinate);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate, playerId: client.id });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)
@@ -129,14 +150,14 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_ATTACKED)
-    handleUserAttacked(client: Socket, attackResult: number) {
+    handleUserAttacked(client: Socket, data: { attackResult: number; playerHasTotem: boolean }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         if (!room) return;
 
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, attackResult);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, data.attackResult);
 
-        if (attackResult > 0) {
-            const isPlayerDead = this.playGameBoardBattleService.userSuccededAttack(room.accessCode);
+        if (data.attackResult > 0) {
+            const isPlayerDead = this.playGameBoardBattleService.userSucceededAttack(room.accessCode, data.playerHasTotem);
 
             this.server.to(room.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
 

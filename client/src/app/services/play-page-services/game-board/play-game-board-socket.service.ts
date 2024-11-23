@@ -5,6 +5,7 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
@@ -50,9 +51,15 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_WON);
         });
+        this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_GRABBED_ITEM, data);
+        });
+        this.playGameBoardManagerService.signalUserThrewItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_THREW_ITEM, data);
+        });
 
-        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
-            this.socket.emit(SocketEvents.USER_ATTACKED, attackResult);
+        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_ATTACKED, data);
         });
         this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_TRIED_ESCAPE);
@@ -94,10 +101,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.END_TURN, () => {
-            if (this.playGameBoardManagerService.isUserTurn) {
-                this.playGameBoardManagerService.endTurn();
-                this.playPageMouseHandlerService.endTurn();
-            }
+            this.playGameBoardManagerService.endTurn();
+            this.playPageMouseHandlerService.endTurn();
             this.playGameBoardManagerService.currentPlayerIdTurn = '';
             this.playGameBoardManagerService.isUserTurn = false;
         });
@@ -105,7 +110,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.START_TURN, (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
-            if (this.playGameBoardManagerService.isUserTurn && !this.playGameBoardManagerService.winnerPlayer) {
+            if (!this.playGameBoardManagerService.winnerPlayer) {
                 this.playGameBoardManagerService.startTurn();
             }
         });
@@ -119,16 +124,26 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
         });
 
+        this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
+            this.playGameBoardManagerService.grabItem(data.playerId, data.itemType, data.tileCoordinate);
+        });
+
+        this.socket.on(SocketEvents.ROOM_USER_THREW_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
+            this.playGameBoardManagerService.throwItem(data.playerId, data.itemType, data.tileCoordinate);
+        });
+
         this.socket.on(SocketEvents.ROOM_USER_RESPAWNED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
             this.playGameBoardManagerService.continueTurn();
         });
 
-        this.socket.on(SocketEvents.ROOM_USER_DID_DOOR_ACTION, (tileCoordinate: Vec2) => {
-            this.playGameBoardManagerService.toggleDoor(tileCoordinate);
+        this.socket.on(SocketEvents.ROOM_USER_DID_DOOR_ACTION, (data: { tileCoordinate: Vec2; playerId: string }) => {
+            this.playGameBoardManagerService.playerUsedAction(data.playerId);
+            this.playGameBoardManagerService.toggleDoor(data.tileCoordinate);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, (data: { playerId: string; enemyPlayerId: string }) => {
+            this.playGameBoardManagerService.playerUsedAction(data.playerId);
             this.playGameBoardManagerService.startBattle(data.playerId, data.enemyPlayerId);
         });
 
@@ -158,6 +173,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.BATTLE_ENDED_BY_ESCAPE, (playerIdTurn: string) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = playerIdTurn;
             this.playGameBoardManagerService.isUserTurn = playerIdTurn === this.socket.id;
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.continueTurn();
         });
@@ -165,11 +181,13 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.FIRST_PLAYER_WON_BATTLE, (data: { firstPlayer: string; loserPlayer: string }) => {
             this.playGameBoardManagerService.currentPlayerIdTurn = data.firstPlayer;
             this.playGameBoardManagerService.isUserTurn = data.firstPlayer === this.socket.id;
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.firstPlayer, data.loserPlayer);
         });
 
         this.socket.on(SocketEvents.SECOND_PLAYER_WON_BATTLE, (data: { winnerPlayer: string; loserPlayer: string }) => {
+            this.playGameBoardManagerService.areOtherPlayersInBattle = false;
             this.battleManagerService.endBattle();
             this.playGameBoardManagerService.endBattleByDeath(data.winnerPlayer, data.loserPlayer);
         });

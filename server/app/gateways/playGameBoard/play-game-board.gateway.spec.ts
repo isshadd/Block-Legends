@@ -113,7 +113,7 @@ describe('PlayGameBoardGateway', () => {
             createBattleTimer: jest.fn(),
             endBattleTurn: jest.fn(),
             getPlayerBattleTurn: jest.fn(),
-            userSuccededAttack: jest.fn(),
+            userSucceededAttack: jest.fn(),
             userUsedEvade: jest.fn(),
             battleRoomFinished: jest.fn(),
             signalRoomTimeOut$: {
@@ -335,14 +335,14 @@ describe('PlayGameBoardGateway', () => {
             };
             const attackResult = 1;
 
-            playGameBoardBattleService.userSuccededAttack.mockReturnValue(false);
+            playGameBoardBattleService.userSucceededAttack.mockReturnValue(false);
 
-            gateway.handleUserAttacked(mockClient as Socket, attackResult);
+            gateway.handleUserAttacked(mockClient as Socket, { attackResult, playerHasTotem: false });
 
             expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
             expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('opponentAttacked', attackResult);
             expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('successfulAttack');
-            expect(playGameBoardBattleService.userSuccededAttack).toHaveBeenCalledWith(mockRoom.accessCode);
+            expect(playGameBoardBattleService.userSucceededAttack).toHaveBeenCalledWith(mockRoom.accessCode, false);
             expect(gateway.endBattleTurn).toHaveBeenCalledWith(mockRoom.accessCode);
         });
 
@@ -358,14 +358,14 @@ describe('PlayGameBoardGateway', () => {
 
             const attackResult = 1;
 
-            playGameBoardBattleService.userSuccededAttack.mockReturnValue(true);
+            playGameBoardBattleService.userSucceededAttack.mockReturnValue(true);
 
-            gateway.handleUserAttacked(mockClient as Socket, attackResult);
+            gateway.handleUserAttacked(mockClient as Socket, { attackResult, playerHasTotem: false });
 
             expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
             expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('opponentAttacked', attackResult);
             expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('successfulAttack');
-            expect(playGameBoardBattleService.userSuccededAttack).toHaveBeenCalledWith(mockRoom.accessCode);
+            expect(playGameBoardBattleService.userSucceededAttack).toHaveBeenCalledWith(mockRoom.accessCode, false);
             expect(gateway.handleBattleEndedByDeath).toHaveBeenCalledWith(mockRoom.accessCode, mockClient.id);
         });
 
@@ -468,7 +468,10 @@ describe('PlayGameBoardGateway', () => {
                     gateway.handleUserDidDoorAction(mockClient as Socket, tileCoordinate);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('roomUserDidDoorAction', tileCoordinate);
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('roomUserDidDoorAction', {
+                        playerId: mockClient.id,
+                        tileCoordinate,
+                    });
                 });
 
                 it("should do nothing if it is not client's turn", () => {
@@ -515,12 +518,12 @@ describe('PlayGameBoardGateway', () => {
             describe('handleUserAttacked', () => {
                 it('should emit opponentAttacked and successfulAttack if attack succeeded without death', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
-                    playGameBoardBattleService.userSuccededAttack.mockReturnValue(false);
+                    playGameBoardBattleService.userSucceededAttack.mockReturnValue(false);
                     gameSocketRoomService.gameBattleRooms.get = jest.fn().mockReturnValue(battleRoom);
                     jest.spyOn(gateway, 'endBattleTurn').mockImplementation(jest.fn());
 
                     const attackResult = 1;
-                    gateway.handleUserAttacked(mockClient as Socket, attackResult);
+                    gateway.handleUserAttacked(mockClient as Socket, { attackResult, playerHasTotem: false });
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('opponentAttacked', attackResult);
@@ -530,12 +533,12 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should handle battle ended by death if player dies', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
-                    playGameBoardBattleService.userSuccededAttack.mockReturnValue(true);
+                    playGameBoardBattleService.userSucceededAttack.mockReturnValue(true);
 
                     const attackResult = 1;
                     jest.spyOn(gateway, 'handleBattleEndedByDeath').mockImplementation(jest.fn());
 
-                    gateway.handleUserAttacked(mockClient as Socket, attackResult);
+                    gateway.handleUserAttacked(mockClient as Socket, { attackResult, playerHasTotem: false });
 
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('opponentAttacked', attackResult);
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('successfulAttack');
@@ -549,7 +552,7 @@ describe('PlayGameBoardGateway', () => {
 
                     const attackResult = 1;
 
-                    gateway.handleUserAttacked(mockClient as Socket, attackResult);
+                    gateway.handleUserAttacked(mockClient as Socket, { attackResult, playerHasTotem: false });
                     expect(gateway.endBattleTurn).not.toHaveBeenCalled();
                 });
             });

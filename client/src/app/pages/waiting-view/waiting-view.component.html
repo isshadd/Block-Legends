@@ -39,7 +39,9 @@
                 >
                     Deverouiller la salle
                 </button>
-                <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
+                <button class="dark-button" type="button" id="start-button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">
+                    Lancer la partie!
+                </button>
             </div>
         </div>
         } @if(isMaxPlayer) {

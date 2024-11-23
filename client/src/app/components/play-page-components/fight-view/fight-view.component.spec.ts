@@ -13,7 +13,7 @@ describe('FightViewComponent', () => {
 
     const mockPlayer = { avatar: AvatarEnum.Alex };
 
-    const signalUserAttacked$ = new BehaviorSubject<number>(0);
+    const signalUserAttacked$ = new BehaviorSubject<{ attackResult: number; playerHasTotem: boolean }>({ attackResult: 0, playerHasTotem: false });
     const signalUserTriedEscape$ = new BehaviorSubject<void>(undefined);
     const signalOpponentAttacked$ = new BehaviorSubject<number>(0);
     const signalOpponentTriedEscape$ = new BehaviorSubject<void>(undefined);
@@ -83,7 +83,7 @@ describe('FightViewComponent', () => {
     it('should trigger attackAnimation on signalUserAttacked$', () => {
         spyOn(component, 'attackAnimation');
         const value = 5;
-        signalUserAttacked$.next(value);
+        signalUserAttacked$.next({ attackResult: value, playerHasTotem: false });
         expect(component.attackAnimation).toHaveBeenCalledWith(value);
     });
 

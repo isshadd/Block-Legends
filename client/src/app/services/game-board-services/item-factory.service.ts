@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Elytra } from '@common/classes/Items/elytra';
+import { EmptyItem } from '@common/classes/Items/empty-item';
 import { EnchantedBook } from '@common/classes/Items/enchanted-book';
 import { Flag } from '@common/classes/Items/flag';
 import { Item } from '@common/classes/Items/item';
@@ -23,7 +24,7 @@ export class ItemFactoryService {
                 return new Elytra();
             case ItemType.Totem:
                 return new Totem();
-            case ItemType.Potion:
+            case ItemType.MagicShield:
                 return new Potion();
             case ItemType.EnchantedBook:
                 return new EnchantedBook();
@@ -35,6 +36,8 @@ export class ItemFactoryService {
                 return new Spawn();
             case ItemType.Random:
                 return new RandomItem();
+            case ItemType.EmptyItem:
+                return new EmptyItem();
             default:
                 return new Item();
         }

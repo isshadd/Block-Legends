@@ -48,9 +48,9 @@ describe('ItemFactoryService', () => {
         });
 
         it('should create a Potion when ItemType.Potion is passed', () => {
-            const item = service.createItem(ItemType.Potion);
+            const item = service.createItem(ItemType.MagicShield);
             expect(item).toBeInstanceOf(Potion);
-            expect(item.type).toBe(ItemType.Potion);
+            expect(item.type).toBe(ItemType.MagicShield);
         });
 
         it('should create an EnchantedBook when ItemType.EnchantedBook is passed', () => {
@@ -110,7 +110,7 @@ describe('ItemFactoryService', () => {
         });
 
         it('should copy coordinates and itemLimit correctly', () => {
-            const originalItem = service.createItem(ItemType.Potion);
+            const originalItem = service.createItem(ItemType.MagicShield);
             originalItem.setCoordinates({ x: 5, y: 15 });
             originalItem.itemLimit = 3;
             const copiedItem = service.copyItem(originalItem);

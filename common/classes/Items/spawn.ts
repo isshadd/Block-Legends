@@ -5,4 +5,8 @@ export class Spawn extends Item {
     type: ItemType = ItemType.Spawn;
     description: string = 'Point de départ. Choisissez où les joueurs commenceront leur aventure.';
     imageUrl: string = 'assets/images/item/bed.png';
+
+    isGrabbable(): boolean {
+        return false;
+    }
 }
