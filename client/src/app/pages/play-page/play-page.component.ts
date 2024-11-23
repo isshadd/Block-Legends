@@ -9,6 +9,8 @@ import { InfoPanelComponent } from '@app/components/info-panel/info-panel.compon
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 // eslint-disable-next-line
+import { ItemChooseComponent } from '@app/components/item-choose/item-choose.component';
+import { PlayGameSideViewBarComponent } from '@app/components/play-game-side-view-bar/play-game-side-view-bar.component';
 import { FightViewComponent } from '@app/components/play-page-components/fight-view/fight-view.component';
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
@@ -24,7 +26,6 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayGameSideViewBarComponent } from '../../components/play-game-side-view-bar/play-game-side-view-bar.component';
 
 @Component({
     selector: 'app-play-page',
@@ -38,6 +39,7 @@ import { PlayGameSideViewBarComponent } from '../../components/play-game-side-vi
         WinPanelComponent,
         PlayGameSideViewBarComponent,
         ItemListContainerComponent,
+        ItemChooseComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',

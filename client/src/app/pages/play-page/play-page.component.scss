@@ -23,16 +23,6 @@ app-event-journal {
     width: 100vw;
     overflow: hidden;
 
-    #win-panel {
-        position: absolute;
-        display: flex;
-        top: 70%;
-        left: 70%;
-        transform: translate(-50%, -50%);
-        z-index: 20;
-        animation: fadeInScale 0.6s ease-in-out forwards;
-    }
-
     @keyframes fadeInScale {
         0% {
             opacity: 0;
@@ -69,11 +59,34 @@ app-event-journal {
         height: 100vh;
         overflow: hidden;
 
+        #win-panel {
+            position: absolute;
+            display: flex;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            animation: fadeInScale 0.6s ease-in-out forwards;
+        }
+
+        app-item-choose {
+            width: 100%;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+        }
+
         #map-container {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             position: relative;
+            z-index: 1;
         }
 
         #fight-comp {
