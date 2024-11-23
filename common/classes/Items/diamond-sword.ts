@@ -3,6 +3,6 @@ import { Item } from './item';
 
 export class DiamondSword extends Item {
     type: ItemType = ItemType.Sword;
-    description: string = 'Épée en diamant. Idéale pour des attaques plus puissantes.';
+    description: string = 'Épée.\n +2 Attaque, -1 Défense.';
     imageUrl: string = 'assets/images/item/diamond-sword.png';
 }

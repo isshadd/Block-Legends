@@ -115,7 +115,7 @@ export class BattleManagerService {
 
     defenseDiceResult(): number {
         if (this.opponentPlayer) {
-            if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Potion) && this.opponentRemainingHealth === 1) {
+            if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.MagicShield) && this.opponentRemainingHealth === 1) {
                 const potionDefenseBoost = 100;
                 if (Math.random() < 0.5) {
                     return potionDefenseBoost;

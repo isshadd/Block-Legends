@@ -24,7 +24,7 @@ export class ItemFactoryService {
                 return new Elytra();
             case ItemType.Totem:
                 return new Totem();
-            case ItemType.Potion:
+            case ItemType.MagicShield:
                 return new Potion();
             case ItemType.EnchantedBook:
                 return new EnchantedBook();
