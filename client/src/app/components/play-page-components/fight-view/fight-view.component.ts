@@ -14,8 +14,8 @@ const DELAY = 500;
 export class FightViewComponent {
     playerDiceResult = 0;
     constructor(public battleManagerService: BattleManagerService) {
-        this.battleManagerService.signalUserAttacked$.subscribe((attackResult: number) => {
-            this.attackAnimation(attackResult);
+        this.battleManagerService.signalUserAttacked$.subscribe((data) => {
+            this.attackAnimation(data.attackResult);
         });
         this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
             this.escapeAnimation();

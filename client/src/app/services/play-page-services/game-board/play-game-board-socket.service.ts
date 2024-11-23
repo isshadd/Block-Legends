@@ -58,8 +58,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.socket.emit(SocketEvents.USER_THREW_ITEM, data);
         });
 
-        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((attackResult: number) => {
-            this.socket.emit(SocketEvents.USER_ATTACKED, attackResult);
+        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_ATTACKED, data);
         });
         this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_TRIED_ESCAPE);

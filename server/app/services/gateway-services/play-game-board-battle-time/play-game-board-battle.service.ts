@@ -112,18 +112,24 @@ export class PlayGameBoardBattleService {
         return Math.random() < 0.4;
     }
 
-    userSucceededAttack(accessCode: number): boolean {
+    userSucceededAttack(accessCode: number, playerHasTotem: boolean): boolean {
         const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
         if (!battleRoom) {
             return false;
         }
 
         if (battleRoom.isFirstPlayerTurn) {
+            if (playerHasTotem) {
+                battleRoom.firstPlayerRemainingLife += 1;
+            }
             battleRoom.secondPlayerRemainingLife--;
             if (battleRoom.secondPlayerRemainingLife <= 0) {
                 return true;
             }
         } else {
+            if (playerHasTotem) {
+                battleRoom.secondPlayerRemainingLife += 1;
+            }
             battleRoom.firstPlayerRemainingLife--;
             if (battleRoom.firstPlayerRemainingLife <= 0) {
                 return true;

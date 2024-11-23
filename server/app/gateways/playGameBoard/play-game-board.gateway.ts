@@ -150,14 +150,14 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_ATTACKED)
-    handleUserAttacked(client: Socket, attackResult: number) {
+    handleUserAttacked(client: Socket, data: { attackResult: number; playerHasTotem: boolean }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         if (!room) return;
 
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, attackResult);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, data.attackResult);
 
-        if (attackResult > 0) {
-            const isPlayerDead = this.playGameBoardBattleService.userSucceededAttack(room.accessCode);
+        if (data.attackResult > 0) {
+            const isPlayerDead = this.playGameBoardBattleService.userSucceededAttack(room.accessCode, data.playerHasTotem);
 
             this.server.to(room.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
 

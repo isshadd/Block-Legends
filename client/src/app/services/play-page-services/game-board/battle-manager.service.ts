@@ -10,7 +10,7 @@ export class BattleManagerService {
     readonly startingEvadeAttempts = 2;
     readonly icePenalty = 2;
 
-    signalUserAttacked = new Subject<number>();
+    signalUserAttacked = new Subject<{ attackResult: number; playerHasTotem: boolean }>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
 
     signalUserTriedEscape = new Subject<void>();
@@ -61,7 +61,9 @@ export class BattleManagerService {
     onUserAttack() {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
-            this.signalUserAttacked.next(attackResult);
+            const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
+
+            this.signalUserAttacked.next({ attackResult: attackResult, playerHasTotem: playerHasTotem });
         }
     }
 
@@ -79,6 +81,10 @@ export class BattleManagerService {
 
         if (!this.isUserTurn) {
             if (attackResult > 0) {
+                if (this.opponentPlayer && this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem)) {
+                    this.opponentRemainingHealth++;
+                }
+
                 this.userRemainingHealth--;
             }
             this.signalOpponentAttacked.next(attackResult);
@@ -125,6 +131,10 @@ export class BattleManagerService {
             return;
         }
 
+        if (this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem)) {
+            this.userRemainingHealth++;
+        }
+
         this.opponentRemainingHealth--;
     }
 
@@ -133,6 +143,10 @@ export class BattleManagerService {
         setTimeout(() => {
             this.clearBattle();
         }, 1000);
+    }
+
+    doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
+        return player.inventory.some((item) => item.type === itemType);
     }
 
     clearBattle() {
@@ -147,9 +161,5 @@ export class BattleManagerService {
         this.userDefence = 0;
         this.opponentDefence = 0;
         this.isBattleOn = false;
-    }
-
-    doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
-        return player.inventory.some((item) => item.type === itemType);
     }
 }
