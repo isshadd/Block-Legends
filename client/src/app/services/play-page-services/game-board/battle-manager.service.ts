@@ -44,12 +44,12 @@ export class BattleManagerService {
         this.isBattleOn = true;
 
         this.userDefence = currentPlayer.attributes.defense;
-        if (currentPlayer.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(currentPlayer, ItemType.Elytra)) {
+        if (this.hasIcePenalty(currentPlayer)) {
             this.userDefence -= this.icePenalty;
         }
 
         this.opponentDefence = opponentPlayer.attributes.defense;
-        if (opponentPlayer.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(opponentPlayer, ItemType.Elytra)) {
+        if (this.hasIcePenalty(opponentPlayer)) {
             this.opponentDefence -= this.icePenalty;
         }
     }
@@ -105,7 +105,7 @@ export class BattleManagerService {
     attackDiceResult(): number {
         if (this.currentPlayer) {
             let currentPlayerAttack: number = this.currentPlayer.attributes.attack;
-            if (this.currentPlayer.mapEntity.isPlayerOnIce) {
+            if (this.hasIcePenalty(this.currentPlayer)) {
                 currentPlayerAttack -= this.icePenalty;
             }
             return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
@@ -147,6 +147,10 @@ export class BattleManagerService {
 
     doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
         return player.inventory.some((item) => item.type === itemType);
+    }
+
+    hasIcePenalty(player: PlayerCharacter): boolean {
+        return player.mapEntity.isPlayerOnIce && !this.doesPlayerHaveItem(player, ItemType.Elytra);
     }
 
     clearBattle() {
