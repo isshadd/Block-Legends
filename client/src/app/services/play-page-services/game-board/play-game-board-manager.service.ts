@@ -60,8 +60,6 @@ export class PlayGameBoardManagerService {
     areOtherPlayersInBattle: boolean = false;
     currentPlayerIdTurn: string = '';
     isUserTurn: boolean = false;
-    userCurrentMovePoints: number = 0;
-    userCurrentActionPoints: number = 0;
     userCurrentPossibleMoves: Map<Tile, Tile[]> = new Map();
     turnOrder: string[] = [];
 
@@ -116,14 +114,14 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        this.userCurrentMovePoints = userPlayerCharacter.attributes.speed;
-        this.userCurrentActionPoints = 1;
+        userPlayerCharacter.currentMovePoints = userPlayerCharacter.attributes.speed;
+        userPlayerCharacter.currentActionPoints = 1;
 
         this.setupPossibleMoves(userPlayerCharacter);
     }
 
     setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
-        if (this.userCurrentMovePoints <= 0 || !this.isUserTurn) {
+        if (userPlayerCharacter.currentMovePoints <= 0 || !this.isUserTurn) {
             return;
         }
         this.setPossibleMoves(userPlayerCharacter);
@@ -133,7 +131,7 @@ export class PlayGameBoardManagerService {
     setPossibleMoves(playerCharacter: PlayerCharacter) {
         this.userCurrentPossibleMoves = this.gameMapDataManagerService.getPossibleMovementTiles(
             playerCharacter.mapEntity.coordinates,
-            this.userCurrentMovePoints,
+            playerCharacter.currentMovePoints,
         );
     }
 
@@ -150,7 +148,8 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        this.userCurrentMovePoints = 0;
+        userPlayerCharacter.currentMovePoints = 0;
+        userPlayerCharacter.currentActionPoints = 0;
         this.possibleItems = [];
         this.hidePossibleMoves();
     }
@@ -180,7 +179,7 @@ export class PlayGameBoardManagerService {
 
         for (const pathTile of path) {
             if (lastTile) {
-                this.userCurrentMovePoints -= (pathTile as WalkableTile).moveCost;
+                userPlayerCharacter.currentMovePoints -= (pathTile as WalkableTile).moveCost;
                 this.signalUserMoved.next({
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
@@ -400,7 +399,9 @@ export class PlayGameBoardManagerService {
     }
 
     handlePlayerAction(tile: Tile) {
-        if (!this.isUserTurn || this.userCurrentActionPoints <= 0) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (!this.isUserTurn || !currentPlayer || currentPlayer.currentActionPoints <= 0) {
             return;
         }
 
@@ -409,7 +410,7 @@ export class PlayGameBoardManagerService {
             if (playerCharacter?.socketId) {
                 this.signalUserDidBattleAction.next(playerCharacter.socketId);
                 this.hidePossibleMoves();
-                this.userCurrentActionPoints -= 1;
+                currentPlayer.currentActionPoints -= 1;
             }
             return;
         }
@@ -417,16 +418,18 @@ export class PlayGameBoardManagerService {
         if (tile.isDoor()) {
             this.hidePossibleMoves();
             this.signalUserDidDoorAction.next(tile.coordinates);
-            this.userCurrentActionPoints -= 1;
+            currentPlayer.currentActionPoints -= 1;
             this.checkIfPLayerDidEverything();
             return;
         }
     }
 
     checkIfPLayerDidEverything() {
-        if (this.userCurrentMovePoints <= 0) {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+
+        if (currentPlayer && currentPlayer.currentMovePoints <= 0) {
             const currentPlayerTile = this.getCurrentPlayerTile();
-            if (this.userCurrentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
+            if (currentPlayer.currentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
                 this.signalUserGotTurnEnded.next();
             }
         }
@@ -622,8 +625,6 @@ export class PlayGameBoardManagerService {
         this.areOtherPlayersInBattle = false;
         this.currentPlayerIdTurn = '';
         this.isUserTurn = false;
-        this.userCurrentMovePoints = 0;
-        this.userCurrentActionPoints = 0;
         this.userCurrentPossibleMoves = new Map();
         this.turnOrder = [];
         this.possibleItems = [];

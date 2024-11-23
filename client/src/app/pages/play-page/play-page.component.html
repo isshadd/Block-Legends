@@ -5,10 +5,8 @@
     <div id="side-menu">
         <app-play-game-side-view-bar
             id="side"
-            [playerCharacter]="this.myPlayer!"
+            [playerCharacter]="this.playGameBoardManagerService.getCurrentPlayerCharacter()"
             [currentPlayerName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
-            [actionPoints]="playGameBoardManagerService.userCurrentActionPoints"
-            [movementPoints]="playGameBoardManagerService.userCurrentMovePoints"
             [gameSize]="gameMapDataManagerService.gameSize()"
             [players]="this.players"
         >
@@ -52,7 +50,10 @@
         </div>
 
         @if(playGameBoardManagerService.possibleItems.length > 0) {
-        <app-item-list-container [containerItems]="playGameBoardManagerService.possibleItems" (itemClicked)="itemThrow($event)"></app-item-list-container>
+        <app-item-list-container
+            [containerItems]="playGameBoardManagerService.possibleItems"
+            (itemClicked)="itemThrow($event)"
+        ></app-item-list-container>
         }
     </div>
 </div>

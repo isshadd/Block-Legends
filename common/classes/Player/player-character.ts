@@ -27,6 +27,9 @@ export class PlayerCharacter implements Character {
     isAbsent: boolean = false;
     inventory: Item[] = [new EmptyItem(), new EmptyItem()];
 
+    currentMovePoints: number = 0;
+    currentActionPoints: number = 0;
+
     // Pour JV:
 
     isVirtual: boolean = false;

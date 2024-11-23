@@ -11,8 +11,6 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 })
 export class SideViewPlayerInfoComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
-    @Input() actionPoints: number;
-    @Input() movementPoints: number;
 
     attackDice: string;
     defenseDice: string;

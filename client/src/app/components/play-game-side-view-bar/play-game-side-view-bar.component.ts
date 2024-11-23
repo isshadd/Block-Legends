@@ -14,9 +14,7 @@ import { MapSize } from '@common/enums/map-size';
     styleUrl: './play-game-side-view-bar.component.scss',
 })
 export class PlayGameSideViewBarComponent {
-    @Input() playerCharacter: PlayerCharacter;
-    @Input() actionPoints: number;
-    @Input() movementPoints: number;
+    @Input() playerCharacter: PlayerCharacter | null;
     @Input() gameSize: MapSize | undefined;
     @Input() players: PlayerCharacter[] = [];
     @Input() currentPlayerName: string;

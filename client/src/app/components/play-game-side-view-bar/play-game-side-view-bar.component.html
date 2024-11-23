@@ -1,9 +1,7 @@
 <div id="side-menu">
-    <app-side-view-player-info
-        [playerCharacter]="playerCharacter"
-        [actionPoints]="actionPoints"
-        [movementPoints]="movementPoints"
-    ></app-side-view-player-info>
+    @if (playerCharacter) {
+    <app-side-view-player-info [playerCharacter]="playerCharacter"></app-side-view-player-info>
+    }
     <div class="division"></div>
     <app-infos-game [currentPlayer]="this.currentPlayerName" [gameSize]="gameSize" [nbrPlayers]="players.length"></app-infos-game>
     <div class="division"></div>

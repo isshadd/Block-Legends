@@ -24,9 +24,9 @@
                 <img src="assets/images/view/sword.png" alt="Attack" class="icon" />
             </span>
             <br />
-            Movement restant: {{ this.movementPoints }} / {{ playerCharacter.attributes.speed }}
+            Movement restant: {{ this.playerCharacter.currentMovePoints }} / {{ playerCharacter.attributes.speed }}
             <br />
-            Actions restantes: {{ actionPoints }}
+            Actions restantes: {{ this.playerCharacter.currentActionPoints }}
         </div>
     </div>
     <div id="player-image">
