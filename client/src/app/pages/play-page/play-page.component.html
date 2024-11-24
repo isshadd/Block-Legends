@@ -1,20 +1,20 @@
 <div id="page-container">
-    @if(playGameBoardManagerService.getWinnerPlayer()) {
-    <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
-    }
     <div id="side-menu">
         <app-play-game-side-view-bar
             id="side"
-            [playerCharacter]="this.myPlayer!"
-            [actionPoints]="this.actionPoints"
-            [totalLife]="totalLifePoints"
-            [game]="playGameBoardManagerService.getCurrentGrid()"
+            [playerCharacter]="this.playGameBoardManagerService.getCurrentPlayerCharacter()"
+            [currentPlayerName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [gameSize]="gameMapDataManagerService.gameSize()"
             [players]="this.players"
         >
         </app-play-game-side-view-bar>
     </div>
     <div id="map-wrapper">
-        @if(battleManagerService.opponentPlayer) {
+        @if(playGameBoardManagerService.getWinnerPlayer()) {
+        <app-win-panel id="win-panel" [winner]="playGameBoardManagerService.getWinnerPlayer()"></app-win-panel>
+        } @if(playGameBoardManagerService.possibleItems.length > 0) {
+        <app-item-choose [containerItems]="playGameBoardManagerService.possibleItems" (itemClicked)="itemThrow($event)"> </app-item-choose>
+        } @if(battleManagerService.opponentPlayer) {
         <app-fight-view id="fight-comp"></app-fight-view>
         }
 
@@ -24,7 +24,8 @@
             (mapTileMouseDown)="onMapTileMouseDown($event.event, $event.tile)"
             (mapTileMouseEnter)="onMapTileMouseEnter($event)"
             (mapTileMouseLeave)="onMapTileMouseLeave($event)"
-        ></app-map>
+        >
+        </app-map>
 
         <app-timer
             [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
@@ -37,11 +38,13 @@
         }
 
         <div class="action-container">
-            <app-container></app-container>
+            <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
 
             <div class="button-container">
-                @if(this.playGameBoardManagerService.isUserTurn) {
+                @if(this.playGameBoardManagerService.isUserTurn) { @if(playGameBoardManagerService.possibleItems.length === 0) {
                 <button class="action-button" (click)="toggleAction()">Action</button>
+                }
+
                 <button class="action-button" (click)="endTurn()">Fin de tour</button>
                 }
                 <button class="action-button" (click)="leaveGame()">Abandon</button>

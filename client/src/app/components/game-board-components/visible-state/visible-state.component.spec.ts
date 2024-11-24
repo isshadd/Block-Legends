@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { VisibleState } from '@app/interfaces/placeable-entity';
+import { VisibleState } from '@common/interfaces/placeable-entity';
 import { VisibleStateColor, VisibleStateComponent } from './visible-state.component';
 
 describe('VisibleStateComponent', () => {

@@ -1,5 +1,5 @@
-import { Tile } from '@app/classes/Tiles/tile';
-import { WalkableTile } from '@app/classes/Tiles/walkable-tile';
+import { Tile } from '@common/classes/Tiles/tile';
+import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
 

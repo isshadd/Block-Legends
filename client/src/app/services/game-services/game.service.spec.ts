@@ -1,7 +1,8 @@
 /* eslint-disable no-undef*/
 
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ProfileEnum } from '@common/enums/profile';
 import { GameService, VP_NUMBER } from './game.service';
 
 const ACCESS_CODE = 5678;
@@ -59,8 +60,8 @@ describe('GameService', () => {
 
     it('should generate virtual character correctly', () => {
         const index = 2;
-        const virtualCharacter = service.generateVirtualCharacter(index);
-        expect(virtualCharacter.name).toBe('Joueur virtuel 3');
+        const virtualCharacter = service.generateVirtualCharacter(index, ProfileEnum.agressive) as PlayerCharacter;
+        expect(virtualCharacter.isVirtual).toBeTrue();
     });
 
     it('should clear game correctly', (done: DoneFn) => {

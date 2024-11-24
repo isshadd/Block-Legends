@@ -8,7 +8,6 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { CreateCharacterComponent } from '@app/pages/create-character/create-character.component';
 import { CreateGameComponent } from '@app/pages/create-game/create-game.component';
 import { FightViewPageComponent } from '@app/pages/fight-view-page/fight-view-page.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
@@ -25,7 +24,6 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    { path: 'game/:id', component: GamePageComponent },
     { path: 'material', component: MaterialPageComponent },
     { path: 'join-game', component: JoinGameComponent },
     { path: 'administration-game', component: AdministrationGameComponent },

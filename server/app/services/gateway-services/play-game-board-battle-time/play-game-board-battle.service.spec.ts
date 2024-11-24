@@ -1,5 +1,5 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { GameBattle } from '@common/interfaces/game.battle';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -425,7 +425,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode, false);
             expect(battleRoom.secondPlayerRemainingLife).toBe(0);
             expect(result).toBe(true);
         });
@@ -445,7 +445,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode, false);
             expect(battleRoom.firstPlayerRemainingLife).toBe(0);
             expect(result).toBe(true);
         });
@@ -465,7 +465,7 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode, false);
             expect(battleRoom.secondPlayerRemainingLife).toBe(49);
             expect(result).toBeUndefined();
         });
@@ -473,7 +473,7 @@ describe('PlayGameBoardBattleService', () => {
         it('should return false if battle room does not exist', () => {
             const accessCode = 9999;
 
-            const result = service.userSuccededAttack(accessCode);
+            const result = service.userSucceededAttack(accessCode, false);
             expect(result).toBe(false);
         });
     });

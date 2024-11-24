@@ -22,7 +22,12 @@
         @if((this.gameService.character$ | async)?.isOrganizer) {
         <div class="admin-buttons">
             <div class="button-container">
-                <button class="dark-button" type="button" (click)="addVirtualPlayers()" [disabled]="true">Ajouter un joueur virtuel</button>
+                <button class="dark-button" type="button" (click)="addVirtualPlayer(profileAggressive)" [disabled]="isLocked$ | async">
+                    Ajouter un joueur virtuel agressif
+                </button>
+                <button class="dark-button" type="button" (click)="addVirtualPlayer(profileDefensive)" [disabled]="isLocked$ | async">
+                    Ajouter un joueur virtuel défensif
+                </button>
                 <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
             </div>
             <div class="button-container">
@@ -34,7 +39,9 @@
                 >
                     Deverouiller la salle
                 </button>
-                <button class="dark-button" type="button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">Lancer la partie!</button>
+                <button class="dark-button" type="button" id="start-button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">
+                    Lancer la partie!
+                </button>
             </div>
         </div>
         } @if(isMaxPlayer) {
@@ -51,7 +58,7 @@
     </div>
     <div id="chat-journal-container">
         <button class="chat-button" (click)="toggleView()">
-            {{ showClavardage ? 'Afficher le journal d\'actions' : 'Afficher le clavardage' }}
+            {{ showClavardage ? "Afficher le journal d'actions" : 'Afficher le clavardage' }}
         </button>
         <div id="app-container">
             <div *ngIf="showClavardage">

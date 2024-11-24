@@ -1,8 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Tile } from '@app/classes/Tiles/tile';
-import { VisibleState } from '@app/interfaces/placeable-entity';
-import { TileType } from '@common/enums/tile-type';
-import { Vec2 } from '@common/interfaces/vec2';
+import { MapSize } from '@common/enums/map-size';
 import { InfosGameComponent } from './infos-game.component';
 
 describe('InfosGameComponent', () => {
@@ -18,7 +15,7 @@ describe('InfosGameComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(InfosGameComponent);
         component = fixture.componentInstance;
-        component.game = createTileGrid(2, 2);
+        component.gameSize = MapSize.SMALL;
         component.nbrPlayers = 2;
         component.currentPlayer = 'Player1';
         fixture.detectChanges();
@@ -28,26 +25,11 @@ describe('InfosGameComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should have game input', () => {
-        const game: Tile[][] = [
-            [
-                {
-                    type: TileType.Grass,
-                    description: 'Test tile',
-                    imageUrl: 'path/to/image',
-                    coordinates: { x: 0, y: 0 } as Vec2,
-                    visibleState: VisibleState.Valid,
-                    isItem: () => false,
-                    isTerrain: () => true,
-                    isWalkable: () => true,
-                    isDoor: () => false,
-                },
-            ],
-        ];
-
-        component.game = game;
+    it('should have gameSize input', () => {
+        const gameSize = MapSize.SMALL;
+        component.gameSize = gameSize;
         fixture.detectChanges();
-        expect(component.game).toEqual(game);
+        expect(component.gameSize).toBe(gameSize);
     });
 
     it('should have nbrPlayers input', () => {
@@ -64,18 +46,3 @@ describe('InfosGameComponent', () => {
         expect(component.currentPlayer).toBe(currentPlayer);
     });
 });
-function createTileGrid(rows: number, cols: number): Tile[][] {
-    const grid: Tile[][] = [];
-
-    for (let row = 0; row < rows; row++) {
-        const rowTiles: Tile[] = [];
-        for (let col = 0; col < cols; col++) {
-            const tile = new Tile();
-            tile.coordinates = { x: col, y: row }; // Initialisation des coordonnées pour chaque tuile
-            rowTiles.push(tile);
-        }
-        grid.push(rowTiles);
-    }
-
-    return grid;
-}

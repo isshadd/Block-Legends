@@ -8,7 +8,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameService } from '@app/services/game-services/game.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Socket } from 'socket.io-client';
 import { WebSocketService } from './websocket.service';

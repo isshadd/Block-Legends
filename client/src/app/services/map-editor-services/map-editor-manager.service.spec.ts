@@ -1,17 +1,17 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Chestplate } from '@app/classes/Items/chestplate';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { Item } from '@app/classes/Items/item';
-import { DoorTile } from '@app/classes/Tiles/door-tile';
-import { GrassTile } from '@app/classes/Tiles/grass-tile';
-import { TerrainTile } from '@app/classes/Tiles/terrain-tile';
-import { Tile } from '@app/classes/Tiles/tile';
-import { PlaceableEntity, VisibleState } from '@app/interfaces/placeable-entity';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { Chestplate } from '@common/classes/Items/chestplate';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { Item } from '@common/classes/Items/item';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
+import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
+import { Tile } from '@common/classes/Tiles/tile';
 import { ItemType } from '@common/enums/item-type';
+import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of, Subject } from 'rxjs';
 import { MapEditorManagerService } from './map-editor-manager.service';

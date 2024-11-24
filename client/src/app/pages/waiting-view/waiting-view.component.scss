@@ -94,6 +94,9 @@ h2 {
         }
     }
 }
+#start-button:not([disabled]) {
+    background-color: darken($secondary, 10%);
+}
 
 .dark-button {
     background-color: darken($primary-light, 10%);
@@ -107,7 +110,7 @@ h2 {
     margin-top: 1vh;
     margin-bottom: 1vh;
     margin-left: 1vh;
-    width: 20vh;
+    width: 25vh;
     height: 5vh;
 
     &:hover {

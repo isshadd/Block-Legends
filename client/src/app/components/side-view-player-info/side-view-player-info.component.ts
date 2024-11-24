@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 
 @Component({
     selector: 'app-side-view-player-info',
@@ -11,8 +11,6 @@ import { PlayerCharacter } from '@common/classes/player-character';
 })
 export class SideViewPlayerInfoComponent implements OnInit {
     @Input() playerCharacter: PlayerCharacter;
-    @Input() actionPoints: number;
-    @Input() totalLife: number;
 
     attackDice: string;
     defenseDice: string;
@@ -35,11 +33,11 @@ export class SideViewPlayerInfoComponent implements OnInit {
 
     ngOnInit(): void {
         if (this.playerCharacter.dice === 'attack') {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D4)';
+            this.attackDice = 'D6';
+            this.defenseDice = 'D4';
         } else {
-            this.attackDice = '(D6)';
-            this.defenseDice = '(D6)';
+            this.attackDice = 'D6';
+            this.defenseDice = 'D6';
         }
     }
 }

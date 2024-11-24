@@ -1,16 +1,16 @@
 // src/app/services/item-factory.service.spec.ts
 
 import { TestBed } from '@angular/core/testing';
-import { Chestplate } from '@app/classes/Items/chestplate';
-import { DiamondSword } from '@app/classes/Items/diamond-sword';
-import { Elytra } from '@app/classes/Items/elytra';
-import { EnchantedBook } from '@app/classes/Items/enchanted-book';
-import { Flag } from '@app/classes/Items/flag';
-import { Item } from '@app/classes/Items/item';
-import { Potion } from '@app/classes/Items/potion';
-import { RandomItem } from '@app/classes/Items/random-item';
-import { Spawn } from '@app/classes/Items/spawn';
-import { Totem } from '@app/classes/Items/totem';
+import { Chestplate } from '@common/classes/Items/chestplate';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { Elytra } from '@common/classes/Items/elytra';
+import { EnchantedBook } from '@common/classes/Items/enchanted-book';
+import { Flag } from '@common/classes/Items/flag';
+import { Item } from '@common/classes/Items/item';
+import { Potion } from '@common/classes/Items/potion';
+import { RandomItem } from '@common/classes/Items/random-item';
+import { Spawn } from '@common/classes/Items/spawn';
+import { Totem } from '@common/classes/Items/totem';
 import { ItemType } from '@common/enums/item-type';
 import { ItemFactoryService } from './item-factory.service';
 
@@ -48,9 +48,9 @@ describe('ItemFactoryService', () => {
         });
 
         it('should create a Potion when ItemType.Potion is passed', () => {
-            const item = service.createItem(ItemType.Potion);
+            const item = service.createItem(ItemType.MagicShield);
             expect(item).toBeInstanceOf(Potion);
-            expect(item.type).toBe(ItemType.Potion);
+            expect(item.type).toBe(ItemType.MagicShield);
         });
 
         it('should create an EnchantedBook when ItemType.EnchantedBook is passed', () => {
@@ -110,7 +110,7 @@ describe('ItemFactoryService', () => {
         });
 
         it('should copy coordinates and itemLimit correctly', () => {
-            const originalItem = service.createItem(ItemType.Potion);
+            const originalItem = service.createItem(ItemType.MagicShield);
             originalItem.setCoordinates({ x: 5, y: 15 });
             originalItem.itemLimit = 3;
             const copiedItem = service.copyItem(originalItem);

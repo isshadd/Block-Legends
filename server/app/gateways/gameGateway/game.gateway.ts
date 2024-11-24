@@ -1,11 +1,16 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+
+const NINE = 9;
+const ONE = 1;
+const THIRTY_SIX = 36;
+const TWO = 2;
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -76,7 +81,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(SocketEvents.ADD_PLAYER_TO_ROOM)
     handleAddPlayerToRoom(client: Socket, payload: { accessCode: number; player: PlayerCharacter }) {
         const { accessCode, player } = payload;
-        player.socketId = client.id;
+        if (!player.isVirtual) {
+            player.socketId = client.id;
+        } else {
+            player.socketId = `${Math.random().toString(THIRTY_SIX).substr(ONE, NINE)}_${Math.random().toString(THIRTY_SIX).substr(TWO, NINE)}`;
+        }
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
         if (!room) {

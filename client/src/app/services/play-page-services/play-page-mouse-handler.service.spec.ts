@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Tile } from '@app/classes/Tiles/tile';
-import { VisibleState } from '@app/interfaces/placeable-entity';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Tile } from '@common/classes/Tiles/tile';
+import { VisibleState } from '@common/interfaces/placeable-entity';
 import { of, Subject } from 'rxjs';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from './play-page-mouse-handler.service';
@@ -128,7 +128,7 @@ describe('PlayPageMouseHandlerService - onMapTileMouseLeave', () => {
     beforeEach(() => {
         const signalUserStartedMovingSubject = new Subject<void>();
 
-        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['getCurrentPlayerCharacter'], {
             signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
             userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
         });
@@ -262,12 +262,16 @@ describe('PlayPageMouseHandlerService - toggleAction', () => {
     beforeEach(() => {
         const signalUserStartedMovingSubject = new Subject<void>();
 
-        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['getCurrentPlayerTile', 'getAdjacentActionTiles'], {
-            signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
-            isUserTurn: true,
-            userCurrentActionPoints: 1,
-            userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
-        });
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj(
+            'PlayGameBoardManagerService',
+            ['getCurrentPlayerTile', 'getAdjacentActionTiles', 'getCurrentPlayerCharacter'],
+            {
+                signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
+                isUserTurn: true,
+                userCurrentActionPoints: 1,
+                userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
+            },
+        );
 
         TestBed.configureTestingModule({
             providers: [PlayPageMouseHandlerService, { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy }],
@@ -290,7 +294,9 @@ describe('PlayPageMouseHandlerService - toggleAction', () => {
     });
 
     it('should set isActionOpen to false if user has no action points', () => {
-        playGameBoardManagerServiceSpy.userCurrentActionPoints = 0;
+        const player = new PlayerCharacter('test');
+        player.currentActionPoints = 0;
+        playGameBoardManagerServiceSpy.getCurrentPlayerCharacter.and.returnValue(player);
 
         service.toggleAction();
 
@@ -426,12 +432,16 @@ describe('PlayPageMouseHandlerService - toggleAction specific part', () => {
     beforeEach(() => {
         const signalUserStartedMovingSubject = new Subject<void>();
 
-        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['getCurrentPlayerTile', 'getAdjacentActionTiles'], {
-            signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
-            userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
-            isUserTurn: true,
-            userCurrentActionPoints: 1,
-        });
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj(
+            'PlayGameBoardManagerService',
+            ['getCurrentPlayerTile', 'getAdjacentActionTiles', 'getCurrentPlayerCharacter'],
+            {
+                signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
+                userCurrentPossibleMoves: new Map<Tile, Tile[]>(),
+                isUserTurn: true,
+                userCurrentActionPoints: 1,
+            },
+        );
 
         TestBed.configureTestingModule({
             providers: [PlayPageMouseHandlerService, { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy }],
@@ -443,6 +453,10 @@ describe('PlayPageMouseHandlerService - toggleAction specific part', () => {
     it('should set visibleState of actionTiles to Valid or NotSelected and clear actionTiles', () => {
         const tileWithMove = new Tile();
         const tileWithoutMove = new Tile();
+
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentActionPoints = 1;
+        playGameBoardManagerServiceSpy.getCurrentPlayerCharacter.and.returnValue(mockPlayerCharacter);
 
         playGameBoardManagerServiceSpy.userCurrentPossibleMoves.set(tileWithMove, [tileWithMove]);
 
@@ -464,11 +478,15 @@ describe('PlayPageMouseHandlerService - toggleAction with userCurrentActionPoint
     beforeEach(() => {
         const signalUserStartedMovingSubject = new Subject<void>();
 
-        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['getCurrentPlayerTile', 'getAdjacentActionTiles'], {
-            signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
-            isUserTurn: true,
-            userCurrentActionPoints: 0, // Set action points to 0 to trigger the condition
-        });
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj(
+            'PlayGameBoardManagerService',
+            ['getCurrentPlayerTile', 'getAdjacentActionTiles', 'getCurrentPlayerCharacter'],
+            {
+                signalUserStartedMoving$: signalUserStartedMovingSubject.asObservable(),
+                isUserTurn: true,
+                userCurrentActionPoints: 0, // Set action points to 0 to trigger the condition
+            },
+        );
 
         TestBed.configureTestingModule({
             providers: [PlayPageMouseHandlerService, { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy }],
@@ -478,6 +496,9 @@ describe('PlayPageMouseHandlerService - toggleAction with userCurrentActionPoint
     });
 
     it('should set isActionOpen to false if userCurrentActionPoints is 0 or less', () => {
+        const mockPlayerCharacter = new PlayerCharacter('player1');
+        mockPlayerCharacter.currentActionPoints = 0;
+        playGameBoardManagerServiceSpy.getCurrentPlayerCharacter.and.returnValue(mockPlayerCharacter);
         service.isActionOpen = true; // Simulate that action menu is initially open
 
         service.toggleAction();

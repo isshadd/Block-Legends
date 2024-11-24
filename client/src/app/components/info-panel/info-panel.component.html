@@ -2,7 +2,8 @@
     <button class="close-button" (click)="closePanel()">×</button>
     <app-map-tile-info [tile]="tile"></app-map-tile-info>
     @if(getPlayer()){
-    <app-player-map-entity-info-view [playerCharacter]="getPlayer()!"></app-player-map-entity-info-view>
+    <app-side-view-player-info [playerCharacter]="getPlayer()!"></app-side-view-player-info>
+    <app-item-list-container [containerItems]="getPlayer()?.inventory"></app-item-list-container>
     }@if(getItem()){
     <app-item-info [item]="getItem()!"></app-item-info>
     }

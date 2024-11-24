@@ -6,13 +6,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
+import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
-import { PlayerCharacter } from '@common/classes/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { Profile, ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
+
+const FIVE = 5;
+
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
@@ -33,6 +37,12 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     isOrganizer = false;
     maxPlayers: number = 0;
     showClavardage = true;
+    profileAggressive = ProfileEnum.agressive;
+    profileDefensive = ProfileEnum.defensive;
+    lastVirtualPlayerProfile: Profile | null = null;
+    maxVirtualPlayerRetries = FIVE;
+    lastVirtualPlayerSocketId: string | null = null;
+    virtualPlayerRetryCount = 0;
 
     private destroy$ = new Subject<void>();
 
@@ -59,7 +69,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.chatService.setCharacter(character);
             this.eventJournalService.setCharacter(character);
             if (!this.gameId) return;
-
             if (character.isOrganizer) {
                 this.playersCounter++;
                 this.webSocketService.init();
@@ -85,11 +94,11 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-            players.forEach(() => {
-                this.playersCounter++;
-            });
-        });
+        // this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+        //     players.forEach(() => {
+        //         this.playersCounter++;
+        //     });
+        // });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;
@@ -100,15 +109,37 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.playerLeave();
             }
         });
+
+        this.webSocketService.avatarTakenError$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+            if (this.lastVirtualPlayerProfile && this.virtualPlayerRetryCount < this.maxVirtualPlayerRetries) {
+                this.virtualPlayerRetryCount++;
+                this.addVirtualPlayer(this.lastVirtualPlayerProfile);
+            } else {
+                this.lastVirtualPlayerProfile = null;
+                this.virtualPlayerRetryCount = 0;
+            }
+        });
+
+        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+            this.playersCounter = players.length;
+            if (this.lastVirtualPlayerProfile) {
+                const virtualPlayer = players.find((p) => p.socketId === this.lastVirtualPlayerSocketId);
+                if (virtualPlayer) {
+                    this.lastVirtualPlayerProfile = null;
+                    this.virtualPlayerRetryCount = 0;
+                }
+            }
+        });
     }
 
-    addVirtualPlayers(): void {
-        if (this.playersCounter >= VP_NUMBER) {
+    addVirtualPlayer(profile: Profile): void {
+        if (this.playersCounter <= this.maxPlayers) {
             this.isMaxPlayer = true;
             return;
+        } else {
+            this.isMaxPlayer = false;
         }
-
-        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter);
+        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
         this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
         this.playersCounter++;
     }

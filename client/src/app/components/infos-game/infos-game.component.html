@@ -1,10 +1,14 @@
 <div class="info-game">
     <h3>Informations:</h3>
     <div class="infos">
-        <p>Taille de la carte: {{ game.length }} x {{ game.length }}</p>
-
+        <p>
+            Taille de la carte: @if(gameSize){ {{ gameSize }} x {{ gameSize }}
+            }
+        </p>
         <p>Nombre de joueurs: {{ nbrPlayers }}</p>
 
-        <p>Joueur actuel: <span id="player-name">{{ currentPlayer }}</span></p>
+        <p>
+            Joueur actuel: <span id="player-name">{{ currentPlayer }}</span>
+        </p>
     </div>
 </div>

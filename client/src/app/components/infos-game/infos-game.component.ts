@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Tile } from '@app/classes/Tiles/tile';
+import { MapSize } from '@common/enums/map-size';
 
 @Component({
     selector: 'app-infos-game',
@@ -9,7 +9,7 @@ import { Tile } from '@app/classes/Tiles/tile';
     styleUrl: './infos-game.component.scss',
 })
 export class InfosGameComponent {
-    @Input() game: Tile[][] = [];
+    @Input() gameSize: MapSize | undefined;
     @Input() nbrPlayers: number = 0;
     @Input() currentPlayer: string = '';
 }
