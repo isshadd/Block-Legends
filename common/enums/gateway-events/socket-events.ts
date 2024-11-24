@@ -22,6 +22,7 @@ export const enum SocketEvents {
     USER_ATTACKED = 'userAttacked',
     USER_TRIED_ESCAPE = 'userTriedEscape',
     USER_WON = 'userWon',
+    DEBUG_MODE = 'debugMode',
 
     // RECUS
     ROOM_STATE = 'roomState',

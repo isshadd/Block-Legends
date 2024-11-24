@@ -5,11 +5,13 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
     private readonly connectedClients = new Set<string>();
+    private logger = new Logger(GameGateway.name);
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
@@ -229,6 +231,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         this.server.to(accessCode.toString()).emit(SocketEvents.GAME_PARAMETERS, { gameBoardParameters });
+    }
+    @SubscribeMessage(SocketEvents.DEBUG_MODE)
+    activateDebugMode() {
+        this.logger.log('Debug mode activé');
     }
 
     handleConnection(client: Socket) {

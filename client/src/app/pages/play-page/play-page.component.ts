@@ -2,7 +2,7 @@
 /* eslint-disable max-params */
 /* eslint-disable max-len */
 /* eslint-disable  @typescript-eslint/prefer-for-of */
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Tile } from '@app/classes/Tiles/tile';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
@@ -93,6 +93,13 @@ export class PlayPageComponent implements OnInit, OnDestroy {
                 abandonPlayer,
             ];
         });
+    }
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyDown(event: KeyboardEvent) {
+        if (event.key === 'd' || event.key === 'D' ) {
+            this.activateDebugMode();
+        }
     }
 
     onPlayGameBoardManagerInit() {
@@ -190,5 +197,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
             this.myPlayer,
         ]; // Ajouter le joueur absent en bas
+    }
+
+    activateDebugMode(): void {
+        if(this.myPlayer.isOrganizer)
+            this.webSocketService.activateDebugMode();
     }
 }

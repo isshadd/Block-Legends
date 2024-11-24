@@ -108,6 +108,10 @@ export class WebSocketService {
         }
     }
 
+    activateDebugMode() {
+        this.socket.emit(SocketEvents.DEBUG_MODE);
+    }
+
     // Ajouté par Nihal
     getTotalPlayers(): PlayerCharacter[] {
         let players: PlayerCharacter[] = [];
