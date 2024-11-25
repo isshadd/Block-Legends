@@ -26,6 +26,8 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { DebugService } from '@app/services/debug.service';
 
 @Component({
     selector: 'app-play-page',
@@ -53,6 +55,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;
+    toggleDebug: boolean = false;
 
     private destroy$ = new Subject<void>();
     // eslint-disable-next-line
@@ -67,6 +70,8 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private gameService: GameService,
         private socketStateService: SocketStateService,
         private chatService: ChatService,
+        private eventService: EventJournalService,
+        private debugService: DebugService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -87,7 +92,13 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     @HostListener('window:keydown', ['$event'])
     handleKeyDown(event: KeyboardEvent) {
         if (event.key === 'd' || event.key === 'D' ) {
+            if(this.debugService.isDebugMode)
+                this.eventService.broadcastEvent('Mode débogage désactivé', []);
+            else{
+                this.eventService.broadcastEvent('Mode débogage activé', []);
+            }
             this.activateDebugMode();
+            this.debugService.isDebugMode = !this.debugService.isDebugMode;
         }
     }
 
@@ -190,7 +201,12 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     activateDebugMode(): void {
-        if(this.myPlayer.isOrganizer)
+        //if(this.myPlayer.isOrganizer)
             this.webSocketService.activateDebugMode();
+    }
+
+    deactivateDebugMode(): void {
+        //if(this.myPlayer.isOrganizer)
+            //this.webSocketService.deactivateDebugMode();
     }
 }

@@ -194,5 +194,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
+        this.eventJournalService.broadcastEvent('toggleView', [this.eventJournalService.playerName]);
     }
 }
