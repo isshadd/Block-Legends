@@ -121,7 +121,7 @@ export class PlayGameBoardSocketService {
         if (room) {
             const nonVirtualPlayers = room.players.filter((player) => !player.isVirtual);
             if (nonVirtualPlayers.length === 0) {
-                throw new Error('No non-virtual players in the room');
+                return '';
             }
             const randomIndex = Math.floor(Math.random() * nonVirtualPlayers.length);
             return nonVirtualPlayers[randomIndex].socketId;

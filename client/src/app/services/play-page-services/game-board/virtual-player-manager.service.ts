@@ -3,6 +3,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
@@ -61,6 +62,54 @@ export class VirtualPlayerManagerService {
     }
 
     private handleAgressiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
+        const didPlayerDoAction = this.handleAggressiveActions(player);
+
+        if (!didPlayerDoAction) {
+            this.handleAggressiveMovement(player, didTurnStarted);
+        }
+    }
+
+    private handleAggressiveActions(player: PlayerCharacter): boolean {
+        if (player.currentActionPoints <= 0) {
+            return false;
+        }
+
+        const playerTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
+        const actionTiles: Tile[] = this.playGameBoardManagerService.getAdjacentActionTiles(playerTile);
+
+        if (actionTiles.length === 0) {
+            return false;
+        }
+
+        for (const actionTile of actionTiles) {
+            if (actionTile instanceof WalkableTile && actionTile.hasPlayer() && actionTile.player) {
+                const enemyPlayer = this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(actionTile.player);
+                if (enemyPlayer?.socketId) {
+                    this.playGameBoardManagerService.signalUserDidBattleAction.next({
+                        playerTurnId: player.socketId,
+                        enemyPlayerId: enemyPlayer.socketId,
+                    });
+                    return true;
+                }
+            }
+        }
+
+        for (const actionTile of actionTiles) {
+            if (actionTile instanceof DoorTile) {
+                this.playGameBoardManagerService.signalUserDidDoorAction.next({
+                    tileCoordinate: actionTile.coordinates,
+                    playerTurnId: player.socketId,
+                });
+                this.playGameBoardManagerService.checkIfPLayerDidEverything(player);
+                this.signalVirtualPlayerContinueTurn.next(player.socketId);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private handleAggressiveMovement(player: PlayerCharacter, didTurnStarted: boolean) {
         const possibleMoves = this.setPossibleMoves(player);
         let targetTile: Tile | null = null;
 
@@ -72,6 +121,7 @@ export class VirtualPlayerManagerService {
             if (targetItemTile) {
                 targetTile = targetItemTile;
             } else {
+                // TODO : Check for closed Doors
                 if (didTurnStarted) {
                     const possibleMovesArray = Array.from(possibleMoves.keys());
                     targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
