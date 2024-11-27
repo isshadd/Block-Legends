@@ -44,8 +44,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
             this.endTurn(playerTurnId);
         });
-        this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((tileCoordinate) => {
-            this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, tileCoordinate);
+        this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, data);
         });
         this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
             this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, enemyPlayerId);

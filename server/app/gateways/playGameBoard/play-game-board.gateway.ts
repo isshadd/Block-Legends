@@ -92,7 +92,7 @@ export class PlayGameBoardGateway {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         this.server
             .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_MOVED, { playerId: data.playerTurnId, fromTile: data.fromTile, toTile: data.toTile });
@@ -100,7 +100,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION)
     handleVirtualPlayerChoosedDestination(client: Socket, data: { coordinates: Vec2; virtualPlayerId: string }) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.virtualPlayerId);
         if (!room) return;
         setTimeout(() => {
             this.server
@@ -110,43 +110,47 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)
-    handleUserGrabbedItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserGrabbedItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
-        this.server
-            .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_GRABBED_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, {
+            playerId: data.playerTurnId,
+            itemType: data.itemType,
+            tileCoordinate: data.tileCoordinates,
+        });
     }
 
     @SubscribeMessage(SocketEvents.USER_THREW_ITEM)
-    handleUserThrewItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2 }) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserThrewItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
         this.server
             .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_THREW_ITEM, { playerId: client.id, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
+            .emit(SocketEvents.ROOM_USER_THREW_ITEM, { playerId: data.playerTurnId, itemType: data.itemType, tileCoordinate: data.tileCoordinates });
     }
 
     @SubscribeMessage(SocketEvents.USER_RESPAWNED)
-    handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserRespawned(client: Socket, data: { fromTile: Vec2; toTile: Vec2; playerTurnId: string }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
         this.server
             .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_RESPAWNED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+            .emit(SocketEvents.ROOM_USER_RESPAWNED, { playerId: data.playerTurnId, fromTile: data.fromTile, toTile: data.toTile });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_DOOR_ACTION)
-    handleUserDidDoorAction(client: Socket, tileCoordinate: Vec2) {
-        if (!this.isClientTurn(client.id)) {
+    handleUserDidDoorAction(client: Socket, data: { tileCoordinate: Vec2; playerTurnId: string }) {
+        if (!this.isClientTurn(data.playerTurnId)) {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate, playerId: client.id });
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate: data.tileCoordinate, playerId: data.playerTurnId });
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)

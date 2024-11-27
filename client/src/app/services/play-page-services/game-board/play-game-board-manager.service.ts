@@ -30,7 +30,7 @@ export class PlayGameBoardManagerService {
     signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2; playerTurnId: string }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
-    signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2; playerTurnId: string }>();
     signalUserRespawned$ = this.signalUserRespawned.asObservable();
 
     signalUserStartedMoving = new Subject<string>();
@@ -42,16 +42,16 @@ export class PlayGameBoardManagerService {
     signalUserGotTurnEnded = new Subject<string>();
     signalUserGotTurnEnded$ = this.signalUserGotTurnEnded.asObservable();
 
-    signalUserDidDoorAction = new Subject<Vec2>();
+    signalUserDidDoorAction = new Subject<{ tileCoordinate: Vec2; playerTurnId: string }>();
     signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
 
     signalUserDidBattleAction = new Subject<string>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
-    signalUserGrabbedItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2 }>();
+    signalUserGrabbedItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }>();
     signalUserGrabbedItem$ = this.signalUserGrabbedItem.asObservable();
 
-    signalUserThrewItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2 }>();
+    signalUserThrewItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }>();
     signalUserThrewItem$ = this.signalUserThrewItem.asObservable();
 
     signalUserWon = new Subject<void>();
@@ -265,7 +265,11 @@ export class PlayGameBoardManagerService {
         const terrainTile = tile as TerrainTile;
         if (terrainTile.item?.isGrabbable()) {
             if (currentPlayer.inventory.some((item) => item.type === ItemType.EmptyItem)) {
-                this.signalUserGrabbedItem.next({ itemType: terrainTile.item.type, tileCoordinates: terrainTile.coordinates });
+                this.signalUserGrabbedItem.next({
+                    itemType: terrainTile.item.type,
+                    tileCoordinates: terrainTile.coordinates,
+                    playerTurnId: currentPlayer.socketId,
+                });
             } else {
                 for (const item of currentPlayer.inventory) {
                     this.possibleItems.push(item);
@@ -331,9 +335,13 @@ export class PlayGameBoardManagerService {
 
         const lastItem = this.possibleItems.pop();
         if (item !== lastItem) {
-            this.signalUserThrewItem.next({ itemType: item.type, tileCoordinates: terrainTile.coordinates });
+            this.signalUserThrewItem.next({ itemType: item.type, tileCoordinates: terrainTile.coordinates, playerTurnId: currentPlayer.socketId });
             if (terrainTile.item) {
-                this.signalUserGrabbedItem.next({ itemType: terrainTile.item.type, tileCoordinates: terrainTile.coordinates });
+                this.signalUserGrabbedItem.next({
+                    itemType: terrainTile.item.type,
+                    tileCoordinates: terrainTile.coordinates,
+                    playerTurnId: currentPlayer.socketId,
+                });
             }
         }
 
@@ -427,7 +435,7 @@ export class PlayGameBoardManagerService {
 
         if (tile.isDoor()) {
             this.hidePossibleMoves();
-            this.signalUserDidDoorAction.next(tile.coordinates);
+            this.signalUserDidDoorAction.next({ tileCoordinate: tile.coordinates, playerTurnId: currentPlayer.socketId });
             this.checkIfPLayerDidEverything();
             return;
         }
@@ -518,6 +526,7 @@ export class PlayGameBoardManagerService {
                 this.signalUserRespawned.next({
                     fromTile: currentLoserTile.coordinates,
                     toTile: spawnTile.coordinates,
+                    playerTurnId: loserPlayerCharacter.socketId,
                 });
             }
 
