@@ -33,7 +33,7 @@ export class VirtualPlayerManagerService {
         return this.gameMapDataManagerService.getPossibleMovementTiles(playerCharacter.mapEntity.coordinates, playerCharacter.currentMovePoints);
     }
 
-    async handleVirtualPlayerTurn(player: PlayerCharacter) {
+    handleVirtualPlayerTurn(player: PlayerCharacter) {
         if (!player.isVirtual) return;
 
         if (player.comportement === ProfileEnum.Agressive) {
@@ -65,6 +65,7 @@ export class VirtualPlayerManagerService {
         const reachableAdjacentTiles = adjacentTilesToPlayer.filter((adjacentTile) =>
             Array.from(possibleMoves.keys()).some((possibleMoveTile) => this.areTilesEqual(possibleMoveTile, adjacentTile)),
         );
+
         if (reachableAdjacentTiles.length > 0) {
             const moveToTile = reachableAdjacentTiles[Math.floor(Math.random() * reachableAdjacentTiles.length)];
             this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
@@ -117,7 +118,7 @@ export class VirtualPlayerManagerService {
         const possibleMoves = this.setPossibleMoves(player);
 
         let lastTile: WalkableTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as WalkableTile;
-        // let didPlayerTripped = false;
+        let didPlayerTripped = false;
 
         const path = possibleMoves.get(this.gameMapDataManagerService.getTileAt(destination) as WalkableTile);
         if (!path) {
@@ -128,11 +129,18 @@ export class VirtualPlayerManagerService {
             this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
             return;
         }
+
         this.playGameBoardManagerService.signalUserMoved.next({
             fromTile: lastTile.coordinates,
             toTile: nextPathTile.coordinates,
             playerTurnId: player.socketId,
         });
+
+        didPlayerTripped = this.playGameBoardManagerService.didPlayerTripped(nextPathTile.type, player);
+        if (didPlayerTripped) {
+            this.playGameBoardManagerService.signalUserGotTurnEnded.next(player.socketId);
+            return;
+        }
 
         this.signalMoveVirtualPlayer.next({ coordinates: destination, virtualPlayerId: player.socketId });
 
@@ -142,15 +150,8 @@ export class VirtualPlayerManagerService {
         //     return;
         // }
 
-        // didPlayerTripped = this.didPlayerTripped(pathTile.type, userPlayerCharacter);
-
         // if (didGrabItem) {
         //     break; // SI LE JOUEUR A PRIS UN ITEM, ON ARRETE DE SE DEPLACER
-        // }
-
-        // if (didPlayerTripped) {
-        //     this.signalUserGotTurnEnded.next();
-        //     return;
         // }
 
         // this.checkIfPLayerDidEverything();

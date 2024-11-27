@@ -205,7 +205,7 @@ export class PlayGameBoardManagerService {
 
                 didPlayerTripped = this.didPlayerTripped(pathTile.type, userPlayerCharacter);
 
-                if (didGrabItem) {
+                if (didGrabItem || didPlayerTripped) {
                     break;
                 }
             }
