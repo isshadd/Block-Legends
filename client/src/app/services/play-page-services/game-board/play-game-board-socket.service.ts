@@ -10,6 +10,7 @@ import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
+import { VirtualPlayerBattleManagerService } from './virtual-player-battle-manager.service';
 import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 
 @Injectable({
@@ -28,6 +29,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         public battleManagerService: BattleManagerService,
         public router: Router,
         public virtualPlayerManagerService: VirtualPlayerManagerService,
+        public virtualPlayerBattleManagerService: VirtualPlayerBattleManagerService,
     ) {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_MOVED, data);
@@ -175,6 +177,18 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.battleManagerService.currentPlayerIdTurn = playerIdTurn;
             this.battleManagerService.isUserTurn = playerIdTurn === this.socket.id;
         });
+
+        this.socket.on(
+            SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN,
+            (data: { playerId: string; enemyId: string; enemyRemainingHealth: number; virtualPlayerRemainingEvasions: number }) => {
+                this.virtualPlayerBattleManagerService.startTurn(
+                    data.playerId,
+                    data.enemyId,
+                    data.enemyRemainingHealth,
+                    data.virtualPlayerRemainingEvasions,
+                );
+            },
+        );
 
         this.socket.on(SocketEvents.OPPONENT_ATTACKED, (attackResult: number) => {
             this.battleManagerService.onOpponentAttack(attackResult);

@@ -140,4 +140,32 @@ export class PlayGameBoardBattleService {
     battleRoomFinished(accessCode: number): void {
         this.gameSocketRoomService.gameBattleRooms.delete(accessCode);
     }
+
+    getVirtualPlayerBattleData(
+        accessCode: number,
+        playerId: string,
+    ): { playerId: string; enemyId: string; enemyRemainingHealth: number; virtualPlayerRemainingEvasions: number } {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        if (!battleRoom) {
+            return { playerId: '', enemyId: '', enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
+        }
+
+        if (battleRoom.firstPlayerId === playerId) {
+            return {
+                playerId: battleRoom.firstPlayerId,
+                enemyId: battleRoom.secondPlayerId,
+                enemyRemainingHealth: battleRoom.secondPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.firstPlayerRemainingEvades,
+            };
+        } else if (battleRoom.secondPlayerId === playerId) {
+            return {
+                playerId: battleRoom.secondPlayerId,
+                enemyId: battleRoom.firstPlayerId,
+                enemyRemainingHealth: battleRoom.firstPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.secondPlayerRemainingEvades,
+            };
+        }
+
+        return { playerId: '', enemyId: '', enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
+    }
 }

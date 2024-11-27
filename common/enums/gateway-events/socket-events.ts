@@ -64,6 +64,7 @@ export const enum SocketEvents {
     START_VIRTUAL_PLAYER_TURN = 'startVirtualPlayerTurn',
     CONTINUE_VIRTUAL_PLAYER_TURN = 'continueVirtualPlayerTurn',
     START_TURN_BATTLE = 'startTurnBattle',
+    START_VIRTUAL_PLAYER_BATTLE_TURN = 'startVirtualPlayerBattleTurn',
     AUTOMATIC_ATTACK = 'automaticAttack',
     BATTLE_ENDED_BY_ESCAPE = 'battleEndedByEscape',
     FIRST_PLAYER_WON_BATTLE = 'firstPlayerWonBattle',

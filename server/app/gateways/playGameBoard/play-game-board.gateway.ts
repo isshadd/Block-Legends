@@ -272,6 +272,14 @@ export class PlayGameBoardGateway {
 
     startBattleTurn(accessCode: number, playerId: string) {
         this.server.to(accessCode.toString()).emit(SocketEvents.START_BATTLE_TURN, playerId);
+        if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, playerId).isVirtual) {
+            setTimeout(() => {
+                const data = this.playGameBoardBattleService.getVirtualPlayerBattleData(accessCode, playerId);
+                this.server
+                    .to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode))
+                    .emit(SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN, data);
+            }, this.playGameBoardSocketService.getRandomDelay());
+        }
     }
 
     handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
