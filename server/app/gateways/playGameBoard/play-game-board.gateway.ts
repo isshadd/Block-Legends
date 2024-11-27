@@ -154,19 +154,21 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)
-    handleUserDidBattleAction(client: Socket, enemyPlayerId: string) {
-        if (!this.isClientTurn(client.id)) {
+    handleUserDidBattleAction(client: Socket, data: { playerTurnId: string; enemyPlayerId: string }) {
+        if (!this.isClientTurn(data.playerTurnId)) {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
-        this.handleStartBattle(room.accessCode, client.id, enemyPlayerId);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: client.id, enemyPlayerId });
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+        this.handleStartBattle(room.accessCode, data.playerTurnId, data.enemyPlayerId);
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.ROOM_USER_DID_BATTLE_ACTION, { playerId: data.playerTurnId, enemyPlayerId: data.enemyPlayerId });
     }
 
     @SubscribeMessage(SocketEvents.USER_ATTACKED)
-    handleUserAttacked(client: Socket, data: { attackResult: number; playerHasTotem: boolean }) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserAttacked(client: Socket, data: { playerTurnId: string; attackResult: number; playerHasTotem: boolean }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
         this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_ATTACKED, data.attackResult);
@@ -177,7 +179,7 @@ export class PlayGameBoardGateway {
             this.server.to(room.accessCode.toString()).emit(SocketEvents.SUCCESSFUL_ATTACK);
 
             if (isPlayerDead) {
-                this.handleBattleEndedByDeath(room.accessCode, client.id);
+                this.handleBattleEndedByDeath(room.accessCode, data.playerTurnId);
                 return;
             }
         }
@@ -186,13 +188,13 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_TRIED_ESCAPE)
-    handleUserTriedEscape(client: Socket) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserTriedEscape(client: Socket, playerTurnId: string) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         if (!room) return;
 
         this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_TRIED_ESCAPE);
 
-        if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, client.id)) {
+        if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, playerTurnId)) {
             this.handleBattleEndedByEscape(room.accessCode);
             return;
         }

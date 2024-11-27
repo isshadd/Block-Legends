@@ -47,8 +47,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, data);
         });
-        this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((enemyPlayerId) => {
-            this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, enemyPlayerId);
+        this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, data);
         });
         this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_WON);
@@ -63,8 +63,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_ATTACKED, data);
         });
-        this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_TRIED_ESCAPE);
+        this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+            this.socket.emit(SocketEvents.USER_TRIED_ESCAPE, playerTurnId);
         });
 
         this.virtualPlayerManagerService.signalMoveVirtualPlayer$.pipe(takeUntil(this.destroy$)).subscribe((data) => {

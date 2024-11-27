@@ -45,7 +45,7 @@ export class PlayGameBoardManagerService {
     signalUserDidDoorAction = new Subject<{ tileCoordinate: Vec2; playerTurnId: string }>();
     signalUserDidDoorAction$ = this.signalUserDidDoorAction.asObservable();
 
-    signalUserDidBattleAction = new Subject<string>();
+    signalUserDidBattleAction = new Subject<{ playerTurnId: string; enemyPlayerId: string }>();
     signalUserDidBattleAction$ = this.signalUserDidBattleAction.asObservable();
 
     signalUserGrabbedItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }>();
@@ -427,7 +427,7 @@ export class PlayGameBoardManagerService {
         if (tile instanceof WalkableTile && tile.hasPlayer() && tile.player) {
             const playerCharacter = this.findPlayerFromPlayerMapEntity(tile.player);
             if (playerCharacter?.socketId) {
-                this.signalUserDidBattleAction.next(playerCharacter.socketId);
+                this.signalUserDidBattleAction.next({ playerTurnId: currentPlayer.socketId, enemyPlayerId: playerCharacter.socketId });
                 this.hidePossibleMoves();
             }
             return;
