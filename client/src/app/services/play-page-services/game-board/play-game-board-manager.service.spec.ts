@@ -1522,7 +1522,7 @@ describe('PlayGameBoardManagerService - getCurrentPlayerTile', () => {
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayer);
         gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTile);
 
-        const result = service.getCurrentPlayerTile();
+        const result = service.getPlayerTile();
 
         expect(service.getCurrentPlayerCharacter).toHaveBeenCalled();
         expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(playerCoordinates);
@@ -1532,7 +1532,7 @@ describe('PlayGameBoardManagerService - getCurrentPlayerTile', () => {
     it('should return null if no player is found', () => {
         spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(null);
 
-        const result = service.getCurrentPlayerTile();
+        const result = service.getPlayerTile();
 
         expect(service.getCurrentPlayerCharacter).toHaveBeenCalled();
         expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();

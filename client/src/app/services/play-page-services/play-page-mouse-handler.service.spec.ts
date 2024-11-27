@@ -283,7 +283,7 @@ describe('PlayPageMouseHandlerService - toggleAction', () => {
     it('should set isActionOpen to true and set actionTiles to VisibleState.Action when toggling on with action points', () => {
         const userTile = new Tile();
         const adjacentTile = new Tile();
-        playGameBoardManagerServiceSpy.getCurrentPlayerTile.and.returnValue(userTile);
+        playGameBoardManagerServiceSpy.getPlayerTile.and.returnValue(userTile);
         playGameBoardManagerServiceSpy.getAdjacentActionTiles.and.returnValue([adjacentTile]);
 
         service.toggleAction();

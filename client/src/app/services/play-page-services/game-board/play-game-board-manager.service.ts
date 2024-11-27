@@ -195,7 +195,7 @@ export class PlayGameBoardManagerService {
                     playerTurnId: userPlayerCharacter.socketId,
                 });
 
-                const didGrabItem = this.handleTileItem(pathTile);
+                const didGrabItem = this.handleTileItem(pathTile, userPlayerCharacter, this.possibleItems);
                 if (this.possibleItems.length > 0) {
                     this.signalUserFinishedMoving.next(userPlayerCharacter.socketId);
                     return;
@@ -220,7 +220,7 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        this.checkIfPLayerDidEverything();
+        this.checkIfPLayerDidEverything(userPlayerCharacter);
         this.setupPossibleMoves(userPlayerCharacter);
     }
 
@@ -255,26 +255,24 @@ export class PlayGameBoardManagerService {
         }
     }
 
-    handleTileItem(tile: Tile): boolean {
-        const currentPlayer = this.getCurrentPlayerCharacter();
-
-        if (!tile.isTerrain() || !currentPlayer) {
+    handleTileItem(tile: Tile, player: PlayerCharacter, possibleItems: Item[]): boolean {
+        if (!tile.isTerrain()) {
             return false;
         }
 
         const terrainTile = tile as TerrainTile;
         if (terrainTile.item?.isGrabbable()) {
-            if (currentPlayer.inventory.some((item) => item.type === ItemType.EmptyItem)) {
+            if (player.inventory.some((item) => item.type === ItemType.EmptyItem)) {
                 this.signalUserGrabbedItem.next({
                     itemType: terrainTile.item.type,
                     tileCoordinates: terrainTile.coordinates,
-                    playerTurnId: currentPlayer.socketId,
+                    playerTurnId: player.socketId,
                 });
             } else {
-                for (const item of currentPlayer.inventory) {
-                    this.possibleItems.push(item);
+                for (const item of player.inventory) {
+                    possibleItems.push(item);
                 }
-                this.possibleItems.push(terrainTile.item);
+                possibleItems.push(terrainTile.item);
             }
             return true;
         }
@@ -353,7 +351,7 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        this.checkIfPLayerDidEverything();
+        this.checkIfPLayerDidEverything(currentPlayer);
         this.setupPossibleMoves(currentPlayer);
     }
 
@@ -436,18 +434,16 @@ export class PlayGameBoardManagerService {
         if (tile.isDoor()) {
             this.hidePossibleMoves();
             this.signalUserDidDoorAction.next({ tileCoordinate: tile.coordinates, playerTurnId: currentPlayer.socketId });
-            this.checkIfPLayerDidEverything();
+            this.checkIfPLayerDidEverything(currentPlayer);
             return;
         }
     }
 
-    checkIfPLayerDidEverything() {
-        const currentPlayer = this.getCurrentPlayerCharacter();
-
-        if (currentPlayer && currentPlayer.currentMovePoints <= 0) {
-            const currentPlayerTile = this.getCurrentPlayerTile();
-            if (currentPlayer.currentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
-                this.signalUserGotTurnEnded.next(currentPlayer.socketId);
+    checkIfPLayerDidEverything(player: PlayerCharacter) {
+        if (player.currentMovePoints <= 0) {
+            const playerTile = this.getPlayerTile(player);
+            if (player.currentActionPoints <= 0 || (playerTile && this.getAdjacentActionTiles(playerTile).length === 0)) {
+                this.signalUserGotTurnEnded.next(player.socketId);
             }
         }
     }
@@ -504,7 +500,7 @@ export class PlayGameBoardManagerService {
     continueTurn() {
         const userPlayerCharacter = this.getCurrentPlayerCharacter();
         if (userPlayerCharacter && this.isUserTurn) {
-            this.checkIfPLayerDidEverything();
+            this.checkIfPLayerDidEverything(userPlayerCharacter);
             this.setupPossibleMoves(userPlayerCharacter);
         }
     }
@@ -604,13 +600,7 @@ export class PlayGameBoardManagerService {
         return this.gameMapDataManagerService.getCurrentGrid();
     }
 
-    getCurrentPlayerTile(): Tile | null {
-        const player = this.getCurrentPlayerCharacter();
-
-        if (!player) {
-            return null;
-        }
-
+    getPlayerTile(player: PlayerCharacter): Tile | null {
         return this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates);
     }
 
