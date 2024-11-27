@@ -20,7 +20,7 @@ export class AdministrationGameComponent {
     constructor(
         public dialog: MatDialog,
         private gameServerCommunicationService: GameServerCommunicationService,
-        private gameMapDataManagerService: GameMapDataManagerService,
+        private gameMapDataManagerService: GameMapDataManagerService, //private router: Router,
     ) {}
 
     openCreateGameModal(): void {
@@ -40,8 +40,13 @@ export class AdministrationGameComponent {
             this.selectedFile = input.files[0];
             console.log('Fichier sélectionné :', this.selectedFile);
             const importedGame = await this.gameMapDataManagerService.convertJsonToGameShared(this.selectedFile);
-            this.gameServerCommunicationService.addGame(importedGame).subscribe((game) => {
-                console.log('Jeu importé :', game);
+            this.gameServerCommunicationService.addGame(importedGame).subscribe({
+                next: () => {
+                    window.location.reload();
+                },
+                error: (errors: unknown) => {
+                    this.gameMapDataManagerService.openErrorModal(errors as string | string[]);
+                },
             });
         }
     }
