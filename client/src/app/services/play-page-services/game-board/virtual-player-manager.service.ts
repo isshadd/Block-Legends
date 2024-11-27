@@ -245,46 +245,4 @@ export class VirtualPlayerManagerService {
 
         this.signalMoveVirtualPlayer.next({ coordinates: destination, virtualPlayerId: player.socketId });
     }
-
-    getCurrentVirtualPlayerCharacter(): PlayerCharacter | null {
-        return (
-            this.webSocketService.getRoomInfo().players.find((player) => player.isVirtual && player.socketId !== this.webSocketService.socket.id) ||
-            null
-        );
-    }
-
-    // getPlayerTile(player: PlayerCharacter): Tile {
-    //     return this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
-    // }
-
-    // getCurrentVirtualPlayerTile(): Tile | null {
-    //     const player = this.getCurrentPlayerCharacter();
-
-    //     if (!player) {
-    //         return null;
-    //     }
-
-    //     return this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates);
-    // }
-
-    // startVPBattle(playerId: string, enemyPlayerId: string) {
-    //     const currentPlayer = this.getCurrentVirtualPlayerCharacter();
-    //     if (!currentPlayer) return;
-
-    //     if (currentPlayer.socketId !== playerId && currentPlayer.socketId !== enemyPlayerId) {
-    //         this.areOtherPlayersInBattle = true;
-    //         return;
-    //     }
-
-    //     let opponentPlayer: PlayerCharacter | null;
-    //     if (currentPlayer.socketId === playerId) {
-    //         opponentPlayer = this.findPlayerFromSocketId(enemyPlayerId);
-    //     } else {
-    //         opponentPlayer = this.findPlayerFromSocketId(playerId);
-    //     }
-
-    //     if (!opponentPlayer) return;
-
-    //     this.battleManagerService.init(currentPlayer, opponentPlayer);
-    // }
 }
