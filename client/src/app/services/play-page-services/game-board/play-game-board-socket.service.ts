@@ -50,8 +50,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, data);
         });
-        this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_WON);
+        this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+            this.socket.emit(SocketEvents.USER_WON, playerTurnId);
         });
         this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_GRABBED_ITEM, data);

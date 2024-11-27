@@ -54,7 +54,7 @@ export class PlayGameBoardManagerService {
     signalUserThrewItem = new Subject<{ itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }>();
     signalUserThrewItem$ = this.signalUserThrewItem.asObservable();
 
-    signalUserWon = new Subject<void>();
+    signalUserWon = new Subject<string>();
     signalUserWon$ = this.signalUserWon.asObservable();
 
     currentTime: number = 0;
@@ -552,7 +552,7 @@ export class PlayGameBoardManagerService {
 
         const value = 3;
         if (currentPlayer === playerCharacter && playerCharacter.fightWins >= value) {
-            this.signalUserWon.next();
+            this.signalUserWon.next(currentPlayer.socketId);
         }
     }
 
@@ -564,7 +564,7 @@ export class PlayGameBoardManagerService {
         const currentPlayer = this.getCurrentPlayerCharacter();
 
         if (currentPlayer === playerCharacter && playerCharacter.mapEntity.isOnSpawn() && this.doesPlayerHaveItem(playerCharacter, ItemType.Flag)) {
-            this.signalUserWon.next();
+            this.signalUserWon.next(currentPlayer.socketId);
         }
     }
 

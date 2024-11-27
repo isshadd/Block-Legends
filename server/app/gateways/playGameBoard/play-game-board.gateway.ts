@@ -203,12 +203,12 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_WON)
-    handleUserWon(client: Socket) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    handleUserWon(client: Socket, playerTurnId: string) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         if (!room) return;
 
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, client.id);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, playerTurnId);
     }
 
     isClientTurn(clientId: string): boolean {
