@@ -171,7 +171,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it("devrait gérer avatarTakenError$ et réessayer d'ajouter un joueur virtuel", fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 0;
             component.maxVirtualPlayerRetries = 2;
 
@@ -182,12 +182,12 @@ describe('WaitingViewComponent', () => {
             tick();
 
             expect(component.virtualPlayerRetryCount).toBe(1);
-            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.agressive);
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.Agressive);
             expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalled();
         }));
 
         it('devrait réinitialiser lastVirtualPlayerProfile quand les tentatives max sont atteintes', fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 2;
             component.maxVirtualPlayerRetries = 2;
 
@@ -202,7 +202,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it('devrait réinitialiser virtualPlayerRetryCount quand le joueur virtuel est trouvé dans players$', fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 1;
             component.lastVirtualPlayerSocketId = 'socket123';
 
@@ -217,7 +217,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it("ne devrait pas réinitialiser virtualPlayerRetryCount quand le joueur virtuel n'est pas trouvé dans players$", fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 1;
             component.lastVirtualPlayerSocketId = 'socket123';
 
@@ -227,7 +227,7 @@ describe('WaitingViewComponent', () => {
             (webSocketServiceSpy.players$ as BehaviorSubject<PlayerCharacter[]>).next([{ socketId: 'socket456' } as PlayerCharacter]);
             tick();
 
-            expect(component.lastVirtualPlayerProfile).toBe(ProfileEnum.agressive);
+            expect(component.lastVirtualPlayerProfile).toBe(ProfileEnum.Agressive);
             expect(component.virtualPlayerRetryCount).toBe(1);
         }));
     });
@@ -242,10 +242,10 @@ describe('WaitingViewComponent', () => {
             gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
             component.playersCounter = VP_NUMBER - 1;
 
-            component.addVirtualPlayer(ProfileEnum.agressive);
+            component.addVirtualPlayer(ProfileEnum.Agressive);
 
             expect(component.isMaxPlayer).toBeTrue();
-            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.agressive);
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.Agressive);
             expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalledWith(ACCESS_CODE, virtualPlayer);
             expect(component.lastVirtualPlayerProfile).toBe(null);
             expect(component.lastVirtualPlayerSocketId).toBe(null);
@@ -254,7 +254,7 @@ describe('WaitingViewComponent', () => {
 
         it('ne devrait pas ajouter de joueur quand au maximum', () => {
             component.playersCounter = VP_NUMBER;
-            component.addVirtualPlayer(ProfileEnum.agressive);
+            component.addVirtualPlayer(ProfileEnum.Agressive);
 
             expect(component.isMaxPlayer).toBeTrue();
             expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalled();

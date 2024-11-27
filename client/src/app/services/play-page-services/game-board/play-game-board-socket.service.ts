@@ -10,6 +10,7 @@ import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
+import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 
 @Injectable({
     providedIn: 'root',
@@ -26,6 +27,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         public playPageMouseHandlerService: PlayPageMouseHandlerService,
         public battleManagerService: BattleManagerService,
         public router: Router,
+        public virtualPlayerManagerService: VirtualPlayerManagerService,
     ) {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_MOVED, data);
@@ -33,11 +35,11 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserRespawned$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_RESPAWNED, data);
         });
-        this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_STARTED_MOVING);
+        this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+            this.socket.emit(SocketEvents.USER_STARTED_MOVING, playerTurnId);
         });
-        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.socket.emit(SocketEvents.USER_FINISHED_MOVING);
+        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe((platerTurnId: string) => {
+            this.socket.emit(SocketEvents.USER_FINISHED_MOVING, platerTurnId);
         });
         this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.endTurn();
@@ -63,6 +65,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
         this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.socket.emit(SocketEvents.USER_TRIED_ESCAPE);
+        });
+
+        this.virtualPlayerManagerService.signalMoveVirtualPlayer$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+            this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION, data);
         });
     }
 
@@ -115,6 +121,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
             }
         });
 
+        this.socket.on(SocketEvents.START_VIRTUAL_PLAYER_TURN, (playerIdTurn: string) => {
+            this.virtualPlayerManagerService.startTurn(playerIdTurn);
+        });
+
         this.socket.on(SocketEvents.GAME_BOARD_PLAYER_LEFT, (playerId: string) => {
             this.playGameBoardManagerService.removePlayerFromMap(playerId);
             this.signalPlayerLeft.next(playerId);
@@ -122,6 +132,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on(SocketEvents.ROOM_USER_MOVED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
             this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+        });
+
+        this.socket.on(SocketEvents.VIRTUAL_PLAYER_MOVED, (data: { destination: Vec2; virtualPlayerId: string }) => {
+            this.virtualPlayerManagerService.moveVirtualPlayer(data.virtualPlayerId, data.destination);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {

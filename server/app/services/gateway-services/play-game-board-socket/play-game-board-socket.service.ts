@@ -4,6 +4,9 @@ import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
 
+const DELAY_3s = 3000;
+const DELAY_1s = 1000;
+
 @Injectable()
 export class PlayGameBoardSocketService {
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
@@ -111,5 +114,29 @@ export class PlayGameBoardSocketService {
 
             this.gameSocketRoomService.setCurrentPlayerTurn(accessCode, gameBoardRoom.turnOrder[nextPlayerIndex]);
         }
+    }
+
+    getRandomClientInRoom(accessCode: number): string {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (room) {
+            const nonVirtualPlayers = room.players.filter((player) => !player.isVirtual);
+            if (nonVirtualPlayers.length === 0) {
+                throw new Error('No non-virtual players in the room');
+            }
+            const randomIndex = Math.floor(Math.random() * nonVirtualPlayers.length);
+            return nonVirtualPlayers[randomIndex].socketId;
+        }
+    }
+
+    getPlayerBySocketId(accessCode: number, socketId: string) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (room) {
+            const player = room.players.find((player) => player.socketId === socketId);
+            return player;
+        }
+    }
+
+    getRandomDelay(): number {
+        return Math.floor(Math.random() * DELAY_3s) + DELAY_1s;
     }
 }

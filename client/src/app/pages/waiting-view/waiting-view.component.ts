@@ -12,7 +12,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
-import { Profile, ProfileEnum } from '@common/enums/profile';
+import { ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
 
 const FIVE = 5;
@@ -37,12 +37,13 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     isOrganizer = false;
     maxPlayers: number = 0;
     showClavardage = true;
-    profileAggressive = ProfileEnum.agressive;
-    profileDefensive = ProfileEnum.defensive;
-    lastVirtualPlayerProfile: Profile | null = null;
+    profileAggressive = ProfileEnum.Agressive;
+    profileDefensive = ProfileEnum.Defensive;
+    lastVirtualPlayerProfile: ProfileEnum | null = null;
     maxVirtualPlayerRetries = FIVE;
     lastVirtualPlayerSocketId: string | null = null;
     virtualPlayerRetryCount = 0;
+    hasVirtualPlayer = false;
 
     private destroy$ = new Subject<void>();
 
@@ -77,7 +78,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                     if (this.accessCode !== null && this.accessCode !== undefined) {
-                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.chatService.setAccessCode(this.accessCode);
                         this.eventJournalService.setAccessCode(this.accessCode);
                     }
                 });
@@ -87,18 +88,12 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
                     if (this.accessCode !== null) {
-                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
+                        this.chatService.setAccessCode(this.accessCode);
                         this.eventJournalService.setAccessCode(this.accessCode);
                     }
                 });
             }
         });
-
-        // this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-        //     players.forEach(() => {
-        //         this.playersCounter++;
-        //     });
-        // });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;
@@ -132,16 +127,19 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    addVirtualPlayer(profile: Profile): void {
-        if (this.playersCounter <= this.maxPlayers) {
-            this.isMaxPlayer = true;
-            return;
-        } else {
-            this.isMaxPlayer = false;
+    addVirtualPlayer(profile: ProfileEnum): void {
+        if (!this.hasVirtualPlayer) {
+            if (this.playersCounter <= this.maxPlayers) {
+                this.isMaxPlayer = true;
+                return;
+            } else {
+                this.isMaxPlayer = false;
+            }
+            const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
+            this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
+            this.playersCounter++;
+            this.hasVirtualPlayer = true;
         }
-        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
-        this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
-        this.playersCounter++;
     }
 
     playerLeave(): void {
@@ -175,6 +173,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     kickPlayer(player: PlayerCharacter): void {
         if (this.isOrganizer) {
             this.webSocketService.kickPlayer(player);
+        }
+        if (player.isVirtual) {
+            this.hasVirtualPlayer = false;
         }
     }
 

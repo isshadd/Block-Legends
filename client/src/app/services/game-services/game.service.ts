@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { AvatarService } from '@app/services/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
-import { Profile } from '@common/enums/profile';
+import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 export const VP_NUMBER = 5;
@@ -50,7 +50,7 @@ export class GameService {
         this.currentPlayerSubject.next(player);
     }
 
-    generateVirtualCharacter(index: number, profile: Profile): PlayerCharacter {
+    generateVirtualCharacter(index: number, comportement: ProfileEnum): PlayerCharacter {
         let takenAvatars: string[] = [];
 
         this.avatarService.takenAvatars$.pipe().subscribe((avatarst) => {
@@ -63,7 +63,7 @@ export class GameService {
         const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
         const virtualPlayer = new PlayerCharacter('');
         virtualPlayer.isVirtual = true;
-        virtualPlayer.profile = profile;
+        virtualPlayer.comportement = comportement;
         virtualPlayer.avatar = randomAvatar;
         virtualPlayer.name = randomAvatar.name;
 

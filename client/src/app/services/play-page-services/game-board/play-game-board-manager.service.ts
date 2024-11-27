@@ -27,16 +27,16 @@ export class PlayGameBoardManagerService {
     signalManagerFinishedInit = new Subject<void>();
     signalManagerFinishedInit$ = this.signalManagerFinishedInit.asObservable();
 
-    signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2; playerTurnId: string }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
     signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
     signalUserRespawned$ = this.signalUserRespawned.asObservable();
 
-    signalUserStartedMoving = new Subject<void>();
+    signalUserStartedMoving = new Subject<string>();
     signalUserStartedMoving$ = this.signalUserStartedMoving.asObservable();
 
-    signalUserFinishedMoving = new Subject<void>();
+    signalUserFinishedMoving = new Subject<string>();
     signalUserFinishedMoving$ = this.signalUserFinishedMoving.asObservable();
 
     signalUserGotTurnEnded = new Subject<void>();
@@ -182,7 +182,7 @@ export class PlayGameBoardManagerService {
         this.hidePossibleMoves();
         const movingTimeInterval = 150;
 
-        this.signalUserStartedMoving.next();
+        this.signalUserStartedMoving.next(userPlayerCharacter.socketId);
 
         let lastTile: WalkableTile | null = null;
         let didPlayerTripped = false;
@@ -192,11 +192,12 @@ export class PlayGameBoardManagerService {
                 this.signalUserMoved.next({
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
+                    playerTurnId: userPlayerCharacter.socketId,
                 });
 
                 const didGrabItem = this.handleTileItem(pathTile);
                 if (this.possibleItems.length > 0) {
-                    this.signalUserFinishedMoving.next();
+                    this.signalUserFinishedMoving.next(userPlayerCharacter.socketId);
                     return;
                 }
 
@@ -212,7 +213,7 @@ export class PlayGameBoardManagerService {
             lastTile = pathTile as WalkableTile;
         }
 
-        this.signalUserFinishedMoving.next();
+        this.signalUserFinishedMoving.next(userPlayerCharacter.socketId);
 
         if (didPlayerTripped) {
             this.signalUserGotTurnEnded.next();

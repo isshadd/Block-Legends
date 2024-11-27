@@ -24,6 +24,8 @@ export const enum SocketEvents {
     USER_WON = 'userWon',
     USER_GRABBED_ITEM = 'userGrabbedItem',
     USER_THREW_ITEM = 'userThrewItem',
+    VIRTUAL_PLAYER_CHOOSED_DESTINATION = 'virtualPlayerChoosedDestination',
+    VIRTUAL_PLAYER_MOVED = 'virtualPlayerMoved',
 
     // RECUS
     ROOM_STATE = 'roomState',
@@ -58,6 +60,7 @@ export const enum SocketEvents {
     SET_TIME = 'setTime',
     END_TIME = 'endTime',
     START_TURN = 'startTurn',
+    START_VIRTUAL_PLAYER_TURN = 'startVirtualPlayerTurn',
     START_TURN_BATTLE = 'startTurnBattle',
     AUTOMATIC_ATTACK = 'automaticAttack',
     BATTLE_ENDED_BY_ESCAPE = 'battleEndedByEscape',

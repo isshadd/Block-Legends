@@ -9,12 +9,20 @@
             <h3>Joueurs :</h3>
             <ul id="player-container">
                 @for(player of players$ | async; track player.name) {
-                <li [ngClass]="{ organizer: player.isOrganizer, virtual: player.isVirtual }">
+                <li
+                    *ngIf="player.isVirtual ? (gameService.character$ | async)?.isOrganizer : true"
+                    [ngClass]="{ organizer: player.isOrganizer, virtual: player.isVirtual }"
+                >
                     <img [src]="player.avatar.headImage" alt="Avatar" />
                     <span class="player-name">{{ player.name }}</span>
-                    @if((this.gameService.character$ | async)?.isOrganizer && !player.isOrganizer) {
-                    <button class="dark-button" type="button" (click)="kickPlayer(player)">Expulser</button>
-                    }
+                    <button
+                        *ngIf="(gameService.character$ | async)?.isOrganizer && !player.isOrganizer"
+                        class="dark-button"
+                        type="button"
+                        (click)="kickPlayer(player)"
+                    >
+                        Expulser
+                    </button>
                 </li>
                 }
             </ul>
@@ -25,10 +33,17 @@
                 <button class="dark-button" type="button" (click)="addVirtualPlayer(profileAggressive)" [disabled]="isLocked$ | async">
                     Ajouter un joueur virtuel agressif
                 </button>
-                <button class="dark-button" type="button" (click)="addVirtualPlayer(profileDefensive)" [disabled]="isLocked$ | async">
+                <button
+                    class="dark-button"
+                    type="button"
+                    (click)="addVirtualPlayer(profileDefensive)"
+                    [disabled]="(isLocked$ | async) || hasVirtualPlayer"
+                >
                     Ajouter un joueur virtuel défensif
                 </button>
-                <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
+                <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="(isLocked$ | async) || hasVirtualPlayer">
+                    Verouiller la salle
+                </button>
             </div>
             <div class="button-container">
                 <button

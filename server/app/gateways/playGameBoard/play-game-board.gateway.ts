@@ -58,7 +58,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage(SocketEvents.USER_END_TURN)
     handleUserEndTurn(client: Socket) {
-        if (!this.isClientTurn(client)) {
+        if (!this.isClientTurn(client.id)) {
             return;
         }
 
@@ -67,35 +67,46 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_STARTED_MOVING)
-    handleUserStartedMoving(client: Socket) {
-        if (!this.isClientTurn(client)) {
+    handleUserStartedMoving(client: Socket, playerTurnId: string) {
+        if (!this.isClientTurn(playerTurnId)) {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_FINISHED_MOVING)
-    handleUserFinishedMoving(client: Socket) {
-        if (!this.isClientTurn(client)) {
+    handleUserFinishedMoving(client: Socket, playerTurnId: string) {
+        if (!this.isClientTurn(playerTurnId)) {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         this.playGameBoardTimeService.resumeTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_MOVED)
-    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
-        if (!this.isClientTurn(client)) {
+    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; playerTurnId: string }) {
+        if (!this.isClientTurn(data.playerTurnId)) {
             return;
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.server
             .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: data.playerTurnId, fromTile: data.fromTile, toTile: data.toTile });
+    }
+
+    @SubscribeMessage(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION)
+    handleVirtualPlayerChoosedDestination(client: Socket, data: { coordinates: Vec2; virtualPlayerId: string }) {
+        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        if (!room) return;
+        setTimeout(() => {
+            this.server
+                .to(this.playGameBoardSocketService.getRandomClientInRoom(room.accessCode))
+                .emit(SocketEvents.VIRTUAL_PLAYER_MOVED, { destination: data.coordinates, virtualPlayerId: data.virtualPlayerId });
+        }, 150);
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)
@@ -130,7 +141,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage(SocketEvents.USER_DID_DOOR_ACTION)
     handleUserDidDoorAction(client: Socket, tileCoordinate: Vec2) {
-        if (!this.isClientTurn(client)) {
+        if (!this.isClientTurn(client.id)) {
             return;
         }
 
@@ -140,7 +151,7 @@ export class PlayGameBoardGateway {
 
     @SubscribeMessage(SocketEvents.USER_DID_BATTLE_ACTION)
     handleUserDidBattleAction(client: Socket, enemyPlayerId: string) {
-        if (!this.isClientTurn(client)) {
+        if (!this.isClientTurn(client.id)) {
             return;
         }
 
@@ -194,8 +205,8 @@ export class PlayGameBoardGateway {
         this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, client.id);
     }
 
-    isClientTurn(client: Socket) {
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+    isClientTurn(clientId: string): boolean {
+        const room = this.gameSocketRoomService.getRoomBySocketId(clientId);
 
         if (!room) {
             return false;
@@ -203,8 +214,8 @@ export class PlayGameBoardGateway {
 
         const gameTimer = this.gameSocketRoomService.gameTimerRooms.get(room.accessCode);
 
-        if (room.currentPlayerTurn !== client.id || gameTimer.state !== GameTimerState.ActiveTurn) {
-            this.logger.error(`Ce n'est pas le tour du joueur: ${client.id}`);
+        if (room.currentPlayerTurn !== clientId || gameTimer.state !== GameTimerState.ActiveTurn) {
+            this.logger.error(`Ce n'est pas le tour du joueur: ${clientId}`);
             return false;
         }
 
@@ -226,6 +237,15 @@ export class PlayGameBoardGateway {
 
     startRoomTurn(accessCode: number, playerIdTurn: string) {
         this.server.to(accessCode.toString()).emit(SocketEvents.START_TURN, playerIdTurn);
+        if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, playerIdTurn).isVirtual) {
+            setTimeout(() => {
+                this.startVirtualPlayerTurn(accessCode, playerIdTurn);
+            }, this.playGameBoardSocketService.getRandomDelay());
+        }
+    }
+
+    startVirtualPlayerTurn(accessCode: number, playerId: string) {
+        this.server.to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode)).emit(SocketEvents.START_VIRTUAL_PLAYER_TURN, playerId);
     }
 
     startBattleTurn(accessCode: number, playerId: string) {

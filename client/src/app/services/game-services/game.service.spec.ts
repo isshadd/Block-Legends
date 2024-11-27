@@ -60,7 +60,7 @@ describe('GameService', () => {
 
     it('should generate virtual character correctly', () => {
         const index = 2;
-        const virtualCharacter = service.generateVirtualCharacter(index, ProfileEnum.agressive) as PlayerCharacter;
+        const virtualCharacter = service.generateVirtualCharacter(index, ProfileEnum.Agressive) as PlayerCharacter;
         expect(virtualCharacter.isVirtual).toBeTrue();
     });
 
