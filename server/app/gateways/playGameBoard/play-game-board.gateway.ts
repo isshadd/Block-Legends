@@ -57,12 +57,12 @@ export class PlayGameBoardGateway {
     }
 
     @SubscribeMessage(SocketEvents.USER_END_TURN)
-    handleUserEndTurn(client: Socket) {
-        if (!this.isClientTurn(client.id)) {
+    handleUserEndTurn(client: Socket, playerTurnId: string) {
+        if (!this.isClientTurn(playerTurnId)) {
             return;
         }
 
-        const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
+        const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         this.handleTimeOut(room.accessCode);
     }
 

@@ -39,7 +39,7 @@ export class PlayGameBoardManagerService {
     signalUserFinishedMoving = new Subject<string>();
     signalUserFinishedMoving$ = this.signalUserFinishedMoving.asObservable();
 
-    signalUserGotTurnEnded = new Subject<void>();
+    signalUserGotTurnEnded = new Subject<string>();
     signalUserGotTurnEnded$ = this.signalUserGotTurnEnded.asObservable();
 
     signalUserDidDoorAction = new Subject<Vec2>();
@@ -216,7 +216,7 @@ export class PlayGameBoardManagerService {
         this.signalUserFinishedMoving.next(userPlayerCharacter.socketId);
 
         if (didPlayerTripped) {
-            this.signalUserGotTurnEnded.next();
+            this.signalUserGotTurnEnded.next(userPlayerCharacter.socketId);
             return;
         }
 
@@ -341,7 +341,7 @@ export class PlayGameBoardManagerService {
 
         const didPlayerTripped = this.didPlayerTripped(terrainTile.type, currentPlayer);
         if (didPlayerTripped) {
-            this.signalUserGotTurnEnded.next();
+            this.signalUserGotTurnEnded.next(currentPlayer.socketId);
             return;
         }
 
@@ -439,7 +439,7 @@ export class PlayGameBoardManagerService {
         if (currentPlayer && currentPlayer.currentMovePoints <= 0) {
             const currentPlayerTile = this.getCurrentPlayerTile();
             if (currentPlayer.currentActionPoints <= 0 || (currentPlayerTile && this.getAdjacentActionTiles(currentPlayerTile).length === 0)) {
-                this.signalUserGotTurnEnded.next();
+                this.signalUserGotTurnEnded.next(currentPlayer.socketId);
             }
         }
     }

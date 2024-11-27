@@ -38,11 +38,11 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
             this.socket.emit(SocketEvents.USER_STARTED_MOVING, playerTurnId);
         });
-        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe((platerTurnId: string) => {
-            this.socket.emit(SocketEvents.USER_FINISHED_MOVING, platerTurnId);
+        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+            this.socket.emit(SocketEvents.USER_FINISHED_MOVING, playerTurnId);
         });
-        this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.endTurn();
+        this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+            this.endTurn(playerTurnId);
         });
         this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((tileCoordinate) => {
             this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, tileCoordinate);
@@ -83,10 +83,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.emit(SocketEvents.INIT_GAME_BOARD);
     }
 
-    endTurn(): void {
-        if (this.playGameBoardManagerService.isUserTurn) {
-            this.socket.emit(SocketEvents.USER_END_TURN);
-        }
+    endTurn(platerTurnId: string): void {
+        this.socket.emit(SocketEvents.USER_END_TURN, platerTurnId);
     }
 
     leaveGame(): void {
