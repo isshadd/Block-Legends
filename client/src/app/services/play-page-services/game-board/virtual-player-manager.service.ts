@@ -19,6 +19,12 @@ export class VirtualPlayerManagerService {
     signalMoveVirtualPlayer = new Subject<{ coordinates: Vec2; virtualPlayerId: string }>();
     signalMoveVirtualPlayer$ = this.signalMoveVirtualPlayer.asObservable();
 
+    signalVirtualPlayerContinueTurn = new Subject<string>();
+    signalVirtualPlayerContinueTurn$ = this.signalVirtualPlayerContinueTurn.asObservable();
+
+    signalVirtualPlayerEndedTurn = new Subject<string>();
+    signalVirtualPlayerEndedTurn$ = this.signalVirtualPlayerEndedTurn.asObservable();
+
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -28,7 +34,14 @@ export class VirtualPlayerManagerService {
     startTurn(playerId: string) {
         const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
         if (virtualPlayer) {
-            this.handleVirtualPlayerTurn(virtualPlayer);
+            this.handleVirtualPlayerTurn(virtualPlayer, true);
+        }
+    }
+
+    continueTurn(playerId: string) {
+        const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
+        if (virtualPlayer) {
+            this.handleVirtualPlayerTurn(virtualPlayer, false);
         }
     }
 
@@ -36,20 +49,20 @@ export class VirtualPlayerManagerService {
         return this.gameMapDataManagerService.getPossibleMovementTiles(playerCharacter.mapEntity.coordinates, playerCharacter.currentMovePoints);
     }
 
-    handleVirtualPlayerTurn(player: PlayerCharacter) {
+    handleVirtualPlayerTurn(player: PlayerCharacter, didTurnStarted: boolean) {
         if (!player.isVirtual) return;
 
         if (player.comportement === ProfileEnum.Agressive) {
-            this.handleAgressiveComportment(player);
+            this.handleAgressiveComportment(player, didTurnStarted);
         }
         // else if(player.profile === ProfileEnum.defensive) {
         //     this.handleDefensiveComportment(player);
         // }
     }
 
-    private handleAgressiveComportment(player: PlayerCharacter) {
+    private handleAgressiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
         const possibleMoves = this.setPossibleMoves(player);
-        let targetTile: Tile;
+        let targetTile: Tile | null = null;
 
         const targetPlayerTile = this.findNearestPossiblePlayer(player, possibleMoves);
         if (targetPlayerTile) {
@@ -59,13 +72,19 @@ export class VirtualPlayerManagerService {
             if (targetItemTile) {
                 targetTile = targetItemTile;
             } else {
-                const possibleMovesArray = Array.from(possibleMoves.keys());
-                targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
+                if (didTurnStarted) {
+                    const possibleMovesArray = Array.from(possibleMoves.keys());
+                    targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
+                } else {
+                    this.signalVirtualPlayerEndedTurn.next(player.socketId);
+                }
             }
         }
 
-        this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
-        this.signalMoveVirtualPlayer.next({ coordinates: targetTile.coordinates, virtualPlayerId: player.socketId });
+        if (targetTile) {
+            this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
+            this.signalMoveVirtualPlayer.next({ coordinates: targetTile.coordinates, virtualPlayerId: player.socketId });
+        }
     }
 
     findNearestPossiblePlayer(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
@@ -142,6 +161,7 @@ export class VirtualPlayerManagerService {
         if (!nextPathTile) {
             this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
             this.playGameBoardManagerService.checkIfPLayerDidEverything(player);
+            this.signalVirtualPlayerContinueTurn.next(player.socketId);
             return;
         }
 
@@ -162,6 +182,7 @@ export class VirtualPlayerManagerService {
             }
 
             this.playGameBoardManagerService.checkIfPLayerDidEverything(player);
+            this.signalVirtualPlayerContinueTurn.next(player.socketId);
             return;
         }
 

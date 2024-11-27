@@ -70,6 +70,12 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.virtualPlayerManagerService.signalMoveVirtualPlayer$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION, data);
         });
+        this.virtualPlayerManagerService.signalVirtualPlayerContinueTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+            this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN, playerTurnId);
+        });
+        this.virtualPlayerManagerService.signalVirtualPlayerEndedTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+            this.endTurn(playerTurnId);
+        });
     }
 
     ngOnDestroy() {
@@ -83,8 +89,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.emit(SocketEvents.INIT_GAME_BOARD);
     }
 
-    endTurn(platerTurnId: string): void {
-        this.socket.emit(SocketEvents.USER_END_TURN, platerTurnId);
+    endTurn(playerTurnId: string): void {
+        this.socket.emit(SocketEvents.USER_END_TURN, playerTurnId);
     }
 
     leaveGame(): void {
@@ -121,6 +127,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on(SocketEvents.START_VIRTUAL_PLAYER_TURN, (playerIdTurn: string) => {
             this.virtualPlayerManagerService.startTurn(playerIdTurn);
+        });
+
+        this.socket.on(SocketEvents.CONTINUE_VIRTUAL_PLAYER_TURN, (playerIdTurn: string) => {
+            this.virtualPlayerManagerService.continueTurn(playerIdTurn);
         });
 
         this.socket.on(SocketEvents.GAME_BOARD_PLAYER_LEFT, (playerId: string) => {

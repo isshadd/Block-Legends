@@ -121,6 +121,18 @@ export class PlayGameBoardGateway {
         });
     }
 
+    @SubscribeMessage(SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN)
+    handleVirtualPlayerContinueTurn(client: Socket, virtualPlayerId: string) {
+        if (!this.isClientTurn(virtualPlayerId)) {
+            return;
+        }
+
+        const room = this.gameSocketRoomService.getRoomBySocketId(virtualPlayerId);
+        setTimeout(() => {
+            this.continueVirtualPlayerTurn(room.accessCode, virtualPlayerId);
+        }, this.playGameBoardSocketService.getRandomDelay());
+    }
+
     @SubscribeMessage(SocketEvents.USER_THREW_ITEM)
     handleUserThrewItem(client: Socket, data: { itemType: ItemType; tileCoordinates: Vec2; playerTurnId: string }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
@@ -252,6 +264,10 @@ export class PlayGameBoardGateway {
 
     startVirtualPlayerTurn(accessCode: number, playerId: string) {
         this.server.to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode)).emit(SocketEvents.START_VIRTUAL_PLAYER_TURN, playerId);
+    }
+
+    continueVirtualPlayerTurn(accessCode: number, playerId: string) {
+        this.server.to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode)).emit(SocketEvents.CONTINUE_VIRTUAL_PLAYER_TURN, playerId);
     }
 
     startBattleTurn(accessCode: number, playerId: string) {
