@@ -1,84 +1,111 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { AvatarEnum } from '@common/enums/avatar-enum';
+import { ItemType } from '@common/enums/item-type';
+import { VisibleState } from '@common/interfaces/placeable-entity';
+import { Vec2 } from '@common/interfaces/vec2';
 import { PlayersListComponent } from './players-list.component';
 
 describe('PlayersListComponent', () => {
     let component: PlayersListComponent;
     let fixture: ComponentFixture<PlayersListComponent>;
-    let playGameBoardManagerService: jasmine.SpyObj<PlayGameBoardManagerService>;
-
-    const mockPlayerCharacter: PlayerCharacter = {
-        socketId: 'test-socket-id',
-        // Add other required PlayerCharacter properties here
-    } as PlayerCharacter;
 
     beforeEach(async () => {
-        // Create spy for the service
-        playGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
-            currentPlayerIdTurn: 'test-socket-id',
+        const playGameBoardManagerSpy = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+            currentPlayerIdTurn: '12345',
         });
 
         await TestBed.configureTestingModule({
             imports: [PlayersListComponent],
-            providers: [{ provide: PlayGameBoardManagerService, useValue: playGameBoardManagerService }],
+            providers: [{ provide: PlayGameBoardManagerService, useValue: playGameBoardManagerSpy }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PlayersListComponent);
         component = fixture.componentInstance;
-        fixture.detectChanges();
     });
 
-    it('should create', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('Input properties', () => {
-        it('should initialize players as empty array by default', () => {
-            expect(component.players).toEqual([]);
-        });
+    it('should correctly handle players input', () => {
+        const mockPlayers: PlayerCharacter[] = [new PlayerCharacter('Player 1'), new PlayerCharacter('Player 2')];
+        mockPlayers[0].avatar = AvatarEnum.Alex;
+        mockPlayers[1].avatar = AvatarEnum.Arlina;
+        component.players = mockPlayers;
+        fixture.detectChanges();
 
-        it('should accept players input', () => {
-            const testPlayers: PlayerCharacter[] = [mockPlayerCharacter];
-            component.players = testPlayers;
-            expect(component.players).toEqual(testPlayers);
-        });
+        expect(component.players).toBe(mockPlayers);
     });
 
     describe('isTurn', () => {
-        it('should return true when player socketId matches currentPlayerIdTurn', () => {
-            const player: PlayerCharacter = {
-                socketId: 'test-socket-id',
-                // Add other required PlayerCharacter properties here
-            } as PlayerCharacter;
+        it('should return true if the player ID matches the currentPlayerIdTurn', () => {
+            const mockPlayer = new PlayerCharacter('Player 1');
+            mockPlayer.socketId = '12345';
 
-            const result = component.isTurn(player);
-            expect(result).toBeTrue();
+            expect(component.isTurn(mockPlayer)).toBeTrue();
         });
 
-        it('should return false when player socketId does not match currentPlayerIdTurn', () => {
-            const player: PlayerCharacter = {
-                socketId: 'different-socket-id',
-                // Add other required PlayerCharacter properties here
-            } as PlayerCharacter;
+        it('should return false if the player ID does not match the currentPlayerIdTurn', () => {
+            const mockPlayer = new PlayerCharacter('Player 2');
+            mockPlayer.socketId = '67890'; 
 
-            const result = component.isTurn(player);
-            expect(result).toBeFalse();
+            expect(component.isTurn(mockPlayer)).toBeFalse();
+        });
+    });
+
+    describe('hasFlag', () => {
+        it('should return true if the player has a flag in their inventory', () => {
+            const mockPlayer = new PlayerCharacter('Player 1');
+            mockPlayer.inventory = [
+                {
+                    type: ItemType.Flag,
+                    description: '',
+                    imageUrl: '',
+                    coordinates: { x: 0, y: 0 },
+                    visibleState: VisibleState.NotSelected,
+                    isPlaced: false,
+                    itemLimit: 0,
+                    isItem: function (): boolean {
+                        throw new Error('Function not implemented.');
+                    },
+                    setCoordinates: function (coordinates: Vec2): void {
+                        throw new Error('Function not implemented.');
+                    },
+                    isGrabbable: function (): boolean {
+                        throw new Error('Function not implemented.');
+                    },
+                },
+            ]; 
+
+            expect(component.hasFlag(mockPlayer)).toBeTrue();
         });
 
-        it('should handle undefined currentPlayerIdTurn', () => {
-            // Reset the currentPlayerIdTurn to undefined
-            Object.defineProperty(playGameBoardManagerService, 'currentPlayerIdTurn', {
-                get: () => undefined,
-            });
+        it('should return false if the player does not have a flag in their inventory', () => {
+            const mockPlayer = new PlayerCharacter('Player 2');
+            mockPlayer.inventory = [
+                {
+                    type: ItemType.Sword,
+                    description: '',
+                    imageUrl: '',
+                    coordinates: { x: 0, y: 0 },
+                    visibleState: VisibleState.NotSelected,
+                    isPlaced: false,
+                    itemLimit: 0,
+                    isItem: function (): boolean {
+                        throw new Error('Function not implemented.');
+                    },
+                    setCoordinates: function (coordinates: Vec2): void {
+                        throw new Error('Function not implemented.');
+                    },
+                    isGrabbable: function (): boolean {
+                        throw new Error('Function not implemented.');
+                    },
+                },
+            ]; 
 
-            const player: PlayerCharacter = {
-                socketId: 'test-socket-id',
-                // Add other required PlayerCharacter properties here
-            } as PlayerCharacter;
-
-            const result = component.isTurn(player);
-            expect(result).toBeFalse();
+            expect(component.hasFlag(mockPlayer)).toBeFalse();
         });
     });
 });
