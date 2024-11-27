@@ -76,29 +76,17 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    if (this.accessCode !== null && this.accessCode !== undefined) {
-                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
-                        this.eventJournalService.setAccessCode(this.accessCode);
-                    }
                 });
             } else {
                 this.playersCounter++;
                 this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
-                    if (this.accessCode !== null) {
-                        this.chatService.setAccessCode(this.accessCode); // Ensure accessCode is not null
-                        this.eventJournalService.setAccessCode(this.accessCode);
-                    }
                 });
             }
+            
         });
 
-        // this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-        //     players.forEach(() => {
-        //         this.playersCounter++;
-        //     });
-        // });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;
@@ -194,6 +182,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent('toggleView', [this.eventJournalService.playerName]);
+        this.eventJournalService.broadcastEvent('toggleView', []);
     }
 }

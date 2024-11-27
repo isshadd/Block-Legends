@@ -92,13 +92,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     @HostListener('window:keydown', ['$event'])
     handleKeyDown(event: KeyboardEvent) {
         if (event.key === 'd' || event.key === 'D' ) {
-            if(this.debugService.isDebugMode)
-                this.eventService.broadcastEvent('Mode débogage désactivé', []);
-            else{
-                this.eventService.broadcastEvent('Mode débogage activé', []);
-            }
             this.activateDebugMode();
-            this.debugService.isDebugMode = !this.debugService.isDebugMode;
         }
     }
 
@@ -201,8 +195,14 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     activateDebugMode(): void {
-        //if(this.myPlayer.isOrganizer)
-            this.webSocketService.activateDebugMode();
+        if(this.myPlayer.isOrganizer) {
+            if(this.debugService.isDebugMode)
+                this.eventService.broadcastEvent('Mode débogage désactivé', []);
+            else{
+                this.eventService.broadcastEvent('Mode débogage activé', []);
+            }
+            this.webSocketService.debugMode();
+        }
     }
 
     deactivateDebugMode(): void {

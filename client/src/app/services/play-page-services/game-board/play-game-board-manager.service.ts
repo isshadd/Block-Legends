@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
-//import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -76,7 +76,7 @@ export class PlayGameBoardManagerService {
         public tileFactoryService: TileFactoryService,
         public battleManagerService: BattleManagerService,
         public itemFactoryService: ItemFactoryService,
-        //public eventJournal: EventJournalService,
+        public eventJournal: EventJournalService,
         public debugService: DebugService,
     ) {}
 
@@ -275,7 +275,7 @@ export class PlayGameBoardManagerService {
                 }
                 this.possibleItems.push(terrainTile.item);
             }
-            //this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${terrainTile.item.type}`, [currentPlayer.name]);
+            this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${terrainTile.item.type}`, [currentPlayer.name]);
             return true;
         }
         return false;
@@ -400,14 +400,14 @@ export class PlayGameBoardManagerService {
             return false;
         }
 
-        // if(this.debugService.isDebugMode) {
-        //     return false;
-        // }
+        if(this.debugService.isDebugMode) {
+            return false;
+        }
 
         if (tileType === TileType.Ice) {
             const result = 0.1;
             if (Math.random() < result) {
-                //this.eventJournal.broadcastEvent('glissement', [this.eventJournal.playerName]);
+                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.playerName]);
                 return true;
             }
         }

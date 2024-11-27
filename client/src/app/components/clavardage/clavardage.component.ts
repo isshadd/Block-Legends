@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetec
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+//import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 
 @Component({
     selector: 'app-clavardage',
@@ -21,13 +21,10 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
 
     constructor(
         private chatService: ChatService,
-        private journalService: EventJournalService,
         private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {
-        this.chatService.initialize();
-        this.journalService.initialize();
         this.playerName = this.chatService.playerName;
         this.chatService.messageReceived$.subscribe(() => {
             this.shouldScroll = true;

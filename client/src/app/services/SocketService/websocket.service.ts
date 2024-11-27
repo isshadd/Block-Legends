@@ -14,6 +14,7 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AvatarService } from '../avatar.service';
+import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -40,11 +41,14 @@ export class WebSocketService {
         private chatService: ChatService,
         private eventJournalService: EventJournalService,
         private avatarService: AvatarService,
+        private debugService: DebugService,
     ) {}
 
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
+        this.chatService.initialize();
+        this.eventJournalService.initialize();
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -61,6 +65,7 @@ export class WebSocketService {
         const content = event;
         this.socket.emit(ChatEvents.EventMessage, { time, content, roomID, associatedPlayers: players });
     }
+
 
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
@@ -113,7 +118,7 @@ export class WebSocketService {
         }
     }
 
-    activateDebugMode() {
+    debugMode() {
         this.socket.emit(SocketEvents.DEBUG_MODE);
     }
 
@@ -134,6 +139,7 @@ export class WebSocketService {
         this.socket.on(SocketEvents.ROOM_STATE, (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.chatService.setAccessCode(room.accessCode);
+            this.eventJournalService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
             this.isLockedSubject.next(room.isLocked);
@@ -255,7 +261,7 @@ export class WebSocketService {
             alert(message);
         });
 
-        this.socket.on(SocketEvents.CLOCK, (serverClock: Date) => {
+        this.socket.on(ChatEvents.Clock, (serverClock: Date) => {
             this.chatService.serverClock = serverClock;
             this.eventJournalService.serverClock = serverClock;
         });
@@ -263,14 +269,15 @@ export class WebSocketService {
         this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
-            this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
-                this.chatService.roomMessages.push(broadcastMessage);
-            });
         });
 
         this.socket.on(ChatEvents.RoomMessage, (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
+        });
+
+        this.socket.on(SocketEvents.DEBUG_MODE, () => {
+            this.debugService.isDebugMode = !this.debugService.isDebugMode;
         });
 
         /*

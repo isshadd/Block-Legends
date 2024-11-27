@@ -243,8 +243,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     @SubscribeMessage(SocketEvents.DEBUG_MODE)
     activateDebugMode() {
-        this.logger.log('Debug mode activé');
+        this.server.emit(SocketEvents.DEBUG_MODE);
     }
+
 
     handleConnection(client: Socket) {
         this.connectedClients.add(client.id);
