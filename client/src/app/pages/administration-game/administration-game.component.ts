@@ -39,15 +39,20 @@ export class AdministrationGameComponent {
         if (input.files && input.files.length > 0) {
             this.selectedFile = input.files[0];
             console.log('Fichier sélectionné :', this.selectedFile);
-            const importedGame = await this.gameMapDataManagerService.convertJsonToGameShared(this.selectedFile);
-            this.gameServerCommunicationService.addGame(importedGame).subscribe({
-                next: () => {
-                    window.location.reload();
-                },
-                error: (errors: unknown) => {
-                    this.gameMapDataManagerService.openErrorModal(errors as string | string[]);
-                },
-            });
+            try {
+                const importedGame = await this.gameMapDataManagerService.convertJsonToGameShared(this.selectedFile);
+                this.gameServerCommunicationService.addGame(importedGame).subscribe({
+                    next: () => {
+                        window.location.reload();
+                    },
+                    error: (errors: unknown) => {
+                        this.gameMapDataManagerService.openErrorModal(errors as string | string[]);
+                    },
+                });
+            } catch (error) {
+                console.error('Erreur lors de la conversion du fichier :', error);
+                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier<br> Veuillez vérifier le format du fichier.`);
+            }
         }
     }
 }
