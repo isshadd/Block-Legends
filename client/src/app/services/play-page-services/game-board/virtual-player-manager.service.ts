@@ -56,6 +56,7 @@ export class VirtualPlayerManagerService {
         if (player.comportement === ProfileEnum.Agressive) {
             this.handleAgressiveComportment(player, didTurnStarted);
         }
+        // TODO: Implement defensive comportment
         // else if(player.profile === ProfileEnum.defensive) {
         //     this.handleDefensiveComportment(player);
         // }
