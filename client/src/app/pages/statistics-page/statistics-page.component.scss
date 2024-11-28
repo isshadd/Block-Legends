@@ -1,0 +1,40 @@
+@import 'src/_variables.scss';
+#page-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    #page-separator {
+        width: 200vh;
+        height: 90vb;
+        background-color: $primary-dark;
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        border: 2px solid darken($primary-dark, 10%);
+        #players-table {
+            width: 140vh;
+            height: 80vb;
+            background-color: aqua;
+        }
+        #game-statistics-chat-container {
+            display: flex;
+            flex-direction: column;
+            #game-statistics-table {
+                width: 50vh;
+                height: 50vh;
+                background-color: red;
+            }
+            #chat-container {
+                width: 50vh;
+                height: 30vh;
+                background-color: yellow;
+            }
+        }
+    }
+}
