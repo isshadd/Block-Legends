@@ -15,10 +15,14 @@ export class FightViewComponent {
     playerDiceResult = 0;
     constructor(public battleManagerService: BattleManagerService) {
         this.battleManagerService.signalUserAttacked$.subscribe((data) => {
-            this.attackAnimation(data.attackResult);
+            if (battleManagerService.isUserTurn) {
+                this.attackAnimation(data.attackResult);
+            }
         });
         this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
-            this.escapeAnimation();
+            if (battleManagerService.isUserTurn) {
+                this.escapeAnimation();
+            }
         });
         this.battleManagerService.signalOpponentAttacked$.subscribe((attackResult: number) => {
             this.opponentAttackAnimation(attackResult);
