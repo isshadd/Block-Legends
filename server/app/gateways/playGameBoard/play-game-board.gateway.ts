@@ -312,6 +312,11 @@ export class PlayGameBoardGateway {
 
         this.handleEndBattle(accessCode);
         this.server.to(accessCode.toString()).emit(SocketEvents.BATTLE_ENDED_BY_ESCAPE, firstPlayer);
+        if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, firstPlayer).isVirtual) {
+            setTimeout(() => {
+                this.continueVirtualPlayerTurn(accessCode, firstPlayer);
+            }, this.playGameBoardSocketService.getRandomDelay());
+        }
     }
 
     handleBattleEndedByDeath(accessCode: number, winnerPlayer: string) {

@@ -132,6 +132,12 @@ export class VirtualPlayerManagerService {
         }
 
         if (targetTile) {
+            const playerTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
+            if (this.areTilesEqual(playerTile, targetTile)) {
+                this.signalVirtualPlayerEndedTurn.next(player.socketId);
+                return;
+            }
+
             this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
             this.signalMoveVirtualPlayer.next({ coordinates: targetTile.coordinates, virtualPlayerId: player.socketId });
         }
