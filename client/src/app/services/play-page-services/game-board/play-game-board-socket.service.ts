@@ -180,10 +180,17 @@ export class PlayGameBoardSocketService implements OnDestroy {
 
         this.socket.on(
             SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN,
-            (data: { playerId: string; enemyId: string; enemyRemainingHealth: number; virtualPlayerRemainingEvasions: number }) => {
+            (data: {
+                playerId: string;
+                enemyId: string;
+                virtualPlayerRemainingHealth: number;
+                enemyRemainingHealth: number;
+                virtualPlayerRemainingEvasions: number;
+            }) => {
                 this.virtualPlayerBattleManagerService.startTurn(
                     data.playerId,
                     data.enemyId,
+                    data.virtualPlayerRemainingHealth,
                     data.enemyRemainingHealth,
                     data.virtualPlayerRemainingEvasions,
                 );

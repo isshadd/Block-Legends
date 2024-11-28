@@ -14,17 +14,30 @@ export class VirtualPlayerBattleManagerService {
         public battleManagerService: BattleManagerService,
     ) {}
 
-    startTurn(playerId: string, enemyId: string, enemyRemainingHealth: number, virtualPlayerRemainingEvasions: number) {
+    startTurn(
+        playerId: string,
+        enemyId: string,
+        virtualPlayerRemainingHealth: number,
+        enemyRemainingHealth: number,
+        virtualPlayerRemainingEvasions: number,
+    ) {
         const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
         const enemyPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(enemyId);
         if (virtualPlayer && enemyPlayer) {
-            this.handleVirtualPlayerTurn(virtualPlayer, enemyPlayer, enemyRemainingHealth, virtualPlayerRemainingEvasions);
+            this.handleVirtualPlayerTurn(
+                virtualPlayer,
+                enemyPlayer,
+                virtualPlayerRemainingHealth,
+                enemyRemainingHealth,
+                virtualPlayerRemainingEvasions,
+            );
         }
     }
 
     handleVirtualPlayerTurn(
         player: PlayerCharacter,
         enemyPlayer: PlayerCharacter,
+        virtualPlayerRemainingHealth: number,
         enemyRemainingHealth: number,
         virtualPlayerRemainingEvasions: number,
     ) {
@@ -33,7 +46,7 @@ export class VirtualPlayerBattleManagerService {
         if (player.comportement === ProfileEnum.Agressive) {
             this.handleAgressiveComportment(player, enemyPlayer, enemyRemainingHealth);
         } else if (player.comportement === ProfileEnum.Defensive) {
-            this.handleDefensiveComportment(player, enemyPlayer, enemyRemainingHealth, virtualPlayerRemainingEvasions);
+            this.handleDefensiveComportment(player, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth, virtualPlayerRemainingEvasions);
         }
     }
 
@@ -44,10 +57,11 @@ export class VirtualPlayerBattleManagerService {
     private handleDefensiveComportment(
         virtualPlayer: PlayerCharacter,
         enemyPlayer: PlayerCharacter,
+        virtualPlayerRemainingHealth: number,
         enemyRemainingHealth: number,
         virtualPlayerRemainingEvasions: number,
     ) {
-        if (virtualPlayerRemainingEvasions > 0) {
+        if (virtualPlayerRemainingEvasions > 0 && virtualPlayerRemainingHealth < virtualPlayer.attributes.life) {
             this.escape(virtualPlayer);
         } else {
             this.attack(virtualPlayer, enemyPlayer, enemyRemainingHealth);

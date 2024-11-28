@@ -238,7 +238,6 @@ export class VirtualPlayerManagerService {
 
             if (possibleItems.length > 0) {
                 // TODO Choose what item to throw
-                return;
             }
 
             this.playGameBoardManagerService.checkIfPLayerDidEverything(player);
