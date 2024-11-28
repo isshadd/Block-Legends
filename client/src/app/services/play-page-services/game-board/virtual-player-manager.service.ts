@@ -227,6 +227,10 @@ export class VirtualPlayerManagerService {
             playerTurnId: player.socketId,
         });
 
+        if (this.checkIfVirtualPlayerWonCTFGame(player, nextPathTile)) {
+            return;
+        }
+
         let possibleItems: Item[] = [];
         const didGrabItem = this.playGameBoardManagerService.handleTileItem(nextPathTile, player, possibleItems);
         if (didGrabItem) {
@@ -271,7 +275,6 @@ export class VirtualPlayerManagerService {
                 toTile: spawnTile.coordinates,
             });
         }
-        // TODO: Drop items
     }
 
     checkIfPlayerWonClassicGame(player: PlayerCharacter) {
@@ -283,5 +286,20 @@ export class VirtualPlayerManagerService {
         if (player.fightWins >= value) {
             this.playGameBoardManagerService.signalUserWon.next(player.socketId);
         }
+    }
+
+    checkIfVirtualPlayerWonCTFGame(player: PlayerCharacter, newPlayerTile: Tile): boolean {
+        if (!this.gameMapDataManagerService.isGameModeCTF()) {
+            return false;
+        }
+
+        const spawnTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.spawnCoordinates) as WalkableTile;
+
+        if (this.areTilesEqual(spawnTile, newPlayerTile) && this.playGameBoardManagerService.doesPlayerHaveItem(player, ItemType.Flag)) {
+            this.playGameBoardManagerService.signalUserWon.next(player.socketId);
+            return true;
+        }
+
+        return false;
     }
 }
