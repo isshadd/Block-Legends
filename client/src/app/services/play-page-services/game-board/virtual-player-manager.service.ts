@@ -171,14 +171,14 @@ export class VirtualPlayerManagerService {
     }
 
     findNearestPossibleItem(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): TerrainTile | null {
-        const excludeTypes = [ItemType.Spawn, ItemType.EmptyItem, ItemType.Random];
         let nearestTile: TerrainTile | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
+        // TODO: Instead of distance, use a priority system to choose the best item
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove.isTerrain()) {
                 const item = (possibleMove as TerrainTile).item;
-                if (item && !excludeTypes.includes(item.type)) {
+                if (item && item.isGrabbable()) {
                     const distance = this.calculateDistance(virtualPlayer.mapEntity.coordinates, possibleMove.coordinates);
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -189,6 +189,16 @@ export class VirtualPlayerManagerService {
         }
 
         return nearestTile;
+    }
+
+    getAggressivePlayerItemPriority(itemType: ItemType): number {
+        return 0;
+        // TODO: Swith case for item type and return priority
+    }
+
+    getDefensivePlayerItemPriority(itemType: ItemType): number {
+        return 0;
+        // TODO: Swith case for item type and return priority
     }
 
     calculateDistance(from: Vec2, to: Vec2): number {
@@ -234,25 +244,60 @@ export class VirtualPlayerManagerService {
         let possibleItems: Item[] = [];
         const didGrabItem = this.playGameBoardManagerService.handleTileItem(nextPathTile, player, possibleItems);
         if (didGrabItem) {
-            this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
-
             if (possibleItems.length > 0) {
-                // TODO Choose what item to throw
+                this.throwItemInListAndKeepTheRest(player, possibleItems, nextPathTile);
             }
 
+            if (this.didPlayerTripped(nextPathTile, player)) {
+                return;
+            }
+
+            this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
             this.playGameBoardManagerService.checkIfPLayerDidEverything(player);
             this.signalVirtualPlayerContinueTurn.next(player.socketId);
             return;
         }
 
-        const didPlayerTripped = this.playGameBoardManagerService.didPlayerTripped(nextPathTile.type, player);
-        if (didPlayerTripped) {
-            this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
-            this.playGameBoardManagerService.signalUserGotTurnEnded.next(player.socketId);
+        if (this.didPlayerTripped(nextPathTile, player)) {
             return;
         }
 
         this.signalMoveVirtualPlayer.next({ coordinates: destination, virtualPlayerId: player.socketId });
+    }
+
+    didPlayerTripped(tile: Tile, player: PlayerCharacter): boolean {
+        if (this.playGameBoardManagerService.didPlayerTripped(tile.type, player)) {
+            this.playGameBoardManagerService.signalUserFinishedMoving.next(player.socketId);
+            this.playGameBoardManagerService.signalUserGotTurnEnded.next(player.socketId);
+            return true;
+        }
+        return false;
+    }
+
+    throwItemInListAndKeepTheRest(player: PlayerCharacter, possibleItems: Item[], nextPathTile: Tile) {
+        // TODO: Choose item to throw based on priority
+        const item = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+        this.throwItem(player, possibleItems, item, nextPathTile);
+    }
+
+    throwItem(player: PlayerCharacter, possibleItems: Item[], item: Item, nextPathTile: Tile) {
+        const terrainTile = nextPathTile as TerrainTile;
+
+        const lastItem = possibleItems.pop();
+        if (item !== lastItem) {
+            this.playGameBoardManagerService.signalUserThrewItem.next({
+                itemType: item.type,
+                tileCoordinates: terrainTile.coordinates,
+                playerTurnId: player.socketId,
+            });
+            if (terrainTile.item) {
+                this.playGameBoardManagerService.signalUserGrabbedItem.next({
+                    itemType: terrainTile.item.type,
+                    tileCoordinates: terrainTile.coordinates,
+                    playerTurnId: player.socketId,
+                });
+            }
+        }
     }
 
     wonBattle(playerId: string) {
