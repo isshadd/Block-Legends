@@ -33,17 +33,10 @@
                 <button class="dark-button" type="button" (click)="addVirtualPlayer(profileAggressive)" [disabled]="isLocked$ | async">
                     Ajouter un joueur virtuel agressif
                 </button>
-                <button
-                    class="dark-button"
-                    type="button"
-                    (click)="addVirtualPlayer(profileDefensive)"
-                    [disabled]="(isLocked$ | async) || hasVirtualPlayer"
-                >
+                <button class="dark-button" type="button" (click)="addVirtualPlayer(profileDefensive)" [disabled]="isLocked$ | async">
                     Ajouter un joueur virtuel défensif
                 </button>
-                <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="(isLocked$ | async) || hasVirtualPlayer">
-                    Verouiller la salle
-                </button>
+                <button class="dark-button" type="button" (click)="lockRoom()" [disabled]="isLocked$ | async">Verouiller la salle</button>
             </div>
             <div class="button-container">
                 <button

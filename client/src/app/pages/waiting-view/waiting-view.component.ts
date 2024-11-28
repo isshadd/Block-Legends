@@ -43,7 +43,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     maxVirtualPlayerRetries = FIVE;
     lastVirtualPlayerSocketId: string | null = null;
     virtualPlayerRetryCount = 0;
-    hasVirtualPlayer = false;
 
     private destroy$ = new Subject<void>();
 
@@ -128,7 +127,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
 
     addVirtualPlayer(profile: ProfileEnum): void {
-        if (!this.hasVirtualPlayer) {
+        {
             if (this.playersCounter <= this.maxPlayers) {
                 this.isMaxPlayer = true;
                 return;
@@ -138,7 +137,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
             this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
             this.playersCounter++;
-            this.hasVirtualPlayer = true;
         }
     }
 
@@ -173,9 +171,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     kickPlayer(player: PlayerCharacter): void {
         if (this.isOrganizer) {
             this.webSocketService.kickPlayer(player);
-        }
-        if (player.isVirtual) {
-            this.hasVirtualPlayer = false;
         }
     }
 
