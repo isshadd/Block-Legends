@@ -252,7 +252,12 @@ export class VirtualPlayerManagerService {
         this.signalMoveVirtualPlayer.next({ coordinates: destination, virtualPlayerId: player.socketId });
     }
 
-    wonBattle(playerId: string) {}
+    wonBattle(playerId: string) {
+        const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
+        if (virtualPlayer) {
+            this.checkIfPlayerWonClassicGame(virtualPlayer);
+        }
+    }
 
     lostBattle(playerId: string) {
         const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
@@ -265,6 +270,18 @@ export class VirtualPlayerManagerService {
                 fromTile: playerTile.coordinates,
                 toTile: spawnTile.coordinates,
             });
+        }
+        // TODO: Drop items
+    }
+
+    checkIfPlayerWonClassicGame(player: PlayerCharacter) {
+        if (this.gameMapDataManagerService.isGameModeCTF()) {
+            return;
+        }
+
+        const value = 3;
+        if (player.fightWins >= value) {
+            this.playGameBoardManagerService.signalUserWon.next(player.socketId);
         }
     }
 }
