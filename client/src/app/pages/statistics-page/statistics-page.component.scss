@@ -53,24 +53,22 @@
             .table-row {
                 display: contents;
             }
-
             .table-cell {
                 padding: 10px;
                 border-bottom: 2px solid darken($primary-dark, 10%);
                 border-right: 2px solid darken($primary-dark, 10%);
-                font-size: 2.5vh;
+                font-size: 1.5vh;
                 color: $primary-light;
                 text-align: center;
-            }
-
-            .table-cell:last-child {
-                border-right: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
 
             .table-header .table-cell {
-                font-size: 3vh;
+                font-size: 2vh;
                 font-weight: bold;
-                background-color: $primary-light;
+                background-color: $secondary;
                 color: $primary-dark;
             }
 
