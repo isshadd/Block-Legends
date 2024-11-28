@@ -228,6 +228,14 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.playGameBoardManagerService.endBattleByDeath(data.winnerPlayer, data.loserPlayer);
         });
 
+        this.socket.on(SocketEvents.VIRTUAL_PLAYER_WON_BATTLE, (playerId: string) => {
+            this.virtualPlayerManagerService.wonBattle(playerId);
+        });
+
+        this.socket.on(SocketEvents.VIRTUAL_PLAYER_LOST_BATTLE, (playerId: string) => {
+            this.virtualPlayerManagerService.lostBattle(playerId);
+        });
+
         this.socket.on(SocketEvents.GAME_BOARD_PLAYER_WON, (playerId: string) => {
             this.playGameBoardManagerService.endGame(playerId);
             const wait = 5000;

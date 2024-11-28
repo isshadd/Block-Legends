@@ -75,4 +75,6 @@ export const enum SocketEvents {
     START_BATTLE_TURN = 'startBattleTurn',
     ROOM_USER_GRABBED_ITEM = 'roomUserGrabbedItem',
     ROOM_USER_THREW_ITEM = 'roomUserThrewItem',
+    VIRTUAL_PLAYER_WON_BATTLE = 'virtualPlayerWon',
+    VIRTUAL_PLAYER_LOST_BATTLE = 'virtualPlayerLost',
 }

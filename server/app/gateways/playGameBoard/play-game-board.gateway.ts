@@ -325,12 +325,39 @@ export class PlayGameBoardGateway {
         const secondPlayer = battleRoom.secondPlayerId;
 
         this.handleEndBattle(accessCode);
+
         if (winnerPlayer === firstPlayer) {
             this.server.to(accessCode.toString()).emit(SocketEvents.FIRST_PLAYER_WON_BATTLE, { firstPlayer, loserPlayer: secondPlayer });
+
+            if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, firstPlayer).isVirtual) {
+                this.server
+                    .to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode))
+                    .emit(SocketEvents.VIRTUAL_PLAYER_WON_BATTLE, firstPlayer);
+                setTimeout(() => {
+                    this.continueVirtualPlayerTurn(accessCode, firstPlayer);
+                }, this.playGameBoardSocketService.getRandomDelay());
+            }
+            if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, secondPlayer).isVirtual) {
+                this.server
+                    .to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode))
+                    .emit(SocketEvents.VIRTUAL_PLAYER_LOST_BATTLE, secondPlayer);
+            }
         } else {
             this.server
                 .to(accessCode.toString())
                 .emit(SocketEvents.SECOND_PLAYER_WON_BATTLE, { winnerPlayer: secondPlayer, loserPlayer: firstPlayer });
+
+            if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, secondPlayer).isVirtual) {
+                this.server
+                    .to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode))
+                    .emit(SocketEvents.VIRTUAL_PLAYER_WON_BATTLE, secondPlayer);
+            }
+            if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, firstPlayer).isVirtual) {
+                this.server
+                    .to(this.playGameBoardSocketService.getRandomClientInRoom(accessCode))
+                    .emit(SocketEvents.VIRTUAL_PLAYER_LOST_BATTLE, firstPlayer);
+            }
+
             this.handleTimeOut(accessCode);
         }
     }

@@ -251,4 +251,20 @@ export class VirtualPlayerManagerService {
 
         this.signalMoveVirtualPlayer.next({ coordinates: destination, virtualPlayerId: player.socketId });
     }
+
+    wonBattle(playerId: string) {}
+
+    lostBattle(playerId: string) {
+        const virtualPlayer = this.playGameBoardManagerService.findPlayerFromSocketId(playerId);
+        if (virtualPlayer) {
+            const playerTile = this.gameMapDataManagerService.getTileAt(virtualPlayer.mapEntity.coordinates) as WalkableTile;
+            const spawnTile = this.gameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt(virtualPlayer.mapEntity) as WalkableTile;
+
+            this.playGameBoardManagerService.signalUserRespawned.next({
+                playerTurnId: virtualPlayer.socketId,
+                fromTile: playerTile.coordinates,
+                toTile: spawnTile.coordinates,
+            });
+        }
+    }
 }
