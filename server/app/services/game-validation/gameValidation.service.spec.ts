@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
-import { GameValidationService } from './gameValidation.service';
-import { GameService } from '@app/services/game/game.service';
 import { Game } from '@app/model/database/game';
+import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
+import { GameService } from '@app/services/game/game.service';
 import { GameMode } from '@common/enums/game-mode';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
-import { ItemType } from '@common/enums/item-type';
+import { Test, TestingModule } from '@nestjs/testing';
+import { GameValidationService } from './gameValidation.service';
 
 const mockGameService = {
     getGameByName: jest.fn(),
@@ -433,6 +433,85 @@ describe('GameValidationService', () => {
             it('should not identify non-Wall tiles as wall', async () => {
                 const result = await service.isTileWall({ type: TileType.Grass });
                 expect(result).toBe(false);
+            });
+        });
+        describe('isValidCTF', () => {
+            it('should return true when CTF game has a flag', async () => {
+                const game = {
+                    mode: GameMode.CTF,
+                    tiles: [
+                        [{ type: TileType.Grass }, { type: TileType.Wall }],
+                        [{ type: TileType.Grass, item: { type: ItemType.Flag } }, { type: TileType.Grass }],
+                    ],
+                } as Game;
+                mockGameService.getGameByName.mockResolvedValue(game);
+
+                const result = await service.isValidCTF(game);
+
+                expect(result).toBe(true);
+            });
+
+            it('should return false when CTF game has no flag', async () => {
+                const game = {
+                    mode: GameMode.CTF,
+                    tiles: [
+                        [{ type: TileType.Grass }, { type: TileType.Wall }],
+                        [{ type: TileType.Grass }, { type: TileType.Grass }],
+                    ],
+                } as Game;
+                mockGameService.getGameByName.mockResolvedValue(game);
+
+                const result = await service.isValidCTF(game);
+
+                expect(result).toBe(false);
+            });
+
+            it('should return true when non-CTF game has no flag', async () => {
+                const game = {
+                    mode: GameMode.Classique,
+                    tiles: [
+                        [{ type: TileType.Grass }, { type: TileType.Wall }],
+                        [{ type: TileType.Grass }, { type: TileType.Grass }],
+                    ],
+                } as Game;
+                mockGameService.getGameByName.mockResolvedValue(game);
+
+                const result = await service.isValidCTF(game);
+
+                expect(result).toBe(true);
+            });
+
+            it('should handle UpdateGameDto input', async () => {
+                const updateDto = new UpdateGameDto();
+                updateDto.mode = GameMode.CTF;
+                const game = {
+                    mode: GameMode.CTF,
+                    tiles: [
+                        [{ type: TileType.Grass }, { type: TileType.Wall }],
+                        [{ type: TileType.Grass, item: { type: ItemType.Flag } }, { type: TileType.Grass }],
+                    ],
+                } as Game;
+                mockGameService.getGameByName.mockResolvedValue(game);
+
+                const result = await service.isValidCTF(updateDto);
+
+                expect(result).toBe(true);
+                expect(mockGameService.getGameByName).toHaveBeenCalled();
+            });
+
+            it('should return true for CTF game with multiple flags', async () => {
+                const game = {
+                    mode: GameMode.CTF,
+                    tiles: [
+                        [{ type: TileType.Grass, item: { type: ItemType.Flag } }, { type: TileType.Wall }],
+                        [{ type: TileType.Grass, item: { type: ItemType.Flag } }, { type: TileType.Grass }],
+                    ],
+                } as Game;
+                mockGameService.getGameByName.mockResolvedValue(game);
+
+                const result = await service.isValidCTF(game);
+
+                expect(result).toBe(true);
             });
         });
     });
