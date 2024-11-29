@@ -27,6 +27,8 @@ describe('BattleManagerService - init', () => {
             defenseDice: 6,
             mapEntity: { isPlayerOnIce: false },
         } as PlayerCharacter;
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should initialize the battle with correct values', () => {
@@ -119,6 +121,8 @@ describe('BattleManagerService - onUserAttack', () => {
 
         service.currentPlayer = {} as PlayerCharacter;
         service.opponentPlayer = {} as PlayerCharacter;
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should calculate and emit attack result if action is valid', () => {
@@ -134,7 +138,7 @@ describe('BattleManagerService - onUserAttack', () => {
         expect(service.isValidAction).toHaveBeenCalled();
         expect(service.attackDiceResult).toHaveBeenCalled();
         expect(service.defenseDiceResult).toHaveBeenCalled();
-        expect(signalSpy).toHaveBeenCalledWith(result);
+        expect(signalSpy).toHaveBeenCalledWith({ attackResult: result, playerHasTotem: false });
     });
 
     it('should not emit attack result if action is invalid', () => {
@@ -210,6 +214,8 @@ describe('BattleManagerService - onOpponentAttack', () => {
         service.currentPlayer = { attributes: { life: 10 } } as PlayerCharacter;
         service.opponentPlayer = {} as PlayerCharacter;
         service.userRemainingHealth = 10;
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should decrease userRemainingHealth and emit attack result if opponent attacks with positive result on opponent’s turn', () => {
@@ -291,6 +297,8 @@ describe('BattleManagerService - attackDiceResult', () => {
             providers: [BattleManagerService],
         });
         service = TestBed.inject(BattleManagerService);
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should calculate attack result without ice penalty when player is not on ice', () => {
@@ -339,6 +347,8 @@ describe('BattleManagerService - defenseDiceResult', () => {
             providers: [BattleManagerService],
         });
         service = TestBed.inject(BattleManagerService);
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should calculate defense result based on opponentDefense and defense dice when opponent player is set', () => {
@@ -375,6 +385,8 @@ describe('BattleManagerService - onSuccessfulAttack', () => {
 
         service.opponentPlayer = {} as PlayerCharacter;
         service.opponentRemainingHealth = 10;
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should decrease opponentRemainingHealth by 1 if action is valid', () => {
@@ -474,6 +486,8 @@ describe('BattleManagerService - onOpponentAttack early return', () => {
         service = TestBed.inject(BattleManagerService);
 
         service.userRemainingHealth = 10;
+
+        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
     });
 
     it('should return early if currentPlayer is null', () => {

@@ -3,9 +3,10 @@ export enum ItemType {
     Sword = 'Sword',
     Elytra = 'Elytra',
     EnchantedBook = 'EnchantedBook',
-    Potion = 'Potion',
+    MagicShield = 'Potion',
     Totem = 'Totem',
     Flag = 'Flag',
     Spawn = 'Spawn',
     Random = 'Random',
+    EmptyItem = 'EmptyItem',
 }

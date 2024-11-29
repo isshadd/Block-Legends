@@ -1,6 +1,8 @@
 import { Profile } from '@common/enums/profile';
 import { Avatar } from '../../enums/avatar-enum';
 import { Character } from '../../interfaces/character';
+import { EmptyItem } from '../Items/empty-item';
+import { Item } from '../Items/item';
 import { PlayerAttributes } from './player-attributes';
 import { PlayerMapEntity } from './player-map-entity';
 
@@ -18,10 +20,15 @@ export class PlayerCharacter implements Character {
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
     fightWins: number = 0;
+    fightLoses: number = 0;
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
+    inventory: Item[] = [new EmptyItem(), new EmptyItem()];
+
+    currentMovePoints: number = 0;
+    currentActionPoints: number = 0;
 
     // Pour JV:
 
