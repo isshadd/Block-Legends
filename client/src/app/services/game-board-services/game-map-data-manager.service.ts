@@ -61,6 +61,34 @@ export class GameMapDataManagerService {
         }
     }
 
+    async convertJsonToGameShared(jsonFile: File): Promise<GameShared> {
+        const jsonText = await jsonFile.text();
+
+        const jsonObject = JSON.parse(jsonText);
+
+        const gameShared: GameShared = {
+            _id: jsonObject._id,
+            createdAt: jsonObject.createdAt ? new Date(jsonObject.createdAt) : undefined,
+            updatedAt: jsonObject.updatedAt ? new Date(jsonObject.updatedAt) : undefined,
+            name: jsonObject.name,
+            description: jsonObject.description,
+            size: jsonObject.size as MapSize,
+            mode: jsonObject.mode as GameMode,
+            imageUrl: jsonObject.imageUrl,
+            isVisible: jsonObject.isVisible,
+            tiles: jsonObject.tiles.map((row: unknown[]) =>
+                row.map(
+                    (tile: unknown) =>
+                        ({
+                            ...(tile as object),
+                        }) as TileShared,
+                ),
+            ),
+        };
+
+        return gameShared;
+    }
+
     resetCurrentValues() {
         this.currentName = this.databaseGame.name;
         this.currentDescription = this.databaseGame.description;
