@@ -150,7 +150,7 @@ export class MapEditorSideMenuService {
 
     sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
-            if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn) {
+            if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn && (item as Item).type !== ItemType.Flag) {
                 item.visibleState = VisibleState.Disabled;
             }
         }

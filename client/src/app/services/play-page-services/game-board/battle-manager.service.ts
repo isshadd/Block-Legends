@@ -61,7 +61,10 @@ export class BattleManagerService {
     onUserAttack() {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
-            const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
+            const playerHasTotem =
+                !!this.currentPlayer &&
+                this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem) &&
+                !this.isPlayerHealthMax(this.currentPlayer, this.userRemainingHealth);
 
             if (this.currentPlayer?.socketId) {
                 this.signalUserAttacked.next({ playerTurnId: this.currentPlayer?.socketId, attackResult, playerHasTotem });
@@ -86,7 +89,11 @@ export class BattleManagerService {
 
         if (!this.isUserTurn) {
             if (attackResult > 0) {
-                if (this.opponentPlayer && this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem)) {
+                if (
+                    this.opponentPlayer &&
+                    this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) &&
+                    !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)
+                ) {
                     this.opponentRemainingHealth++;
                 }
 
@@ -136,7 +143,11 @@ export class BattleManagerService {
             return;
         }
 
-        if (this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem)) {
+        if (
+            this.currentPlayer &&
+            this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem) &&
+            !this.isPlayerHealthMax(this.currentPlayer, this.userRemainingHealth)
+        ) {
             this.userRemainingHealth++;
         }
 
@@ -148,6 +159,10 @@ export class BattleManagerService {
         setTimeout(() => {
             this.clearBattle();
         }, 1000);
+    }
+
+    isPlayerHealthMax(player: PlayerCharacter, currentHealth: number): boolean {
+        return currentHealth === player.attributes.life;
     }
 
     doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {

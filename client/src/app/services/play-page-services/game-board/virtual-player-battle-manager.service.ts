@@ -44,14 +44,19 @@ export class VirtualPlayerBattleManagerService {
         if (!player.isVirtual) return;
 
         if (player.comportement === ProfileEnum.Agressive) {
-            this.handleAgressiveComportment(player, enemyPlayer, enemyRemainingHealth);
+            this.handleAgressiveComportment(player, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth);
         } else if (player.comportement === ProfileEnum.Defensive) {
             this.handleDefensiveComportment(player, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth, virtualPlayerRemainingEvasions);
         }
     }
 
-    private handleAgressiveComportment(virtualPlayer: PlayerCharacter, enemyPlayer: PlayerCharacter, enemyRemainingHealth: number) {
-        this.attack(virtualPlayer, enemyPlayer, enemyRemainingHealth);
+    private handleAgressiveComportment(
+        virtualPlayer: PlayerCharacter,
+        enemyPlayer: PlayerCharacter,
+        virtualPlayerRemainingHealth: number,
+        enemyRemainingHealth: number,
+    ) {
+        this.attack(virtualPlayer, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth);
     }
 
     private handleDefensiveComportment(
@@ -64,13 +69,15 @@ export class VirtualPlayerBattleManagerService {
         if (virtualPlayerRemainingEvasions > 0 && virtualPlayerRemainingHealth < virtualPlayer.attributes.life) {
             this.escape(virtualPlayer);
         } else {
-            this.attack(virtualPlayer, enemyPlayer, enemyRemainingHealth);
+            this.attack(virtualPlayer, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth);
         }
     }
 
-    attack(virtualPlayer: PlayerCharacter, enemyPlayer: PlayerCharacter, enemyRemainingHealth: number) {
+    attack(virtualPlayer: PlayerCharacter, enemyPlayer: PlayerCharacter, virtualPlayerRemainingHealth: number, enemyRemainingHealth: number) {
         const attackResult = this.attackDiceResult(virtualPlayer) - this.defenseDiceResult(enemyPlayer, enemyRemainingHealth);
-        const playerHasTotem = this.battleManagerService.doesPlayerHaveItem(virtualPlayer, ItemType.Totem);
+        const playerHasTotem =
+            this.battleManagerService.doesPlayerHaveItem(virtualPlayer, ItemType.Totem) &&
+            !this.battleManagerService.isPlayerHealthMax(virtualPlayer, virtualPlayerRemainingHealth);
 
         if (virtualPlayer?.socketId) {
             this.battleManagerService.signalUserAttacked.next({ playerTurnId: virtualPlayer?.socketId, attackResult, playerHasTotem });
