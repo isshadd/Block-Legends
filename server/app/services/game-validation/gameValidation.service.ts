@@ -2,6 +2,7 @@ import { Game } from '@app/model/database/game';
 import { UpdateGameDto } from '@app/model/dto/game/update-game.dto';
 import { Tile } from '@app/model/schema/tile.schema';
 import { GameService } from '@app/services/game/game.service';
+import { GameMode } from '@common/enums/game-mode';
 import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
@@ -42,6 +43,11 @@ export class GameValidationService {
             errors.push('La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.');
         }
 
+        const isValidateCTF = await this.isValidCTF(game);
+        if (!isValidateCTF) {
+            errors.push('Un jeu en mode CTF doit nécessairement contenir un drapeau.');
+        }
+
         return {
             isValid: errors.length === 0,
             errors,
@@ -68,6 +74,21 @@ export class GameValidationService {
             gameToValidate = game;
         }
         return gameToValidate;
+    }
+
+    async isValidCTF(game: Game | UpdateGameDto): Promise<boolean> {
+        const gameToValidate = await this.assignGameToRightType(game);
+        if (gameToValidate.mode === GameMode.CTF) {
+            for (const row of gameToValidate.tiles) {
+                for (const tile of row) {
+                    if (tile.item && tile.item.type === ItemType.Flag) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     async isValidSizeBySpawnPoints(game: Game | UpdateGameDto): Promise<boolean> {
