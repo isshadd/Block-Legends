@@ -26,6 +26,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 
 @Component({
     selector: 'app-play-page',
@@ -40,6 +41,7 @@ import { Subject, takeUntil } from 'rxjs';
         PlayGameSideViewBarComponent,
         ItemListContainerComponent,
         ItemChooseComponent,
+        TabContainerComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',

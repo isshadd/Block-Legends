@@ -26,17 +26,23 @@
             (mapTileMouseLeave)="onMapTileMouseLeave($event)"
         >
         </app-map>
+        <!-- 
+        <app-timer
+            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [seconds]="playGameBoardManagerService.currentTime"
+            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
+        ></app-timer> -->
 
+        @if (playPageMouseHandlerService.rightSelectedTile) {
+        <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
+        }
+    </div>
+    <div id="side-menu-right">
         <app-timer
             [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
             [seconds]="playGameBoardManagerService.currentTime"
             [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
         ></app-timer>
-
-        @if (playPageMouseHandlerService.rightSelectedTile) {
-        <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
-        }
-
         <div class="action-container">
             <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
 
@@ -49,6 +55,7 @@
                 }
                 <button class="action-button" (click)="leaveGame()">Abandon</button>
             </div>
+            <app-tab-container></app-tab-container>
         </div>
     </div>
 </div>
