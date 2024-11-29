@@ -76,11 +76,11 @@ export class GameMapDataManagerService {
             mode: jsonObject.mode as GameMode,
             imageUrl: jsonObject.imageUrl,
             isVisible: jsonObject.isVisible,
-            tiles: jsonObject.tiles.map((row: any[]) =>
+            tiles: jsonObject.tiles.map((row: unknown[]) =>
                 row.map(
-                    (tile: any) =>
+                    (tile: unknown) =>
                         ({
-                            ...tile,
+                            ...(tile as object),
                         }) as TileShared,
                 ),
             ),

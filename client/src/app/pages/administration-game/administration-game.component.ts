@@ -20,7 +20,7 @@ export class AdministrationGameComponent {
     constructor(
         public dialog: MatDialog,
         private gameServerCommunicationService: GameServerCommunicationService,
-        private gameMapDataManagerService: GameMapDataManagerService, //private router: Router,
+        private gameMapDataManagerService: GameMapDataManagerService,
     ) {}
 
     openCreateGameModal(): void {
@@ -38,7 +38,6 @@ export class AdministrationGameComponent {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
             this.selectedFile = input.files[0];
-            console.log('Fichier sélectionné :', this.selectedFile);
             try {
                 const importedGame = await this.gameMapDataManagerService.convertJsonToGameShared(this.selectedFile);
                 this.gameServerCommunicationService.addGame(importedGame).subscribe({
@@ -46,12 +45,17 @@ export class AdministrationGameComponent {
                         window.location.reload();
                     },
                     error: (errors: unknown) => {
-                        this.gameMapDataManagerService.openErrorModal(errors as string | string[]);
+                        if (typeof errors === 'string' || Array.isArray(errors)) {
+                            this.gameMapDataManagerService.openErrorModal(errors);
+                        } else {
+                            this.gameMapDataManagerService.openErrorModal(
+                                "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
+                            );
+                        }
                     },
                 });
             } catch (error) {
-                console.error('Erreur lors de la conversion du fichier :', error);
-                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier<br> Veuillez vérifier le format du fichier.`);
+                this.gameMapDataManagerService.openErrorModal("Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.");
             }
         }
     }

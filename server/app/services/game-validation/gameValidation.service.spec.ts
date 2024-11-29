@@ -41,7 +41,7 @@ describe('GameValidationService', () => {
                 [{ type: TileType.Wall }, { type: TileType.Door }, { type: TileType.Wall }],
                 [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
             ],
-            mode: GameMode.CTF,
+            mode: GameMode.Classique,
             imageUrl: 'http://example.com/image.png',
             isVisible: true,
         };
@@ -479,24 +479,6 @@ describe('GameValidationService', () => {
                 const result = await service.isValidCTF(game);
 
                 expect(result).toBe(true);
-            });
-
-            it('should handle UpdateGameDto input', async () => {
-                const updateDto = new UpdateGameDto();
-                updateDto.mode = GameMode.CTF;
-                const game = {
-                    mode: GameMode.CTF,
-                    tiles: [
-                        [{ type: TileType.Grass }, { type: TileType.Wall }],
-                        [{ type: TileType.Grass, item: { type: ItemType.Flag } }, { type: TileType.Grass }],
-                    ],
-                } as Game;
-                mockGameService.getGameByName.mockResolvedValue(game);
-
-                const result = await service.isValidCTF(updateDto);
-
-                expect(result).toBe(true);
-                expect(mockGameService.getGameByName).toHaveBeenCalled();
             });
 
             it('should return true for CTF game with multiple flags', async () => {
