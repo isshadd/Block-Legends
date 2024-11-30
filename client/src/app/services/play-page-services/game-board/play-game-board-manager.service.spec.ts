@@ -28,6 +28,8 @@ describe('PlayGameBoardManagerService', () => {
     mockPlayerCharacter.avatar = AvatarEnum.Steve;
     mockPlayerCharacter.attributes = { life: 3, speed: 3, attack: 3, defense: 3 };
     mockPlayerCharacter.mapEntity = new PlayerMapEntity('avatar.png');
+    mockPlayerCharacter.currentActionPoints = 0;
+    mockPlayerCharacter.currentMovePoints = 0;
 
     describe('Subjects and Observables', () => {
         let service: PlayGameBoardManagerService;
@@ -809,7 +811,7 @@ describe('PlayGameBoardManagerService', () => {
 
             service.checkIfPLayerDidEverything(mockPlayerCharacter);
 
-            expect(service.signalUserGotTurnEnded.next).toHaveBeenCalled();
+            expect(service.signalUserGotTurnEnded.next).toHaveBeenCalledWith(mockPlayerCharacter.socketId);
         });
 
         it('should emit signalUserGotTurnEnded if no move points and no adjacent action tiles are available', () => {
@@ -822,7 +824,7 @@ describe('PlayGameBoardManagerService', () => {
 
             service.checkIfPLayerDidEverything(mockPlayerCharacter);
 
-            expect(service.signalUserGotTurnEnded.next).toHaveBeenCalled();
+            expect(service.signalUserGotTurnEnded.next).toHaveBeenCalledWith(mockPlayerCharacter.socketId);
         });
 
         it('should not emit signalUserGotTurnEnded if move points are available', () => {

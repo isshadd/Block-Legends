@@ -6,8 +6,13 @@ import { PlayGameBoardSocketService } from '@app/services/play-page-services/gam
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
+import { VirtualPlayerBattleManagerService } from './virtual-player-battle-manager.service';
+import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;
@@ -19,6 +24,8 @@ describe('PlayGameBoardSocketService', () => {
     let mockBattleManagerService: any;
     let mockRouter: any;
     let mockPlayer: PlayerCharacter;
+    let mockVirtualPlayerManagerService: any;
+    let mockVirtualPlayerBattleManagerService: any;
     let socketCallbacks: { [event: string]: Function };
     /* eslint-disable */
     beforeEach(() => {
@@ -38,16 +45,38 @@ describe('PlayGameBoardSocketService', () => {
         };
 
         mockPlayGameBoardManagerService = {
-            signalUserMoved$: new Subject<unknown>(),
-            signalUserRespawned$: new Subject<unknown>(),
-            signalUserStartedMoving$: new Subject<void>(),
-            signalUserFinishedMoving$: new Subject<void>(),
-            signalUserGotTurnEnded$: new Subject<void>(),
-            signalUserDidDoorAction$: new Subject<unknown>(),
-            signalUserDidBattleAction$: new Subject<unknown>(),
-            signalUserGrabbedItem$: new Subject<unknown>(),
-            signalUserThrewItem$: new Subject<unknown>(),
-            signalUserWon$: new Subject<void>(),
+            signalUserMoved$: new Subject<{
+                fromTile: Vec2;
+                toTile: Vec2;
+                playerTurnId: string;
+            }>(),
+            signalUserRespawned$: new Subject<{
+                fromTile: Vec2;
+                toTile: Vec2;
+                playerTurnId: string;
+            }>(),
+            signalUserStartedMoving$: new Subject<string>(),
+            signalUserFinishedMoving$: new Subject<string>(),
+            signalUserGotTurnEnded$: new Subject<string>(),
+            signalUserDidDoorAction$: new Subject<{
+                tileCoordinate: Vec2;
+                playerTurnId: string;
+            }>(),
+            signalUserDidBattleAction$: new Subject<{
+                playerTurnId: string;
+                enemyPlayerId: string;
+            }>(),
+            signalUserGrabbedItem$: new Subject<{
+                itemType: ItemType;
+                tileCoordinates: Vec2;
+                playerTurnId: string;
+            }>(),
+            signalUserThrewItem$: new Subject<{
+                itemType: ItemType;
+                tileCoordinates: Vec2;
+                playerTurnId: string;
+            }>(),
+            signalUserWon$: new Subject<string>(),
             isUserTurn: false,
             currentPlayerIdTurn: '',
             winnerPlayer: null,
@@ -63,6 +92,8 @@ describe('PlayGameBoardSocketService', () => {
             continueTurn: jasmine.createSpy('continueTurn'),
             removePlayerFromMap: jasmine.createSpy('removePlayerFromMap'),
             playerUsedAction: jasmine.createSpy('playerUsedAction'),
+            grabItem: jasmine.createSpy('grabItem'),
+            throwItem: jasmine.createSpy('throwItem'),
         };
 
         mockPlayPageMouseHandlerService = {
@@ -71,8 +102,12 @@ describe('PlayGameBoardSocketService', () => {
         };
 
         mockBattleManagerService = {
-            signalUserAttacked$: new Subject<number>(),
-            signalUserTriedEscape$: new Subject<void>(),
+            signalUserAttacked$: new Subject<{
+                playerTurnId: string;
+                attackResult: number;
+                playerHasTotem: boolean;
+            }>(),
+            signalUserTriedEscape$: new Subject<string>(),
             currentPlayerIdTurn: '',
             isUserTurn: false,
             onOpponentAttack: jasmine.createSpy('onOpponentAttack'),
@@ -81,6 +116,24 @@ describe('PlayGameBoardSocketService', () => {
             onSuccessfulAttack: jasmine.createSpy('onSuccessfulAttack'),
             endBattle: jasmine.createSpy('endBattle'),
             clearBattle: jasmine.createSpy('clearBattle'),
+        };
+
+        mockVirtualPlayerManagerService = {
+            signalMoveVirtualPlayer$: new Subject<{
+                coordinates: Vec2;
+                virtualPlayerId: string;
+            }>(),
+            signalVirtualPlayerContinueTurn$: new Subject<string>(),
+            signalVirtualPlayerEndedTurn$: new Subject<string>(),
+            startTurn: jasmine.createSpy('startTurn'),
+            continueTurn: jasmine.createSpy('continueTurn'),
+            wonBattle: jasmine.createSpy('wonBattle'),
+            lostBattle: jasmine.createSpy('lostBattle'),
+            moveVirtualPlayer: jasmine.createSpy('moveVirtualPlayer'),
+        };
+
+        mockVirtualPlayerBattleManagerService = {
+            startTurn: jasmine.createSpy('startTurn'),
         };
 
         mockRouter = {
@@ -97,6 +150,8 @@ describe('PlayGameBoardSocketService', () => {
                 { provide: PlayGameBoardManagerService, useValue: mockPlayGameBoardManagerService },
                 { provide: PlayPageMouseHandlerService, useValue: mockPlayPageMouseHandlerService },
                 { provide: BattleManagerService, useValue: mockBattleManagerService },
+                { provide: VirtualPlayerManagerService, useValue: mockVirtualPlayerManagerService },
+                { provide: VirtualPlayerBattleManagerService, useValue: mockVirtualPlayerBattleManagerService },
                 { provide: Router, useValue: mockRouter },
             ],
         });
@@ -119,73 +174,116 @@ describe('PlayGameBoardSocketService', () => {
             expect(Object.keys(socketCallbacks).length).toBeGreaterThan(0);
         });
 
-        it('should subscribe to signalUserMoved$ and emit "userMoved"', () => {
-            const data = { x: 1, y: 2 };
+        it(`should subscribe to signalUserMoved$ and emit ${SocketEvents.USER_MOVED}`, () => {
+            const fromTile = { x: 0, y: 0 } as Vec2;
+            const toTile = { x: 1, y: 0 } as Vec2;
+            const data = { fromTile, toTile, playerTurnId: mockPlayer.socketId };
             mockPlayGameBoardManagerService.signalUserMoved$.next(data);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userMoved', data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_MOVED, data);
         });
 
-        it('should subscribe to signalUserRespawned$ and emit "userRespawned"', () => {
-            const data = { x: 3, y: 4 };
+        it(`should subscribe to signalUserRespawned$ and emit ${SocketEvents.USER_RESPAWNED}`, () => {
+            const fromTile = { x: 0, y: 0 } as Vec2;
+            const toTile = { x: 1, y: 0 } as Vec2;
+            const data = { fromTile, toTile, playerTurnId: mockPlayer.socketId };
             mockPlayGameBoardManagerService.signalUserRespawned$.next(data);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userRespawned', data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_RESPAWNED, data);
         });
 
-        it('should subscribe to signalUserStartedMoving$ and emit "userStartedMoving"', () => {
-            mockPlayGameBoardManagerService.signalUserStartedMoving$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userStartedMoving');
+        it(`should subscribe to signalUserStartedMoving$ and emit ${SocketEvents.USER_STARTED_MOVING}`, () => {
+            mockPlayGameBoardManagerService.signalUserStartedMoving$.next(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_STARTED_MOVING, mockPlayer.socketId);
         });
 
-        it('should subscribe to signalUserFinishedMoving$ and emit "userFinishedMoving"', () => {
-            mockPlayGameBoardManagerService.signalUserFinishedMoving$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userFinishedMoving');
+        it(`should subscribe to signalUserFinishedMoving$ and emit ${SocketEvents.USER_FINISHED_MOVING}`, () => {
+            mockPlayGameBoardManagerService.signalUserFinishedMoving$.next(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_FINISHED_MOVING, mockPlayer.socketId);
         });
 
         it('should subscribe to signalUserGotTurnEnded$ and call endTurn', () => {
             spyOn(service, 'endTurn');
-            mockPlayGameBoardManagerService.signalUserGotTurnEnded$.next();
-            expect(service.endTurn).toHaveBeenCalled();
+            mockPlayGameBoardManagerService.signalUserGotTurnEnded$.next(mockPlayer.socketId);
+            expect(service.endTurn).toHaveBeenCalledWith(mockPlayer.socketId);
         });
 
-        it('should subscribe to signalUserDidDoorAction$ and emit "userDidDoorAction"', () => {
-            const tileCoordinate = { x: 5, y: 6 };
-            mockPlayGameBoardManagerService.signalUserDidDoorAction$.next(tileCoordinate);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userDidDoorAction', tileCoordinate);
+        it(`should subscribe to signalUserDidDoorAction$ and emit ${SocketEvents.USER_DID_DOOR_ACTION}`, () => {
+            const tileCoordinate = { x: 0, y: 0 };
+            const data = { tileCoordinate, playerTurnId: mockPlayer.socketId };
+            mockPlayGameBoardManagerService.signalUserDidDoorAction$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_DID_DOOR_ACTION, data);
         });
 
-        it('should subscribe to signalUserDidBattleAction$ and emit "userDidBattleAction"', () => {
+        it(`should subscribe to signalUserDidBattleAction$ and emit ${SocketEvents.USER_DID_DOOR_ACTION}`, () => {
             const enemyPlayerId = 'enemy123';
-            mockPlayGameBoardManagerService.signalUserDidBattleAction$.next(enemyPlayerId);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userDidBattleAction', enemyPlayerId);
+            const data = { playerTurnId: mockPlayer.socketId, enemyPlayerId };
+            mockPlayGameBoardManagerService.signalUserDidBattleAction$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_DID_BATTLE_ACTION, data);
         });
 
-        it('should subscribe to signalUserWon$ and emit "userWon"', () => {
-            mockPlayGameBoardManagerService.signalUserWon$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userWon');
+        it(`should subscribe to signalUserWon$ and emit ${SocketEvents.USER_WON}`, () => {
+            mockPlayGameBoardManagerService.signalUserWon$.next(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_WON, mockPlayer.socketId);
         });
 
-        it('should subscribe to battleManagerService.signalUserAttacked$ and emit "userAttacked"', () => {
+        it(`should subscribe to signalUserGrabbedItem$ and emit ${SocketEvents.USER_GRABBED_ITEM}`, () => {
+            const itemType = ItemType.Totem;
+            const tileCoordinates = { x: 0, y: 0 };
+            const data = { itemType, tileCoordinates, playerTurnId: mockPlayer.socketId };
+            mockPlayGameBoardManagerService.signalUserGrabbedItem$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_GRABBED_ITEM, data);
+        });
+
+        it(`should subscribe to signalUserThrewItem$ and emit ${SocketEvents.USER_THREW_ITEM}`, () => {
+            const itemType = ItemType.Totem;
+            const tileCoordinates = { x: 0, y: 0 };
+            const data = { itemType, tileCoordinates, playerTurnId: mockPlayer.socketId };
+            mockPlayGameBoardManagerService.signalUserThrewItem$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_THREW_ITEM, data);
+        });
+
+        it(`should subscribe to battleManagerService.signalUserAttacked$ and emit ${SocketEvents.USER_ATTACKED}`, () => {
             const attackResult = 50;
-            mockBattleManagerService.signalUserAttacked$.next(attackResult);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userAttacked', attackResult);
+            const playerHasTotem = true;
+            const data = { playerTurnId: mockPlayer.socketId, attackResult, playerHasTotem };
+            mockBattleManagerService.signalUserAttacked$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_ATTACKED, data);
         });
 
-        it('should subscribe to battleManagerService.signalUserTriedEscape$ and emit "userTriedEscape"', () => {
-            mockBattleManagerService.signalUserTriedEscape$.next();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userTriedEscape');
+        it(`should subscribe to battleManagerService.signalUserTriedEscape$ and emit ${SocketEvents.USER_TRIED_ESCAPE}`, () => {
+            mockBattleManagerService.signalUserTriedEscape$.next(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_TRIED_ESCAPE, mockPlayer.socketId);
+        });
+
+        it(`should subscribe to virtualPlayerManagerService.signalMoveVirtualPlayer$ and emit ${SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION}`, () => {
+            const coordinates = { x: 1, y: 1 } as Vec2;
+            const data = { coordinates, virtualPlayerId: mockPlayer.socketId };
+            mockVirtualPlayerManagerService.signalMoveVirtualPlayer$.next(data);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION, data);
+        });
+
+        it(`should subscribe to virtualPlayerManagerService.signalVirtualPlayerContinueTurn$ and emit ${SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN}`, () => {
+            mockVirtualPlayerManagerService.signalVirtualPlayerContinueTurn$.next(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN, mockPlayer.socketId);
+        });
+
+        it(`should subscribe to virtualPlayerManagerService.signalVirtualPlayerEndedTurn$ and call endturn`, () => {
+            spyOn(service, 'endTurn');
+            mockVirtualPlayerManagerService.signalVirtualPlayerEndedTurn$.next(mockPlayer.socketId);
+            expect(service.endTurn).toHaveBeenCalledWith(mockPlayer.socketId);
         });
     });
 
     describe('endTurn', () => {
-        it('should emit "userEndTurn" if isUserTurn is true', () => {
+        it(`should emit ${SocketEvents.USER_END_TURN} if isUserTurn is true`, () => {
             service.endTurn(mockPlayer.socketId);
-            expect(mockSocket.emit).toHaveBeenCalledWith('userEndTurn', mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith(SocketEvents.USER_END_TURN, mockPlayer.socketId);
         });
     });
 
     describe('leaveGame', () => {
         it('should disconnect the socket, clear battle, reset manager, clear UI, and navigate to /home', () => {
             service.leaveGame();
+            expect(mockWebSocketService.resetValues).toHaveBeenCalled();
             expect(mockBattleManagerService.clearBattle).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.resetManager).toHaveBeenCalled();
             expect(mockPlayPageMouseHandlerService.clearUI).toHaveBeenCalled();
@@ -206,153 +304,206 @@ describe('PlayGameBoardSocketService', () => {
     });
 
     describe('Socket Listeners', () => {
-        it('should handle "initGameBoardParameters" event', () => {
+        it(`should handle ${SocketEvents.INIT_GAME_BOARD_PARAMETERS} event`, () => {
             const gameBoardParameters = {};
-            socketCallbacks['initGameBoardParameters'](gameBoardParameters);
+            socketCallbacks[SocketEvents.INIT_GAME_BOARD_PARAMETERS](gameBoardParameters);
             expect(mockPlayGameBoardManagerService.init).toHaveBeenCalledWith(gameBoardParameters);
         });
 
-        it('should handle "setTime" event', () => {
+        it(`should handle ${SocketEvents.SET_TIME} event`, () => {
             const time = 100;
-            socketCallbacks['setTime'](time);
+            socketCallbacks[SocketEvents.SET_TIME](time);
             expect(mockPlayGameBoardManagerService.currentTime).toBe(time);
         });
 
-        it('should handle "endTurn" event', () => {
+        it(`should handle ${SocketEvents.END_TURN} event`, () => {
             mockPlayGameBoardManagerService.isUserTurn = true;
-            socketCallbacks['endTurn']();
+            socketCallbacks[SocketEvents.END_TURN]();
             expect(mockPlayGameBoardManagerService.endTurn).toHaveBeenCalled();
             expect(mockPlayPageMouseHandlerService.endTurn).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe('');
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeFalse();
         });
 
-        it('should handle "startTurn" event when it is user turn', () => {
-            const playerIdTurn = 'user123';
+        it(`should handle ${SocketEvents.START_TURN} event when it is user turn`, () => {
             // eslint-disable-next-line
-            (mockSocket as any).id = 'user123';
-            socketCallbacks['startTurn'](playerIdTurn);
-            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
+            (mockSocket as any).id = mockPlayer.socketId;
+            socketCallbacks[SocketEvents.START_TURN](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(mockPlayer.socketId);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
             expect(mockPlayGameBoardManagerService.startTurn).toHaveBeenCalled();
         });
 
-        it('should handle "startTurn" event when it is not user turn', () => {
-            const playerIdTurn = 'otherPlayer';
+        it(`should handle ${SocketEvents.START_TURN} event winnerPlayerExists`, () => {
+            mockPlayGameBoardManagerService.winnerPlayer = new PlayerCharacter('winnerPlayer');
             // eslint-disable-next-line
-            (mockSocket as any).id = 'user123';
-            socketCallbacks['startTurn'](playerIdTurn);
-            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
-            expect(mockPlayGameBoardManagerService.isUserTurn).toBeFalse();
-            expect(mockPlayGameBoardManagerService.startTurn).toHaveBeenCalled();
+            (mockSocket as any).id = mockPlayer.socketId;
+            socketCallbacks[SocketEvents.START_TURN](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
+            expect(mockPlayGameBoardManagerService.startTurn).not.toHaveBeenCalled();
         });
 
-        it('should handle "gameBoardPlayerLeft" event', () => {
-            const playerId = 'playerLeft';
-            socketCallbacks['gameBoardPlayerLeft'](playerId);
-            expect(mockPlayGameBoardManagerService.removePlayerFromMap).toHaveBeenCalledWith(playerId);
+        it(`should handle ${SocketEvents.START_VIRTUAL_PLAYER_TURN} event`, () => {
+            socketCallbacks[SocketEvents.START_VIRTUAL_PLAYER_TURN](mockPlayer.socketId);
+            expect(mockVirtualPlayerManagerService.startTurn).toHaveBeenCalledWith(mockPlayer.socketId);
         });
 
-        it('should handle "roomUserMoved" event', () => {
-            const data = { playerId: 'player1', fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 } };
-            socketCallbacks['roomUserMoved'](data);
+        it(`should handle ${SocketEvents.CONTINUE_VIRTUAL_PLAYER_TURN} event`, () => {
+            socketCallbacks[SocketEvents.CONTINUE_VIRTUAL_PLAYER_TURN](mockPlayer.socketId);
+            expect(mockVirtualPlayerManagerService.continueTurn).toHaveBeenCalledWith(mockPlayer.socketId);
+        });
+
+        it(`should handle ${SocketEvents.GAME_BOARD_PLAYER_LEFT} event`, () => {
+            socketCallbacks[SocketEvents.GAME_BOARD_PLAYER_LEFT](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.removePlayerFromMap).toHaveBeenCalledWith(mockPlayer.socketId);
+        });
+
+        it(`should handle ${SocketEvents.ROOM_USER_MOVED} event`, () => {
+            const data = { playerId: mockPlayer.socketId, fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 } };
+            socketCallbacks[SocketEvents.ROOM_USER_MOVED](data);
             expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
         });
 
-        it('should handle "roomUserRespawned" event', () => {
-            const data = { playerId: 'player2', fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 } };
-            socketCallbacks['roomUserRespawned'](data);
+        it(`should handle ${SocketEvents.VIRTUAL_PLAYER_MOVED} event`, () => {
+            const data = { coordinates: { x: 1, y: 1 }, virtualPlayerId: mockPlayer.socketId };
+            socketCallbacks[SocketEvents.VIRTUAL_PLAYER_MOVED](data);
+            expect(mockVirtualPlayerManagerService.moveVirtualPlayer).toHaveBeenCalledWith(data.coordinates, data.virtualPlayerId);
+        });
+
+        it(`should handle ${SocketEvents.ROOM_USER_GRABBED_ITEM} event`, () => {
+            const data = { itemType: ItemType.Totem, tileCoordinates: { x: 1, y: 1 } as Vec2, playerId: mockPlayer.socketId };
+            socketCallbacks[SocketEvents.ROOM_USER_GRABBED_ITEM](data);
+            expect(mockPlayGameBoardManagerService.grabItem).toHaveBeenCalledWith(data.playerId, data.itemType, data.tileCoordinates);
+        });
+
+        it(`should handle ${SocketEvents.ROOM_USER_THREW_ITEM} event`, () => {
+            const data = { itemType: ItemType.Totem, tileCoordinates: { x: 1, y: 1 }, playerId: mockPlayer.socketId };
+            socketCallbacks[SocketEvents.ROOM_USER_THREW_ITEM](data);
+            expect(mockPlayGameBoardManagerService.throwItem).toHaveBeenCalledWith(data.itemType, data.tileCoordinates, data.playerId);
+        });
+
+        it(`should handle ${SocketEvents.ROOM_USER_RESPAWNED} event`, () => {
+            const data = { playerId: mockPlayer.socketId, fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 } };
+            socketCallbacks[SocketEvents.ROOM_USER_RESPAWNED](data);
             expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
             expect(mockPlayGameBoardManagerService.continueTurn).toHaveBeenCalled();
         });
 
-        it('should handle "roomUserDidDoorAction" event', () => {
+        it(`should handle ${SocketEvents.ROOM_USER_DID_DOOR_ACTION} event`, () => {
             const tileCoordinate = { x: 4, y: 4 };
-            socketCallbacks['roomUserDidDoorAction']({ tileCoordinate: tileCoordinate, playerId: 'player1' });
+            socketCallbacks[SocketEvents.ROOM_USER_DID_DOOR_ACTION]({ tileCoordinate: tileCoordinate, playerId: mockPlayer.socketId });
+            expect(mockPlayGameBoardManagerService.playerUsedAction).toHaveBeenCalledWith(mockPlayer.socketId);
             expect(mockPlayGameBoardManagerService.toggleDoor).toHaveBeenCalledWith(tileCoordinate);
         });
 
-        it('should handle "roomUserDidBattleAction" event', () => {
-            const data = { playerId: 'player1', enemyPlayerId: 'enemy1' };
-            socketCallbacks['roomUserDidBattleAction'](data);
+        it(`should handle ${SocketEvents.ROOM_USER_DID_BATTLE_ACTION} event`, () => {
+            const data = { playerId: mockPlayer.socketId, enemyPlayerId: 'enemy1' };
+            socketCallbacks[SocketEvents.ROOM_USER_DID_BATTLE_ACTION](data);
+            expect(mockPlayGameBoardManagerService.playerUsedAction).toHaveBeenCalledWith(data.playerId);
             expect(mockPlayGameBoardManagerService.startBattle).toHaveBeenCalledWith(data.playerId, data.enemyPlayerId);
         });
 
-        it('should handle "startBattleTurn" event', () => {
-            const playerIdTurn = 'playerTurn';
+        it(`should handle ${SocketEvents.START_BATTLE_TURN} event`, () => {
             // eslint-disable-next-line
-            (mockSocket as any).id = 'playerTurn';
-            socketCallbacks['startBattleTurn'](playerIdTurn);
-            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
+            (mockSocket as any).id = mockPlayer.socketId;
+            socketCallbacks[SocketEvents.START_BATTLE_TURN](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(mockPlayer.socketId);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
-            expect(mockBattleManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
+            expect(mockBattleManagerService.currentPlayerIdTurn).toBe(mockPlayer.socketId);
             expect(mockBattleManagerService.isUserTurn).toBeTrue();
         });
 
-        it('should handle "opponentAttacked" event', () => {
+        it(`should handle ${SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN} event`, () => {
+            const data = {
+                playerId: mockPlayer.socketId,
+                enemyId: 'player2',
+                virtualPlayerRemainingHealth: 0,
+                enemyRemainingHealth: 0,
+                virtualPlayerRemainingEvasions: 0,
+            };
+            socketCallbacks[SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN](data);
+            expect(mockVirtualPlayerBattleManagerService.startTurn).toHaveBeenCalledWith(
+                data.playerId,
+                data.enemyId,
+                data.virtualPlayerRemainingHealth,
+                data.enemyRemainingHealth,
+                data.virtualPlayerRemainingEvasions,
+            );
+        });
+
+        it(`should handle ${SocketEvents.OPPONENT_ATTACKED} event`, () => {
             const attackResult = 75;
-            socketCallbacks['opponentAttacked'](attackResult);
+            socketCallbacks[SocketEvents.OPPONENT_ATTACKED](attackResult);
             expect(mockBattleManagerService.onOpponentAttack).toHaveBeenCalledWith(attackResult);
         });
 
-        it('should handle "opponentTriedEscape" event', () => {
-            socketCallbacks['opponentTriedEscape']();
+        it(`should handle ${SocketEvents.OPPONENT_TRIED_ESCAPE} event`, () => {
+            socketCallbacks[SocketEvents.OPPONENT_TRIED_ESCAPE]();
             expect(mockBattleManagerService.onOpponentEscape).toHaveBeenCalled();
         });
 
-        it('should handle "automaticAttack" event', () => {
-            socketCallbacks['automaticAttack']();
+        it(`should handle ${SocketEvents.AUTOMATIC_ATTACK} event`, () => {
+            socketCallbacks[SocketEvents.AUTOMATIC_ATTACK]();
             expect(mockBattleManagerService.onUserAttack).toHaveBeenCalled();
         });
 
-        it('should handle "successfulAttack" event', () => {
-            socketCallbacks['successfulAttack']();
+        it(`should handle ${SocketEvents.SUCCESSFUL_ATTACK} event`, () => {
+            socketCallbacks[SocketEvents.SUCCESSFUL_ATTACK]();
             expect(mockBattleManagerService.onSuccessfulAttack).toHaveBeenCalled();
         });
 
-        it('should handle "battleEndedByEscape" event', () => {
-            const playerIdTurn = 'playerEscape';
+        it(`should handle ${SocketEvents.BATTLE_ENDED_BY_ESCAPE} event`, () => {
             // eslint-disable-next-line
-            (mockSocket as any).id = 'playerEscape';
-            socketCallbacks['battleEndedByEscape'](playerIdTurn);
-            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(playerIdTurn);
+            (mockSocket as any).id = mockPlayer.socketId;
+            socketCallbacks[SocketEvents.BATTLE_ENDED_BY_ESCAPE](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(mockPlayer.socketId);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
             expect(mockBattleManagerService.endBattle).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.continueTurn).toHaveBeenCalled();
         });
 
-        it('should handle "firstPlayerWonBattle" event', () => {
-            const data = { firstPlayer: 'player1', loserPlayer: 'player2' };
+        it(`should handle ${SocketEvents.FIRST_PLAYER_WON_BATTLE} event`, () => {
+            const data = { firstPlayer: mockPlayer.socketId, loserPlayer: 'player2' };
             // eslint-disable-next-line
-            (mockSocket as any).id = 'player1';
-            socketCallbacks['firstPlayerWonBattle'](data);
+            (mockSocket as any).id = mockPlayer.socketId;
+            socketCallbacks[SocketEvents.FIRST_PLAYER_WON_BATTLE](data);
             expect(mockPlayGameBoardManagerService.currentPlayerIdTurn).toBe(data.firstPlayer);
             expect(mockPlayGameBoardManagerService.isUserTurn).toBeTrue();
             expect(mockBattleManagerService.endBattle).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.endBattleByDeath).toHaveBeenCalledWith(data.firstPlayer, data.loserPlayer);
         });
 
-        it('should handle "secondPlayerWonBattle" event', () => {
+        it(`should handle ${SocketEvents.SECOND_PLAYER_WON_BATTLE} event`, () => {
             const data = { winnerPlayer: 'player2', loserPlayer: 'player1' };
-            socketCallbacks['secondPlayerWonBattle'](data);
+            socketCallbacks[SocketEvents.SECOND_PLAYER_WON_BATTLE](data);
             expect(mockBattleManagerService.endBattle).toHaveBeenCalled();
             expect(mockPlayGameBoardManagerService.endBattleByDeath).toHaveBeenCalledWith(data.winnerPlayer, data.loserPlayer);
         });
 
-        it('should handle "gameBoardPlayerWon" event and leave game after timeout', fakeAsync(() => {
-            const playerId = 'winnerPlayer';
+        it(`should handle ${SocketEvents.VIRTUAL_PLAYER_WON_BATTLE} event`, () => {
+            socketCallbacks[SocketEvents.VIRTUAL_PLAYER_WON_BATTLE](mockPlayer.socketId);
+            expect(mockVirtualPlayerManagerService.wonBattle).toHaveBeenCalledWith(mockPlayer.socketId);
+        });
+
+        it(`should handle ${SocketEvents.VIRTUAL_PLAYER_LOST_BATTLE} event`, () => {
+            socketCallbacks[SocketEvents.VIRTUAL_PLAYER_LOST_BATTLE](mockPlayer.socketId);
+            expect(mockVirtualPlayerManagerService.lostBattle).toHaveBeenCalledWith(mockPlayer.socketId);
+        });
+
+        it(`should handle ${SocketEvents.GAME_BOARD_PLAYER_WON} event and leave game after timeout`, fakeAsync(() => {
             spyOn(service, 'leaveGame');
-            socketCallbacks['gameBoardPlayerWon'](playerId);
-            expect(mockPlayGameBoardManagerService.endGame).toHaveBeenCalledWith(playerId);
+            socketCallbacks[SocketEvents.GAME_BOARD_PLAYER_WON](mockPlayer.socketId);
+            expect(mockPlayGameBoardManagerService.endGame).toHaveBeenCalledWith(mockPlayer.socketId);
 
             tick(5000);
             expect(service.leaveGame).toHaveBeenCalled();
         }));
 
-        it('should handle "lastPlayerStanding" event and leave game', () => {
+        it(`should handle ${SocketEvents.LAST_PLAYER_STANDING} event and leave game`, () => {
             spyOn(window, 'alert');
             spyOn(service, 'leaveGame');
-            socketCallbacks['lastPlayerStanding']();
+            socketCallbacks[SocketEvents.LAST_PLAYER_STANDING]();
             expect(window.alert).toHaveBeenCalledWith('Tous les autres joueurs ont quitté la partie. Fin de partie');
             expect(service.leaveGame).toHaveBeenCalled();
         });
