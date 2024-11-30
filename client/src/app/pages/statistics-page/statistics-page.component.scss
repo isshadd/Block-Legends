@@ -1,4 +1,9 @@
 @import 'src/_variables.scss';
+.dark-button {
+    padding: 5px;
+    margin: 0px;
+    top: 0px;
+}
 
 #page-container {
     position: relative;
@@ -10,7 +15,7 @@
 
     #page-separator {
         width: 220vh;
-        height: 90vb;
+        height: 90vh;
         background-color: $primary-dark;
         position: absolute;
         display: flex;
@@ -22,7 +27,7 @@
 
         #players-table {
             width: 160vh;
-            height: 80vb;
+            height: 80vh;
             background-color: $primary-dark;
             border: 2px solid darken($primary-dark, 10%);
             overflow-y: scroll;
@@ -96,7 +101,64 @@
             #game-statistics-table {
                 width: 50vh;
                 height: 50vh;
-                background-color: red;
+                background-color: $primary-dark;
+                display: flex;
+                flex-direction: column;
+                row-gap: 5px;
+                #play-time {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #turn-number {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #tile-pourcentage {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #door-pourcentage {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #flag-capture {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
             }
 
             #chat-container {

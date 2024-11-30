@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { AvatarEnum } from '@common/enums/avatar-enum';
+import { ArrowDownButtonComponent } from '../../components/arrow-down-button/arrow-down-button.component';
+import { ArrowUpButtonComponent } from '../../components/arrow-up-button/arrow-up-button.component';
 import { ClavardageComponent } from '../../components/clavardage/clavardage.component';
-import { ArrowUpButtonComponent } from "../../components/arrow-up-button/arrow-up-button.component";
-import { ArrowDownButtonComponent } from "../../components/arrow-down-button/arrow-down-button.component";
 
 export enum SortCharacters {
     Name = 'name',
@@ -14,30 +14,16 @@ export enum SortCharacters {
 @Component({
     selector: 'app-statistics-page',
     standalone: true,
-    imports: [ClavardageComponent, ArrowUpButtonComponent, ArrowDownButtonComponent],
+    imports: [ClavardageComponent, RouterLink, ArrowUpButtonComponent, ArrowDownButtonComponent],
     templateUrl: './statistics-page.component.html',
     styleUrl: './statistics-page.component.scss',
 })
 export class StatisticsPageComponent {
-    @Input() winner: PlayerCharacter;
-    player1: PlayerCharacter;
-    player2: PlayerCharacter;
-    playersList: PlayerCharacter[] = [];
+    @Input() isGameModeCTF: boolean;
+    @Input() playersList: PlayerCharacter[] = [];
     sortCharacters = SortCharacters;
 
-    constructor() {
-        this.player1 = new PlayerCharacter('Player1');
-        this.player1.avatar = AvatarEnum.Alex;
-        this.playersList.push(this.player1);
-        this.player1.fightWins = 2;
-        this.player1.fightLoses = 1;
-
-        this.player2 = new PlayerCharacter('Player2');
-        this.player2.avatar = AvatarEnum.Arlina;
-        this.playersList.push(this.player2);
-        this.player2.fightWins = 1;
-        this.player2.fightLoses = 3;
-    }
+    constructor() {}
 
     sortPlayersIncreasing(sort: SortCharacters) {
         switch (sort) {

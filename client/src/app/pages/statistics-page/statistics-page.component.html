@@ -1,3 +1,4 @@
+<button class="dark-button" routerLink="/home">Retour</button>
 <div id="page-container">
     <div id="page-separator">
         <div id="players-table">
@@ -88,7 +89,30 @@
             </div>
         </div>
         <div id="game-statistics-chat-container">
-            <div id="game-statistics-table"></div>
+            <div id="game-statistics-table">
+                <div id="play-time">
+                    Durée de la partie:
+                    <span> 00:00:00 </span>
+                </div>
+                <div id="turn-number">
+                    Nombre de tours:
+                    <span> 0 </span>
+                </div>
+                <div id="tile-pourcentage">
+                    Pourcentage de tuiles visitées:
+                    <span> 0 </span>
+                </div>
+                <div id="door-pourcentage">
+                    Pourcentage de porte manipulées:
+                    <span> 0 </span>
+                </div>
+                @if(isGameModeCTF){
+                <div id="flag-capture">
+                    Nombre de jouers ayant le drapeau:
+                    <span> 0 </span>
+                </div>
+                }
+            </div>
             <div id="chat-container">
                 <app-clavardage></app-clavardage>
             </div>
