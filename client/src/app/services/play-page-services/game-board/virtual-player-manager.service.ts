@@ -144,16 +144,15 @@ export class VirtualPlayerManagerService {
     }
 
     private handleDefensiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
-        const didPlayerDoAction = this.handleDefensiveActions(player);
+        const didPlayerDoAction = this.handleDefensiveActions(player, didTurnStarted);
 
         if (!didPlayerDoAction) {
             this.handleDefensiveMovement(player, didTurnStarted);
         }
     }
 
-    private handleDefensiveActions(player: PlayerCharacter): boolean {
-        if (player.currentActionPoints <= 0) {
-            this.signalVirtualPlayerEndedTurn.next(player.socketId);
+    private handleDefensiveActions(player: PlayerCharacter, didTurnStarted: boolean): boolean {
+        if (player.currentActionPoints <= 0 || didTurnStarted) {
             return false;
         }
 
@@ -161,7 +160,6 @@ export class VirtualPlayerManagerService {
         const actionTiles: Tile[] = this.playGameBoardManagerService.getAdjacentActionTiles(playerTile);
 
         if (actionTiles.length === 0) {
-            this.signalVirtualPlayerEndedTurn.next(player.socketId);
             return false;
         }
 
@@ -216,10 +214,12 @@ export class VirtualPlayerManagerService {
             console.log(targetTile);
             const playerTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
             if (this.areTilesEqual(playerTile, targetTile)) {
+                console.log('target tile is player tile');
                 this.signalVirtualPlayerEndedTurn.next(player.socketId);
                 return;
             }
 
+            console.log('move to target tile');
             this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
             this.signalMoveVirtualPlayer.next({ coordinates: targetTile.coordinates, virtualPlayerId: player.socketId });
         }
