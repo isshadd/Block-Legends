@@ -28,6 +28,7 @@ describe('PlayGameBoardManagerService', () => {
     mockPlayerCharacter.avatar = AvatarEnum.Steve;
     mockPlayerCharacter.attributes = { life: 3, speed: 3, attack: 3, defense: 3 };
     mockPlayerCharacter.mapEntity = new PlayerMapEntity('avatar.png');
+    mockPlayerCharacter.mapEntity.coordinates = { x: 0, y: 0 } as Vec2;
     mockPlayerCharacter.currentActionPoints = 0;
     mockPlayerCharacter.currentMovePoints = 0;
 
@@ -764,6 +765,7 @@ describe('PlayGameBoardManagerService', () => {
         it('should handle battle action when user has action points and it is user’s turn', () => {
             const mockTile = new WalkableTile();
             const mockActionPlayer = new PlayerCharacter('player1');
+            mockActionPlayer.socketId = 'player1';
             mockActionPlayer.currentActionPoints = 1;
             const mockPlayerCharacter = new PlayerCharacter('player2');
             mockPlayerCharacter.socketId = 'player2';
@@ -807,6 +809,8 @@ describe('PlayGameBoardManagerService', () => {
         });
 
         it('should emit signalUserGotTurnEnded if no move points and no action points are available', () => {
+            mockPlayerCharacter.currentMovePoints = 0;
+            mockPlayerCharacter.currentActionPoints = 0;
             spyOn(service.signalUserGotTurnEnded, 'next');
 
             service.checkIfPLayerDidEverything(mockPlayerCharacter);
@@ -815,6 +819,7 @@ describe('PlayGameBoardManagerService', () => {
         });
 
         it('should emit signalUserGotTurnEnded if no move points and no adjacent action tiles are available', () => {
+            mockPlayerCharacter.currentMovePoints = 0;
             mockPlayerCharacter.currentActionPoints = 1;
 
             const mockTile = new Tile();
@@ -1458,6 +1463,7 @@ describe('PlayGameBoardManagerService', () => {
         });
 
         it('should return null if no player is found', () => {
+            gameMapDataManagerServiceSpy.getTileAt.and.returnValue(null);
             const result = service.getPlayerTile(mockPlayerCharacter);
 
             expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockPlayerCharacter.mapEntity.coordinates);
