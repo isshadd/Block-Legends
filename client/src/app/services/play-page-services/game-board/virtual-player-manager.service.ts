@@ -382,9 +382,12 @@ export class VirtualPlayerManagerService {
 
     getAggressivePlayerItemPriority(itemType: ItemType): number {
         switch (itemType) {
-            case ItemType.Sword:
-            case ItemType.Elytra:
-                return 2;
+            case ItemType.Sword || ItemType.Flag:
+                return 10;
+            case ItemType.Totem:
+                return 8;
+            case ItemType.Random:
+                return 5;
             default:
                 return 0;
         }
@@ -392,10 +395,12 @@ export class VirtualPlayerManagerService {
 
     getDefensivePlayerItemPriority(itemType: ItemType): number {
         switch (itemType) {
+            case ItemType.MagicShield || ItemType.Flag:
+                return 10;
             case ItemType.Chestplate:
-            case ItemType.MagicShield:
-            case ItemType.Totem:
-                return 2;
+                return 9;
+            case ItemType.EnchantedBook:
+                return 8;
             default:
                 return 0;
         }
