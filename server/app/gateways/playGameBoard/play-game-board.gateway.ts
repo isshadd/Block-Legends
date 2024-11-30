@@ -1,4 +1,4 @@
- /* eslint-disable max-lines */
+/* eslint-disable max-lines */
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
@@ -72,7 +72,7 @@ export class PlayGameBoardGateway {
         if (!this.isClientTurn(playerTurnId)) {
             return;
         }
-        
+
         client.emit(SocketEvents.USER_DID_MOVE);
         const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
@@ -83,22 +83,25 @@ export class PlayGameBoardGateway {
         if (!this.isClientTurn(playerTurnId)) {
             return;
         }
-        
+
         client.emit(SocketEvents.USER_FINISHED_MOVE);
         const room = this.gameSocketRoomService.getRoomBySocketId(playerTurnId);
         this.playGameBoardTimeService.resumeTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_MOVED)
-    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; playerTurnId: string, isTeleport: boolean }) {
+    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; playerTurnId: string; isTeleport: boolean }) {
         if (!this.isClientTurn(data.playerTurnId)) {
             return;
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
-        this.server
-            .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: data.playerTurnId, fromTile: data.fromTile, toTile: data.toTile, isTeleport: data.isTeleport });
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_MOVED, {
+            playerId: data.playerTurnId,
+            fromTile: data.fromTile,
+            toTile: data.toTile,
+            isTeleport: data.isTeleport,
+        });
     }
 
     @SubscribeMessage(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION)
