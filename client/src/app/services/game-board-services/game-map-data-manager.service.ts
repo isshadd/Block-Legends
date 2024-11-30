@@ -185,12 +185,6 @@ export class GameMapDataManagerService {
         return pathfinder.findAllReachableTiles(coordinates);
     }
 
-    getMovementTiles(coordinates: Vec2): Map<Tile, Tile[]> {
-        const movePoints = 999;
-        const pathfinder = new Pathfinder(this, movePoints);
-        return pathfinder.findAllReachableTiles(coordinates);
-    }
-
     getTileAt(coordinates: Vec2): Tile | null {
         if (coordinates.x < 0 || coordinates.x >= this.currentGrid.length || coordinates.y < 0 || coordinates.y >= this.currentGrid.length)
             return null;

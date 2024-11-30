@@ -153,10 +153,6 @@ export class PlayGameBoardManagerService {
         });
     }
 
-    setDebugModePossibleMoves(playerCharacter: PlayerCharacter) {
-        this.userCurrentPossibleMoves = this.gameMapDataManagerService.getMovementTiles(playerCharacter.mapEntity.coordinates);
-    }
-
     endTurn() {
         const player = this.findPlayerFromSocketId(this.currentPlayerIdTurn);
 
