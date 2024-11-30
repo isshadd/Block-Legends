@@ -1,6 +1,5 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { Elytra } from '@common/classes/Items/elytra';
 import { Totem } from '@common/classes/Items/totem';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
@@ -112,13 +111,24 @@ describe('BattleManagerService', () => {
             expect(service.isValidAction).toHaveBeenCalled();
             expect(service.attackDiceResult).toHaveBeenCalled();
             expect(service.defenseDiceResult).toHaveBeenCalled();
-            expect(service.doesPlayerHaveItem).toHaveBeenCalled();
-            expect(service.isPlayerHealthMax).toHaveBeenCalled();
             expect(signalSpy).toHaveBeenCalledWith({ playerTurnId: mockCurrentPlayer.socketId, attackResult: result, playerHasTotem: false });
+        });
 
+        it('should calculate and emit attack result if action is valid and has totem', () => {
+            spyOn(service, 'isValidAction').and.returnValue(true);
+            const attackDiceResult = 8;
+            const defenseDiceResult = 3;
+            spyOn(service, 'attackDiceResult').and.returnValue(attackDiceResult);
+            spyOn(service, 'defenseDiceResult').and.returnValue(defenseDiceResult);
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
-            spyOn(service, 'isPlayerHealthMax').and.returnValue(true);
+            spyOn(service, 'isPlayerHealthMax').and.returnValue(false);
+            const signalSpy = spyOn(service.signalUserAttacked, 'next');
+
             service.onUserAttack();
+            const result = attackDiceResult - defenseDiceResult;
+            expect(service.isValidAction).toHaveBeenCalled();
+            expect(service.attackDiceResult).toHaveBeenCalled();
+            expect(service.defenseDiceResult).toHaveBeenCalled();
             expect(signalSpy).toHaveBeenCalledWith({ playerTurnId: mockCurrentPlayer.socketId, attackResult: result, playerHasTotem: true });
         });
 
@@ -214,7 +224,7 @@ describe('BattleManagerService', () => {
 
             service.onOpponentAttack(attackResult);
 
-            const result = 10;
+            const result = 1;
             expect(service.userRemainingHealth).toBe(result);
             expect(signalSpy).not.toHaveBeenCalled();
         });
@@ -268,6 +278,7 @@ describe('BattleManagerService', () => {
             } as PlayerCharacter;
 
             spyOn(Math, 'random').and.returnValue(0.5);
+            spyOn(service, 'hasIcePenalty').and.returnValue(true);
 
             const result = service.attackDiceResult();
 
@@ -292,18 +303,28 @@ describe('BattleManagerService', () => {
             service.opponentRemainingHealth = 1;
 
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-            spyOn(Math, 'random').and.returnValue(1);
+            spyOn(Math, 'random').and.returnValue(0);
 
             const result = service.defenseDiceResult();
 
-            const expectedResult = 10;
+            const expectedResult = 5;
             expect(result).toBe(expectedResult);
+        });
+
+        it('should get defense from MagicShieldItem', () => {
+            service.opponentPlayer = {
+                defenseDice: 6,
+            } as PlayerCharacter;
+            service.opponentDefence = 4;
+            service.opponentRemainingHealth = 1;
 
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(Math, 'random').and.returnValue(0);
 
-            const result2 = service.defenseDiceResult();
-            const expectedResult2 = 100;
-            expect(result2).toBe(expectedResult2);
+            const result = service.defenseDiceResult();
+
+            const expectedResult = 100;
+            expect(result).toBe(expectedResult);
         });
 
         it('should return 0 if opponentPlayer is null', () => {
@@ -329,6 +350,8 @@ describe('BattleManagerService', () => {
 
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
             spyOn(service, 'isPlayerHealthMax').and.returnValue(false);
+
+            service.onSuccessfulAttack();
 
             expect(service.userRemainingHealth).toBe(2);
         });
@@ -364,19 +387,17 @@ describe('BattleManagerService', () => {
 
     describe('isPlayerHealthMax', () => {
         it('should return true if player is max health', () => {
-            spyOn(service, 'isPlayerHealthMax');
             const result = service.isPlayerHealthMax(mockCurrentPlayer, mockCurrentPlayer.attributes.life);
             expect(result).toBeTrue();
         });
 
         it('should return false if player is not max health', () => {
-            spyOn(service, 'isPlayerHealthMax');
             const result = service.isPlayerHealthMax(mockCurrentPlayer, mockCurrentPlayer.attributes.life - 1);
             expect(result).toBeFalse();
         });
     });
 
-    describe('isPlayerHealthMax', () => {
+    describe('doesPlayerHaveItem', () => {
         it('should return true if player has specific item', () => {
             mockCurrentPlayer.inventory = [new Totem()];
 
@@ -395,26 +416,24 @@ describe('BattleManagerService', () => {
     describe('hasIcePenalty', () => {
         it('should return true if player is on ice and does not have specific item', () => {
             mockCurrentPlayer.mapEntity.isPlayerOnIce = true;
-            mockCurrentPlayer.inventory = [];
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
 
-            spyOn(service, 'hasIcePenalty');
             const result = service.hasIcePenalty(mockCurrentPlayer);
             expect(result).toBeTrue();
         });
 
         it('should return false if player is not on ice', () => {
             mockCurrentPlayer.mapEntity.isPlayerOnIce = false;
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
 
-            spyOn(service, 'hasIcePenalty');
             const result = service.hasIcePenalty(mockCurrentPlayer);
             expect(result).toBeFalse();
         });
 
         it('should return false if player is on ice and has specific item', () => {
             mockCurrentPlayer.mapEntity.isPlayerOnIce = true;
-            mockCurrentPlayer.inventory = [new Elytra()];
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
 
-            spyOn(service, 'hasIcePenalty');
             const result = service.hasIcePenalty(mockCurrentPlayer);
             expect(result).toBeFalse();
         });
