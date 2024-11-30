@@ -1,4 +1,6 @@
 /* eslint-disable max-lines */
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-shadow */ // pour les tests, le mocPlayer est réassigné
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
@@ -20,7 +22,7 @@ import { BattleManagerService } from './battle-manager.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 describe('PlayGameBoardManagerService', () => {
-    let mockPlayerCharacter = new PlayerCharacter('player1');
+    const mockPlayerCharacter = new PlayerCharacter('player1');
     mockPlayerCharacter.socketId = 'player1';
     mockPlayerCharacter.name = 'player1';
     mockPlayerCharacter.avatar = AvatarEnum.Steve;

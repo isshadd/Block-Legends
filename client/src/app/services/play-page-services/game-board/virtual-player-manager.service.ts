@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */ // pour le moment, le service est trop complexe pour être simplifié
+
 import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
@@ -61,7 +63,7 @@ export class VirtualPlayerManagerService {
         }
     }
 
-    private handleAgressiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
+    handleAgressiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
         const didPlayerDoAction = this.handleAggressiveActions(player);
 
         if (!didPlayerDoAction) {
@@ -69,7 +71,7 @@ export class VirtualPlayerManagerService {
         }
     }
 
-    private handleAggressiveActions(player: PlayerCharacter): boolean {
+    handleAggressiveActions(player: PlayerCharacter): boolean {
         if (player.currentActionPoints <= 0) {
             return false;
         }
@@ -109,7 +111,7 @@ export class VirtualPlayerManagerService {
         return false;
     }
 
-    private handleAggressiveMovement(player: PlayerCharacter, didTurnStarted: boolean) {
+    handleAggressiveMovement(player: PlayerCharacter, didTurnStarted: boolean) {
         const possibleMoves = this.setPossibleMoves(player);
         let targetTile: Tile | null = null;
 
@@ -122,6 +124,17 @@ export class VirtualPlayerManagerService {
                 targetTile = targetItemTile;
             } else {
                 // TODO : Check for closed Doors
+                const targetDoorTile = this.findNearestClosedDoor(player, possibleMoves);
+                if (targetDoorTile) {
+                    targetTile = targetDoorTile;
+                } else {
+                    if (didTurnStarted) {
+                        const possibleMovesArray = Array.from(possibleMoves.keys());
+                        targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
+                    } else {
+                        this.signalVirtualPlayerEndedTurn.next(player.socketId);
+                    }
+                }
                 if (didTurnStarted) {
                     const possibleMovesArray = Array.from(possibleMoves.keys());
                     targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
@@ -143,7 +156,7 @@ export class VirtualPlayerManagerService {
         }
     }
 
-    private handleDefensiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
+    handleDefensiveComportment(player: PlayerCharacter, didTurnStarted: boolean) {
         const didPlayerDoAction = this.handleDefensiveActions(player, didTurnStarted);
 
         if (!didPlayerDoAction) {
@@ -151,7 +164,7 @@ export class VirtualPlayerManagerService {
         }
     }
 
-    private handleDefensiveActions(player: PlayerCharacter, didTurnStarted: boolean): boolean {
+    handleDefensiveActions(player: PlayerCharacter, didTurnStarted: boolean): boolean {
         if (player.currentActionPoints <= 0 || didTurnStarted) {
             return false;
         }
@@ -178,31 +191,26 @@ export class VirtualPlayerManagerService {
         return false;
     }
 
-    private handleDefensiveMovement(player: PlayerCharacter, didTurnStarted: boolean) {
+    handleDefensiveMovement(player: PlayerCharacter, didTurnStarted: boolean) {
         const possibleMoves = this.setPossibleMoves(player);
         let targetTile: Tile | null = null;
 
         const itemTile = this.findNearestPossibleItem(player, possibleMoves);
         if (itemTile) {
-            console.log('found item');
             targetTile = itemTile;
         } else {
             const nearestOpenDoorTile = this.findNearestOpenDoor(player, possibleMoves);
             if (nearestOpenDoorTile) {
-                console.log('found open door');
                 targetTile = nearestOpenDoorTile;
             } else {
                 const furthestTileFromPlayers = this.findFurthestTileFromPlayers(player, possibleMoves);
                 if (furthestTileFromPlayers) {
-                    console.log('fuite');
                     targetTile = furthestTileFromPlayers;
                 } else {
                     if (didTurnStarted) {
-                        console.log('random move');
                         const possibleMovesArray = Array.from(possibleMoves.keys());
                         targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
                     } else {
-                        console.log('no move');
                         this.signalVirtualPlayerEndedTurn.next(player.socketId);
                         return;
                     }
@@ -211,15 +219,12 @@ export class VirtualPlayerManagerService {
         }
 
         if (targetTile) {
-            console.log(targetTile);
             const playerTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
             if (this.areTilesEqual(playerTile, targetTile)) {
-                console.log('target tile is player tile');
                 this.signalVirtualPlayerEndedTurn.next(player.socketId);
                 return;
             }
 
-            console.log('move to target tile');
             this.playGameBoardManagerService.signalUserStartedMoving.next(player.socketId);
             this.signalMoveVirtualPlayer.next({ coordinates: targetTile.coordinates, virtualPlayerId: player.socketId });
         }
@@ -287,6 +292,37 @@ export class VirtualPlayerManagerService {
         return nearestOpenDoor;
     }
 
+    findNearestClosedDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): DoorTile | null {
+        let nearestDoor: DoorTile | null = null;
+        let minDistance = Number.MAX_SAFE_INTEGER;
+
+        for (const possibleMove of possibleMoves.keys()) {
+            if (possibleMove instanceof DoorTile) {
+                const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestDoor = possibleMove;
+                }
+            }
+        }
+
+        if (nearestDoor) {
+            const adjacentTiles = this.gameMapDataManagerService.getNeighbours(nearestDoor);
+            const accessibleTiles = adjacentTiles.filter(
+                (tile) =>
+                    tile instanceof WalkableTile &&
+                    (!tile.hasPlayer() || (tile.player && this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(tile.player) !== player)) &&
+                    Array.from(possibleMoves.keys()).some((possibleMoveTile) => this.areTilesEqual(possibleMoveTile, tile)),
+            );
+
+            if (accessibleTiles.length > 0) {
+                nearestDoor = accessibleTiles[0] as OpenDoor;
+            }
+        }
+
+        return nearestDoor;
+    }
+
     findNearestPossiblePlayer(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
         const players = this.webSocketService.getRoomInfo().players;
         let nearestTile: WalkableTile | null = null;
@@ -316,15 +352,24 @@ export class VirtualPlayerManagerService {
 
     findNearestPossibleItem(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): TerrainTile | null {
         let nearestTile: TerrainTile | null = null;
+        let highestPriority = -1;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
-        // TODO: Instead of distance, use a priority system to choose the best item
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove.isTerrain()) {
                 const item = (possibleMove as TerrainTile).item;
                 if (item && item.isGrabbable()) {
+                    let priority = 0;
+                    if (virtualPlayer.comportement === ProfileEnum.Agressive) {
+                        priority = this.getAggressivePlayerItemPriority(item.type);
+                    } else if (virtualPlayer.comportement === ProfileEnum.Defensive) {
+                        priority = this.getDefensivePlayerItemPriority(item.type);
+                    }
+
                     const distance = this.calculateDistance(virtualPlayer.mapEntity.coordinates, possibleMove.coordinates);
-                    if (distance < minDistance) {
+
+                    if (priority > highestPriority || (priority === highestPriority && distance < minDistance)) {
+                        highestPriority = priority;
                         minDistance = distance;
                         nearestTile = possibleMove as TerrainTile;
                     }
@@ -336,13 +381,24 @@ export class VirtualPlayerManagerService {
     }
 
     getAggressivePlayerItemPriority(itemType: ItemType): number {
-        return 0;
-        // TODO: Swith case for item type and return priority
+        switch (itemType) {
+            case ItemType.Sword:
+            case ItemType.Elytra:
+                return 2;
+            default:
+                return 0;
+        }
     }
 
     getDefensivePlayerItemPriority(itemType: ItemType): number {
-        return 0;
-        // TODO: Swith case for item type and return priority
+        switch (itemType) {
+            case ItemType.Chestplate:
+            case ItemType.MagicShield:
+            case ItemType.Totem:
+                return 2;
+            default:
+                return 0;
+        }
     }
 
     calculateDistance(from: Vec2, to: Vec2): number {
@@ -361,7 +417,7 @@ export class VirtualPlayerManagerService {
         }
         const possibleMoves = this.setPossibleMoves(player);
 
-        let lastTile: WalkableTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as WalkableTile;
+        const lastTile: WalkableTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as WalkableTile;
 
         const path = possibleMoves.get(this.gameMapDataManagerService.getTileAt(destination) as WalkableTile);
         if (!path) {
@@ -385,7 +441,7 @@ export class VirtualPlayerManagerService {
             return;
         }
 
-        let possibleItems: Item[] = [];
+        const possibleItems: Item[] = [];
         const didGrabItem = this.playGameBoardManagerService.handleTileItem(nextPathTile, player, possibleItems);
         if (didGrabItem) {
             if (possibleItems.length > 0) {

@@ -1,3 +1,5 @@
+/* eslint-disable max-params*/ // impossible d'instancier le service sans ces paramètres
+
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';

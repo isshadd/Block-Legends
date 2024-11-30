@@ -60,7 +60,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - isValidAction', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -112,7 +112,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onUserAttack', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -154,7 +154,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onUserEscape', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -204,7 +204,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onOpponentAttack', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -256,7 +256,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onOpponentEscape', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -291,7 +291,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - attackDiceResult', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -341,7 +341,7 @@ describe('BattleManagerService - init', () => {
         });
     });
     describe('BattleManagerService - defenseDiceResult', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -376,7 +376,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onSuccessfulAttack', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -412,7 +412,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - endBattle', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -439,7 +439,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - clearBattle', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -478,7 +478,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onOpponentAttack early return', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({
@@ -519,7 +519,7 @@ describe('BattleManagerService - init', () => {
     });
 
     describe('BattleManagerService - onOpponentEscape early return', () => {
-        let service: BattleManagerService;
+        // let service: BattleManagerService;
 
         beforeEach(() => {
             TestBed.configureTestingModule({

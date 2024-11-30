@@ -50,7 +50,7 @@ export class VirtualPlayerBattleManagerService {
         }
     }
 
-    private handleAgressiveComportment(
+    handleAgressiveComportment(
         virtualPlayer: PlayerCharacter,
         enemyPlayer: PlayerCharacter,
         virtualPlayerRemainingHealth: number,
@@ -59,7 +59,7 @@ export class VirtualPlayerBattleManagerService {
         this.attack(virtualPlayer, enemyPlayer, virtualPlayerRemainingHealth, enemyRemainingHealth);
     }
 
-    private handleDefensiveComportment(
+    handleDefensiveComportment(
         virtualPlayer: PlayerCharacter,
         enemyPlayer: PlayerCharacter,
         virtualPlayerRemainingHealth: number,
