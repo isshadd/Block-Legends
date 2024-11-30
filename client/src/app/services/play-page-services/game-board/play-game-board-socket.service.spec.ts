@@ -366,21 +366,21 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         it(`should handle ${SocketEvents.VIRTUAL_PLAYER_MOVED} event`, () => {
-            const data = { coordinates: { x: 1, y: 1 }, virtualPlayerId: mockPlayer.socketId };
+            const data = { destination: { x: 1, y: 1 } as Vec2, virtualPlayerId: mockPlayer.socketId };
             socketCallbacks[SocketEvents.VIRTUAL_PLAYER_MOVED](data);
-            expect(mockVirtualPlayerManagerService.moveVirtualPlayer).toHaveBeenCalledWith(data.coordinates, data.virtualPlayerId);
+            expect(mockVirtualPlayerManagerService.moveVirtualPlayer).toHaveBeenCalledWith(data.virtualPlayerId, data.destination);
         });
 
         it(`should handle ${SocketEvents.ROOM_USER_GRABBED_ITEM} event`, () => {
-            const data = { itemType: ItemType.Totem, tileCoordinates: { x: 1, y: 1 } as Vec2, playerId: mockPlayer.socketId };
+            const data = { itemType: ItemType.Totem, tileCoordinate: { x: 1, y: 1 } as Vec2, playerId: mockPlayer.socketId };
             socketCallbacks[SocketEvents.ROOM_USER_GRABBED_ITEM](data);
-            expect(mockPlayGameBoardManagerService.grabItem).toHaveBeenCalledWith(data.playerId, data.itemType, data.tileCoordinates);
+            expect(mockPlayGameBoardManagerService.grabItem).toHaveBeenCalledWith(data.playerId, data.itemType, data.tileCoordinate);
         });
 
         it(`should handle ${SocketEvents.ROOM_USER_THREW_ITEM} event`, () => {
-            const data = { itemType: ItemType.Totem, tileCoordinates: { x: 1, y: 1 }, playerId: mockPlayer.socketId };
+            const data = { itemType: ItemType.Totem, tileCoordinate: { x: 1, y: 1 } as Vec2, playerId: mockPlayer.socketId };
             socketCallbacks[SocketEvents.ROOM_USER_THREW_ITEM](data);
-            expect(mockPlayGameBoardManagerService.throwItem).toHaveBeenCalledWith(data.itemType, data.tileCoordinates, data.playerId);
+            expect(mockPlayGameBoardManagerService.throwItem).toHaveBeenCalledWith(data.playerId, data.itemType, data.tileCoordinate);
         });
 
         it(`should handle ${SocketEvents.ROOM_USER_RESPAWNED} event`, () => {
