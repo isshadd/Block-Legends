@@ -80,40 +80,40 @@ describe('PlayGameBoardManagerService', () => {
         });
 
         it('should emit and subscribe to signalUserStartedMoving$', (done) => {
-            service.signalUserStartedMoving$.subscribe(() => {
-                expect(true).toBeTrue();
+            service.signalUserStartedMoving$.subscribe((data) => {
+                expect(data).toEqual(mockPlayerCharacter.socketId);
                 done();
             });
             service.signalUserStartedMoving.next(mockPlayerCharacter.socketId);
         });
 
         it('should emit and subscribe to signalUserFinishedMoving$', (done) => {
-            service.signalUserFinishedMoving$.subscribe(() => {
-                expect(true).toBeTrue();
+            service.signalUserFinishedMoving$.subscribe((data) => {
+                expect(data).toEqual(mockPlayerCharacter.socketId);
                 done();
             });
             service.signalUserFinishedMoving.next(mockPlayerCharacter.socketId);
         });
 
         it('should emit and subscribe to signalUserGotTurnEnded$', (done) => {
-            service.signalUserGotTurnEnded$.subscribe(() => {
-                expect(true).toBeTrue();
+            service.signalUserGotTurnEnded$.subscribe((data) => {
+                expect(data).toEqual(mockPlayerCharacter.socketId);
                 done();
             });
             service.signalUserGotTurnEnded.next(mockPlayerCharacter.socketId);
         });
 
         it('should emit and subscribe to signalUserDidDoorAction$', (done) => {
-            const doorActionPosition = { x: 5, y: 5 } as Vec2;
+            const doorActionData = { tileCoordinate: { x: 5, y: 5 } as Vec2, playerTurnId: mockPlayerCharacter.socketId };
             service.signalUserDidDoorAction$.subscribe((data) => {
-                expect(data).toEqual(doorActionPosition);
+                expect(data).toEqual(doorActionData);
                 done();
             });
-            service.signalUserDidDoorAction.next(doorActionPosition);
+            service.signalUserDidDoorAction.next(doorActionData);
         });
 
         it('should emit and subscribe to signalUserDidBattleAction$', (done) => {
-            const battleActionData = 'opponentId';
+            const battleActionData = { playerTurnId: mockPlayerCharacter.socketId, enemyPlayerId: 'opponentId' };
             service.signalUserDidBattleAction$.subscribe((data) => {
                 expect(data).toBe(battleActionData);
                 done();
@@ -122,15 +122,15 @@ describe('PlayGameBoardManagerService', () => {
         });
 
         it('should emit and subscribe to signalUserWon$', (done) => {
-            service.signalUserWon$.subscribe(() => {
-                expect(true).toBeTrue();
+            service.signalUserWon$.subscribe((data) => {
+                expect(data).toEqual(mockPlayerCharacter.socketId);
                 done();
             });
-            service.signalUserWon.next();
+            service.signalUserWon.next(mockPlayerCharacter.socketId);
         });
     });
 
-    describe('PlayGameBoardManagerService - init', () => {
+    describe('init', () => {
         let service: PlayGameBoardManagerService;
         // let gameBoardParameters: GameBoardParameters;
 
@@ -177,7 +177,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - initGameBoard', () => {
+    describe('initGameBoard', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -206,7 +206,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - initCharacters', () => {
+    describe('initCharacters', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
@@ -263,7 +263,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - startTurn', () => {
+    describe('startTurn', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -330,7 +330,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - setupPossibleMoves', () => {
+    describe('setupPossibleMoves', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -390,7 +390,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - setPossibleMoves', () => {
+    describe('setPossibleMoves', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -430,7 +430,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - showPossibleMoves', () => {
+    describe('showPossibleMoves', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -463,7 +463,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - endTurn', () => {
+    describe('endTurn', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -517,7 +517,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - hidePossibleMoves', () => {
+    describe('hidePossibleMoves', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -551,7 +551,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - moveUserPlayer', () => {
+    describe('moveUserPlayer', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -629,7 +629,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - movePlayer', () => {
+    describe('movePlayer', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -694,7 +694,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - waitInterval', () => {
+    describe('waitInterval', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -735,7 +735,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - handlePlayerAction', () => {
+    describe('handlePlayerAction', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -774,7 +774,7 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.hidePossibleMoves).toHaveBeenCalled();
         });
     });
-    describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
+    describe('checkIfPLayerDidEverything', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
         let player1: PlayerCharacter;
@@ -859,7 +859,7 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.signalUserGotTurnEnded.next).not.toHaveBeenCalled();
         });
     });
-    describe('PlayGameBoardManagerService - checkIfPLayerDidEverything', () => {
+    describe('checkIfPLayerDidEverything', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
         let player1: PlayerCharacter;
@@ -945,7 +945,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - toggleDoor', () => {
+    describe('toggleDoor', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
         let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
@@ -1030,7 +1030,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - startBattle', () => {
+    describe('startBattle', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
         let battleManagerServiceSpy: jasmine.SpyObj<BattleManagerService>;
@@ -1105,7 +1105,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - continueTurn', () => {
+    describe('continueTurn', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -1149,7 +1149,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - endBattleByDeath', () => {
+    describe('endBattleByDeath', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -1260,7 +1260,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - checkIfPlayerWonClassicGame', () => {
+    describe('checkIfPlayerWonClassicGame', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -1324,7 +1324,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - endGame', () => {
+    describe('endGame', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -1360,7 +1360,7 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.winnerPlayer).toBeNull();
         });
     });
-    describe('PlayGameBoardManagerService - getWinnerPlayer', () => {
+    describe('getWinnerPlayer', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -1394,7 +1394,7 @@ describe('PlayGameBoardManagerService', () => {
             expect(result).toBeNull();
         });
     });
-    describe('PlayGameBoardManagerService - removePlayerFromMap', () => {
+    describe('removePlayerFromMap', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
         let battleManagerServiceSpy: jasmine.SpyObj<BattleManagerService>;
@@ -1479,7 +1479,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - getCurrentGrid', () => {
+    describe('getCurrentGrid', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -1514,7 +1514,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - getCurrentPlayerTile', () => {
+    describe('getCurrentPlayerTile', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -1561,7 +1561,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - getAdjacentActionTiles', () => {
+    describe('getAdjacentActionTiles', () => {
         let service: PlayGameBoardManagerService;
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -1631,7 +1631,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - findPlayerFromPlayerMapEntity', () => {
+    describe('findPlayerFromPlayerMapEntity', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -1694,7 +1694,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - findPlayerFromName', () => {
+    describe('findPlayerFromName', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -1755,7 +1755,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - findPlayerFromSocketId', () => {
+    describe('findPlayerFromSocketId', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -1825,7 +1825,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - getCurrentPlayerTurnName', () => {
+    describe('getCurrentPlayerTurnName', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -1893,7 +1893,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - getCurrentPlayerCharacter', () => {
+    describe('getCurrentPlayerCharacter', () => {
         let service: PlayGameBoardManagerService;
         let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
@@ -1935,7 +1935,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - resetManager', () => {
+    describe('resetManager', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
@@ -1973,7 +1973,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
-    describe('PlayGameBoardManagerService - continueTurn', () => {
+    describe('continueTurn', () => {
         let service: PlayGameBoardManagerService;
 
         beforeEach(() => {
