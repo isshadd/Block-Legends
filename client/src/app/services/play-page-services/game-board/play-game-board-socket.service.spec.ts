@@ -5,6 +5,7 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
 
@@ -17,6 +18,7 @@ describe('PlayGameBoardSocketService', () => {
     let mockPlayPageMouseHandlerService: any;
     let mockBattleManagerService: any;
     let mockRouter: any;
+    let mockPlayer: PlayerCharacter;
     let socketCallbacks: { [event: string]: Function };
     /* eslint-disable */
     beforeEach(() => {
@@ -84,6 +86,9 @@ describe('PlayGameBoardSocketService', () => {
         mockRouter = {
             navigate: jasmine.createSpy('navigate'),
         };
+
+        mockPlayer = new PlayerCharacter('player1');
+        mockPlayer.socketId = 'player1';
 
         TestBed.configureTestingModule({
             providers: [
@@ -173,15 +178,8 @@ describe('PlayGameBoardSocketService', () => {
 
     describe('endTurn', () => {
         it('should emit "userEndTurn" if isUserTurn is true', () => {
-            mockPlayGameBoardManagerService.isUserTurn = true;
-            service.endTurn();
-            expect(mockSocket.emit).toHaveBeenCalledWith('userEndTurn');
-        });
-
-        it('should not emit "userEndTurn" if isUserTurn is false', () => {
-            mockPlayGameBoardManagerService.isUserTurn = false;
-            service.endTurn();
-            expect(mockSocket.emit).not.toHaveBeenCalledWith('userEndTurn');
+            service.endTurn(mockPlayer.socketId);
+            expect(mockSocket.emit).toHaveBeenCalledWith('userEndTurn', mockPlayer.socketId);
         });
     });
 
