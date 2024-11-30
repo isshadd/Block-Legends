@@ -38,6 +38,7 @@ describe('PlayGameBoardGateway', () => {
                 },
                 avatar: undefined,
                 name: 'player1',
+                isVirtual: false,
             } as PlayerCharacter,
             {
                 socketId: 'player2',
@@ -49,6 +50,19 @@ describe('PlayGameBoardGateway', () => {
                 },
                 avatar: undefined,
                 name: 'player2',
+                isVirtual: false,
+            } as PlayerCharacter,
+            {
+                socketId: 'virtualPlayer',
+                attributes: {
+                    speed: 15,
+                    life: 100,
+                    attack: 0,
+                    defense: 0,
+                },
+                avatar: undefined,
+                name: 'virtualPlayer',
+                isVirtual: true,
             } as PlayerCharacter,
         ],
         organizer: 'player1',
@@ -257,7 +271,7 @@ describe('PlayGameBoardGateway', () => {
 
             gateway.handleUserEndTurn(mockClient as Socket, mockClient.id);
 
-            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient);
+            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient.id);
             expect(handleTimeOutSpy).toHaveBeenCalledWith(mockRoom.accessCode);
         });
 
@@ -273,7 +287,7 @@ describe('PlayGameBoardGateway', () => {
 
             gateway.handleUserEndTurn(mockClient as Socket, mockClient.id);
 
-            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient);
+            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient.id);
             expect(handleTimeOutSpy).not.toHaveBeenCalled();
         });
     });
@@ -296,7 +310,7 @@ describe('PlayGameBoardGateway', () => {
 
             gateway.handleUserMoved(mockClient as Socket, moveData);
 
-            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient);
+            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient.id);
             expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
             expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('roomUserMoved', {
                 playerId: mockClient.id,
@@ -322,7 +336,7 @@ describe('PlayGameBoardGateway', () => {
 
             gateway.handleUserMoved(mockClient as Socket, moveData);
 
-            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient);
+            expect(isClientTurnSpy).toHaveBeenCalledWith(mockClient.id);
             expect(gateway.server.to).not.toHaveBeenCalled();
         });
     });
@@ -683,6 +697,7 @@ describe('PlayGameBoardGateway', () => {
             describe('startRoomTurn', () => {
                 it('should emit startTurn with the playerId', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
                     gateway.startRoomTurn(mockRoom.accessCode, mockRoom.currentPlayerTurn);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
@@ -693,6 +708,7 @@ describe('PlayGameBoardGateway', () => {
             describe('startBattleTurn', () => {
                 it('should emit startBattleTurn with the playerId', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
                     gateway.startBattleTurn(mockRoom.accessCode, battleRoom.firstPlayerId);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
@@ -704,6 +720,7 @@ describe('PlayGameBoardGateway', () => {
                 it('should pause timer, create battle timer, and emit startBattleTurn if room is valid', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     playGameBoardBattleService.getPlayerBattleTurn.mockReturnValue(battleRoom.firstPlayerId);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
 
                     gateway.handleStartBattle(mockRoom.accessCode, battleRoom.firstPlayerId, battleRoom.secondPlayerId);
 
@@ -746,6 +763,7 @@ describe('PlayGameBoardGateway', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     playGameBoardBattleService.getPlayerBattleTurn.mockReturnValue(battleRoom.firstPlayerId);
                     gameSocketRoomService.gameBattleRooms.set(mockRoom.accessCode, battleRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
 
                     gateway.endBattleTurn(mockRoom.accessCode);
 
@@ -760,6 +778,7 @@ describe('PlayGameBoardGateway', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     gameSocketRoomService.gameBattleRooms.set(mockRoom.accessCode, battleRoom);
                     gameSocketRoomService.gameTimerRooms.set(mockRoom.accessCode, mockGameTimer);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
 
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
 
@@ -782,6 +801,7 @@ describe('PlayGameBoardGateway', () => {
 
                 it('should emit firstPlayerWonBattle if the first player is the winner', () => {
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
 
                     gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.firstPlayerId);
 
@@ -796,6 +816,7 @@ describe('PlayGameBoardGateway', () => {
                 it('should emit secondPlayerWonBattle and handleTimeOut if the second player is the winner', () => {
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
                     const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[1]);
 
                     gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.secondPlayerId);
 
