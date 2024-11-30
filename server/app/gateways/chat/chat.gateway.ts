@@ -23,14 +23,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     roomMessage(socket: Socket, message: RoomMessage) {
         if (socket.rooms.has(message.room)) {
             const sentMessage = `${message.time} ${message.sender} : ${message.content}`;
-            this.logger.log(`room is ${message.room}`);
             this.server.to(message.room).emit(ChatEvents.RoomMessage, sentMessage);
         }
     }
 
     @SubscribeMessage(ChatEvents.EventMessage)
     eventMessage(socket: Socket, payload: { time: Date; content: string; roomID: string; associatedPlayers: string[] }) {
-        this.logger.log(`Event message received`, payload.roomID);
         const { time, content, roomID, associatedPlayers } = payload;
         const event = `${time} ${content}`;
         if (content === 'attack' || content === 'fuir') {
@@ -38,9 +36,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         } else {
             if (socket.rooms.has(roomID)) {
                 this.server.to(roomID).emit(ChatEvents.EventReceived, { event, associatedPlayers });
-                this.logger.log(`Event message sent`);
             }
         }
+    }
+
+    @SubscribeMessage('log')
+    logMessage(socket: Socket, message: string) {
+        this.logger.log(message);
     }
 
     afterInit() {

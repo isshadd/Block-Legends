@@ -24,7 +24,8 @@ export const enum SocketEvents {
     USER_WON = 'userWon',
     USER_GRABBED_ITEM = 'userGrabbedItem',
     USER_THREW_ITEM = 'userThrewItem',
-    DEBUG_MODE = 'debugMode',
+    TOGGLE_DEBUG_MODE = 'toggleDebugMode',
+    DEBUG_MODE_OFF = 'debugModeOff',
 
     // RECUS
     ROOM_STATE = 'roomState',
@@ -70,4 +71,9 @@ export const enum SocketEvents {
     START_BATTLE_TURN = 'startBattleTurn',
     ROOM_USER_GRABBED_ITEM = 'roomUserGrabbedItem',
     ROOM_USER_THREW_ITEM = 'roomUserThrewItem',
+    DEBUG_MODE_REC = 'debugModeRec',
+    DEBUG_MODE_OFF_REC = 'debugModeOffRec',
+    USER_DID_MOVE = 'userDidMove',
+    USER_FINISHED_MOVE = 'userFinishedMove',
+
 }

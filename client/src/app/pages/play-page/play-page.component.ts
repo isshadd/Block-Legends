@@ -15,7 +15,6 @@ import { FightViewComponent } from '@app/components/play-page-components/fight-v
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
-import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
@@ -28,6 +27,8 @@ import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { DebugService } from '@app/services/debug.service';
+
+const TIMEOUT_DURATION = 500;
 
 @Component({
     selector: 'app-play-page',
@@ -55,7 +56,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;
-    toggleDebug: boolean = false;
 
     private destroy$ = new Subject<void>();
     // eslint-disable-next-line
@@ -66,12 +66,11 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         public gameMapDataManagerService: GameMapDataManagerService,
         public battleManagerService: BattleManagerService,
         public router: Router,
+        public debugService: DebugService,
         private webSocketService: WebSocketService,
         private gameService: GameService,
         private socketStateService: SocketStateService,
-        private chatService: ChatService,
         private eventService: EventJournalService,
-        private debugService: DebugService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -91,8 +90,11 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     @HostListener('window:keydown', ['$event'])
     handleKeyDown(event: KeyboardEvent) {
-        if (event.key === 'd' || event.key === 'D' ) {
-            this.activateDebugMode();
+        if (event.key === 'd' || event.key === 'D') {
+            this.toggleDebugMode();
+        }
+        if (event.key === 't') {
+            // this.webSocketService.sendLog(`${this.myPlayer.currentMovePoints}`)
         }
     }
 
@@ -176,10 +178,12 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     leaveGame(): void {
-        this.myPlayer.isAbsent = true;
-        this.chatService.clearMessages();
-        this.handlePlayerAbandon();
-        this.playGameBoardSocketService.leaveGame();
+        this.turnOffDebugMode();
+        setTimeout(() => {
+            this.myPlayer.isAbsent = true;
+            this.handlePlayerAbandon();
+            this.playGameBoardSocketService.leaveGame();
+        }, TIMEOUT_DURATION);
     }
 
     handlePlayerAbandon(): void {
@@ -194,19 +198,25 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.playGameBoardManagerService.userThrewItem(item);
     }
 
-    activateDebugMode(): void {
-        if(this.myPlayer.isOrganizer) {
-            if(this.debugService.isDebugMode)
-                this.eventService.broadcastEvent('Mode débogage désactivé', []);
-            else{
+    toggleDebugMode(): void {
+        if (this.myPlayer.isOrganizer) {
+            if (this.debugService.isDebugMode) this.eventService.broadcastEvent('Mode débogage désactivé', []);
+            else {
                 this.eventService.broadcastEvent('Mode débogage activé', []);
             }
             this.webSocketService.debugMode();
         }
     }
 
+    turnOffDebugMode(): void {
+        if (this.myPlayer.isOrganizer) {
+            this.eventService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
+            this.webSocketService.debugModeOff();
+        }
+    }
+
     deactivateDebugMode(): void {
-        //if(this.myPlayer.isOrganizer)
-            //this.webSocketService.deactivateDebugMode();
+        // if(this.myPlayer.isOrganizer)
+        // this.webSocketService.deactivateDebugMode();
     }
 }

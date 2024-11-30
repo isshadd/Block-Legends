@@ -71,7 +71,7 @@ export class PlayGameBoardGateway {
         if (!this.isClientTurn(client)) {
             return;
         }
-
+        client.emit(SocketEvents.USER_DID_MOVE);
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
     }
@@ -81,13 +81,13 @@ export class PlayGameBoardGateway {
         if (!this.isClientTurn(client)) {
             return;
         }
-
+        client.emit(SocketEvents.USER_FINISHED_MOVE);
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.playGameBoardTimeService.resumeTimer(room.accessCode);
     }
 
     @SubscribeMessage(SocketEvents.USER_MOVED)
-    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2 }) {
+    handleUserMoved(client: Socket, data: { fromTile: Vec2; toTile: Vec2; isTeleport: boolean }) {
         if (!this.isClientTurn(client)) {
             return;
         }
@@ -95,7 +95,7 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(client.id);
         this.server
             .to(room.accessCode.toString())
-            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile });
+            .emit(SocketEvents.ROOM_USER_MOVED, { playerId: client.id, fromTile: data.fromTile, toTile: data.toTile, isTeleport: data.isTeleport });
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)

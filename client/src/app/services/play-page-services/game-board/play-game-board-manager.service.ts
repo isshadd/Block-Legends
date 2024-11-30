@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { Injectable } from '@angular/core';
+import { DebugService } from '@app/services/debug.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
@@ -20,7 +21,6 @@ import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { BattleManagerService } from './battle-manager.service';
-import { DebugService } from '@app/services/debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -29,7 +29,7 @@ export class PlayGameBoardManagerService {
     signalManagerFinishedInit = new Subject<void>();
     signalManagerFinishedInit$ = this.signalManagerFinishedInit.asObservable();
 
-    signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
+    signalUserMoved = new Subject<{ fromTile: Vec2; toTile: Vec2; isTeleport: boolean }>();
     signalUserMoved$ = this.signalUserMoved.asObservable();
 
     signalUserRespawned = new Subject<{ fromTile: Vec2; toTile: Vec2 }>();
@@ -70,6 +70,8 @@ export class PlayGameBoardManagerService {
 
     winnerPlayer: PlayerCharacter | null = null;
 
+    readonly movingTimeInterval = 150;
+    /* eslint-disable max-params */
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
         public webSocketService: WebSocketService,
@@ -133,6 +135,7 @@ export class PlayGameBoardManagerService {
         if (userPlayerCharacter.currentMovePoints <= 0 || !this.isUserTurn) {
             return;
         }
+
         this.setPossibleMoves(userPlayerCharacter);
         this.showPossibleMoves();
     }
@@ -148,6 +151,10 @@ export class PlayGameBoardManagerService {
         this.userCurrentPossibleMoves.forEach((path, tile) => {
             tile.visibleState = VisibleState.Valid;
         });
+    }
+
+    setDebugModePossibleMoves(playerCharacter: PlayerCharacter) {
+        this.userCurrentPossibleMoves = this.gameMapDataManagerService.getMovementTiles(playerCharacter.mapEntity.coordinates);
     }
 
     endTurn() {
@@ -184,7 +191,6 @@ export class PlayGameBoardManagerService {
         }
 
         this.hidePossibleMoves();
-        const movingTimeInterval = 150;
 
         this.signalUserStartedMoving.next();
 
@@ -196,6 +202,7 @@ export class PlayGameBoardManagerService {
                 this.signalUserMoved.next({
                     fromTile: lastTile.coordinates,
                     toTile: pathTile.coordinates,
+                    isTeleport: false,
                 });
 
                 const didGrabItem = this.handleTileItem(pathTile);
@@ -204,7 +211,7 @@ export class PlayGameBoardManagerService {
                     return;
                 }
 
-                await this.waitInterval(movingTimeInterval);
+                await this.waitInterval(this.movingTimeInterval);
 
                 didPlayerTripped = this.didPlayerTripped(pathTile.type, userPlayerCharacter);
 
@@ -227,7 +234,32 @@ export class PlayGameBoardManagerService {
         this.setupPossibleMoves(userPlayerCharacter);
     }
 
-    movePlayer(playerId: string, fromTile: Vec2, toTile: Vec2) {
+    async teleportPlayer(toTile: Tile) {
+        const userPlayerCharacter = this.getCurrentPlayerCharacter();
+        const lastTile = this.getCurrentPlayerTile();
+
+        if (
+            !userPlayerCharacter ||
+            !this.isUserTurn ||
+            !lastTile ||
+            !toTile.isWalkable() ||
+            (toTile as WalkableTile).hasPlayer() ||
+            (toTile.isTerrain() && (toTile as TerrainTile).item?.isGrabbable())
+        ) {
+            return;
+        }
+
+        this.hidePossibleMoves();
+        this.signalUserMoved.next({
+            fromTile: lastTile.coordinates,
+            toTile: toTile.coordinates,
+            isTeleport: true,
+        });
+        await this.waitInterval(this.movingTimeInterval);
+        this.setupPossibleMoves(userPlayerCharacter);
+    }
+
+    movePlayer(playerId: string, fromTile: Vec2, toTile: Vec2, isTeleport: boolean) {
         const userPlayerCharacter = this.findPlayerFromSocketId(playerId);
 
         if (!userPlayerCharacter) {
@@ -242,8 +274,7 @@ export class PlayGameBoardManagerService {
 
         const toTileInstance = this.gameMapDataManagerService.getTileAt(toTile) as WalkableTile;
         toTileInstance.setPlayer(userPlayerCharacter.mapEntity);
-        userPlayerCharacter.currentMovePoints -= toTileInstance.moveCost;
-
+        if (!isTeleport) userPlayerCharacter.currentMovePoints -= toTileInstance.moveCost;
         this.checkIfPlayerWonCTFGame(userPlayerCharacter);
     }
 
@@ -400,7 +431,7 @@ export class PlayGameBoardManagerService {
             return false;
         }
 
-        if(this.debugService.isDebugMode) {
+        if (this.debugService.isDebugMode) {
             return false;
         }
 

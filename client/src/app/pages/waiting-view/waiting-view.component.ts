@@ -84,9 +84,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.changeRoomId(this.accessCode);
                 });
             }
-            
         });
-
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
             this.maxPlayers = max;

@@ -256,15 +256,15 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         it('should handle "roomUserMoved" event', () => {
-            const data = { playerId: 'player1', fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 } };
+            const data = { playerId: 'player1', fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 }, isTeleport: false};
             socketCallbacks['roomUserMoved'](data);
-            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
+            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile, data.isTeleport);
         });
 
         it('should handle "roomUserRespawned" event', () => {
-            const data = { playerId: 'player2', fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 } };
+            const data = { playerId: 'player2', fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 }, isTeleport: false };
             socketCallbacks['roomUserRespawned'](data);
-            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
+            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile, data.isTeleport);
             expect(mockPlayGameBoardManagerService.continueTurn).toHaveBeenCalled();
         });
 

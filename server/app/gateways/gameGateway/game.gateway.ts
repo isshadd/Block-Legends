@@ -241,11 +241,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         this.server.to(accessCode.toString()).emit(SocketEvents.GAME_PARAMETERS, { gameBoardParameters });
     }
-    @SubscribeMessage(SocketEvents.DEBUG_MODE)
-    activateDebugMode() {
-        this.server.emit(SocketEvents.DEBUG_MODE);
+
+    @SubscribeMessage(SocketEvents.TOGGLE_DEBUG_MODE)
+    toggleDebugMode(socket: Socket, roomID: string) {
+        if (socket.rooms.has(roomID)) {
+            this.server.to(roomID).emit(SocketEvents.DEBUG_MODE_REC);
+        }
     }
 
+    @SubscribeMessage(SocketEvents.DEBUG_MODE_OFF)
+    turnOffDebugMode(socket: Socket, roomID: string) {
+        if (socket.rooms.has(roomID)) {
+            this.server.to(roomID).emit(SocketEvents.DEBUG_MODE_OFF_REC);
+        }
+    }
 
     handleConnection(client: Socket) {
         this.connectedClients.add(client.id);

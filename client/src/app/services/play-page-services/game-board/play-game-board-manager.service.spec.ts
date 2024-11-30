@@ -44,7 +44,11 @@ describe('PlayGameBoardManagerService - Subjects and Observables', () => {
     });
 
     it('should emit and subscribe to signalUserMoved$', (done) => {
-        const movementData = { fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 } } as { fromTile: Vec2; toTile: Vec2 };
+        const movementData = { fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 }, isTeleport: false } as {
+            fromTile: Vec2;
+            toTile: Vec2;
+            isTeleport: boolean;
+        };
         service.signalUserMoved$.subscribe((data) => {
             expect(data).toEqual(movementData);
             done();
@@ -570,7 +574,7 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
 
         expect(service.hidePossibleMoves).toHaveBeenCalled();
         expect(service.signalUserStartedMoving.next).toHaveBeenCalled();
-        expect(service.signalUserMoved.next).toHaveBeenCalledWith({ fromTile: tile1.coordinates, toTile: tile2.coordinates });
+        expect(service.signalUserMoved.next).toHaveBeenCalledWith({ fromTile: tile1.coordinates, toTile: tile2.coordinates, isTeleport: false });
         expect(service.signalUserFinishedMoving.next).toHaveBeenCalled();
         expect(service.checkIfPLayerDidEverything).toHaveBeenCalled();
         expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
@@ -601,7 +605,7 @@ describe('PlayGameBoardManagerService - moveUserPlayer', () => {
 
         expect(service.hidePossibleMoves).toHaveBeenCalled();
         expect(service.signalUserStartedMoving.next).toHaveBeenCalled();
-        expect(service.signalUserMoved.next).toHaveBeenCalledWith({ fromTile: tile1.coordinates, toTile: tile2.coordinates });
+        expect(service.signalUserMoved.next).toHaveBeenCalledWith({ fromTile: tile1.coordinates, toTile: tile2.coordinates, isTeleport: false });
         expect(service.signalUserFinishedMoving.next).toHaveBeenCalled();
         expect(service.signalUserGotTurnEnded.next).toHaveBeenCalled();
         expect(service.setupPossibleMoves).not.toHaveBeenCalled();
@@ -651,7 +655,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
         spyOn(toTileInstance, 'setPlayer');
         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
 
-        service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates);
+        service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates, false);
 
         expect(service.findPlayerFromSocketId).toHaveBeenCalledWith(playerId);
         expect(fromTileInstance.removePlayer).toHaveBeenCalled();
@@ -666,7 +670,7 @@ describe('PlayGameBoardManagerService - movePlayer', () => {
         spyOn(service, 'findPlayerFromSocketId').and.returnValue(null);
         gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
 
-        service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates);
+        service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates, false);
 
         expect(service.findPlayerFromSocketId).toHaveBeenCalledWith(playerId);
         expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();

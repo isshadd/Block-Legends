@@ -1,13 +1,9 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class DebugService {
-
-  isDebugMode: boolean = false;
-  constructor() { }
-
-
-  
+    isDebugMode: boolean = false;
+    isPlayerMoving: boolean = false;
 }

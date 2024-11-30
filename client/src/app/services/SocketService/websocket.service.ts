@@ -14,6 +14,7 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AvatarService } from '../avatar.service';
+// eslint-disable-next-line no-restricted-imports
 import { DebugService } from '../debug.service';
 
 @Injectable({
@@ -34,7 +35,7 @@ export class WebSocketService {
 
     currentRoom: GameRoom;
     chatRoom: GameRoom;
-
+    // eslint-disable-next-line max-params
     constructor(
         private router: Router,
         private gameService: GameService,
@@ -65,7 +66,6 @@ export class WebSocketService {
         const content = event;
         this.socket.emit(ChatEvents.EventMessage, { time, content, roomID, associatedPlayers: players });
     }
-
 
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
@@ -98,6 +98,7 @@ export class WebSocketService {
         this.playersSubject.next([]);
         this.socket.disconnect();
         this.chatService.clearMessages();
+        this.eventJournalService.clearEvents();
     }
 
     lockRoom() {
@@ -119,7 +120,15 @@ export class WebSocketService {
     }
 
     debugMode() {
-        this.socket.emit(SocketEvents.DEBUG_MODE);
+        if (this.currentRoom.accessCode) this.socket.emit(SocketEvents.TOGGLE_DEBUG_MODE, this.currentRoom.accessCode.toString());
+    }
+
+    debugModeOff() {
+        if (this.currentRoom.accessCode) this.socket.emit(SocketEvents.DEBUG_MODE_OFF, this.currentRoom.accessCode.toString());
+    }
+
+    sendLog(message: string) {
+        this.socket.emit('log', message);
     }
 
     // Ajouté par Nihal
@@ -276,8 +285,20 @@ export class WebSocketService {
             this.chatService.messageReceivedSubject.next();
         });
 
-        this.socket.on(SocketEvents.DEBUG_MODE, () => {
+        this.socket.on(SocketEvents.DEBUG_MODE_REC, () => {
             this.debugService.isDebugMode = !this.debugService.isDebugMode;
+        });
+
+        this.socket.on(SocketEvents.DEBUG_MODE_OFF_REC, () => {
+            this.debugService.isDebugMode = false;
+        });
+
+        this.socket.on(SocketEvents.USER_DID_MOVE, () => {
+            this.debugService.isPlayerMoving = true;
+        });
+
+        this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
+            this.debugService.isPlayerMoving = false;
         });
 
         /*

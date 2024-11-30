@@ -17,6 +17,8 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
+// eslint-disable-next-line no-restricted-imports
+import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -27,12 +29,13 @@ export class GameMapDataManagerService {
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
-
+    // eslint-disable-next-line max-params
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
         public dialog: MatDialog,
+        public debugService: DebugService,
         private router: Router,
     ) {}
 
@@ -150,6 +153,12 @@ export class GameMapDataManagerService {
     }
 
     getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
+        const pathfinder = new Pathfinder(this, movePoints);
+        return pathfinder.findAllReachableTiles(coordinates);
+    }
+
+    getMovementTiles(coordinates: Vec2): Map<Tile, Tile[]> {
+        const movePoints = 999;
         const pathfinder = new Pathfinder(this, movePoints);
         return pathfinder.findAllReachableTiles(coordinates);
     }
