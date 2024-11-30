@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
@@ -102,11 +103,12 @@ export class PlayGameBoardGateway {
     handleVirtualPlayerChoosedDestination(client: Socket, data: { coordinates: Vec2; virtualPlayerId: string }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.virtualPlayerId);
         if (!room) return;
+        const movementInterval = 150;
         setTimeout(() => {
             this.server
                 .to(this.playGameBoardSocketService.getRandomClientInRoom(room.accessCode))
                 .emit(SocketEvents.VIRTUAL_PLAYER_MOVED, { destination: data.coordinates, virtualPlayerId: data.virtualPlayerId });
-        }, 150);
+        }, movementInterval);
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)

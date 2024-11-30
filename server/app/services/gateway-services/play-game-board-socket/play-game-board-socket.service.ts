@@ -4,8 +4,8 @@ import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
 
-const DELAY_2000ms = 2000;
-const DELAY_500ms = 500;
+const DELAY_2000_MS = 2000;
+const DELAY_500_MS = 500;
 
 @Injectable()
 export class PlayGameBoardSocketService {
@@ -131,12 +131,12 @@ export class PlayGameBoardSocketService {
     getPlayerBySocketId(accessCode: number, socketId: string) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (room) {
-            const player = room.players.find((player) => player.socketId === socketId);
+            const player = room.players.find((p) => p.socketId === socketId);
             return player;
         }
     }
 
     getRandomDelay(): number {
-        return Math.floor(Math.random() * DELAY_2000ms) + DELAY_500ms;
+        return Math.floor(Math.random() * DELAY_2000_MS) + DELAY_500_MS;
     }
 }
