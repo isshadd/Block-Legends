@@ -1,8 +1,12 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
+import { Elytra } from '@common/classes/Items/elytra';
+import { Totem } from '@common/classes/Items/totem';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { ItemType } from '@common/enums/item-type';
 import { BattleManagerService } from './battle-manager.service';
-describe('BattleManagerService - init', () => {
+describe('BattleManagerService', () => {
     let service: BattleManagerService;
     let mockCurrentPlayer: PlayerCharacter;
     let mockOpponentPlayer: PlayerCharacter;
@@ -14,23 +18,22 @@ describe('BattleManagerService - init', () => {
 
         service = TestBed.inject(BattleManagerService);
 
-        mockCurrentPlayer = {
-            attributes: { life: 10, defense: 5, attack: 7 },
-            attackDice: 6,
-            defenseDice: 6,
-            mapEntity: { isPlayerOnIce: true },
-            socketId: 'player1',
-        } as PlayerCharacter;
+        mockCurrentPlayer = new PlayerCharacter('player1');
+        mockCurrentPlayer.socketId = 'player1';
+        mockCurrentPlayer.attributes = { life: 0, defense: 0, attack: 0, speed: 0 };
+        mockCurrentPlayer.mapEntity = new PlayerMapEntity('avatar.png');
+        mockCurrentPlayer.mapEntity.isPlayerOnIce = false;
+        mockCurrentPlayer.inventory = [];
 
-        mockOpponentPlayer = {
-            attributes: { life: 8, defense: 4, attack: 6 },
-            attackDice: 6,
-            defenseDice: 6,
-            mapEntity: { isPlayerOnIce: false },
-            socketId: 'player2',
-        } as PlayerCharacter;
+        mockOpponentPlayer = new PlayerCharacter('player2');
+        mockOpponentPlayer.socketId = 'player2';
+        mockOpponentPlayer.attributes = { life: 0, defense: 0, attack: 0, speed: 0 };
+        mockOpponentPlayer.mapEntity = new PlayerMapEntity('avatar.png');
+        mockOpponentPlayer.mapEntity.isPlayerOnIce = false;
+        mockOpponentPlayer.inventory = [];
 
-        spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+        service.currentPlayer = mockCurrentPlayer;
+        service.opponentPlayer = mockOpponentPlayer;
     });
 
     it('should initialize the battle with correct values', () => {
@@ -45,7 +48,7 @@ describe('BattleManagerService - init', () => {
         expect(service.userRemainingHealth).toBe(mockCurrentPlayer.attributes.life);
         expect(service.opponentRemainingHealth).toBe(mockOpponentPlayer.attributes.life);
 
-        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.icePenalty);
+        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense);
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense);
     });
 
@@ -59,20 +62,8 @@ describe('BattleManagerService - init', () => {
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.icePenalty);
     });
 
-    describe('BattleManagerService - isValidAction', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-
-            service = TestBed.inject(BattleManagerService);
-        });
-
+    describe('isValidAction', () => {
         it('should return true if currentPlayer, opponentPlayer are set and isUserTurn is true', () => {
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
             service.isUserTurn = true;
 
             const result = service.isValidAction();
@@ -82,7 +73,6 @@ describe('BattleManagerService - init', () => {
 
         it('should return false if currentPlayer is null', () => {
             service.currentPlayer = null;
-            service.opponentPlayer = {} as PlayerCharacter;
             service.isUserTurn = true;
 
             const result = service.isValidAction();
@@ -91,7 +81,6 @@ describe('BattleManagerService - init', () => {
         });
 
         it('should return false if opponentPlayer is null', () => {
-            service.currentPlayer = {} as PlayerCharacter;
             service.opponentPlayer = null;
             service.isUserTurn = true;
 
@@ -101,8 +90,6 @@ describe('BattleManagerService - init', () => {
         });
 
         it('should return false if isUserTurn is false', () => {
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
             service.isUserTurn = false;
 
             const result = service.isValidAction();
@@ -111,35 +98,28 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - onUserAttack', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
+    describe('onUserAttack', () => {
         it('should calculate and emit attack result if action is valid', () => {
             spyOn(service, 'isValidAction').and.returnValue(true);
-            const value = 8;
-            const diceResult = 3;
-            spyOn(service, 'attackDiceResult').and.returnValue(value);
-            spyOn(service, 'defenseDiceResult').and.returnValue(diceResult);
+            const attackDiceResult = 8;
+            const defenseDiceResult = 3;
+            spyOn(service, 'attackDiceResult').and.returnValue(attackDiceResult);
+            spyOn(service, 'defenseDiceResult').and.returnValue(defenseDiceResult);
             const signalSpy = spyOn(service.signalUserAttacked, 'next');
 
             service.onUserAttack();
-            const result = value - diceResult;
+            const result = attackDiceResult - defenseDiceResult;
             expect(service.isValidAction).toHaveBeenCalled();
             expect(service.attackDiceResult).toHaveBeenCalled();
             expect(service.defenseDiceResult).toHaveBeenCalled();
+            expect(service.doesPlayerHaveItem).toHaveBeenCalled();
+            expect(service.isPlayerHealthMax).toHaveBeenCalled();
             expect(signalSpy).toHaveBeenCalledWith({ playerTurnId: mockCurrentPlayer.socketId, attackResult: result, playerHasTotem: false });
+
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'isPlayerHealthMax').and.returnValue(true);
+            service.onUserAttack();
+            expect(signalSpy).toHaveBeenCalledWith({ playerTurnId: mockCurrentPlayer.socketId, attackResult: result, playerHasTotem: true });
         });
 
         it('should not emit attack result if action is invalid', () => {
@@ -153,19 +133,7 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - onUserEscape', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
-        });
-
+    describe('onUserEscape', () => {
         it('should decrease userEvasionAttempts and emit signal if action is valid and evasion attempts are available', () => {
             spyOn(service, 'isValidAction').and.returnValue(true);
             service.userEvasionAttempts = 2;
@@ -203,47 +171,44 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - onOpponentAttack', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.currentPlayer = { attributes: { life: 10 } } as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
-            service.userRemainingHealth = 10;
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
+    describe('onOpponentAttack', () => {
         it('should decrease userRemainingHealth and emit attack result if opponent attacks with positive result on opponent’s turn', () => {
             service.isUserTurn = false;
+            service.userRemainingHealth = 1;
+            service.opponentRemainingHealth = 1;
             const attackResult = 5;
             const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
 
             service.onOpponentAttack(attackResult);
-            const result = 9;
+            const result = 0;
             expect(service.userRemainingHealth).toBe(result);
             expect(signalSpy).toHaveBeenCalledWith(attackResult);
+
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'isPlayerHealthMax').and.returnValue(false);
+
+            service.onOpponentAttack(attackResult);
+            const result2 = 2;
+
+            expect(service.opponentRemainingHealth).toBe(result2);
         });
 
         it('should not decrease userRemainingHealth but emit attack result if opponent attacks with zero or negative result', () => {
             service.isUserTurn = false;
+            service.userRemainingHealth = 1;
             const attackResult = 0;
             const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
 
             service.onOpponentAttack(attackResult);
 
-            const result = 10;
+            const result = 1;
             expect(service.userRemainingHealth).toBe(result);
             expect(signalSpy).toHaveBeenCalledWith(attackResult);
         });
 
         it('should not emit signal or decrease health if it is user’s turn', () => {
             service.isUserTurn = true;
+            service.userRemainingHealth = 1;
             const attackResult = 5;
             const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
 
@@ -255,22 +220,10 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - onOpponentEscape', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
-            service.opponentEvasionAttempts = 2;
-        });
-
+    describe('onOpponentEscape', () => {
         it('should decrease opponentEvasionAttempts and emit signal if it is opponent’s turn', () => {
             service.isUserTurn = false;
+            service.opponentEvasionAttempts = 2;
             const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
 
             service.onOpponentEscape();
@@ -281,6 +234,7 @@ describe('BattleManagerService - init', () => {
 
         it('should not emit signal or decrease evasion attempts if it is user’s turn', () => {
             service.isUserTurn = true;
+            service.opponentEvasionAttempts = 2;
             const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
 
             service.onOpponentEscape();
@@ -290,18 +244,7 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - attackDiceResult', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
+    describe('attackDiceResult', () => {
         it('should calculate attack result without ice penalty when player is not on ice', () => {
             service.currentPlayer = {
                 attributes: { attack: 10 },
@@ -340,30 +283,27 @@ describe('BattleManagerService - init', () => {
             expect(result).toBe(0);
         });
     });
-    describe('BattleManagerService - defenseDiceResult', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
+    describe('defenseDiceResult', () => {
         it('should calculate defense result based on opponentDefense and defense dice when opponent player is set', () => {
             service.opponentPlayer = {
                 defenseDice: 6,
             } as PlayerCharacter;
             service.opponentDefence = 4;
+            service.opponentRemainingHealth = 1;
 
-            spyOn(Math, 'random').and.returnValue(0.5);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            spyOn(Math, 'random').and.returnValue(1);
 
             const result = service.defenseDiceResult();
 
-            const expectedResult = 8;
+            const expectedResult = 10;
             expect(result).toBe(expectedResult);
+
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+
+            const result2 = service.defenseDiceResult();
+            const expectedResult2 = 100;
+            expect(result2).toBe(expectedResult2);
         });
 
         it('should return 0 if opponentPlayer is null', () => {
@@ -375,52 +315,36 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - onSuccessfulAttack', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.opponentPlayer = {} as PlayerCharacter;
-            service.opponentRemainingHealth = 10;
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
+    describe('onSuccessfulAttack', () => {
         it('should decrease opponentRemainingHealth by 1 if action is valid', () => {
             spyOn(service, 'isValidAction').and.returnValue(true);
+            service.opponentRemainingHealth = 1;
+            service.userRemainingHealth = 1;
 
             service.onSuccessfulAttack();
 
             expect(service.isValidAction).toHaveBeenCalled();
-            const remainingHealth = 9;
+            const remainingHealth = 0;
             expect(service.opponentRemainingHealth).toBe(remainingHealth);
+
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'isPlayerHealthMax').and.returnValue(false);
+
+            expect(service.userRemainingHealth).toBe(2);
         });
 
         it('should not decrease opponentRemainingHealth if action is invalid', () => {
             spyOn(service, 'isValidAction').and.returnValue(false);
-
+            service.opponentRemainingHealth = 1;
             service.onSuccessfulAttack();
 
             expect(service.isValidAction).toHaveBeenCalled();
-            const remainingHealth = 10;
+            const remainingHealth = 1;
             expect(service.opponentRemainingHealth).toBe(remainingHealth);
         });
     });
 
-    describe('BattleManagerService - endBattle', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-        });
-
+    describe('endBattle', () => {
         it('should set isBattleOn to false immediately and call clearBattle after 1000 ms', () => {
             spyOn(service, 'clearBattle');
 
@@ -438,28 +362,65 @@ describe('BattleManagerService - init', () => {
         });
     });
 
-    describe('BattleManagerService - clearBattle', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = {} as PlayerCharacter;
-            service.currentPlayerIdTurn = 'player1';
-            service.isUserTurn = true;
-            service.userEvasionAttempts = 2;
-            service.opponentEvasionAttempts = 2;
-            service.userRemainingHealth = 10;
-            service.opponentRemainingHealth = 8;
-            service.userDefence = 5;
-            service.opponentDefence = 4;
-            service.isBattleOn = true;
+    describe('isPlayerHealthMax', () => {
+        it('should return true if player is max health', () => {
+            spyOn(service, 'isPlayerHealthMax');
+            const result = service.isPlayerHealthMax(mockCurrentPlayer, mockCurrentPlayer.attributes.life);
+            expect(result).toBeTrue();
         });
 
+        it('should return false if player is not max health', () => {
+            spyOn(service, 'isPlayerHealthMax');
+            const result = service.isPlayerHealthMax(mockCurrentPlayer, mockCurrentPlayer.attributes.life - 1);
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('isPlayerHealthMax', () => {
+        it('should return true if player has specific item', () => {
+            mockCurrentPlayer.inventory = [new Totem()];
+
+            const result = service.doesPlayerHaveItem(mockCurrentPlayer, ItemType.Totem);
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if player does not have specific item', () => {
+            mockCurrentPlayer.inventory = [];
+
+            const result = service.doesPlayerHaveItem(mockCurrentPlayer, ItemType.Totem);
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('hasIcePenalty', () => {
+        it('should return true if player is on ice and does not have specific item', () => {
+            mockCurrentPlayer.mapEntity.isPlayerOnIce = true;
+            mockCurrentPlayer.inventory = [];
+
+            spyOn(service, 'hasIcePenalty');
+            const result = service.hasIcePenalty(mockCurrentPlayer);
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if player is not on ice', () => {
+            mockCurrentPlayer.mapEntity.isPlayerOnIce = false;
+
+            spyOn(service, 'hasIcePenalty');
+            const result = service.hasIcePenalty(mockCurrentPlayer);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if player is on ice and has specific item', () => {
+            mockCurrentPlayer.mapEntity.isPlayerOnIce = true;
+            mockCurrentPlayer.inventory = [new Elytra()];
+
+            spyOn(service, 'hasIcePenalty');
+            const result = service.hasIcePenalty(mockCurrentPlayer);
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('clearBattle', () => {
         it('should reset all battle properties to initial values', () => {
             service.clearBattle();
 
@@ -474,82 +435,6 @@ describe('BattleManagerService - init', () => {
             expect(service.userDefence).toBe(0);
             expect(service.opponentDefence).toBe(0);
             expect(service.isBattleOn).toBeFalse();
-        });
-    });
-
-    describe('BattleManagerService - onOpponentAttack early return', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.userRemainingHealth = 10;
-
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
-        it('should return early if currentPlayer is null', () => {
-            service.currentPlayer = null;
-            service.opponentPlayer = {} as PlayerCharacter;
-            const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
-            const attackResult = 5;
-            service.onOpponentAttack(attackResult);
-
-            expect(signalSpy).not.toHaveBeenCalled();
-            const remainingHealth = 10;
-            expect(service.userRemainingHealth).toBe(remainingHealth);
-        });
-
-        it('should return early if opponentPlayer is null', () => {
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = null;
-            const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
-
-            const attackResult = 5;
-            service.onOpponentAttack(attackResult);
-
-            expect(signalSpy).not.toHaveBeenCalled();
-
-            const remainingHealth = 10;
-            expect(service.userRemainingHealth).toBe(remainingHealth);
-        });
-    });
-
-    describe('BattleManagerService - onOpponentEscape early return', () => {
-        // let service: BattleManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [BattleManagerService],
-            });
-            service = TestBed.inject(BattleManagerService);
-
-            service.opponentEvasionAttempts = 2;
-        });
-
-        it('should return early if currentPlayer is null', () => {
-            service.currentPlayer = null;
-            service.opponentPlayer = {} as PlayerCharacter;
-            const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
-
-            service.onOpponentEscape();
-
-            expect(signalSpy).not.toHaveBeenCalled();
-            expect(service.opponentEvasionAttempts).toBe(2);
-        });
-
-        it('should return early if opponentPlayer is null', () => {
-            service.currentPlayer = {} as PlayerCharacter;
-            service.opponentPlayer = null;
-            const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
-
-            service.onOpponentEscape();
-
-            expect(signalSpy).not.toHaveBeenCalled();
-            expect(service.opponentEvasionAttempts).toBe(2);
         });
     });
 });
