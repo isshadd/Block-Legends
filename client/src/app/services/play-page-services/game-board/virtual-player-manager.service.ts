@@ -440,6 +440,7 @@ export class VirtualPlayerManagerService {
             fromTile: lastTile.coordinates,
             toTile: nextPathTile.coordinates,
             playerTurnId: player.socketId,
+            isTeleport: false,
         });
 
         if (this.checkIfVirtualPlayerWonCTFGame(player, nextPathTile)) {

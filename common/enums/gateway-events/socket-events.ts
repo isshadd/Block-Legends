@@ -27,6 +27,8 @@ export const enum SocketEvents {
     VIRTUAL_PLAYER_CHOOSED_DESTINATION = 'virtualPlayerChoosedDestination',
     VIRTUAL_PLAYER_MOVED = 'virtualPlayerMoved',
     VIRTUAL_PLAYER_CONTINUE_TURN = 'virtualPlayerContinueTurn',
+    TOGGLE_DEBUG_MODE = 'toggleDebugMode',
+    DEBUG_MODE_OFF = 'debugModeOff',
 
     // RECUS
     ROOM_STATE = 'roomState',
@@ -77,4 +79,9 @@ export const enum SocketEvents {
     ROOM_USER_THREW_ITEM = 'roomUserThrewItem',
     VIRTUAL_PLAYER_WON_BATTLE = 'virtualPlayerWon',
     VIRTUAL_PLAYER_LOST_BATTLE = 'virtualPlayerLost',
+    DEBUG_MODE_REC = 'debugModeRec',
+    DEBUG_MODE_OFF_REC = 'debugModeOffRec',
+    USER_DID_MOVE = 'userDidMove',
+    USER_FINISHED_MOVE = 'userFinishedMove',
+
 }

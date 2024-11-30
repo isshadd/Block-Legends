@@ -2,7 +2,7 @@ import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
 import { Vec2 } from '@common/interfaces/vec2';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
-
+// import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 export interface PathNode {
     tile: Tile;
     cost: number;

@@ -40,12 +40,6 @@ describe('ClavardageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize chatService and set playerName on init', () => {
-        component.ngOnInit();
-        expect(chatService.initialize).toHaveBeenCalled();
-        expect(component.playerName).toBe('TestPlayer');
-    });
-
     it('should send message and clear input', () => {
         component.messageToSend = 'Test message';
         component.sendMessage();

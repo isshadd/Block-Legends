@@ -57,11 +57,13 @@ describe('PlayGameBoardManagerService', () => {
             service.signalManagerFinishedInit.next();
         });
 
+
         it('should emit and subscribe to signalUserMoved$', (done) => {
-            const movementData = { fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 }, playerTurnId: mockPlayerCharacter.socketId } as {
+            const movementData = { fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 }, playerTurnId: mockPlayerCharacter.socketId, isTeleport: false } as {
                 fromTile: Vec2;
                 toTile: Vec2;
                 playerTurnId: string;
+                isTeleport: boolean;
             };
             service.signalUserMoved$.subscribe((data) => {
                 expect(data).toEqual(movementData);

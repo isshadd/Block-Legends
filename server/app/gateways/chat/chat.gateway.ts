@@ -40,6 +40,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
     }
 
+    @SubscribeMessage('log')
+    logMessage(socket: Socket, message: string) {
+        this.logger.log(message);
+    }
+
     afterInit() {
         setInterval(() => {
             this.emitTime();
