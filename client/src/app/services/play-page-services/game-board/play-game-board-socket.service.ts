@@ -120,8 +120,8 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.signalPlayerLeft.next(playerId);
         });
 
-        this.socket.on(SocketEvents.ROOM_USER_MOVED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
-            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+        this.socket.on(SocketEvents.ROOM_USER_MOVED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2; isTeleport: boolean }) => {
+            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile, data.isTeleport);
         });
 
         this.socket.on(SocketEvents.ROOM_USER_GRABBED_ITEM, (data: { playerId: string; itemType: ItemType; tileCoordinate: Vec2 }) => {
@@ -133,7 +133,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.ROOM_USER_RESPAWNED, (data: { playerId: string; fromTile: Vec2; toTile: Vec2 }) => {
-            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile);
+            this.playGameBoardManagerService.movePlayer(data.playerId, data.fromTile, data.toTile, false);
             this.playGameBoardManagerService.continueTurn();
         });
 

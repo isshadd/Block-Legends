@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { DebugService } from '@app/services/debug.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
@@ -34,6 +36,10 @@ export class BattleManagerService {
     userDefence = 0;
     opponentDefence = 0;
 
+    constructor(
+        private debugService: DebugService,
+        private webSocketService: WebSocketService,
+    ) {}
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
@@ -108,6 +114,10 @@ export class BattleManagerService {
             if (this.hasIcePenalty(this.currentPlayer)) {
                 currentPlayerAttack -= this.icePenalty;
             }
+            if (this.debugService.isDebugMode) {
+                this.webSocketService.sendLog(`attack dice is of value ${this.currentPlayer.attackDice}`);
+                return currentPlayerAttack + this.currentPlayer.attackDice;
+            }
             return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
         }
         return 0;
@@ -120,6 +130,10 @@ export class BattleManagerService {
                 if (Math.random() < 0.5) {
                     return potionDefenseBoost;
                 }
+            }
+            if (this.debugService.isDebugMode) {
+                this.webSocketService.sendLog(`defense dice is of value ${this.opponentPlayer.defenseDice}`);
+                return this.opponentDefence + this.opponentPlayer.defenseDice;
             }
             return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }

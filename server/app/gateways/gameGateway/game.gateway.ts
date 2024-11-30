@@ -5,6 +5,7 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
 
 const NINE = 9;
 const ONE = 1;
@@ -15,6 +16,7 @@ const TWO = 2;
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
     private readonly connectedClients = new Set<string>();
+    private logger = new Logger(GameGateway.name);
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
@@ -238,6 +240,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         this.server.to(accessCode.toString()).emit(SocketEvents.GAME_PARAMETERS, { gameBoardParameters });
+    }
+
+    @SubscribeMessage(SocketEvents.TOGGLE_DEBUG_MODE)
+    toggleDebugMode(socket: Socket, roomID: string) {
+        if (socket.rooms.has(roomID)) {
+            this.server.to(roomID).emit(SocketEvents.DEBUG_MODE_REC);
+        }
+    }
+
+    @SubscribeMessage(SocketEvents.DEBUG_MODE_OFF)
+    turnOffDebugMode(socket: Socket, roomID: string) {
+        if (socket.rooms.has(roomID)) {
+            this.server.to(roomID).emit(SocketEvents.DEBUG_MODE_OFF_REC);
+        }
     }
 
     handleConnection(client: Socket) {

@@ -14,6 +14,8 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AvatarService } from '../avatar.service';
+// eslint-disable-next-line no-restricted-imports
+import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -33,18 +35,21 @@ export class WebSocketService {
 
     currentRoom: GameRoom;
     chatRoom: GameRoom;
-
+    // eslint-disable-next-line max-params
     constructor(
         private router: Router,
         private gameService: GameService,
         private chatService: ChatService,
         private eventJournalService: EventJournalService,
         private avatarService: AvatarService,
+        private debugService: DebugService,
     ) {}
 
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
+        this.chatService.initialize();
+        this.eventJournalService.initialize();
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -93,6 +98,7 @@ export class WebSocketService {
         this.playersSubject.next([]);
         this.socket.disconnect();
         this.chatService.clearMessages();
+        this.eventJournalService.clearEvents();
     }
 
     lockRoom() {
@@ -113,6 +119,18 @@ export class WebSocketService {
         }
     }
 
+    debugMode() {
+        if (this.currentRoom.accessCode) this.socket.emit(SocketEvents.TOGGLE_DEBUG_MODE, this.currentRoom.accessCode.toString());
+    }
+
+    debugModeOff() {
+        if (this.currentRoom.accessCode) this.socket.emit(SocketEvents.DEBUG_MODE_OFF, this.currentRoom.accessCode.toString());
+    }
+
+    sendLog(message: string) {
+        this.socket.emit('log', message);
+    }
+
     // Ajouté par Nihal
     getTotalPlayers(): PlayerCharacter[] {
         let players: PlayerCharacter[] = [];
@@ -130,6 +148,7 @@ export class WebSocketService {
         this.socket.on(SocketEvents.ROOM_STATE, (room: GameRoom) => {
             this.gameService.setAccessCode(room.accessCode);
             this.chatService.setAccessCode(room.accessCode);
+            this.eventJournalService.setAccessCode(room.accessCode);
             this.playersSubject.next(room.players);
             this.currentRoom = room;
             this.isLockedSubject.next(room.isLocked);
@@ -251,7 +270,7 @@ export class WebSocketService {
             alert(message);
         });
 
-        this.socket.on(SocketEvents.CLOCK, (serverClock: Date) => {
+        this.socket.on(ChatEvents.Clock, (serverClock: Date) => {
             this.chatService.serverClock = serverClock;
             this.eventJournalService.serverClock = serverClock;
         });
@@ -259,14 +278,27 @@ export class WebSocketService {
         this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
-            this.socket.on(SocketEvents.MASS_MESSAGE, (broadcastMessage: string) => {
-                this.chatService.roomMessages.push(broadcastMessage);
-            });
         });
 
         this.socket.on(ChatEvents.RoomMessage, (message: string) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
+        });
+
+        this.socket.on(SocketEvents.DEBUG_MODE_REC, () => {
+            this.debugService.isDebugMode = !this.debugService.isDebugMode;
+        });
+
+        this.socket.on(SocketEvents.DEBUG_MODE_OFF_REC, () => {
+            this.debugService.isDebugMode = false;
+        });
+
+        this.socket.on(SocketEvents.USER_DID_MOVE, () => {
+            this.debugService.isPlayerMoving = true;
+        });
+
+        this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
+            this.debugService.isPlayerMoving = false;
         });
 
         /*
