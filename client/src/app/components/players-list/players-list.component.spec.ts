@@ -4,7 +4,6 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { ItemType } from '@common/enums/item-type';
 import { VisibleState } from '@common/interfaces/placeable-entity';
-import { Vec2 } from '@common/interfaces/vec2';
 import { PlayersListComponent } from './players-list.component';
 
 describe('PlayersListComponent', () => {
@@ -49,7 +48,7 @@ describe('PlayersListComponent', () => {
 
         it('should return false if the player ID does not match the currentPlayerIdTurn', () => {
             const mockPlayer = new PlayerCharacter('Player 2');
-            mockPlayer.socketId = '67890'; 
+            mockPlayer.socketId = '67890';
 
             expect(component.isTurn(mockPlayer)).toBeFalse();
         });
@@ -67,17 +66,17 @@ describe('PlayersListComponent', () => {
                     visibleState: VisibleState.NotSelected,
                     isPlaced: false,
                     itemLimit: 0,
-                    isItem: function (): boolean {
+                    isItem(): boolean {
                         throw new Error('Function not implemented.');
                     },
-                    setCoordinates: function (coordinates: Vec2): void {
+                    setCoordinates(): void {
                         throw new Error('Function not implemented.');
                     },
-                    isGrabbable: function (): boolean {
+                    isGrabbable(): boolean {
                         throw new Error('Function not implemented.');
                     },
                 },
-            ]; 
+            ];
 
             expect(component.hasFlag(mockPlayer)).toBeTrue();
         });
@@ -93,17 +92,17 @@ describe('PlayersListComponent', () => {
                     visibleState: VisibleState.NotSelected,
                     isPlaced: false,
                     itemLimit: 0,
-                    isItem: function (): boolean {
+                    isItem(): boolean {
                         throw new Error('Function not implemented.');
                     },
-                    setCoordinates: function (coordinates: Vec2): void {
+                    setCoordinates(): void {
                         throw new Error('Function not implemented.');
                     },
-                    isGrabbable: function (): boolean {
+                    isGrabbable(): boolean {
                         throw new Error('Function not implemented.');
                     },
                 },
-            ]; 
+            ];
 
             expect(component.hasFlag(mockPlayer)).toBeFalse();
         });

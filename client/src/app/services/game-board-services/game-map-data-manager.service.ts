@@ -17,6 +17,8 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
+// eslint-disable-next-line no-restricted-imports
+import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -27,12 +29,13 @@ export class GameMapDataManagerService {
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
-
+    // eslint-disable-next-line max-params
     constructor(
         public tileFactoryService: TileFactoryService,
         public itemFactoryService: ItemFactoryService,
         public gameServerCommunicationService: GameServerCommunicationService,
         public dialog: MatDialog,
+        public debugService: DebugService,
         private router: Router,
     ) {}
 
@@ -59,6 +62,34 @@ export class GameMapDataManagerService {
         } else {
             this.saveGameInDb();
         }
+    }
+
+    async convertJsonToGameShared(jsonFile: File): Promise<GameShared> {
+        const jsonText = await jsonFile.text();
+
+        const jsonObject = JSON.parse(jsonText);
+
+        const gameShared: GameShared = {
+            _id: jsonObject._id,
+            createdAt: jsonObject.createdAt ? new Date(jsonObject.createdAt) : undefined,
+            updatedAt: jsonObject.updatedAt ? new Date(jsonObject.updatedAt) : undefined,
+            name: jsonObject.name,
+            description: jsonObject.description,
+            size: jsonObject.size as MapSize,
+            mode: jsonObject.mode as GameMode,
+            imageUrl: jsonObject.imageUrl,
+            isVisible: jsonObject.isVisible,
+            tiles: jsonObject.tiles.map((row: unknown[]) =>
+                row.map(
+                    (tile: unknown) =>
+                        ({
+                            ...(tile as object),
+                        }) as TileShared,
+                ),
+            ),
+        };
+
+        return gameShared;
     }
 
     resetCurrentValues() {

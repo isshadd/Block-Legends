@@ -22,7 +22,7 @@ describe('ItemListContainerComponent', () => {
 
     it('should set item visibleState to Hovered on onMouseEnter', () => {
         const mockItem = new Item();
-        mockItem.visibleState = VisibleState.NotSelected; 
+        mockItem.visibleState = VisibleState.NotSelected;
 
         component.onMouseEnter(mockItem);
 
@@ -41,19 +41,19 @@ describe('ItemListContainerComponent', () => {
     it('should emit itemClicked event on left-click in onMouseDown', () => {
         const mockItem = new Item();
         spyOn(component.itemClicked, 'emit');
-        const event = new MouseEvent('mousedown', { button: 0 }); 
-        spyOn(event, 'preventDefault'); 
+        const event = new MouseEvent('mousedown', { button: 0 });
+        spyOn(event, 'preventDefault');
 
         component.onMouseDown(event, mockItem);
 
         expect(component.itemClicked.emit).toHaveBeenCalledWith(mockItem);
-        expect(event.preventDefault).toHaveBeenCalled(); 
+        expect(event.preventDefault).toHaveBeenCalled();
     });
 
     it('should not emit itemClicked event on right-click in onMouseDown', () => {
         const mockItem = new Item();
         spyOn(component.itemClicked, 'emit');
-        const event = new MouseEvent('mousedown', { button: 2 }); 
+        const event = new MouseEvent('mousedown', { button: 2 });
 
         component.onMouseDown(event, mockItem);
 

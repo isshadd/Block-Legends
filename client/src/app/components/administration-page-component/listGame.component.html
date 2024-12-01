@@ -16,7 +16,7 @@
         <div class="action_icons">
             <span class="material-icons" (click)="deleteGame(game._id)" title="Supprimer">delete</span>
             <span class="material-icons" (click)="editGame(game)" title="Éditer">edit</span>
-            <span class="material-icons" title="Exporter">file_download</span>
+            <span class="material-icons" title="Exporter" (click)="downloadGameAsJson(game)">file_download</span>
             <span class="material-icons" (click)="toggleVisibility(game)" title="Changer visibilité">
                 {{ game.isVisible ? 'visibility' : 'visibility_off' }}
             </span>

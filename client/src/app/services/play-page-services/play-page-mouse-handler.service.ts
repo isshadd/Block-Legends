@@ -3,6 +3,8 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Subject, takeUntil } from 'rxjs';
+// eslint-disable-next-line no-restricted-imports
+import { DebugService } from '../debug.service';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 
 enum MouseButton {
@@ -23,7 +25,10 @@ export class PlayPageMouseHandlerService implements OnDestroy {
 
     private destroy$ = new Subject<void>();
 
-    constructor(public playGameBoardManagerService: PlayGameBoardManagerService) {
+    constructor(
+        public playGameBoardManagerService: PlayGameBoardManagerService,
+        public debugService: DebugService,
+    ) {
         playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
             this.clearUI();
         });
@@ -88,10 +93,21 @@ export class PlayPageMouseHandlerService implements OnDestroy {
         }
     }
 
-    handleRightClick(event: MouseEvent, tile: Tile) {
-        this.discardRightSelectedTile();
-        this.rightSelectedTile = tile;
+    handleDebugRightClick(event: MouseEvent, tile: Tile) {
+        if (this.debugService.isPlayerMoving) return;
+        this.playGameBoardManagerService.teleportPlayer(tile);
         event.preventDefault();
+    }
+
+    handleRightClick(event: MouseEvent, tile: Tile) {
+        this.discardRightClickSelectedPlayer();
+        this.discardRightSelectedTile();
+
+        if (this.debugService.isDebugMode) this.handleDebugRightClick(event, tile);
+        else {
+            this.rightSelectedTile = tile;
+            event.preventDefault();
+        }
     }
 
     toggleAction(): void {
@@ -103,8 +119,8 @@ export class PlayPageMouseHandlerService implements OnDestroy {
                 this.isActionOpen = false;
             }
 
-            if (this.isActionOpen) {
-                const userTile = this.playGameBoardManagerService.getCurrentPlayerTile();
+            if (userPlayer && this.isActionOpen) {
+                const userTile = this.playGameBoardManagerService.getPlayerTile(userPlayer);
                 if (!userTile) return;
 
                 this.actionTiles = this.playGameBoardManagerService.getAdjacentActionTiles(userTile);

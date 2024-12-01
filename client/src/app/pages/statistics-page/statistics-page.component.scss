@@ -1,16 +1,19 @@
 @import 'src/_variables.scss';
-
+.dark-button {
+    margin: 5px;
+    top: 0px;
+}
 #page-container {
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
     width: 100%;
-    height: 100%;
+    height: 90%;
+    overflow-y: hidden;
 
     #page-separator {
-        width: 200vh;
-        height: 90vb;
+        width: 210vh;
+        height: 85vh;
         background-color: $primary-dark;
         position: absolute;
         display: flex;
@@ -21,12 +24,12 @@
         border: 2px solid darken($primary-dark, 10%);
 
         #players-table {
-            width: 140vh;
-            height: 80vb;
+            width: 160vh;
+            height: 80vh;
             background-color: $primary-dark;
             border: 2px solid darken($primary-dark, 10%);
             overflow-y: scroll;
-            overflow-x: scroll;
+            overflow-x: hidden;
             scrollbar-color: darken($primary-dark, 10%) $primary-dark;
             scrollbar-width: thin;
 
@@ -54,7 +57,7 @@
                 display: contents;
             }
             .table-cell {
-                padding: 10px;
+                padding: 5px;
                 border-bottom: 2px solid darken($primary-dark, 10%);
                 border-right: 2px solid darken($primary-dark, 10%);
                 font-size: 1.5vh;
@@ -63,6 +66,11 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                .button-container {
+                    display: flex;
+                    flex-direction: column;
+                    column-gap: 0px;
+                }
             }
 
             .table-header .table-cell {
@@ -91,7 +99,64 @@
             #game-statistics-table {
                 width: 50vh;
                 height: 50vh;
-                background-color: red;
+                background-color: $primary-dark;
+                display: flex;
+                flex-direction: column;
+                row-gap: 5px;
+                #play-time {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #turn-number {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #tile-pourcentage {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #door-pourcentage {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
+
+                #flag-capture {
+                    display: flex;
+                    margin-left: 10px;
+                    color: $primary-light;
+
+                    span {
+                        margin-left: 10px;
+                        color: $secondary;
+                    }
+                }
             }
 
             #chat-container {

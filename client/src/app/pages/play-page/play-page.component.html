@@ -33,7 +33,7 @@
             [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
         ></app-timer> -->
 
-        @if (playPageMouseHandlerService.rightSelectedTile) {
+        @if (playPageMouseHandlerService.rightSelectedTile && !this.debugService.isDebugMode) {
         <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
         }
     </div>
