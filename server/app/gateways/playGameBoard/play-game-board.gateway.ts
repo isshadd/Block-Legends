@@ -3,7 +3,10 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
-import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
+import {
+    PlayerNumberStatisticType,
+    PlayGameStatisticsService,
+} from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
@@ -216,6 +219,7 @@ export class PlayGameBoardGateway {
         this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_TRIED_ESCAPE);
 
         if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, playerTurnId)) {
+            this.playGameStatisticsService.increasePlayerStatistic(room.accessCode, playerTurnId, PlayerNumberStatisticType.TotalEvasions);
             this.handleBattleEndedByEscape(room.accessCode);
             return;
         }
@@ -298,6 +302,9 @@ export class PlayGameBoardGateway {
         this.playGameBoardTimeService.pauseTimer(accessCode);
         this.playGameBoardBattleService.createBattleTimer(accessCode, playerId, enemyPlayerId);
 
+        this.playGameStatisticsService.increasePlayerStatistic(accessCode, playerId, PlayerNumberStatisticType.TotalCombats);
+        this.playGameStatisticsService.increasePlayerStatistic(accessCode, enemyPlayerId, PlayerNumberStatisticType.TotalCombats);
+
         const playerTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
         this.startBattleTurn(accessCode, playerTurn);
     }
@@ -340,6 +347,8 @@ export class PlayGameBoardGateway {
 
         if (winnerPlayer === firstPlayer) {
             this.server.to(accessCode.toString()).emit(SocketEvents.FIRST_PLAYER_WON_BATTLE, { firstPlayer, loserPlayer: secondPlayer });
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, firstPlayer, PlayerNumberStatisticType.FightWins);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, secondPlayer, PlayerNumberStatisticType.FightLoses);
 
             if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, firstPlayer).isVirtual) {
                 this.server
@@ -358,6 +367,8 @@ export class PlayGameBoardGateway {
             this.server
                 .to(accessCode.toString())
                 .emit(SocketEvents.SECOND_PLAYER_WON_BATTLE, { winnerPlayer: secondPlayer, loserPlayer: firstPlayer });
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, secondPlayer, PlayerNumberStatisticType.FightWins);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, firstPlayer, PlayerNumberStatisticType.FightLoses);
 
             if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, secondPlayer).isVirtual) {
                 this.server

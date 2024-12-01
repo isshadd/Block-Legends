@@ -6,6 +6,15 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
 import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
+export enum PlayerNumberStatisticType {
+    TotalCombats = 'totalCombats',
+    TotalEvasions = 'totalEvasions',
+    FightWins = 'fightWins',
+    FightLoses = 'fightLoses',
+    TotalLostLife = 'totalLostLife',
+    TotalDamageDealt = 'totalDamageDealt',
+}
+
 @Injectable()
 export class PlayGameStatisticsService {
     private readonly logger = new Logger(PlayGameStatisticsService.name);
@@ -53,7 +62,7 @@ export class PlayGameStatisticsService {
         return gameStatisticsRoom.players.find((player) => player.socketId === playerId);
     }
 
-    increasePlayerStatistic(accessCode: number, playerId: string, statistic: keyof PlayerCharacter) {
+    increasePlayerStatistic(accessCode: number, playerId: string, statistic: PlayerNumberStatisticType) {
         const player = this.getPlayerStatisticsById(accessCode, playerId);
 
         if (!player) {

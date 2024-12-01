@@ -1,6 +1,7 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
+import { PlayerNumberStatisticType, PlayGameStatisticsService } from '../play-game-statistics/play-game-statistics.service';
 
 @Injectable()
 export class PlayGameBoardBattleService {
@@ -14,7 +15,10 @@ export class PlayGameBoardBattleService {
     signalRoomTimePassed = new Subject<number>();
     signalRoomTimePassed$ = this.signalRoomTimePassed.asObservable();
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
+    ) {
         this.startTimer();
     }
 
@@ -123,6 +127,8 @@ export class PlayGameBoardBattleService {
                 battleRoom.firstPlayerRemainingLife += 1;
             }
             battleRoom.secondPlayerRemainingLife--;
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.firstPlayerId, PlayerNumberStatisticType.TotalDamageDealt);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.secondPlayerId, PlayerNumberStatisticType.TotalLostLife);
             if (battleRoom.secondPlayerRemainingLife <= 0) {
                 return true;
             }
@@ -131,6 +137,8 @@ export class PlayGameBoardBattleService {
                 battleRoom.secondPlayerRemainingLife += 1;
             }
             battleRoom.firstPlayerRemainingLife--;
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.secondPlayerId, PlayerNumberStatisticType.TotalDamageDealt);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.firstPlayerId, PlayerNumberStatisticType.TotalLostLife);
             if (battleRoom.firstPlayerRemainingLife <= 0) {
                 return true;
             }
