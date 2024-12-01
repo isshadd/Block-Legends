@@ -1,21 +1,19 @@
 @import 'src/_variables.scss';
 .dark-button {
-    padding: 5px;
-    margin: 0px;
+    margin: 5px;
     top: 0px;
 }
-
 #page-container {
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
     width: 100%;
-    height: 100%;
+    height: 90%;
+    overflow-y: hidden;
 
     #page-separator {
-        width: 220vh;
-        height: 90vh;
+        width: 210vh;
+        height: 85vh;
         background-color: $primary-dark;
         position: absolute;
         display: flex;
