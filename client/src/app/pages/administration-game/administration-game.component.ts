@@ -44,18 +44,18 @@ export class AdministrationGameComponent {
                     next: () => {
                         window.location.reload();
                     },
-                    error: (errors: unknown) => {
+                    error: (errors: any) => {
                         if (typeof errors === 'string' || Array.isArray(errors)) {
                             this.gameMapDataManagerService.openErrorModal(errors);
                         } else {
                             this.gameMapDataManagerService.openErrorModal(
-                                "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
+                                errors.message || "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
                             );
                         }
                     },
                 });
             } catch (error) {
-                this.gameMapDataManagerService.openErrorModal("Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.");
+                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier <br> ${error}`);
             }
         }
     }
