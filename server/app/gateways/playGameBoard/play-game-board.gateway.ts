@@ -130,7 +130,7 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
-        this.playGameStatisticsService.addDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
+        this.playGameStatisticsService.addPlayerDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, {
             playerId: data.playerTurnId,
             itemType: data.itemType,
