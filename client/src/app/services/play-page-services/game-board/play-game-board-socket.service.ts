@@ -105,6 +105,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.router.navigate(['/home']);
     }
 
+    goToStatisticsPage(): void {
+        this.router.navigate(['/statistics-page']);
+    }
+
     private setupSocketListeners(): void {
         this.socket.on(SocketEvents.INIT_GAME_BOARD_PARAMETERS, (gameBoardParameters: GameBoardParameters) => {
             this.playGameBoardManagerService.init(gameBoardParameters);
@@ -249,7 +253,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.playGameBoardManagerService.endGame(playerId);
             const wait = 5000;
             setTimeout(() => {
-                this.leaveGame();
+                this.goToStatisticsPage();
             }, wait);
         });
 
