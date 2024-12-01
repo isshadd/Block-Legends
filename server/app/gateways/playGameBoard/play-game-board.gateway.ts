@@ -101,6 +101,10 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+
+        this.playGameStatisticsService.addDifferentTerrainTileVisited(room.accessCode, data.playerTurnId, data.fromTile);
+        this.playGameStatisticsService.addDifferentTerrainTileVisited(room.accessCode, data.playerTurnId, data.toTile);
+
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_MOVED, {
             playerId: data.playerTurnId,
             fromTile: data.fromTile,
@@ -126,6 +130,7 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
+        this.playGameStatisticsService.addDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, {
             playerId: data.playerTurnId,
             itemType: data.itemType,
