@@ -137,16 +137,11 @@ export class GameStatisticsService {
         const door = this.gameMapDataManagerService
             .getCurrentGrid()
             .reduce((count, row) => count + row.filter((tile) => tile instanceof DoorTile || tile instanceof OpenDoor).length, 0);
-        console.log(door);
         return door;
     }
 
     getTotalDoorsInteractedPercentage() {
         let totalDoors = this.totalDoorsInMap();
         return totalDoors === 0 ? 0 : Math.round((this.gameStatistics.totalDoorsInteracted.length / totalDoors) * 100);
-    }
-
-    getTotalPlayersThatGrabbedFlagPercentage() {
-        return Math.round((this.gameStatistics.totalPlayersThatGrabbedFlag.length / this.gameStatistics.players.length) * 100);
     }
 }

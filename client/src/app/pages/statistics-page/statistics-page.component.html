@@ -146,7 +146,7 @@
                 @if(gameMapDataManagerService.isGameModeCTF()){
                 <div id="flag-capture">
                     Nombre de jouers ayant le drapeau:
-                    <span> {{ gameStatisticsService.getTotalPlayersThatGrabbedFlagPercentage() }}% </span>
+                    <span> {{ gameStatisticsService.gameStatistics.totalPlayersThatGrabbedFlag.length }} </span>
                 </div>
                 } }@else {
                 <div id="play-time">
@@ -168,7 +168,7 @@
                 @if(gameMapDataManagerService.isGameModeCTF()){
                 <div id="flag-capture">
                     Nombre de jouers ayant le drapeau:
-                    <span> 0% </span>
+                    <span> 0 </span>
                 </div>
                 } }
                 <div id="chat-container">
