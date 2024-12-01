@@ -360,9 +360,9 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         it(`should handle ${SocketEvents.ROOM_USER_MOVED} event`, () => {
-            const data = { playerId: mockPlayer.socketId, fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 } };
+            const data = { playerId: mockPlayer.socketId, fromTile: { x: 0, y: 0 }, toTile: { x: 1, y: 1 }, isTeleport: false };
             socketCallbacks[SocketEvents.ROOM_USER_MOVED](data);
-            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
+            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile, data.isTeleport);
         });
 
         it(`should handle ${SocketEvents.VIRTUAL_PLAYER_MOVED} event`, () => {
@@ -384,9 +384,9 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         it(`should handle ${SocketEvents.ROOM_USER_RESPAWNED} event`, () => {
-            const data = { playerId: mockPlayer.socketId, fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 } };
+            const data = { playerId: mockPlayer.socketId, fromTile: { x: 2, y: 2 }, toTile: { x: 3, y: 3 }, isTeleport: false };
             socketCallbacks[SocketEvents.ROOM_USER_RESPAWNED](data);
-            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile);
+            expect(mockPlayGameBoardManagerService.movePlayer).toHaveBeenCalledWith(data.playerId, data.fromTile, data.toTile, data.isTeleport);
             expect(mockPlayGameBoardManagerService.continueTurn).toHaveBeenCalled();
         });
 

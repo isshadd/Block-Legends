@@ -304,6 +304,7 @@ describe('PlayGameBoardGateway', () => {
                 fromTile: { x: 1, y: 2 },
                 toTile: { x: 3, y: 4 },
                 playerTurnId: mockClient.id,
+                isTeleport: false,
             };
 
             const isClientTurnSpy = jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
@@ -316,6 +317,7 @@ describe('PlayGameBoardGateway', () => {
                 playerId: mockClient.id,
                 fromTile: moveData.fromTile,
                 toTile: moveData.toTile,
+                isTeleport: false,
             });
         });
 
@@ -330,6 +332,7 @@ describe('PlayGameBoardGateway', () => {
                 fromTile: { x: 1, y: 2 },
                 toTile: { x: 3, y: 4 },
                 playerTurnId: mockClient.id,
+                isTeleport: false,
             };
 
             const isClientTurnSpy = jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
@@ -440,7 +443,7 @@ describe('PlayGameBoardGateway', () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-                    const data = { fromTile: { x: 1, y: 1 }, toTile: { x: 2, y: 2 }, playerTurnId: mockClient.id };
+                    const data = { fromTile: { x: 1, y: 1 }, toTile: { x: 2, y: 2 }, playerTurnId: mockClient.id, isTeleport: false };
                     gateway.handleUserMoved(mockClient as Socket, data);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
@@ -448,6 +451,7 @@ describe('PlayGameBoardGateway', () => {
                         playerId: mockClient.id,
                         fromTile: data.fromTile,
                         toTile: data.toTile,
+                        isTeleport: false,
                     });
                 });
 
@@ -455,7 +459,7 @@ describe('PlayGameBoardGateway', () => {
                     jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
 
-                    const data = { fromTile: { x: 1, y: 1 }, toTile: { x: 2, y: 2 }, playerTurnId: mockClient.id };
+                    const data = { fromTile: { x: 1, y: 1 }, toTile: { x: 2, y: 2 }, playerTurnId: mockClient.id, isTeleport: false };
                     gateway.handleUserMoved(mockClient as Socket, data);
 
                     expect(gateway.server.to).not.toHaveBeenCalled();

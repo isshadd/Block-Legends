@@ -381,29 +381,25 @@ export class VirtualPlayerManagerService {
     }
 
     getAggressivePlayerItemPriority(itemType: ItemType): number {
-        switch (itemType) {
-            case ItemType.Sword || ItemType.Flag:
-                return 10;
-            case ItemType.Totem:
-                return 8;
-            case ItemType.Random:
-                return 5;
-            default:
-                return 0;
-        }
+        const AGGRESSIVE_PRIORITY = {
+            [ItemType.Sword]: 10,
+            [ItemType.Flag]: 10,
+            [ItemType.Totem]: 8,
+            [ItemType.Random]: 5,
+        };
+
+        return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;
     }
 
     getDefensivePlayerItemPriority(itemType: ItemType): number {
-        switch (itemType) {
-            case ItemType.MagicShield || ItemType.Flag:
-                return 10;
-            case ItemType.Chestplate:
-                return 9;
-            case ItemType.EnchantedBook:
-                return 8;
-            default:
-                return 0;
-        }
+        const DEFENSIVE_PRIORITY = {
+            [ItemType.MagicShield]: 10,
+            [ItemType.Flag]: 10,
+            [ItemType.Chestplate]: 9,
+            [ItemType.EnchantedBook]: 8,
+        };
+
+        return DEFENSIVE_PRIORITY[itemType as keyof typeof DEFENSIVE_PRIORITY] || 0;
     }
 
     calculateDistance(from: Vec2, to: Vec2): number {
@@ -440,6 +436,7 @@ export class VirtualPlayerManagerService {
             fromTile: lastTile.coordinates,
             toTile: nextPathTile.coordinates,
             playerTurnId: player.socketId,
+            isTeleport: false,
         });
 
         if (this.checkIfVirtualPlayerWonCTFGame(player, nextPathTile)) {

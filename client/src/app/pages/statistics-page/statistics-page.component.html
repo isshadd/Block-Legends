@@ -1,0 +1,121 @@
+<button class="dark-button" routerLink="/home">Retour</button>
+<div id="page-container">
+    <div id="page-separator">
+        <div id="players-table">
+            <div class="table">
+                <div class="table-header">
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.Name)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.Name)"></app-arrow-down-button>
+                        </div>
+                        Players
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.Fights)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.Fights)"></app-arrow-down-button>
+                        </div>
+                        Nombre de Combats
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Nombre de Victoires
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Nombre de Défaites
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Nombre d'Evasion
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Total des Points de Vie Perdus
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Total des Vie Enlevés
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Nombre d'Objets Différents Ramassés
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button (click)="sortPlayersIncreasing(this.sortCharacters.FightWins)"></app-arrow-up-button>
+                            <app-arrow-down-button (click)="sortPlayersDecreasing(this.sortCharacters.FightWins)"></app-arrow-down-button>
+                        </div>
+                        Pourcentage de Tuiles de Terrain Visitées
+                    </div>
+                </div>
+                @for(player of playersList; track player){
+                <div class="table-row">
+                    <div class="table-cell">
+                        <div class="player-avatar">
+                            <img src="{{ player.avatar.headImage }}" alt="avatar" />
+                        </div>
+                        <div class="player-name">{{ player.name }}</div>
+                    </div>
+                    <div class="table-cell">{{ player.fightLoses + player.fightWins }}</div>
+                    <div class="table-cell">{{ player.fightWins }}</div>
+                    <div class="table-cell">{{ player.fightLoses }}</div>
+                    <div class="table-cell">{{ player }}</div>
+                    <div class="table-cell">{{ player }}</div>
+                    <div class="table-cell">{{ player }}</div>
+                    <div class="table-cell">{{ player }}</div>
+                    <div class="table-cell">{{ player }}</div>
+                </div>
+                }
+            </div>
+        </div>
+        <div id="game-statistics-chat-container">
+            <div id="game-statistics-table">
+                <div id="play-time">
+                    Durée de la partie:
+                    <span> 00:00:00 </span>
+                </div>
+                <div id="turn-number">
+                    Nombre de tours:
+                    <span> 0 </span>
+                </div>
+                <div id="tile-pourcentage">
+                    Pourcentage de tuiles visitées:
+                    <span> 0 </span>
+                </div>
+                <div id="door-pourcentage">
+                    Pourcentage de porte manipulées:
+                    <span> 0 </span>
+                </div>
+                @if(isGameModeCTF){
+                <div id="flag-capture">
+                    Nombre de jouers ayant le drapeau:
+                    <span> 0 </span>
+                </div>
+                }
+            </div>
+            <div id="chat-container">
+                <app-clavardage></app-clavardage>
+            </div>
+        </div>
+    </div>
+</div>

@@ -59,7 +59,7 @@ describe('WaitingViewComponent', () => {
 
         chatServiceSpy = jasmine.createSpyObj('ChatService', ['setCharacter', 'setAccessCode']);
 
-        eventJournalServiceSpy = jasmine.createSpyObj('EventJournalService', ['setCharacter', 'setAccessCode']);
+        eventJournalServiceSpy = jasmine.createSpyObj('EventJournalService', ['setCharacter', 'setAccessCode', 'broadcastEvent']);
 
         mockActivatedRoute = {
             queryParams: of({ roomId: '1234' }),
@@ -100,8 +100,6 @@ describe('WaitingViewComponent', () => {
             expect(webSocketServiceSpy.createGame).toHaveBeenCalledWith('1234', mockCharacter);
             expect(component.accessCode).toBe(ACCESS_CODE);
             expect(component.playersCounter).toBe(0);
-            expect(chatServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
-            expect(eventJournalServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
         }));
 
         it('devrait initialiser pour un non-organisateur', fakeAsync(() => {
@@ -115,8 +113,6 @@ describe('WaitingViewComponent', () => {
             expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
             expect(component.accessCode).toBe(ACCESS_CODE);
             expect(component.playersCounter).toBe(0);
-            expect(chatServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
-            expect(eventJournalServiceSpy.setAccessCode).toHaveBeenCalledWith(ACCESS_CODE);
         }));
 
         it('devrait retourner tôt si le character est null', fakeAsync(() => {

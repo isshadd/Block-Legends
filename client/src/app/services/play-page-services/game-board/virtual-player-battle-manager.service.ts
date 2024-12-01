@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
@@ -12,6 +13,7 @@ export class VirtualPlayerBattleManagerService {
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public battleManagerService: BattleManagerService,
+        private debugService: DebugService,
     ) {}
 
     startTurn(
@@ -93,6 +95,9 @@ export class VirtualPlayerBattleManagerService {
         if (this.battleManagerService.hasIcePenalty(virtualPlayer)) {
             currentPlayerAttack -= this.battleManagerService.icePenalty;
         }
+        if (this.debugService.isDebugMode) {
+            return currentPlayerAttack + virtualPlayer.attackDice;
+        }
         return currentPlayerAttack + Math.floor(Math.random() * virtualPlayer.attackDice) + 1;
     }
 
@@ -106,6 +111,9 @@ export class VirtualPlayerBattleManagerService {
         let enemyPlayerDefence: number = enemyPlayer.attributes.defense;
         if (this.battleManagerService.hasIcePenalty(enemyPlayer)) {
             enemyPlayerDefence -= this.battleManagerService.icePenalty;
+        }
+        if (this.debugService.isDebugMode) {
+            return enemyPlayerDefence + 1;
         }
         return enemyPlayerDefence + Math.floor(Math.random() * enemyPlayer.defenseDice) + 1;
     }
