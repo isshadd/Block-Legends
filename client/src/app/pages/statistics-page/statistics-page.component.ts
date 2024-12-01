@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { ArrowDownButtonComponent } from '@app/components/arrow-down-button/arrow-down-button.component';
 import { ArrowUpButtonComponent } from '@app/components/arrow-up-button/arrow-up-button.component';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
+import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 
 export enum SortCharacters {
@@ -22,6 +23,8 @@ export class StatisticsPageComponent {
     @Input() isGameModeCTF: boolean;
     @Input() playersList: PlayerCharacter[] = [];
     sortCharacters = SortCharacters;
+
+    constructor(public gameStatisticsService: GameStatisticsService) {}
 
     sortPlayersIncreasing(sort: SortCharacters) {
         switch (sort) {

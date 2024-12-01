@@ -3,6 +3,7 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
+import { PlayGameStatisticsService } from '../play-game-statistics/play-game-statistics.service';
 
 const DELAY_2000_MS = 2000;
 const DELAY_500_MS = 500;
@@ -11,7 +12,10 @@ const DELAY_500_MS = 500;
 export class PlayGameBoardSocketService {
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
+    ) {}
 
     initRoomGameBoard(accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
@@ -28,6 +32,7 @@ export class PlayGameBoardSocketService {
         this.gameSocketRoomService.setCurrentPlayerTurn(accessCode, turnOrder[0]);
 
         this.gameSocketRoomService.gameBoardRooms.set(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
+        this.playGameStatisticsService.initGameStatistics(room.accessCode);
         this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 

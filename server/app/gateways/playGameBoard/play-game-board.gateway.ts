@@ -3,6 +3,7 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
@@ -23,6 +24,7 @@ export class PlayGameBoardGateway {
         private readonly playGameBoardTimeService: PlayGameBoardTimeService,
         private readonly playGameBoardBattleService: PlayGameBoardBattleService,
         private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
     ) {
         this.playGameBoardTimeService.signalRoomTimePassed$.subscribe((accessCode) => {
             this.updateRoomTime(accessCode);
@@ -227,7 +229,10 @@ export class PlayGameBoardGateway {
         if (!room) return;
 
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, playerTurnId);
+        const gameStatistics = this.playGameStatisticsService.endGameStatistics(room.accessCode);
+        this.server
+            .to(room.accessCode.toString())
+            .emit(SocketEvents.GAME_BOARD_PLAYER_WON, { playerTurnId: playerTurnId, gameStatistics: gameStatistics });
     }
 
     isClientTurn(clientId: string): boolean {
