@@ -112,26 +112,46 @@
                         </div>
                         <div class="player-name">{{ player.name }}</div>
                     </div>
-                    <div class="table-cell">{{ player.fightLoses + player.fightWins }}</div>
+                    <div class="table-cell">{{ player.totalCombats }}</div>
                     <div class="table-cell">{{ player.fightWins }}</div>
                     <div class="table-cell">{{ player.fightLoses }}</div>
-                    <div class="table-cell">{{ player }}</div>
-                    <div class="table-cell">{{ player }}</div>
-                    <div class="table-cell">{{ player }}</div>
-                    <div class="table-cell">{{ player }}</div>
-                    <div class="table-cell">{{ player }}</div>
+                    <div class="table-cell">{{ player.totalEvasions }}</div>
+                    <div class="table-cell">{{ player.totalLostLife }}</div>
+                    <div class="table-cell">{{ player.totalDamageDealt }}</div>
+                    <div class="table-cell">{{ player.differentItemsGrabbed }}</div>
+                    <div class="table-cell">{{ player.differentTerrainTilesVisited }}</div>
                 </div>
                 }
             </div>
         </div>
         <div id="game-statistics-chat-container">
             <div id="game-statistics-table">
+                @if(gameStatisticsService.gameStatistics) {
                 <div id="play-time">
-                    Durée de la partie: @if (gameStatisticsService.gameStatistics) {
-                    <span> {{ gameStatisticsService.gameStatistics.totalGameTime }} </span>
-                    } @else {
+                    Durée de la partie:
+                    <span>{{ formatGameTime(gameStatisticsService.gameStatistics.totalGameTime) }}</span>
+                </div>
+                <div id="turn-number">
+                    Nombre de tours:
+                    <span> {{ gameStatisticsService.gameStatistics.totalPlayerTurns }} </span>
+                </div>
+                <div id="tile-pourcentage">
+                    Pourcentage de tuiles visitées:
+                    <span> {{ gameStatisticsService.getTotalTilePercentage() }} </span>
+                </div>
+                <div id="door-pourcentage">
+                    Pourcentage de porte manipulées:
+                    <span> 0 </span>
+                </div>
+                @if(gameMapDataManagerService.isGameModeCTF()){
+                <div id="flag-capture">
+                    Nombre de jouers ayant le drapeau:
+                    <span> 0 </span>
+                </div>
+                } }@else {
+                <div id="play-time">
+                    Durée de la partie:
                     <span> 00:00:00 </span>
-                    }
                 </div>
                 <div id="turn-number">
                     Nombre de tours:
@@ -150,10 +170,10 @@
                     Nombre de jouers ayant le drapeau:
                     <span> 0 </span>
                 </div>
-                }
-            </div>
-            <div id="chat-container">
-                <app-clavardage></app-clavardage>
+                } }
+                <div id="chat-container">
+                    <app-clavardage></app-clavardage>
+                </div>
             </div>
         </div>
     </div>

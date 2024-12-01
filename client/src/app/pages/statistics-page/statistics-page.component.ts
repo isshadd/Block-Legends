@@ -15,9 +15,20 @@ import { GameStatisticsService, SortCharacters } from '@app/services/play-page-s
 })
 export class StatisticsPageComponent {
     sortCharacters = SortCharacters;
-
     constructor(
         public gameStatisticsService: GameStatisticsService,
         public gameMapDataManagerService: GameMapDataManagerService,
     ) {}
+
+    formatGameTime(totalGameTime: number): string {
+        const hours = Math.floor(totalGameTime / 3600);
+        const minutes = Math.floor((totalGameTime % 3600) / 60);
+        const seconds = totalGameTime % 60;
+
+        return `${this.padWithZero(hours)}:${this.padWithZero(minutes)}:${this.padWithZero(seconds)}`;
+    }
+
+    padWithZero(value: number): string {
+        return value.toString().padStart(2, '0');
+    }
 }

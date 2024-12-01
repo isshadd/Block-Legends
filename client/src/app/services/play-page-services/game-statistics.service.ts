@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
+import { OpenDoor } from '@common/classes/Tiles/open-door';
+import { AvatarEnum } from '@common/enums/avatar-enum';
+import { ItemType } from '@common/enums/item-type';
 import { GameStatistics } from '@common/interfaces/game-statistics';
+import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 
 export enum SortCharacters {
     Name = 'name',
@@ -11,9 +17,61 @@ export enum SortCharacters {
     providedIn: 'root',
 })
 export class GameStatisticsService {
-    gameStatistics: GameStatistics;
+    gameStatistics: GameStatistics = {
+        players: [],
+        isGameOn: false,
+        totalGameTime: 0,
+        totalPlayerTurns: 0,
+        totalTerrainTilesVisited: [],
+        totalDoorsInteracted: [],
+        totalPlayersThatGrabbedFlag: [],
+    };
 
-    constructor() {}
+    constructor(public gameMapDataManagerService: GameMapDataManagerService) {
+        const player1 = new PlayerCharacter('Player 1');
+        const player2 = new PlayerCharacter('Player 2');
+
+        player1.avatar = AvatarEnum.Alex;
+        player1.totalCombats = 2;
+        player1.totalEvasions = 2;
+        player1.fightWins = 1;
+        player1.fightLoses = 1;
+        player1.totalLostLife = 10;
+        player1.totalDamageDealt = 11;
+        player1.differentItemsGrabbed = [ItemType.Totem, ItemType.Flag];
+        player1.differentTerrainTilesVisited = [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+        ];
+
+        player2.avatar = AvatarEnum.Arlina;
+        player2.totalCombats = 3;
+        player2.totalEvasions = 3;
+        player2.fightWins = 2;
+        player2.fightLoses = 0;
+        player2.totalLostLife = 5;
+        player2.totalDamageDealt = 20;
+        player2.differentItemsGrabbed = [ItemType.Totem];
+        player2.differentTerrainTilesVisited = [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+        ];
+
+        this.gameStatistics.players.push(player1);
+        this.gameStatistics.players.push(player2);
+        this.gameStatistics.isGameOn = true;
+        this.gameStatistics.totalGameTime = 3600;
+        this.gameStatistics.totalPlayerTurns = 2;
+        this.gameStatistics.totalTerrainTilesVisited = [
+            { x: 1, y: 1 },
+            { x: 2, y: 2 },
+            { x: 3, y: 3 },
+            { x: 2, y: 2 },
+        ];
+        this.gameStatistics.totalDoorsInteracted = [{ x: 2, y: 2 }];
+        this.gameStatistics.totalPlayersThatGrabbedFlag = ['Player 1'];
+    }
 
     initGameStatistics(newGameStatistics: GameStatistics) {
         console.log(newGameStatistics);
@@ -56,5 +114,21 @@ export class GameStatisticsService {
             default:
                 break;
         }
+    }
+
+    getTotalTilePercentage() {
+        return (
+            (this.gameMapDataManagerService.getCurrentGrid().length - this.gameStatistics.totalTerrainTilesVisited.length) /
+            this.gameMapDataManagerService.getCurrentGrid().length
+        );
+    }
+
+    totalDoorsInMap() {
+        return this.gameMapDataManagerService.getCurrentGrid().filter((tile) => tile instanceof DoorTile || tile instanceof OpenDoor).length;
+    }
+
+    getTotalDoorsInteractedPercentage() {
+        let totalDoors = this.totalDoorsInMap();
+        return totalDoors === 0 ? 0 : (totalDoors - this.gameStatistics.totalDoorsInteracted.length) / totalDoors;
     }
 }
