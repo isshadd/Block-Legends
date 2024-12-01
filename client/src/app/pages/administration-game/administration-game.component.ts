@@ -55,7 +55,7 @@ export class AdministrationGameComponent {
                     },
                 });
             } catch (error) {
-                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier <br> ${error}`);
+                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier. `);
             }
         }
     }
