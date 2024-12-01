@@ -145,4 +145,8 @@ export class GameStatisticsService {
         let totalDoors = this.totalDoorsInMap();
         return totalDoors === 0 ? 0 : Math.round((this.gameStatistics.totalDoorsInteracted.length / totalDoors) * 100);
     }
+
+    getTotalPlayersThatGrabbedFlagPercentage() {
+        return Math.round((this.gameStatistics.totalPlayersThatGrabbedFlag.length / this.gameStatistics.players.length) * 100);
+    }
 }

@@ -119,7 +119,7 @@
                     <div class="table-cell">{{ player.totalLostLife }}</div>
                     <div class="table-cell">{{ player.totalDamageDealt }}</div>
                     <div class="table-cell">{{ player.differentItemsGrabbed.length }}</div>
-                    <div class="table-cell">{{ player.differentTerrainTilesVisited.length }}</div>
+                    <div class="table-cell">{{ player.differentTerrainTilesVisited.length }}%</div>
                 </div>
                 }
             </div>
@@ -137,16 +137,16 @@
                 </div>
                 <div id="tile-pourcentage">
                     Pourcentage de tuiles visitées:
-                    <span> {{ gameStatisticsService.getTotalTilePercentage() }} </span>
+                    <span> {{ gameStatisticsService.getTotalTilePercentage() }}% </span>
                 </div>
                 <div id="door-pourcentage">
                     Pourcentage de porte manipulées:
-                    <span> {{ gameStatisticsService.getTotalDoorsInteractedPercentage() }} </span>
+                    <span> {{ gameStatisticsService.getTotalDoorsInteractedPercentage() }}% </span>
                 </div>
                 @if(gameMapDataManagerService.isGameModeCTF()){
                 <div id="flag-capture">
                     Nombre de jouers ayant le drapeau:
-                    <span> 0 </span>
+                    <span> {{ gameStatisticsService.getTotalPlayersThatGrabbedFlagPercentage() }}% </span>
                 </div>
                 } }@else {
                 <div id="play-time">
@@ -159,16 +159,16 @@
                 </div>
                 <div id="tile-pourcentage">
                     Pourcentage de tuiles visitées:
-                    <span> 0 </span>
+                    <span> 0% </span>
                 </div>
                 <div id="door-pourcentage">
                     Pourcentage de porte manipulées:
-                    <span> 0 </span>
+                    <span> 0% </span>
                 </div>
                 @if(gameMapDataManagerService.isGameModeCTF()){
                 <div id="flag-capture">
                     Nombre de jouers ayant le drapeau:
-                    <span> 0 </span>
+                    <span> 0% </span>
                 </div>
                 } }
                 <div id="chat-container">
