@@ -86,6 +86,9 @@ export class PlayGameStatisticsService {
         }
 
         if (!player.differentItemsGrabbed.includes(itemType)) {
+            if (itemType === ItemType.Flag) {
+                this.addPlayerThatGrabbedFlag(accessCode, playerId);
+            }
             player.differentItemsGrabbed.push(itemType);
         }
     }
@@ -106,6 +109,7 @@ export class PlayGameStatisticsService {
             terrainTilesTypes.includes(tile.type) &&
             !player.differentTerrainTilesVisited.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)
         ) {
+            this.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
             player.differentTerrainTilesVisited.push(tilePosition);
         }
     }
