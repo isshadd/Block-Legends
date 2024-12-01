@@ -7,10 +7,10 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.Name)"
+                                (click)="gameStatisticsService.sortPlayersByOtherAttribute(this.sortAttribute.Name, this.sortDirection.Ascending)"
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.Name)"
+                                (click)="gameStatisticsService.sortPlayersByOtherAttribute(this.sortAttribute.Name, this.sortDirection.Descending)"
                             ></app-arrow-down-button>
                         </div>
                         Players
@@ -18,10 +18,14 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.Fights)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalCombats, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.Fights)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalCombats, this.sortDirection.Descending)
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Nombre de Combats
@@ -29,10 +33,14 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Descending)
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Nombre de Victoires
@@ -40,10 +48,14 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Descending)
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Nombre de Défaites
@@ -51,10 +63,14 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightLoses, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightLoses, this.sortDirection.Descending)
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Nombre d'Evasion
@@ -62,10 +78,17 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalEvasions, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalEvasions,
+                                        this.sortDirection.Descending
+                                    )
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Total des Points de Vie Perdus
@@ -73,10 +96,17 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalLostLife, this.sortDirection.Ascending)
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalLostLife,
+                                        this.sortDirection.Descending
+                                    )
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Total des Vie Enlevés
@@ -84,10 +114,20 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentItemsGrabbed,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentItemsGrabbed,
+                                        this.sortDirection.Descending
+                                    )
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Nombre d'Objets Différents Ramassés
@@ -95,10 +135,20 @@
                     <div class="table-cell">
                         <div class="button-container">
                             <app-arrow-up-button
-                                (click)="gameStatisticsService.sortPlayersIncreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentTerrainTilesVisited,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
                             ></app-arrow-up-button>
                             <app-arrow-down-button
-                                (click)="gameStatisticsService.sortPlayersDecreasing(this.sortCharacters.FightWins)"
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentTerrainTilesVisited,
+                                        this.sortDirection.Descending
+                                    )
+                                "
                             ></app-arrow-down-button>
                         </div>
                         Pourcentage de Tuiles de Terrain Visitées

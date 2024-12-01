@@ -6,11 +6,21 @@ import { Tile } from '@common/classes/Tiles/tile';
 import { GameStatistics } from '@common/interfaces/game-statistics';
 import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 
-export enum SortCharacters {
+export enum SortAttribute {
     Name = 'name',
-    Fights = 'fights',
+    TotalCombats = 'totalCombats',
+    TotalEvasions = 'totalEvasions',
     FightWins = 'fightWins',
     FightLoses = 'fightLoses',
+    TotalLostLife = 'totalLostLife',
+    TotalDamageDealt = 'totalDamageDealt',
+    DifferentItemsGrabbed = 'differentItemsGrabbed',
+    DifferentTerrainTilesVisited = 'differentTerrainTilesVisited',
+}
+
+export enum SortDirection {
+    Ascending = 'ascending',
+    Descending = 'descending',
 }
 @Injectable({
     providedIn: 'root',
@@ -34,39 +44,44 @@ export class GameStatisticsService {
         this.gameStatistics = newGameStatistics;
     }
 
-    sortPlayersIncreasing(sort: SortCharacters) {
-        switch (sort) {
-            case SortCharacters.Fights:
-                this.gameStatistics.players.sort((a, b) => b.fightWins + b.fightLoses - (a.fightWins + a.fightLoses));
-                break;
-            case SortCharacters.Name:
-                this.gameStatistics.players.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case SortCharacters.FightWins:
-                this.gameStatistics.players.sort((a, b) => b.fightWins - a.fightWins);
-                break;
-            case SortCharacters.FightLoses:
-                this.gameStatistics.players.sort((a, b) => b.fightLoses - a.fightLoses);
-                break;
-
-            default:
-                break;
-        }
+    sortPlayersByNumberAttribute(sortAttribute: SortAttribute, sortDirection: SortDirection) {
+        this.gameStatistics.players.sort((a, b) => {
+            if (sortDirection === SortDirection.Ascending) {
+                return (b[sortAttribute] as number) - (a[sortAttribute] as number);
+            } else {
+                return (a[sortAttribute] as number) - (b[sortAttribute] as number);
+            }
+        });
     }
 
-    sortPlayersDecreasing(sort: SortCharacters) {
-        switch (sort) {
-            case SortCharacters.Fights:
-                this.gameStatistics.players.sort((a, b) => a.fightWins + a.fightLoses - (b.fightWins + b.fightLoses));
+    sortPlayersByOtherAttribute(sortAttribute: SortAttribute, sortDirection: SortDirection) {
+        switch (sortAttribute) {
+            case SortAttribute.DifferentItemsGrabbed:
+                this.gameStatistics.players.sort((a, b) => {
+                    if (sortDirection === SortDirection.Ascending) {
+                        return b.differentItemsGrabbed.length - a.differentItemsGrabbed.length;
+                    } else {
+                        return a.differentItemsGrabbed.length - a.differentItemsGrabbed.length;
+                    }
+                });
                 break;
-            case SortCharacters.Name:
-                this.gameStatistics.players.sort((a, b) => b.name.localeCompare(a.name));
+            case SortAttribute.DifferentTerrainTilesVisited:
+                this.gameStatistics.players.sort((a, b) => {
+                    if (sortDirection === SortDirection.Ascending) {
+                        return b.differentTerrainTilesVisited.length - a.differentTerrainTilesVisited.length;
+                    } else {
+                        return a.differentTerrainTilesVisited.length - b.differentTerrainTilesVisited.length;
+                    }
+                });
                 break;
-            case SortCharacters.FightWins:
-                this.gameStatistics.players.sort((a, b) => a.fightWins - b.fightWins);
-                break;
-            case SortCharacters.FightLoses:
-                this.gameStatistics.players.sort((a, b) => a.fightLoses - b.fightLoses);
+            case SortAttribute.Name:
+                this.gameStatistics.players.sort((a, b) => {
+                    if (sortDirection === SortDirection.Ascending) {
+                        return b.name.localeCompare(a.name);
+                    } else {
+                        return a.name.localeCompare(b.name);
+                    }
+                });
                 break;
             default:
                 break;
