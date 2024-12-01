@@ -147,20 +147,13 @@ export class PlayGameStatisticsService {
 
     increaseGameTotalDoorsInteracted(accessCode: number, tilePosition: Vec2) {
         const gameStatisticsRoom = this.gameSocketRoomService.gameStatisticsRooms.get(accessCode);
-        const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
 
         if (!gameStatisticsRoom) {
             this.logger.error(`Room pas trouve pour code: ${accessCode}`);
             return;
         }
 
-        const doorTileTypes = [TileType.Door, TileType.OpenDoor];
-        const tile = gameBoardRoom.game.tiles[tilePosition.y][tilePosition.x];
-
-        if (
-            doorTileTypes.includes(tile.type) &&
-            !gameStatisticsRoom.totalDoorsInteracted.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)
-        ) {
+        if (!gameStatisticsRoom.totalDoorsInteracted.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)) {
             gameStatisticsRoom.totalDoorsInteracted.push(tilePosition);
         }
     }
