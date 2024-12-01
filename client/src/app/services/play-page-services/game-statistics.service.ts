@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
+import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { OpenDoor } from '@common/classes/Tiles/open-door';
+import { Tile } from '@common/classes/Tiles/tile';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { ItemType } from '@common/enums/item-type';
 import { GameStatistics } from '@common/interfaces/game-statistics';
@@ -26,6 +28,7 @@ export class GameStatisticsService {
         totalDoorsInteracted: [],
         totalPlayersThatGrabbedFlag: [],
     };
+    currentGrid: Tile[][] = [];
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {
         const player1 = new PlayerCharacter('Player 1');
@@ -71,6 +74,12 @@ export class GameStatisticsService {
         ];
         this.gameStatistics.totalDoorsInteracted = [{ x: 2, y: 2 }];
         this.gameStatistics.totalPlayersThatGrabbedFlag = ['Player 1'];
+
+        this.currentGrid = [
+            [new GrassTile(), new GrassTile(), new GrassTile(), new DoorTile()],
+            [new GrassTile(), new DoorTile(), new GrassTile(), new GrassTile()],
+            [new GrassTile(), new GrassTile(), new DoorTile(), new GrassTile()],
+        ];
     }
 
     initGameStatistics(newGameStatistics: GameStatistics) {
@@ -117,18 +126,23 @@ export class GameStatisticsService {
     }
 
     getTotalTilePercentage() {
-        return (
-            (this.gameMapDataManagerService.getCurrentGrid().length - this.gameStatistics.totalTerrainTilesVisited.length) /
-            this.gameMapDataManagerService.getCurrentGrid().length
-        );
+        let gridLength: number = 0;
+        for (let column of this.gameMapDataManagerService.getCurrentGrid()) {
+            gridLength += column.length;
+        }
+        return gridLength === 0 ? 0 : Math.round((this.gameStatistics.totalTerrainTilesVisited.length / gridLength) * 100);
     }
 
     totalDoorsInMap() {
-        return this.gameMapDataManagerService.getCurrentGrid().filter((tile) => tile instanceof DoorTile || tile instanceof OpenDoor).length;
+        const door = this.gameMapDataManagerService
+            .getCurrentGrid()
+            .reduce((count, row) => count + row.filter((tile) => tile instanceof DoorTile || tile instanceof OpenDoor).length, 0);
+        console.log(door);
+        return door;
     }
 
     getTotalDoorsInteractedPercentage() {
         let totalDoors = this.totalDoorsInMap();
-        return totalDoors === 0 ? 0 : (totalDoors - this.gameStatistics.totalDoorsInteracted.length) / totalDoors;
+        return totalDoors === 0 ? 0 : Math.round((this.gameStatistics.totalDoorsInteracted.length / totalDoors) * 100);
     }
 }

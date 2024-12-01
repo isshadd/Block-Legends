@@ -118,8 +118,8 @@
                     <div class="table-cell">{{ player.totalEvasions }}</div>
                     <div class="table-cell">{{ player.totalLostLife }}</div>
                     <div class="table-cell">{{ player.totalDamageDealt }}</div>
-                    <div class="table-cell">{{ player.differentItemsGrabbed }}</div>
-                    <div class="table-cell">{{ player.differentTerrainTilesVisited }}</div>
+                    <div class="table-cell">{{ player.differentItemsGrabbed.length }}</div>
+                    <div class="table-cell">{{ player.differentTerrainTilesVisited.length }}</div>
                 </div>
                 }
             </div>
@@ -141,7 +141,7 @@
                 </div>
                 <div id="door-pourcentage">
                     Pourcentage de porte manipulées:
-                    <span> 0 </span>
+                    <span> {{ gameStatisticsService.getTotalDoorsInteractedPercentage() }} </span>
                 </div>
                 @if(gameMapDataManagerService.isGameModeCTF()){
                 <div id="flag-capture">
