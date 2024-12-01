@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ArrowDownButtonComponent } from '@app/components/arrow-down-button/arrow-down-button.component';
+import { ArrowUpButtonComponent } from '@app/components/arrow-up-button/arrow-up-button.component';
+import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { ArrowDownButtonComponent } from '../../components/arrow-down-button/arrow-down-button.component';
-import { ArrowUpButtonComponent } from '../../components/arrow-up-button/arrow-up-button.component';
-import { ClavardageComponent } from '../../components/clavardage/clavardage.component';
 
 export enum SortCharacters {
     Name = 'name',
@@ -22,8 +22,6 @@ export class StatisticsPageComponent {
     @Input() isGameModeCTF: boolean;
     @Input() playersList: PlayerCharacter[] = [];
     sortCharacters = SortCharacters;
-
-    constructor() {}
 
     sortPlayersIncreasing(sort: SortCharacters) {
         switch (sort) {
