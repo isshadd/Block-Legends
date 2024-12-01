@@ -57,6 +57,10 @@ export class EventJournalService {
         this.roomEvents.push(sentEvent);
     }
 
+    clearEvents() {
+        this.roomEvents = [];
+    }
+
     getFilteredEvents(): { event: string; associatedPlayers: string[] }[] {
         return this.roomEvents.filter((event) => event.associatedPlayers.includes(this.playerName));
     }

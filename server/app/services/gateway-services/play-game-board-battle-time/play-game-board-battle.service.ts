@@ -140,4 +140,40 @@ export class PlayGameBoardBattleService {
     battleRoomFinished(accessCode: number): void {
         this.gameSocketRoomService.gameBattleRooms.delete(accessCode);
     }
+
+    getVirtualPlayerBattleData(
+        accessCode: number,
+        playerId: string,
+    ): {
+        playerId: string;
+        enemyId: string;
+        virtualPlayerRemainingHealth: number;
+        enemyRemainingHealth: number;
+        virtualPlayerRemainingEvasions: number;
+    } {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        if (!battleRoom) {
+            return { playerId: '', enemyId: '', virtualPlayerRemainingHealth: 0, enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
+        }
+
+        if (battleRoom.firstPlayerId === playerId) {
+            return {
+                playerId: battleRoom.firstPlayerId,
+                enemyId: battleRoom.secondPlayerId,
+                virtualPlayerRemainingHealth: battleRoom.firstPlayerRemainingLife,
+                enemyRemainingHealth: battleRoom.secondPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.firstPlayerRemainingEvades,
+            };
+        } else if (battleRoom.secondPlayerId === playerId) {
+            return {
+                playerId: battleRoom.secondPlayerId,
+                enemyId: battleRoom.firstPlayerId,
+                virtualPlayerRemainingHealth: battleRoom.secondPlayerRemainingLife,
+                enemyRemainingHealth: battleRoom.firstPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.secondPlayerRemainingEvades,
+            };
+        }
+
+        return { playerId: '', enemyId: '', virtualPlayerRemainingHealth: 0, enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
+    }
 }

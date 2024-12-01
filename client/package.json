@@ -41,6 +41,7 @@
     "@angular/cli": "18.2.1",
     "@angular/compiler-cli": "18.2.0",
     "@types/jasmine": "4.3.5",
+    "@types/jest": "^29.5.14",
     "@types/node": "20.4.8",
     "@types/socket.io-client": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "7.17.0",

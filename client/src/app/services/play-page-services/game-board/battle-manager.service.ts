@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
@@ -10,10 +11,10 @@ export class BattleManagerService {
     readonly startingEvadeAttempts = 2;
     readonly icePenalty = 2;
 
-    signalUserAttacked = new Subject<{ attackResult: number; playerHasTotem: boolean }>();
+    signalUserAttacked = new Subject<{ playerTurnId: string; attackResult: number; playerHasTotem: boolean }>();
     signalUserAttacked$ = this.signalUserAttacked.asObservable();
 
-    signalUserTriedEscape = new Subject<void>();
+    signalUserTriedEscape = new Subject<string>();
     signalUserTriedEscape$ = this.signalUserTriedEscape.asObservable();
 
     signalOpponentAttacked = new Subject<number>();
@@ -34,6 +35,7 @@ export class BattleManagerService {
     userDefence = 0;
     opponentDefence = 0;
 
+    constructor(private debugService: DebugService) {}
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
         this.opponentPlayer = opponentPlayer;
@@ -61,16 +63,24 @@ export class BattleManagerService {
     onUserAttack() {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
-            const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
+            const playerHasTotem =
+                !!this.currentPlayer &&
+                this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem) &&
+                !this.isPlayerHealthMax(this.currentPlayer, this.userRemainingHealth);
 
-            this.signalUserAttacked.next({ attackResult, playerHasTotem });
+            if (this.currentPlayer?.socketId) {
+                this.signalUserAttacked.next({ playerTurnId: this.currentPlayer?.socketId, attackResult, playerHasTotem });
+            }
         }
     }
 
     onUserEscape() {
         if (this.isValidAction() && this.userEvasionAttempts > 0) {
             this.userEvasionAttempts--;
-            this.signalUserTriedEscape.next();
+
+            if (this.currentPlayer?.socketId) {
+                this.signalUserTriedEscape.next(this.currentPlayer?.socketId);
+            }
         }
     }
 
@@ -81,7 +91,11 @@ export class BattleManagerService {
 
         if (!this.isUserTurn) {
             if (attackResult > 0) {
-                if (this.opponentPlayer && this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem)) {
+                if (
+                    this.opponentPlayer &&
+                    this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) &&
+                    !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)
+                ) {
                     this.opponentRemainingHealth++;
                 }
 
@@ -108,6 +122,9 @@ export class BattleManagerService {
             if (this.hasIcePenalty(this.currentPlayer)) {
                 currentPlayerAttack -= this.icePenalty;
             }
+            if (this.debugService.isDebugMode) {
+                return currentPlayerAttack + this.currentPlayer.attackDice;
+            }
             return currentPlayerAttack + Math.floor(Math.random() * this.currentPlayer.attackDice) + 1;
         }
         return 0;
@@ -121,6 +138,9 @@ export class BattleManagerService {
                     return potionDefenseBoost;
                 }
             }
+            if (this.debugService.isDebugMode) {
+                return this.opponentDefence + 1;
+            }
             return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;
         }
         return 0;
@@ -131,7 +151,11 @@ export class BattleManagerService {
             return;
         }
 
-        if (this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem)) {
+        if (
+            this.currentPlayer &&
+            this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem) &&
+            !this.isPlayerHealthMax(this.currentPlayer, this.userRemainingHealth)
+        ) {
             this.userRemainingHealth++;
         }
 
@@ -143,6 +167,10 @@ export class BattleManagerService {
         setTimeout(() => {
             this.clearBattle();
         }, 1000);
+    }
+
+    isPlayerHealthMax(player: PlayerCharacter, currentHealth: number): boolean {
+        return currentHealth === player.attributes.life;
     }
 
     doesPlayerHaveItem(player: PlayerCharacter, itemType: ItemType): boolean {
