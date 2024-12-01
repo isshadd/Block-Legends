@@ -130,7 +130,7 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
-        this.playGameStatisticsService.addDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
+        this.playGameStatisticsService.addPlayerDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, {
             playerId: data.playerTurnId,
             itemType: data.itemType,
@@ -177,6 +177,7 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+        this.playGameStatisticsService.increaseGameTotalDoorsInteracted(room.accessCode, data.tileCoordinate);
         this.server
             .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate: data.tileCoordinate, playerId: data.playerTurnId });
@@ -276,6 +277,7 @@ export class PlayGameBoardGateway {
 
     startRoomTurn(accessCode: number, playerIdTurn: string) {
         this.server.to(accessCode.toString()).emit(SocketEvents.START_TURN, playerIdTurn);
+        this.playGameStatisticsService.increaseGameTotalPlayerTurns(accessCode);
         if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, playerIdTurn).isVirtual) {
             setTimeout(() => {
                 this.startVirtualPlayerTurn(accessCode, playerIdTurn);

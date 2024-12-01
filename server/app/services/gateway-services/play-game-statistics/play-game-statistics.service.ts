@@ -77,7 +77,7 @@ export class PlayGameStatisticsService {
         }
     }
 
-    addDifferentItemGrabbed(accessCode: number, playerId: string, itemType: ItemType) {
+    addPlayerDifferentItemGrabbed(accessCode: number, playerId: string, itemType: ItemType) {
         const player = this.getPlayerStatisticsById(accessCode, playerId);
 
         if (!player) {
@@ -86,6 +86,9 @@ export class PlayGameStatisticsService {
         }
 
         if (!player.differentItemsGrabbed.includes(itemType)) {
+            if (itemType === ItemType.Flag) {
+                this.addPlayerThatGrabbedFlag(accessCode, playerId);
+            }
             player.differentItemsGrabbed.push(itemType);
         }
     }
@@ -106,7 +109,72 @@ export class PlayGameStatisticsService {
             terrainTilesTypes.includes(tile.type) &&
             !player.differentTerrainTilesVisited.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)
         ) {
+            this.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
             player.differentTerrainTilesVisited.push(tilePosition);
+        }
+    }
+
+    increaseGameTotalPlayerTurns(accessCode: number) {
+        const gameStatisticsRoom = this.gameSocketRoomService.gameStatisticsRooms.get(accessCode);
+
+        if (!gameStatisticsRoom) {
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
+            return;
+        }
+
+        gameStatisticsRoom.totalPlayerTurns++;
+    }
+
+    increaseGameTotalTerrainTilesVisited(accessCode: number, tilePosition: Vec2) {
+        const gameStatisticsRoom = this.gameSocketRoomService.gameStatisticsRooms.get(accessCode);
+        const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+
+        if (!gameStatisticsRoom) {
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
+            return;
+        }
+
+        const terrainTilesTypes = [TileType.Grass, TileType.Water, TileType.Ice];
+        const tile = gameBoardRoom.game.tiles[tilePosition.y][tilePosition.x];
+
+        if (
+            terrainTilesTypes.includes(tile.type) &&
+            !gameStatisticsRoom.totalTerrainTilesVisited.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)
+        ) {
+            gameStatisticsRoom.totalTerrainTilesVisited.push(tilePosition);
+        }
+    }
+
+    increaseGameTotalDoorsInteracted(accessCode: number, tilePosition: Vec2) {
+        const gameStatisticsRoom = this.gameSocketRoomService.gameStatisticsRooms.get(accessCode);
+        const gameBoardRoom = this.gameSocketRoomService.gameBoardRooms.get(accessCode);
+
+        if (!gameStatisticsRoom) {
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
+            return;
+        }
+
+        const doorTileTypes = [TileType.Door, TileType.OpenDoor];
+        const tile = gameBoardRoom.game.tiles[tilePosition.y][tilePosition.x];
+
+        if (
+            doorTileTypes.includes(tile.type) &&
+            !gameStatisticsRoom.totalDoorsInteracted.some((position) => position.x === tilePosition.x && position.y === tilePosition.y)
+        ) {
+            gameStatisticsRoom.totalDoorsInteracted.push(tilePosition);
+        }
+    }
+
+    addPlayerThatGrabbedFlag(accessCode: number, playerId: string) {
+        const gameStatisticsRoom = this.gameSocketRoomService.gameStatisticsRooms.get(accessCode);
+
+        if (!gameStatisticsRoom) {
+            this.logger.error(`Room pas trouve pour code: ${accessCode}`);
+            return;
+        }
+
+        if (!gameStatisticsRoom.totalPlayersThatGrabbedFlag.includes(playerId)) {
+            gameStatisticsRoom.totalPlayersThatGrabbedFlag.push(playerId);
         }
     }
 
