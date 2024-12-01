@@ -12,7 +12,7 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
-import { Profile, ProfileEnum } from '@common/enums/profile';
+import { ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
 
 const FIVE = 5;
@@ -37,9 +37,9 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     isOrganizer = false;
     maxPlayers: number = 0;
     showClavardage = true;
-    profileAggressive = ProfileEnum.agressive;
-    profileDefensive = ProfileEnum.defensive;
-    lastVirtualPlayerProfile: Profile | null = null;
+    profileAggressive = ProfileEnum.Agressive;
+    profileDefensive = ProfileEnum.Defensive;
+    lastVirtualPlayerProfile: ProfileEnum | null = null;
     maxVirtualPlayerRetries = FIVE;
     lastVirtualPlayerSocketId: string | null = null;
     virtualPlayerRetryCount = 0;
@@ -118,16 +118,18 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
     }
 
-    addVirtualPlayer(profile: Profile): void {
-        if (this.playersCounter <= this.maxPlayers) {
-            this.isMaxPlayer = true;
-            return;
-        } else {
-            this.isMaxPlayer = false;
+    addVirtualPlayer(profile: ProfileEnum): void {
+        {
+            if (this.playersCounter <= this.maxPlayers) {
+                this.isMaxPlayer = true;
+                return;
+            } else {
+                this.isMaxPlayer = false;
+            }
+            const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
+            this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
+            this.playersCounter++;
         }
-        const virtualPlayer = this.gameService.generateVirtualCharacter(this.playersCounter, profile);
-        this.webSocketService.addPlayerToRoom(this.accessCode as number, virtualPlayer);
-        this.playersCounter++;
     }
 
     playerLeave(): void {

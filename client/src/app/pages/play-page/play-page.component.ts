@@ -174,7 +174,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     endTurn(): void {
-        this.playGameBoardSocketService.endTurn();
+        const socketId = this.playGameBoardManagerService.getCurrentPlayerCharacter()?.socketId;
+        if (socketId) {
+            this.playGameBoardSocketService.endTurn(socketId);
+        }
     }
 
     leaveGame(): void {

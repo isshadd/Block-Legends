@@ -1,4 +1,4 @@
-import { Profile } from '@common/enums/profile';
+import { ProfileEnum } from '@common/enums/profile';
 import { Avatar } from '../../enums/avatar-enum';
 import { Character } from '../../interfaces/character';
 import { EmptyItem } from '../Items/empty-item';
@@ -33,7 +33,7 @@ export class PlayerCharacter implements Character {
     // Pour JV:
 
     isVirtual: boolean = false;
-    profile: Profile | null = null;
+    comportement: ProfileEnum | null = null;
 
     constructor(public name: string) {}
 
