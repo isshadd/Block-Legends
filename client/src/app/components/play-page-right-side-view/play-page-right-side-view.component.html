@@ -12,15 +12,15 @@
             <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
         </div>
 
-        <div class="button-container">
+        <div id="button-container">
             @if(this.playGameBoardManagerService.isUserTurn) { @if(playGameBoardManagerService.possibleItems.length === 0) {
             <button class="action-button" (click)="toggleAction()">Action</button>
             }
 
-            <button class="action-button" (click)="endTurn()">Fin de tour</button>
+            <button class="player-button" (click)="endTurn()">Fin de tour</button>
             }
-            <button class="action-button" (click)="leaveGame()">Abandon</button>
+            <button class="player-button" (click)="leaveGame()">Abandon</button>
         </div>
-        <app-tab-container></app-tab-container>
+        <div id="chat-container"><app-tab-container></app-tab-container></div>
     </div>
 </div>

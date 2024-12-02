@@ -23,7 +23,29 @@
             justify-self: center;
         }
     }
-    app-tab-container {
-        height: 200px;
+    #button-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        margin-top: 3vh;
+        .action-button {
+            margin: 5px;
+            background-color: $secondary;
+            border-radius: 2px;
+            font-size: 12px;
+            padding: 4px;
+        }
+        .player-button {
+            margin: 5px;
+            background-color: $primary-light;
+            border-radius: 2px;
+            font-size: 12px;
+            padding: 4px;
+        }
+    }
+    #chat-container {
+        height: 300px;
     }
 }
