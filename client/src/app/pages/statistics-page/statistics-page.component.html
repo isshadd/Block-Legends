@@ -169,7 +169,7 @@
                     <div class="table-cell">{{ player.totalLostLife }}</div>
                     <div class="table-cell">{{ player.totalDamageDealt }}</div>
                     <div class="table-cell">{{ player.differentItemsGrabbed.length }}</div>
-                    <div class="table-cell">{{ gameStatisticsService.getTilePercentage(player) }}%</div>
+                    <div class="table-cell">{{ gameStatisticsService.getTilePercentageByPlayer(player) }}%</div>
                 </div>
                 }
             </div>
@@ -187,7 +187,7 @@
                 </div>
                 <div id="tile-pourcentage">
                     Pourcentage de tuiles terrain visitées:
-                    <span> {{ gameStatisticsService.getTilePercentage() }}% </span>
+                    <span> {{ gameStatisticsService.getGameTilePercentage() }}% </span>
                 </div>
                 <div id="door-pourcentage">
                     Pourcentage de porte manipulées:

@@ -88,16 +88,12 @@ export class GameStatisticsService {
         }
     }
 
-    getTilePercentage(player?: PlayerCharacter): number {
-        let gridLength: number = 0;
-        for (let column of this.gameMapDataManagerService.getCurrentGrid()) {
-            gridLength += column.length;
-        }
-        if (player) {
-            return gridLength === 0 ? 0 : Math.round((player.differentTerrainTilesVisited.length / gridLength) * 100);
-        }
+    getGameTilePercentage(): number {
+        return Math.round((this.gameStatistics.totalTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) * 100);
+    }
 
-        return gridLength === 0 ? 0 : Math.round((this.gameStatistics.totalTerrainTilesVisited.length / gridLength) * 100);
+    getTilePercentageByPlayer(player: PlayerCharacter): number {
+        return Math.round((player.differentTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) * 100);
     }
 
     totalDoorsInMap() {
