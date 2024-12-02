@@ -4,6 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 
+export enum ButtonType {
+    HEALTH = 'health',
+    SPEED = 'speed',
+    ATTACK = 'attack',
+    DEFENSE = 'defense',
+}
 @Component({
     selector: 'app-attributes',
     standalone: true,
@@ -15,7 +21,12 @@ export class AttributesComponent {
     @Input() character: PlayerCharacter;
 
     characterStatus: string | null;
+    buttonType = ButtonType;
 
+    isBlinking: boolean = true;
+    isHealthDisabled: boolean = true;
+    isSpeedDisabled: boolean = true;
+    isFirstClick: boolean = true;
     selectedAttackDice: string = 'dice6';
     selectedDefenseDice: string = 'dice4';
 
@@ -55,6 +66,22 @@ export class AttributesComponent {
             this.selectedAttackDice = 'dice6';
         } else {
             this.selectedAttackDice = 'dice4';
+        }
+    }
+
+    buttonClicked(type: ButtonType): void {
+        if (this.isFirstClick) {
+            this.isBlinking = false;
+        }
+        switch (type) {
+            case ButtonType.HEALTH:
+                this.isHealthDisabled = !this.isHealthDisabled;
+                this.isSpeedDisabled = true;
+                break;
+            case ButtonType.SPEED:
+                this.isSpeedDisabled = !this.isSpeedDisabled;
+                this.isHealthDisabled = true;
+                break;
         }
     }
 }

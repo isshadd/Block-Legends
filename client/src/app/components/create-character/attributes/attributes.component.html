@@ -9,7 +9,16 @@
                     </span>
                 </div>
             </div>
-            <button class="dark-button" type="button" (click)="character.assignLifeBonus()">Assigner un +2</button>
+            <button
+                class="dark-button"
+                type="button"
+                (click)="buttonClicked(buttonType.HEALTH)"
+                [class.blinking]="isBlinking"
+                [disabled]="!isHealthDisabled"
+                (click)="character.assignLifeBonus()"
+            >
+                Assigner un +2
+            </button>
         </div>
         <div class="block-container">
             <div class="attribute-container" id="life" matTooltip="le nombre de points de vie du personnage">
@@ -20,7 +29,16 @@
                     </span>
                 </div>
             </div>
-            <button class="dark-button" type="button" (click)="character.assignSpeedBonus()">Assigner un +2</button>
+            <button
+                class="dark-button"
+                type="button"
+                (click)="character.assignSpeedBonus()"
+                (click)="buttonClicked(buttonType.SPEED)"
+                [class.blinking]="isBlinking"
+                [disabled]="!isSpeedDisabled"
+            >
+                Assigner un +2
+            </button>
         </div>
         <div class="block-container">
             <div class="attribute-container" id="attack" matTooltip="représente la force avec laquelle une attaque est faite sur l’adversaire">

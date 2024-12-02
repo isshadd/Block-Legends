@@ -39,5 +39,17 @@
         margin: 1vh;
         width: 25vh;
         height: 6vh;
+        &:hover {
+            background-color: lighten($primary-dark, 10%);
+        }
+    }
+    .create-button {
+        background-color: $secondary;
+        margin: 1vh;
+        width: 25vh;
+        height: 6vh;
+        &:hover {
+            background-color: lighten($secondary, 10%);
+        }
     }
 }
