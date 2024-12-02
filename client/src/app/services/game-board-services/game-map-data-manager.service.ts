@@ -192,6 +192,18 @@ export class GameMapDataManagerService {
         return count;
     }
 
+    getDoorsCount(): number {
+        let count = 0;
+        for (const row of this.currentGrid) {
+            for (const tile of row) {
+                if (tile.isDoor()) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
     getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
         const pathfinder = new Pathfinder(this, movePoints);
         return pathfinder.findAllReachableTiles(coordinates);

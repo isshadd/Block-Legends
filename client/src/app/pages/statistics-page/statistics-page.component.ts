@@ -23,9 +23,12 @@ export class StatisticsPageComponent {
     ) {}
 
     formatGameTime(totalGameTime: number): string {
-        const hours = Math.floor(totalGameTime / 3600);
-        const minutes = Math.floor((totalGameTime % 3600) / 60);
-        const seconds = totalGameTime % 60;
+        const SECONDS_IN_AN_HOUR = 3600;
+        const SECONDS_IN_A_MINUTE = 60;
+
+        const hours = Math.floor(totalGameTime / SECONDS_IN_AN_HOUR);
+        const minutes = Math.floor((totalGameTime % SECONDS_IN_AN_HOUR) / SECONDS_IN_A_MINUTE);
+        const seconds = totalGameTime % SECONDS_IN_A_MINUTE;
 
         return `${this.padWithZero(hours)}:${this.padWithZero(minutes)}:${this.padWithZero(seconds)}`;
     }

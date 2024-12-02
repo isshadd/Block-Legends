@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { DoorTile } from '@common/classes/Tiles/door-tile';
-import { OpenDoor } from '@common/classes/Tiles/open-door';
 import { Tile } from '@common/classes/Tiles/tile';
 import { GameStatistics } from '@common/interfaces/game-statistics';
-import { GameMapDataManagerService } from '../game-board-services/game-map-data-manager.service';
 
 export enum SortAttribute {
     Name = 'name',
@@ -36,6 +34,8 @@ export class GameStatisticsService {
         totalPlayersThatGrabbedFlag: [],
     };
     currentGrid: Tile[][] = [];
+
+    private readonly percentageMutltiplier = 100;
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
@@ -88,22 +88,21 @@ export class GameStatisticsService {
     }
 
     getGameTilePercentage(): number {
-        return Math.round((this.gameStatistics.totalTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) * 100);
+        return Math.round(
+            (this.gameStatistics.totalTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) *
+                this.percentageMutltiplier,
+        );
     }
 
     getTilePercentageByPlayer(player: PlayerCharacter): number {
-        return Math.round((player.differentTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) * 100);
+        return Math.round(
+            (player.differentTerrainTilesVisited.length / this.gameMapDataManagerService.getTerrainTilesCount()) * this.percentageMutltiplier,
+        );
     }
 
-    totalDoorsInMap() {
-        const door = this.gameMapDataManagerService
-            .getCurrentGrid()
-            .reduce((count, row) => count + row.filter((tile) => tile instanceof DoorTile || tile instanceof OpenDoor).length, 0);
-        return door;
-    }
-
-    getTotalDoorsInteractedPercentage() {
-        let totalDoors = this.totalDoorsInMap();
-        return totalDoors === 0 ? 0 : Math.round((this.gameStatistics.totalDoorsInteracted.length / totalDoors) * 100);
+    getGameDoorsInteractedPercentage(): number {
+        return Math.round(
+            (this.gameStatistics.totalDoorsInteracted.length / this.gameMapDataManagerService.getDoorsCount()) * this.percentageMutltiplier,
+        );
     }
 }

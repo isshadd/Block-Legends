@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
+import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -12,7 +13,6 @@ import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { GameStatisticsService } from '../game-statistics.service';
 import { VirtualPlayerBattleManagerService } from './virtual-player-battle-manager.service';
 import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 
