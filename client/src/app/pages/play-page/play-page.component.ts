@@ -28,7 +28,7 @@ import { WebSocketService } from '@app/services/SocketService/websocket.service'
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
 import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
-import { PlayPageRightSideViewComponent } from "../../components/play-page-right-side-view/play-page-right-side-view.component";
+import { PlayPageRightSideViewComponent } from '../../components/play-page-right-side-view/play-page-right-side-view.component';
 
 const TIMEOUT_DURATION = 500;
 
@@ -36,24 +36,22 @@ const TIMEOUT_DURATION = 500;
     selector: 'app-play-page',
     standalone: true,
     imports: [
-    MapComponent,
-    RouterModule,
-    TimerComponent,
-    InfoPanelComponent,
-    FightViewComponent,
-    WinPanelComponent,
-    PlayGameSideViewBarComponent,
-    ItemListContainerComponent,
-    ItemChooseComponent,
-    TabContainerComponent,
-    PlayPageRightSideViewComponent
-],
+        MapComponent,
+        RouterModule,
+        TimerComponent,
+        InfoPanelComponent,
+        FightViewComponent,
+        WinPanelComponent,
+        PlayGameSideViewBarComponent,
+        ItemListContainerComponent,
+        ItemChooseComponent,
+        TabContainerComponent,
+        PlayPageRightSideViewComponent,
+    ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
 })
 export class PlayPageComponent implements OnInit, OnDestroy {
-    
-
     selectedTile: Tile | null = null;
     isBattlePhase: boolean = false;
     myPlayer: PlayerCharacter;
