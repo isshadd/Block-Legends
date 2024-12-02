@@ -3,12 +3,14 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameMode } from '@common/enums/game-mode';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameRoom } from '@common/interfaces/game-room';
+import { GameStatistics } from '@common/interfaces/game-statistics';
 import { GameBattle } from '@common/interfaces/game.battle';
 import { GameTimer } from '@common/interfaces/game.timer';
 import { Logger } from '@nestjs/common';
@@ -22,6 +24,7 @@ describe('PlayGameBoardGateway', () => {
     let playGameBoardTimeService: jest.Mocked<PlayGameBoardTimeService>;
     let playGameBoardBattleService: jest.Mocked<PlayGameBoardBattleService>;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
+    let playGameStatisticsService: jest.Mocked<PlayGameStatisticsService>;
     let mockServer: Partial<Server>;
 
     const mockRoom: GameRoom = {
@@ -155,6 +158,15 @@ describe('PlayGameBoardGateway', () => {
             },
         } as any;
 
+        playGameStatisticsService = {
+            addDifferentTerrainTileVisited: jest.fn(),
+            addPlayerDifferentItemGrabbed: jest.fn(),
+            increaseGameTotalDoorsInteracted: jest.fn(),
+            increasePlayerStatistic: jest.fn(),
+            endGameStatistics: jest.fn(),
+            increaseGameTotalPlayerTurns: jest.fn(),
+        } as any;
+
         mockServer = {
             emit: jest.fn(),
             to: jest.fn().mockReturnThis(),
@@ -170,6 +182,7 @@ describe('PlayGameBoardGateway', () => {
                 { provide: PlayGameBoardTimeService, useValue: playGameBoardTimeService },
                 { provide: PlayGameBoardBattleService, useValue: playGameBoardBattleService },
                 { provide: GameSocketRoomService, useValue: gameSocketRoomService },
+                { provide: PlayGameStatisticsService, useValue: playGameStatisticsService },
                 {
                     provide: 'WEB_SOCKET_SERVER',
                     useValue: mockServer,
@@ -618,13 +631,19 @@ describe('PlayGameBoardGateway', () => {
 
             describe('handleUserWon', () => {
                 it('should pause timer and emit gameBoardPlayerWon', () => {
+                    const gameStatistics: GameStatistics = {} as GameStatistics;
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameStatisticsService.endGameStatistics.mockReturnValue(gameStatistics);
 
                     gateway.handleUserWon(mockClient as Socket, mockClient.id);
 
                     expect(playGameBoardTimeService.pauseTimer).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(playGameStatisticsService.endGameStatistics).toHaveBeenCalledWith(mockRoom.accessCode);
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('gameBoardPlayerWon', mockClient.id);
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('gameBoardPlayerWon', {
+                        playerTurnId: mockClient.id,
+                        gameStatistics,
+                    });
                 });
 
                 it('should handle invalid room', () => {

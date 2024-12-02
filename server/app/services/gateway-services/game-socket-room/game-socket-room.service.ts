@@ -5,6 +5,7 @@ import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameRoom } from '@common/interfaces/game-room';
+import { GameStatistics } from '@common/interfaces/game-statistics';
 import { GameBattle } from '@common/interfaces/game.battle';
 import { GameTimer } from '@common/interfaces/game.timer';
 import { Injectable } from '@nestjs/common';
@@ -22,6 +23,7 @@ export class GameSocketRoomService {
     gameBoardRooms: Map<number, GameBoardParameters> = new Map();
     gameTimerRooms: Map<number, GameTimer> = new Map();
     gameBattleRooms: Map<number, GameBattle> = new Map();
+    gameStatisticsRooms: Map<number, GameStatistics> = new Map();
 
     constructor(readonly gameService: GameService) {}
 
@@ -103,6 +105,15 @@ export class GameSocketRoomService {
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
         this.gameTimerRooms.set(accessCode, { time: 0, isPaused: true, state: GameTimerState.PreparingTurn });
+        this.gameStatisticsRooms.set(accessCode, {
+            players: [],
+            isGameOn: false,
+            totalGameTime: 0,
+            totalPlayerTurns: 0,
+            totalTerrainTilesVisited: [],
+            totalDoorsInteracted: [],
+            totalPlayersThatGrabbedFlag: [],
+        });
         return newRoom;
     }
 
@@ -157,6 +168,7 @@ export class GameSocketRoomService {
                     this.gameBoardRooms.delete(accessCode);
                     this.gameTimerRooms.delete(accessCode);
                     this.gameBattleRooms.delete(accessCode);
+                    this.gameStatisticsRooms.delete(accessCode);
                 } else if (room.organizer === socketId) {
                     room.organizer = room.players[0].socketId;
                 }

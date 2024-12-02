@@ -300,13 +300,13 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: player.socketId,
                 });
+                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player.name]);
             } else {
                 for (const item of player.inventory) {
                     possibleItems.push(item);
                 }
                 possibleItems.push(terrainTile.item);
             }
-            this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player.name]);
             return true;
         }
         return false;
@@ -373,6 +373,7 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: currentPlayer.socketId,
                 });
+                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer.name]);
             }
         }
 

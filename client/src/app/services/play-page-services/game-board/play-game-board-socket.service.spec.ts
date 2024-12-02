@@ -3,11 +3,13 @@ import { Router } from '@angular/router';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
+import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
+import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
@@ -26,6 +28,7 @@ describe('PlayGameBoardSocketService', () => {
     let mockPlayer: PlayerCharacter;
     let mockVirtualPlayerManagerService: any;
     let mockVirtualPlayerBattleManagerService: any;
+    let mockGameStatisticsService: any;
     let socketCallbacks: { [event: string]: Function };
     /* eslint-disable */
     beforeEach(() => {
@@ -143,6 +146,10 @@ describe('PlayGameBoardSocketService', () => {
         mockPlayer = new PlayerCharacter('player1');
         mockPlayer.socketId = 'player1';
 
+        mockGameStatisticsService = {
+            initGameStatistics: jasmine.createSpy('initGameStatistics'),
+        };
+
         TestBed.configureTestingModule({
             providers: [
                 PlayGameBoardSocketService,
@@ -152,6 +159,7 @@ describe('PlayGameBoardSocketService', () => {
                 { provide: BattleManagerService, useValue: mockBattleManagerService },
                 { provide: VirtualPlayerManagerService, useValue: mockVirtualPlayerManagerService },
                 { provide: VirtualPlayerBattleManagerService, useValue: mockVirtualPlayerBattleManagerService },
+                { provide: GameStatisticsService, useValue: mockGameStatisticsService },
                 { provide: Router, useValue: mockRouter },
             ],
         });
@@ -288,6 +296,13 @@ describe('PlayGameBoardSocketService', () => {
             expect(mockPlayGameBoardManagerService.resetManager).toHaveBeenCalled();
             expect(mockPlayPageMouseHandlerService.clearUI).toHaveBeenCalled();
             expect(mockRouter.navigate).toHaveBeenCalledWith(['/home']);
+        });
+    });
+
+    describe('goToStatisticsPage', () => {
+        it('should navigate to statistics page', () => {
+            service.goToStatisticsPage();
+            expect(mockRouter.navigate).toHaveBeenCalledWith(['/statistics-page']);
         });
     });
 
@@ -492,12 +507,14 @@ describe('PlayGameBoardSocketService', () => {
         });
 
         it(`should handle ${SocketEvents.GAME_BOARD_PLAYER_WON} event and leave game after timeout`, fakeAsync(() => {
-            spyOn(service, 'leaveGame');
-            socketCallbacks[SocketEvents.GAME_BOARD_PLAYER_WON](mockPlayer.socketId);
-            expect(mockPlayGameBoardManagerService.endGame).toHaveBeenCalledWith(mockPlayer.socketId);
+            const data = { playerTurnId: mockPlayer.socketId, gameStatistics: {} as GameStatistics };
+            spyOn(service, 'goToStatisticsPage');
+            socketCallbacks[SocketEvents.GAME_BOARD_PLAYER_WON](data);
+            expect(mockPlayGameBoardManagerService.endGame).toHaveBeenCalledWith(data.playerTurnId);
+            expect(mockGameStatisticsService.initGameStatistics).toHaveBeenCalledWith(data.gameStatistics);
 
             tick(5000);
-            expect(service.leaveGame).toHaveBeenCalled();
+            expect(service.goToStatisticsPage).toHaveBeenCalled();
         }));
 
         it(`should handle ${SocketEvents.LAST_PLAYER_STANDING} event and leave game`, () => {

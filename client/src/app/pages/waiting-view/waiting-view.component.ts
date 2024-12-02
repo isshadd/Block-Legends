@@ -8,6 +8,7 @@ import { EventJournalComponent } from '@app/components/event-journal/event-journ
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -54,6 +55,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         private socketStateService: SocketStateService,
         private chatService: ChatService,
         private eventJournalService: EventJournalService,
+        private playGameBoardManagerService: PlayGameBoardManagerService,
     ) {}
 
     ngOnInit(): void {
@@ -91,7 +93,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         });
 
         this.webSocketService.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
-            if (!this.isOrganizer) {
+            if (!this.isOrganizer && !this.playGameBoardManagerService.winnerPlayer) {
                 this.playerLeave();
             }
         });
