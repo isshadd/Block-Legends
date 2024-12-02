@@ -1,0 +1,19 @@
+@import 'src/_variables.scss';
+#side-menu-right {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 25%;
+    max-width: 15%;
+    min-width: 300px;
+    height: 100vh;
+    background-color: $primary-dark;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
+    padding-top: 70px;
+
+    app-tab-container {
+        height: 200px;
+    }
+}

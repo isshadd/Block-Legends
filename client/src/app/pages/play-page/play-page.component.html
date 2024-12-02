@@ -37,25 +37,9 @@
         <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
         }
     </div>
-    <div id="side-menu-right">
-        <app-timer
-            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
-            [seconds]="playGameBoardManagerService.currentTime"
-            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
-        ></app-timer>
-        <div class="action-container">
-            <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
-
-            <div class="button-container">
-                @if(this.playGameBoardManagerService.isUserTurn) { @if(playGameBoardManagerService.possibleItems.length === 0) {
-                <button class="action-button" (click)="toggleAction()">Action</button>
-                }
-
-                <button class="action-button" (click)="endTurn()">Fin de tour</button>
-                }
-                <button class="action-button" (click)="leaveGame()">Abandon</button>
-            </div>
-            <app-tab-container></app-tab-container>
-        </div>
-    </div>
+    <app-play-page-right-side-view
+        (toggleActionClicked)="toggleAction()"
+        (endTurnClicked)="endTurn()"
+        (leaveGameClicked)="leaveGame()"
+    ></app-play-page-right-side-view>
 </div>
