@@ -40,7 +40,6 @@ export class GameStatisticsService {
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
     initGameStatistics(newGameStatistics: GameStatistics) {
-        console.log(newGameStatistics);
         this.gameStatistics = newGameStatistics;
     }
 

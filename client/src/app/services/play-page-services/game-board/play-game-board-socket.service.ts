@@ -255,6 +255,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.socket.on(SocketEvents.GAME_BOARD_PLAYER_WON, (data: { playerTurnId: string; gameStatistics: GameStatistics }) => {
             this.playGameBoardManagerService.endGame(data.playerTurnId);
             this.gameStatisticsService.initGameStatistics(data.gameStatistics);
+            this.webSocketService.isGameFinished = true;
             const wait = 5000;
             setTimeout(() => {
                 this.goToStatisticsPage();
@@ -262,8 +263,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
         });
 
         this.socket.on(SocketEvents.LAST_PLAYER_STANDING, () => {
-            alert('Tous les autres joueurs ont quitté la partie. Fin de partie');
-            this.leaveGame();
+            if (!this.playGameBoardManagerService.winnerPlayer) {
+                alert('Tous les autres joueurs ont quitté la partie. Fin de partie');
+                this.leaveGame();
+            }
         });
     }
 }
