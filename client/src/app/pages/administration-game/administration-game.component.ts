@@ -44,6 +44,7 @@ export class AdministrationGameComponent {
                     next: () => {
                         window.location.reload();
                     },
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     error: (errors: any) => {
                         if (typeof errors === 'string' || Array.isArray(errors)) {
                             this.gameMapDataManagerService.openErrorModal(errors);
@@ -55,7 +56,7 @@ export class AdministrationGameComponent {
                     },
                 });
             } catch (error) {
-                this.gameMapDataManagerService.openErrorModal(`Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier. `);
+                this.gameMapDataManagerService.openErrorModal("Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.");
             }
         }
     }
