@@ -36,6 +36,10 @@
             border-radius: 2px;
             font-size: 12px;
             padding: 4px;
+
+            &:hover {
+                background-color: lighten($secondary, 10%);
+            }
         }
         .player-button {
             margin: 5px;
@@ -43,6 +47,10 @@
             border-radius: 2px;
             font-size: 12px;
             padding: 4px;
+
+            &:hover {
+                background-color: darken($primary-light, 10%);
+            }
         }
     }
     #chat-container {
