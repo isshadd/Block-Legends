@@ -61,7 +61,7 @@ export class GameStatisticsService {
                     if (sortDirection === SortDirection.Ascending) {
                         return b.differentItemsGrabbed.length - a.differentItemsGrabbed.length;
                     } else {
-                        return a.differentItemsGrabbed.length - a.differentItemsGrabbed.length;
+                        return a.differentItemsGrabbed.length - b.differentItemsGrabbed.length;
                     }
                 });
                 break;

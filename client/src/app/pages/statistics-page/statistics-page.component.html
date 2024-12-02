@@ -49,21 +49,6 @@
                         <div class="button-container">
                             <app-arrow-up-button
                                 (click)="
-                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Ascending)
-                                "
-                            ></app-arrow-up-button>
-                            <app-arrow-down-button
-                                (click)="
-                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Descending)
-                                "
-                            ></app-arrow-down-button>
-                        </div>
-                        Nombre de Défaites
-                    </div>
-                    <div class="table-cell">
-                        <div class="button-container">
-                            <app-arrow-up-button
-                                (click)="
                                     gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightLoses, this.sortDirection.Ascending)
                                 "
                             ></app-arrow-up-button>
@@ -73,7 +58,7 @@
                                 "
                             ></app-arrow-down-button>
                         </div>
-                        Nombre d'Evasion
+                        Nombre de Défaites
                     </div>
                     <div class="table-cell">
                         <div class="button-container">
@@ -91,7 +76,7 @@
                                 "
                             ></app-arrow-down-button>
                         </div>
-                        Total des Points de Vie Perdus
+                        Nombre d'Evasions
                     </div>
                     <div class="table-cell">
                         <div class="button-container">
@@ -109,7 +94,28 @@
                                 "
                             ></app-arrow-down-button>
                         </div>
-                        Total des Vie Enlevés
+                        Total des Points de Vie Perdus
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalDamageDealt,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalDamageDealt,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Total des Vies Enlevés
                     </div>
                     <div class="table-cell">
                         <div class="button-container">
