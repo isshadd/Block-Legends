@@ -59,7 +59,8 @@ export class ListGameComponent {
     }
 
     downloadGameAsJson(game: GameShared): void {
-        const gameJson = JSON.stringify(game, null, 2);
+        const { isVisible, ...gameWithoutVisibility } = game;
+        const gameJson = JSON.stringify(gameWithoutVisibility, null, 2);
 
         const blob = new Blob([gameJson], { type: 'application/json' });
 

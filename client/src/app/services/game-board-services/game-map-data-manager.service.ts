@@ -78,7 +78,7 @@ export class GameMapDataManagerService {
             size: jsonObject.size as MapSize,
             mode: jsonObject.mode as GameMode,
             imageUrl: jsonObject.imageUrl,
-            isVisible: jsonObject.isVisible,
+            isVisible: false,
             tiles: jsonObject.tiles.map((row: unknown[]) =>
                 row.map(
                     (tile: unknown) =>

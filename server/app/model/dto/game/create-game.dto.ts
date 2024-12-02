@@ -22,7 +22,7 @@ export class CreateGameDto implements CreateGameSharedDto {
 
     @ApiProperty({ enum: MAP_CONSTANTS.allowedSizes })
     @IsInt({ message: 'La taille du jeu doit être un nombre entier' })
-    @IsIn(MAP_CONSTANTS.allowedSizes, { message: 'La taille du jeu doit être une des valeurs suivantes : 5, 10, 15, 20' })
+    @IsIn(MAP_CONSTANTS.allowedSizes, { message: 'La taille du jeu doit être une des valeurs suivantes : 10, 15, 20' })
     size: MapSize;
 
     @ApiProperty({ enum: MAP_CONSTANTS.allowedModes })
