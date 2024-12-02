@@ -1,7 +1,10 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import {
+    PlayerNumberStatisticType,
+    PlayGameStatisticsService,
+} from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
-import { PlayerNumberStatisticType, PlayGameStatisticsService } from '../play-game-statistics/play-game-statistics.service';
 
 @Injectable()
 export class PlayGameBoardBattleService {

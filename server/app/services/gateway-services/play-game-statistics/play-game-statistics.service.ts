@@ -1,10 +1,10 @@
+import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Injectable, Logger } from '@nestjs/common';
-import { GameSocketRoomService } from '../game-socket-room/game-socket-room.service';
 
 export enum PlayerNumberStatisticType {
     TotalCombats = 'totalCombats',

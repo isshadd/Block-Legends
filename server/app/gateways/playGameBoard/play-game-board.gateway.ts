@@ -240,9 +240,7 @@ export class PlayGameBoardGateway {
 
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
         const gameStatistics = this.playGameStatisticsService.endGameStatistics(room.accessCode);
-        this.server
-            .to(room.accessCode.toString())
-            .emit(SocketEvents.GAME_BOARD_PLAYER_WON, { playerTurnId: playerTurnId, gameStatistics: gameStatistics });
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, { playerTurnId, gameStatistics });
     }
 
     isClientTurn(clientId: string): boolean {

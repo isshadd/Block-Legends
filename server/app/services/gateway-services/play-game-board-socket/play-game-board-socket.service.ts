@@ -1,9 +1,9 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
-import { PlayGameStatisticsService } from '../play-game-statistics/play-game-statistics.service';
 
 const DELAY_2000_MS = 2000;
 const DELAY_500_MS = 500;
