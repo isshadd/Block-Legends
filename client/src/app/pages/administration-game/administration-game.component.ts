@@ -44,12 +44,13 @@ export class AdministrationGameComponent {
                     next: () => {
                         window.location.reload();
                     },
-                    error: (errors: unknown) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    error: (errors: any) => {
                         if (typeof errors === 'string' || Array.isArray(errors)) {
                             this.gameMapDataManagerService.openErrorModal(errors);
                         } else {
                             this.gameMapDataManagerService.openErrorModal(
-                                "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
+                                errors.message || "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
                             );
                         }
                     },
