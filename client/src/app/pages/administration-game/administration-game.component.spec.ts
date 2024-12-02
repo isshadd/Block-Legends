@@ -53,4 +53,15 @@ describe('AdministrationGameComponent', () => {
         expect(component.dialog).toBeTruthy();
         expect(component.dialog).toBe(dialogSpy);
     });
+
+    it('should call gameServerCommunicationService.addGame when onFileChange is called', async () => {
+        const file = new File([''], 'filename', { type: 'application/json' });
+
+        const event = { target: { files: [file] } } as unknown as Event;
+
+        await component.onFileChange(event);
+
+        expect(component.selectedFile).toBe(file);
+        expect(component.selectedFile).toBeTruthy();
+    });
 });
