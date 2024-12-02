@@ -18,8 +18,6 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
     messages: RoomMessage[] = this.chatService.roomMessages;
     playerName: string = '';
     shouldScroll: boolean = false;
-    playerColors: { [key: string]: string } = {}; // Store generated colors for players
-    colors: string[] = ['#3a86ff', '#ff006e', '#8338ec', '#fb5607', '#ffbe0b', '#00b4d8']; // Predefined set of colors
 
     constructor(
         private chatService: ChatService,
@@ -51,21 +49,6 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
         this.chatService.broadcastMessageToAll(this.messageToSend);
         this.messageToSend = '';
         this.shouldScroll = true;
-    }
-
-    getPlayerClass(player: string): string {
-        if (!this.playerColors[playerName]) {
-            this.playerColors[playerName] = this.assignColor(playerName);
-        }
-        this.playerColors[playerName]
-
-        return this.playerColors[playerName];
-    }
-
-    private assignColor(playerName: string): string {
-        const index = Object.keys(this.playerColors).length % this.colors.length;
-        this.colors.pop()
-        return this.colors[index];
     }
 
     private scrollToBottom(): void {

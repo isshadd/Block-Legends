@@ -1,4 +1,8 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import {
+    PlayerNumberStatisticType,
+    PlayGameStatisticsService,
+} from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { Injectable } from '@nestjs/common';
 import { Subject } from 'rxjs';
 
@@ -14,7 +18,10 @@ export class PlayGameBoardBattleService {
     signalRoomTimePassed = new Subject<number>();
     signalRoomTimePassed$ = this.signalRoomTimePassed.asObservable();
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
+    ) {
         this.startTimer();
     }
 
@@ -123,6 +130,8 @@ export class PlayGameBoardBattleService {
                 battleRoom.firstPlayerRemainingLife += 1;
             }
             battleRoom.secondPlayerRemainingLife--;
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.firstPlayerId, PlayerNumberStatisticType.TotalDamageDealt);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.secondPlayerId, PlayerNumberStatisticType.TotalLostLife);
             if (battleRoom.secondPlayerRemainingLife <= 0) {
                 return true;
             }
@@ -131,6 +140,8 @@ export class PlayGameBoardBattleService {
                 battleRoom.secondPlayerRemainingLife += 1;
             }
             battleRoom.firstPlayerRemainingLife--;
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.secondPlayerId, PlayerNumberStatisticType.TotalDamageDealt);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, battleRoom.firstPlayerId, PlayerNumberStatisticType.TotalLostLife);
             if (battleRoom.firstPlayerRemainingLife <= 0) {
                 return true;
             }
@@ -139,5 +150,41 @@ export class PlayGameBoardBattleService {
 
     battleRoomFinished(accessCode: number): void {
         this.gameSocketRoomService.gameBattleRooms.delete(accessCode);
+    }
+
+    getVirtualPlayerBattleData(
+        accessCode: number,
+        playerId: string,
+    ): {
+        playerId: string;
+        enemyId: string;
+        virtualPlayerRemainingHealth: number;
+        enemyRemainingHealth: number;
+        virtualPlayerRemainingEvasions: number;
+    } {
+        const battleRoom = this.gameSocketRoomService.gameBattleRooms.get(accessCode);
+        if (!battleRoom) {
+            return { playerId: '', enemyId: '', virtualPlayerRemainingHealth: 0, enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
+        }
+
+        if (battleRoom.firstPlayerId === playerId) {
+            return {
+                playerId: battleRoom.firstPlayerId,
+                enemyId: battleRoom.secondPlayerId,
+                virtualPlayerRemainingHealth: battleRoom.firstPlayerRemainingLife,
+                enemyRemainingHealth: battleRoom.secondPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.firstPlayerRemainingEvades,
+            };
+        } else if (battleRoom.secondPlayerId === playerId) {
+            return {
+                playerId: battleRoom.secondPlayerId,
+                enemyId: battleRoom.firstPlayerId,
+                virtualPlayerRemainingHealth: battleRoom.secondPlayerRemainingLife,
+                enemyRemainingHealth: battleRoom.firstPlayerRemainingLife,
+                virtualPlayerRemainingEvasions: battleRoom.secondPlayerRemainingEvades,
+            };
+        }
+
+        return { playerId: '', enemyId: '', virtualPlayerRemainingHealth: 0, enemyRemainingHealth: 0, virtualPlayerRemainingEvasions: 0 };
     }
 }

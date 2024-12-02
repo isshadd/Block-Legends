@@ -2,7 +2,7 @@
 /* eslint-disable max-params */
 /* eslint-disable max-len */
 /* eslint-disable  @typescript-eslint/prefer-for-of */
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
@@ -15,8 +15,10 @@ import { FightViewComponent } from '@app/components/play-page-components/fight-v
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
+import { DebugService } from '@app/services/debug.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameService } from '@app/services/game-services/game.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
@@ -25,8 +27,8 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
-import { DebugService } from '@app/services/debug.service';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
+import { PlayPageRightSideViewComponent } from '../../components/play-page-right-side-view/play-page-right-side-view.component';
 
 const TIMEOUT_DURATION = 500;
 
@@ -43,6 +45,8 @@ const TIMEOUT_DURATION = 500;
         PlayGameSideViewBarComponent,
         ItemListContainerComponent,
         ItemChooseComponent,
+        TabContainerComponent,
+        PlayPageRightSideViewComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
@@ -120,7 +124,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.socketStateService.setActiveSocket(this.webSocketService);
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
-            // this.updatePlayersList();
         });
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
@@ -131,23 +134,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             }
         });
     }
-
-    // updatePlayersList(): void {
-    //     const allPlayers = this.webSocketService.getTotalPlayers();
-
-    //     this.players = this.playGameBoardManagerService.turnOrder.map((playerName) => {
-    //         const player = allPlayers.find((p) => p.name === playerName);
-    //         if (player) {
-    //             return player;
-    //         } else {
-    //             const absentPlayer = new PlayerCharacter(playerName);
-    //             absentPlayer.isAbsent = true;
-    //             return absentPlayer;
-    //         }
-    //     });
-
-    //     this.players.sort((a, b) => Number(a.isAbsent) - Number(b.isAbsent));
-    // }
 
     ngOnDestroy(): void {
         this.destroy$.next();
@@ -178,7 +164,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     endTurn(): void {
-        this.playGameBoardSocketService.endTurn();
+        const socketId = this.playGameBoardManagerService.getCurrentPlayerCharacter()?.socketId;
+        if (socketId) {
+            this.playGameBoardSocketService.endTurn(socketId);
+        }
     }
 
     leaveGame(): void {

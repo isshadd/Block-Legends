@@ -78,7 +78,7 @@ export class GameMapDataManagerService {
             size: jsonObject.size as MapSize,
             mode: jsonObject.mode as GameMode,
             imageUrl: jsonObject.imageUrl,
-            isVisible: jsonObject.isVisible,
+            isVisible: false,
             tiles: jsonObject.tiles.map((row: unknown[]) =>
                 row.map(
                     (tile: unknown) =>
@@ -178,6 +178,30 @@ export class GameMapDataManagerService {
             }
         }
         return tilesWithSpawn;
+    }
+
+    getTerrainTilesCount(): number {
+        let count = 0;
+        for (const row of this.currentGrid) {
+            for (const tile of row) {
+                if (tile.isTerrain()) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    getDoorsCount(): number {
+        let count = 0;
+        for (const row of this.currentGrid) {
+            for (const tile of row) {
+                if (tile.isDoor()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {

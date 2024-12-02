@@ -1,0 +1,26 @@
+<div id="side-menu-right">
+    <div id="timer-container">
+        <app-timer
+            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [seconds]="playGameBoardManagerService.currentTime"
+            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
+        ></app-timer>
+    </div>
+
+    <div class="action-container">
+        <div id="item-list-container">
+            <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
+        </div>
+
+        <div id="button-container">
+            @if(this.playGameBoardManagerService.isUserTurn) { @if(playGameBoardManagerService.possibleItems.length === 0) {
+            <button class="action-button" (click)="toggleAction()">Action</button>
+            }
+
+            <button class="player-button" (click)="endTurn()">Fin de tour</button>
+            }
+            <button class="player-button" (click)="leaveGame()">Abandon</button>
+        </div>
+        <div id="chat-container"><app-tab-container></app-tab-container></div>
+    </div>
+</div>

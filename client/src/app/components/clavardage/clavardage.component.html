@@ -3,7 +3,7 @@
     <ul class="messages">
       <li *ngFor="let msg of messages; trackBy: trackByIndex">
         <span class="message-time">{{ msg.time }} </span>
-        <span [ngStyle]="{'color': getPlayerClass(msg.sender)}" class="message-sender">{{ msg.sender }} </span>:
+        <span class="message-sender">{{ msg.sender }} </span>:
         <span class="message-content">{{ msg.content }} </span>
       </li>
     </ul>

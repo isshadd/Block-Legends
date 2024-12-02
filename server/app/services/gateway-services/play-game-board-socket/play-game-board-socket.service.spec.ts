@@ -1,5 +1,6 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
@@ -12,6 +13,7 @@ import { PlayGameBoardSocketService } from './play-game-board-socket.service';
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
+    let playGameStatisticsService: jest.Mocked<PlayGameStatisticsService>;
     let loggerLogSpy: jest.SpyInstance;
     let loggerErrorSpy: jest.SpyInstance;
 
@@ -72,12 +74,21 @@ describe('PlayGameBoardSocketService', () => {
             setSpawnCounter: jest.fn(),
         };
 
+        const mockPlayGameStatisticsService = {
+            initGameStatistics: jest.fn(),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayGameBoardSocketService, { provide: GameSocketRoomService, useValue: mockGameSocketRoomService }],
+            providers: [
+                PlayGameBoardSocketService,
+                { provide: GameSocketRoomService, useValue: mockGameSocketRoomService },
+                { provide: PlayGameStatisticsService, useValue: mockPlayGameStatisticsService },
+            ],
         }).compile();
 
         service = module.get<PlayGameBoardSocketService>(PlayGameBoardSocketService);
         gameSocketRoomService = module.get<GameSocketRoomService>(GameSocketRoomService) as jest.Mocked<GameSocketRoomService>;
+        playGameStatisticsService = module.get<PlayGameStatisticsService>(PlayGameStatisticsService) as jest.Mocked<PlayGameStatisticsService>;
 
         loggerLogSpy = jest.spyOn(Logger.prototype, 'log').mockImplementation(jest.fn());
         loggerErrorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(jest.fn());
@@ -101,6 +112,7 @@ describe('PlayGameBoardSocketService', () => {
             jest.spyOn(service, 'setupTurnOrder').mockReturnValue(mockGameBoardRoom.turnOrder);
             jest.spyOn(gameSocketRoomService, 'setCurrentPlayerTurn').mockImplementation(jest.fn());
             jest.spyOn(gameSocketRoomService.gameBoardRooms, 'set').mockImplementation((key, value) => new Map().set(key, value));
+            playGameStatisticsService.initGameStatistics.mockImplementation(jest.fn());
 
             service.initRoomGameBoard(accessCode);
 
@@ -109,6 +121,7 @@ describe('PlayGameBoardSocketService', () => {
             expect(service.setupSpawnPoints).toHaveBeenCalledWith(mockRoom, mockGame);
             expect(service.setupTurnOrder).toHaveBeenCalledWith(mockRoom);
             expect(gameSocketRoomService.setCurrentPlayerTurn).toHaveBeenCalledWith(accessCode, mockRoom.currentPlayerTurn);
+            expect(playGameStatisticsService.initGameStatistics).toHaveBeenCalledWith(mockRoom.accessCode);
             expect(loggerLogSpy).toHaveBeenCalledWith(`GameBoard setup fait pour room: ${mockRoom.accessCode}`);
         });
 

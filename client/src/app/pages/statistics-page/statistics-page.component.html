@@ -1,0 +1,236 @@
+<button class="dark-button" (click)="returnHome()">Retour</button>
+<div id="page-container">
+    <div id="page-separator">
+        <div id="players-table">
+            <div class="table">
+                <div class="table-header">
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="gameStatisticsService.sortPlayersByOtherAttribute(this.sortAttribute.Name, this.sortDirection.Ascending)"
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="gameStatisticsService.sortPlayersByOtherAttribute(this.sortAttribute.Name, this.sortDirection.Descending)"
+                            ></app-arrow-down-button>
+                        </div>
+                        Players
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalCombats, this.sortDirection.Ascending)
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalCombats, this.sortDirection.Descending)
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Nombre de Combats
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Ascending)
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightWins, this.sortDirection.Descending)
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Nombre de Victoires
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightLoses, this.sortDirection.Ascending)
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.FightLoses, this.sortDirection.Descending)
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Nombre de Défaites
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalEvasions, this.sortDirection.Ascending)
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalEvasions,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Nombre d'Evasions
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(this.sortAttribute.TotalLostLife, this.sortDirection.Ascending)
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalLostLife,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Total des Points de Vie Perdus
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalDamageDealt,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByNumberAttribute(
+                                        this.sortAttribute.TotalDamageDealt,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Total des Vies Enlevés
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentItemsGrabbed,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentItemsGrabbed,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Nombre d'Objets Différents Ramassés
+                    </div>
+                    <div class="table-cell">
+                        <div class="button-container">
+                            <app-arrow-up-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentTerrainTilesVisited,
+                                        this.sortDirection.Ascending
+                                    )
+                                "
+                            ></app-arrow-up-button>
+                            <app-arrow-down-button
+                                (click)="
+                                    gameStatisticsService.sortPlayersByOtherAttribute(
+                                        this.sortAttribute.DifferentTerrainTilesVisited,
+                                        this.sortDirection.Descending
+                                    )
+                                "
+                            ></app-arrow-down-button>
+                        </div>
+                        Pourcentage de Tuiles de Terrain Visitées
+                    </div>
+                </div>
+                @for(player of gameStatisticsService.gameStatistics.players; track player){
+                <div class="table-row">
+                    <div class="table-cell">
+                        <div class="player-avatar">
+                            <img src="{{ player.avatar.headImage }}" alt="avatar" />
+                        </div>
+                        <div class="player-name">{{ player.name }}</div>
+                    </div>
+                    <div class="table-cell">{{ player.totalCombats }}</div>
+                    <div class="table-cell">{{ player.fightWins }}</div>
+                    <div class="table-cell">{{ player.fightLoses }}</div>
+                    <div class="table-cell">{{ player.totalEvasions }}</div>
+                    <div class="table-cell">{{ player.totalLostLife }}</div>
+                    <div class="table-cell">{{ player.totalDamageDealt }}</div>
+                    <div class="table-cell">{{ player.differentItemsGrabbed.length }}</div>
+                    <div class="table-cell">{{ gameStatisticsService.getTilePercentageByPlayer(player) }}%</div>
+                </div>
+                }
+            </div>
+        </div>
+        <div id="game-statistics-chat-container">
+            <div id="game-statistics-table">
+                @if(gameStatisticsService.gameStatistics) {
+                <div id="play-time">
+                    Durée de la partie:
+                    <span>{{ formatGameTime(gameStatisticsService.gameStatistics.totalGameTime) }}</span>
+                </div>
+                <div id="turn-number">
+                    Nombre de tours:
+                    <span> {{ gameStatisticsService.gameStatistics.totalPlayerTurns }} </span>
+                </div>
+                <div id="tile-pourcentage">
+                    Pourcentage de tuiles terrain visitées:
+                    <span> {{ gameStatisticsService.getGameTilePercentage() }}% </span>
+                </div>
+                <div id="door-pourcentage">
+                    Pourcentage de porte manipulées:
+                    <span> {{ gameStatisticsService.getGameDoorsInteractedPercentage() }}% </span>
+                </div>
+                @if(gameMapDataManagerService.isGameModeCTF()){
+                <div id="flag-capture">
+                    Nombre de jouers ayant le drapeau:
+                    <span> {{ gameStatisticsService.gameStatistics.totalPlayersThatGrabbedFlag.length }} </span>
+                </div>
+                } }@else {
+                <div id="play-time">
+                    Durée de la partie:
+                    <span> 00:00:00 </span>
+                </div>
+                <div id="turn-number">
+                    Nombre de tours:
+                    <span> 0 </span>
+                </div>
+                <div id="tile-pourcentage">
+                    Pourcentage de tuiles terrain visitées:
+                    <span> 0% </span>
+                </div>
+                <div id="door-pourcentage">
+                    Pourcentage de porte manipulées:
+                    <span> 0% </span>
+                </div>
+                @if(gameMapDataManagerService.isGameModeCTF()){
+                <div id="flag-capture">
+                    Nombre de jouers ayant le drapeau:
+                    <span> 0 </span>
+                </div>
+                } }
+                <div id="chat-container">
+                    <app-clavardage></app-clavardage>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

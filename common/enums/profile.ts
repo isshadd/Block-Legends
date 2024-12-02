@@ -1,8 +1,4 @@
-export interface Profile {
-    comportement: string;
+export enum ProfileEnum {
+    Agressive = 'agressive',
+    Defensive = 'defensive',
 }
-
-export const ProfileEnum = {
-    agressive: { comportement: 'aggressive' },
-    defensive: { comportement: 'defensive' },
-} as const;

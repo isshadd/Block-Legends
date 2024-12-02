@@ -1,14 +1,21 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
+
+const DELAY_2000_MS = 2000;
+const DELAY_500_MS = 500;
 
 @Injectable()
 export class PlayGameBoardSocketService {
     private readonly logger = new Logger(PlayGameBoardSocketService.name);
 
-    constructor(private readonly gameSocketRoomService: GameSocketRoomService) {}
+    constructor(
+        private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
+    ) {}
 
     initRoomGameBoard(accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
@@ -25,6 +32,7 @@ export class PlayGameBoardSocketService {
         this.gameSocketRoomService.setCurrentPlayerTurn(accessCode, turnOrder[0]);
 
         this.gameSocketRoomService.gameBoardRooms.set(room.accessCode, { game: gameBoardRoom.game, spawnPlaces, turnOrder });
+        this.playGameStatisticsService.initGameStatistics(room.accessCode);
         this.logger.log(`GameBoard setup fait pour room: ${room.accessCode}`);
     }
 
@@ -111,5 +119,29 @@ export class PlayGameBoardSocketService {
 
             this.gameSocketRoomService.setCurrentPlayerTurn(accessCode, gameBoardRoom.turnOrder[nextPlayerIndex]);
         }
+    }
+
+    getRandomClientInRoom(accessCode: number): string {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (room) {
+            const nonVirtualPlayers = room.players.filter((player) => !player.isVirtual);
+            if (nonVirtualPlayers.length === 0) {
+                return '';
+            }
+            const randomIndex = Math.floor(Math.random() * nonVirtualPlayers.length);
+            return nonVirtualPlayers[randomIndex].socketId;
+        }
+    }
+
+    getPlayerBySocketId(accessCode: number, socketId: string) {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+        if (room) {
+            const player = room.players.find((p) => p.socketId === socketId);
+            return player;
+        }
+    }
+
+    getRandomDelay(): number {
+        return Math.floor(Math.random() * DELAY_2000_MS) + DELAY_500_MS;
     }
 }

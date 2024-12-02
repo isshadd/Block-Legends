@@ -119,8 +119,8 @@ export class PlayPageMouseHandlerService implements OnDestroy {
                 this.isActionOpen = false;
             }
 
-            if (this.isActionOpen) {
-                const userTile = this.playGameBoardManagerService.getCurrentPlayerTile();
+            if (userPlayer && this.isActionOpen) {
+                const userTile = this.playGameBoardManagerService.getPlayerTile(userPlayer);
                 if (!userTile) return;
 
                 this.actionTiles = this.playGameBoardManagerService.getAdjacentActionTiles(userTile);

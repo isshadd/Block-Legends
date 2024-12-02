@@ -1,4 +1,6 @@
-import { Profile } from '@common/enums/profile';
+import { ItemType } from '@common/enums/item-type';
+import { ProfileEnum } from '@common/enums/profile';
+import { Vec2 } from '@common/interfaces/vec2';
 import { Avatar } from '../../enums/avatar-enum';
 import { Character } from '../../interfaces/character';
 import { EmptyItem } from '../Items/empty-item';
@@ -19,8 +21,7 @@ export class PlayerCharacter implements Character {
     dice: string = 'attack';
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
-    fightWins: number = 0;
-    fightLoses: number = 0;
+
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
@@ -31,10 +32,21 @@ export class PlayerCharacter implements Character {
     currentMovePoints: number = 0;
     currentActionPoints: number = 0;
 
+    // Statistics
+
+    totalCombats: number = 0;
+    totalEvasions: number = 0;
+    fightWins: number = 0;
+    fightLoses: number = 0;
+    totalLostLife: number = 0;
+    totalDamageDealt: number = 0;
+    differentItemsGrabbed: ItemType[] = [];
+    differentTerrainTilesVisited: Vec2[] = [];
+
     // Pour JV:
 
     isVirtual: boolean = false;
-    profile: Profile | null = null;
+    comportement: ProfileEnum | null = null;
 
     constructor(public name: string) {}
 

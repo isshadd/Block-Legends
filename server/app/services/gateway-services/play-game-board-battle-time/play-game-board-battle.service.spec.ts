@@ -1,4 +1,5 @@
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
+import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { GameBattle } from '@common/interfaces/game.battle';
@@ -10,6 +11,7 @@ jest.useFakeTimers();
 describe('PlayGameBoardBattleService', () => {
     let service: PlayGameBoardBattleService;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
+    let playGameStatisticsService: jest.Mocked<PlayGameStatisticsService>;
 
     const mockRoom: GameRoom = {
         id: 'room1',
@@ -50,12 +52,21 @@ describe('PlayGameBoardBattleService', () => {
             getRoomByAccessCode: jest.fn(),
         };
 
+        const mockPlayGameStatisticsService = {
+            increasePlayerStatistic: jest.fn(),
+        };
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [PlayGameBoardBattleService, { provide: GameSocketRoomService, useValue: mockGameSocketRoomService }],
+            providers: [
+                PlayGameBoardBattleService,
+                { provide: GameSocketRoomService, useValue: mockGameSocketRoomService },
+                { provide: PlayGameStatisticsService, useValue: mockPlayGameStatisticsService },
+            ],
         }).compile();
 
         service = module.get<PlayGameBoardBattleService>(PlayGameBoardBattleService);
         gameSocketRoomService = module.get<GameSocketRoomService>(GameSocketRoomService) as jest.Mocked<GameSocketRoomService>;
+        playGameStatisticsService = module.get<PlayGameStatisticsService>(PlayGameStatisticsService) as jest.Mocked<PlayGameStatisticsService>;
     });
 
     afterEach(() => {
@@ -423,9 +434,11 @@ describe('PlayGameBoardBattleService', () => {
                 secondPlayerRemainingLife: 1,
             };
 
+            playGameStatisticsService.increasePlayerStatistic.mockImplementation(jest.fn());
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
             const result = service.userSucceededAttack(accessCode, false);
+            expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalled();
             expect(battleRoom.secondPlayerRemainingLife).toBe(0);
             expect(result).toBe(true);
         });

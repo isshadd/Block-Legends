@@ -35,6 +35,7 @@ export class WebSocketService {
     avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
 
     currentRoom: GameRoom;
+    isGameFinished = false;
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,
@@ -50,6 +51,7 @@ export class WebSocketService {
         this.setupSocketListeners();
         this.chatService.initialize();
         this.eventJournalService.initialize();
+        this.isGameFinished = false;
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -257,7 +259,7 @@ export class WebSocketService {
 
         this.socket.on(SocketEvents.ROOM_CLOSED, () => {
             this.currentRoom.players.forEach((player) => {
-                if (!player.isOrganizer) {
+                if (!player.isOrganizer && !this.isGameFinished) {
                     this.leaveGame();
                     this.router.navigate(['/home']);
                 }

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -24,6 +25,7 @@ describe('WaitingViewComponent', () => {
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let eventJournalServiceSpy: jasmine.SpyObj<EventJournalService>;
     let mockActivatedRoute: Partial<ActivatedRoute>;
+    let playGameBoardManagerServiceSpy: jasmine.SpyObj<PlayGameBoardManagerService>;
 
     const mockCharacter = {
         isOrganizer: true,
@@ -65,6 +67,8 @@ describe('WaitingViewComponent', () => {
             queryParams: of({ roomId: '1234' }),
         };
 
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['init']);
+
         await TestBed.configureTestingModule({
             imports: [WaitingViewComponent],
             providers: [
@@ -75,6 +79,7 @@ describe('WaitingViewComponent', () => {
                 { provide: SocketStateService, useValue: socketStateServiceSpy },
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: EventJournalService, useValue: eventJournalServiceSpy },
+                { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy },
             ],
         }).compileComponents();
 
@@ -167,7 +172,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it("devrait gérer avatarTakenError$ et réessayer d'ajouter un joueur virtuel", fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 0;
             component.maxVirtualPlayerRetries = 2;
 
@@ -178,12 +183,12 @@ describe('WaitingViewComponent', () => {
             tick();
 
             expect(component.virtualPlayerRetryCount).toBe(1);
-            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.agressive);
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.Agressive);
             expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalled();
         }));
 
         it('devrait réinitialiser lastVirtualPlayerProfile quand les tentatives max sont atteintes', fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 2;
             component.maxVirtualPlayerRetries = 2;
 
@@ -198,7 +203,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it('devrait réinitialiser virtualPlayerRetryCount quand le joueur virtuel est trouvé dans players$', fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 1;
             component.lastVirtualPlayerSocketId = 'socket123';
 
@@ -213,7 +218,7 @@ describe('WaitingViewComponent', () => {
         }));
 
         it("ne devrait pas réinitialiser virtualPlayerRetryCount quand le joueur virtuel n'est pas trouvé dans players$", fakeAsync(() => {
-            component.lastVirtualPlayerProfile = ProfileEnum.agressive;
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 1;
             component.lastVirtualPlayerSocketId = 'socket123';
 
@@ -223,7 +228,7 @@ describe('WaitingViewComponent', () => {
             (webSocketServiceSpy.players$ as BehaviorSubject<PlayerCharacter[]>).next([{ socketId: 'socket456' } as PlayerCharacter]);
             tick();
 
-            expect(component.lastVirtualPlayerProfile).toBe(ProfileEnum.agressive);
+            expect(component.lastVirtualPlayerProfile).toBe(ProfileEnum.Agressive);
             expect(component.virtualPlayerRetryCount).toBe(1);
         }));
     });
@@ -238,10 +243,10 @@ describe('WaitingViewComponent', () => {
             gameServiceSpy.generateVirtualCharacter.and.returnValue(virtualPlayer);
             component.playersCounter = VP_NUMBER - 1;
 
-            component.addVirtualPlayer(ProfileEnum.agressive);
+            component.addVirtualPlayer(ProfileEnum.Agressive);
 
             expect(component.isMaxPlayer).toBeTrue();
-            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.agressive);
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(component.playersCounter, ProfileEnum.Agressive);
             expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalledWith(ACCESS_CODE, virtualPlayer);
             expect(component.lastVirtualPlayerProfile).toBe(null);
             expect(component.lastVirtualPlayerSocketId).toBe(null);
@@ -250,7 +255,7 @@ describe('WaitingViewComponent', () => {
 
         it('ne devrait pas ajouter de joueur quand au maximum', () => {
             component.playersCounter = VP_NUMBER;
-            component.addVirtualPlayer(ProfileEnum.agressive);
+            component.addVirtualPlayer(ProfileEnum.Agressive);
 
             expect(component.isMaxPlayer).toBeTrue();
             expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalled();
