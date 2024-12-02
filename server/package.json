@@ -13,7 +13,7 @@
         "test": "jest",
         "test:gateway": "jest --testPathPattern=game.gateway.spec.ts",
         "test:game-socket-room": "jest --testPathPattern=game-socket-room.service.spec.ts",
-        "coverage": "jest --coverage --detectOpenHandles",
+        "coverage": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
     },
     "dependencies": {
