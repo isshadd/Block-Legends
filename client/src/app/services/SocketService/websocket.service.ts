@@ -258,7 +258,6 @@ export class WebSocketService {
         this.socket.on(SocketEvents.ROOM_CLOSED, () => {
             this.currentRoom.players.forEach((player) => {
                 if (!player.isOrganizer && !this.isGameFinished) {
-                    console.log('room closed');
                     this.leaveGame();
                     this.router.navigate(['/home']);
                 }
