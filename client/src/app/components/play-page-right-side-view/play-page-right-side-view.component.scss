@@ -3,8 +3,7 @@
     display: flex;
     flex-direction: column;
     flex-basis: 25%;
-    max-width: 15%;
-    min-width: 300px;
+    width: 300px;
     height: 100vh;
     background-color: $primary-dark;
     overflow-x: hidden;
@@ -12,7 +11,18 @@
     scrollbar-width: thin;
     scrollbar-color: darken($primary-dark, 10%) lighten($primary-dark, 3%);
     padding-top: 70px;
-
+    #timer-container {
+        display: flex;
+        justify-content: center;
+    }
+    #item-list-container {
+        margin-top: 20px;
+        height: auto;
+        width: 300px;
+        app-item-list-container {
+            justify-self: center;
+        }
+    }
     app-tab-container {
         height: 200px;
     }

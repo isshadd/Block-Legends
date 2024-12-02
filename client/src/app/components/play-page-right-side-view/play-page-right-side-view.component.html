@@ -1,11 +1,16 @@
 <div id="side-menu-right">
-    <app-timer
-        [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
-        [seconds]="playGameBoardManagerService.currentTime"
-        [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
-    ></app-timer>
+    <div id="timer-container">
+        <app-timer
+            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
+            [seconds]="playGameBoardManagerService.currentTime"
+            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
+        ></app-timer>
+    </div>
+
     <div class="action-container">
-        <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
+        <div id="item-list-container">
+            <app-item-list-container [containerItems]="playGameBoardManagerService.getCurrentPlayerCharacter()?.inventory"></app-item-list-container>
+        </div>
 
         <div class="button-container">
             @if(this.playGameBoardManagerService.isUserTurn) { @if(playGameBoardManagerService.possibleItems.length === 0) {
