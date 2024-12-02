@@ -70,7 +70,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private webSocketService: WebSocketService,
         private gameService: GameService,
         private socketStateService: SocketStateService,
-        private eventService: EventJournalService,
+        private eventJournalService: EventJournalService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -94,7 +94,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.toggleDebugMode();
         }
         if (event.key === 't') {
-            // this.webSocketService.sendLog(`${this.myPlayer.currentMovePoints}`)
+            this.eventJournalService.broadcastEvent(`${this.eventJournalService.player.socketId}`, []);
         }
     }
 
@@ -124,7 +124,10 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!character) return;
             this.myPlayer = character;
-            this.totalLifePoints = this.myPlayer.attributes.life;
+            if(this.myPlayer.isOrganizer) {
+                this.webSocketService.sendLog(`${this.myPlayer.name}`);
+                this.totalLifePoints = this.myPlayer.attributes.life;
+            }
         });
     }
 
@@ -200,9 +203,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     toggleDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            if (this.debugService.isDebugMode) this.eventService.broadcastEvent('Mode débogage désactivé', []);
+            if (this.debugService.isDebugMode) this.eventJournalService.broadcastEvent('Mode débogage désactivé', []);
             else {
-                this.eventService.broadcastEvent('Mode débogage activé', []);
+                this.eventJournalService.broadcastEvent('Mode débogage activé', []);
             }
             this.webSocketService.debugMode();
         }
@@ -210,13 +213,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     turnOffDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            this.eventService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
+            this.eventJournalService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
             this.webSocketService.debugModeOff();
         }
     }
 
-    deactivateDebugMode(): void {
-        // if(this.myPlayer.isOrganizer)
-        // this.webSocketService.deactivateDebugMode();
-    }
 }

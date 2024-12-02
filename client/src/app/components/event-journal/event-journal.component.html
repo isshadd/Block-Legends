@@ -1,4 +1,4 @@
-<div class="journal">
+<!-- <div class="journal">
     <button (click)="showMyEvents = !showMyEvents">
         {{ showMyEvents ? 'Toutes les actions' : 'Mes actions' }}
     </button>
@@ -9,6 +9,25 @@
                 <div>{{ event.event }}</div>
                 <ul>
                     <li *ngFor="let player of event.associatedPlayers">{{ player }}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div> -->
+<div class="journal">
+    <button (click)="showMyEvents = !showMyEvents">
+        {{ showMyEvents ? 'Toutes les actions' : 'Mes actions' }}
+    </button>
+
+    <div class="journal-container" #journalEvents>
+        <ul class="events">
+            <li *ngFor="let event of showMyEvents ? filteredEvents : events">
+                <div class="event-time">{{ event.event.time }}</div>
+                <div class="event-content">{{ event.event.content }}</div>
+                <ul>
+                    <li *ngFor="let player of event.associatedPlayers">
+                        <span>{{ player.name }}</span>
+                    </li>
                 </ul>
             </li>
         </ul>

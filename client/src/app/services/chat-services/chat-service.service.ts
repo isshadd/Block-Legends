@@ -4,6 +4,8 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
+import { RoomMessage } from '@common/interfaces/roomMessage';
+
 
 const MAX_STRING_LENGTH = 200;
 
@@ -13,15 +15,16 @@ const MAX_STRING_LENGTH = 200;
 export class ChatService {
     socket: WebSocketService | null = null;
     serverClock: Date;
-    roomMessages: string[] = [];
-    playerName: string;
+    roomMessages: RoomMessage[] = [];
+    player: PlayerCharacter;
+    playerId: string;
     accessCode: number;
     roomID: string;
 
     messageReceivedSubject = new Subject<void>();
     messageReceived$ = this.messageReceivedSubject.asObservable();
 
-    constructor(private socketStateService: SocketStateService) {}
+    constructor(public socketStateService: SocketStateService) {}
 
     initialize() {
         this.socket = this.socketStateService.getActiveSocket();
@@ -33,10 +36,11 @@ export class ChatService {
                 this.socket = null;
             }
         });
+
     }
 
     setCharacter(character: PlayerCharacter) {
-        this.playerName = character.name;
+        this.player = character;
     }
 
     setAccessCode(code: number | undefined) {
@@ -50,6 +54,10 @@ export class ChatService {
         this.roomID = code.toString();
     }
 
+    setPlayerId(playerId: string) {
+        this.playerId = playerId;
+    }
+
     clearMessages() {
         this.roomMessages = [];
     }
@@ -60,7 +68,7 @@ export class ChatService {
             return;
         }
         if (this.socket && roomMessage.trim()) {
-            const message = { room: this.roomID, time: this.serverClock, sender: this.playerName, content: roomMessage };
+            const message = { room: this.roomID, time: this.serverClock, sender: this.player.name, content: roomMessage };
             this.socket.sendMsgToRoom(message);
         }
     }

@@ -1,6 +1,9 @@
 import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { CommonModule } from '@angular/common';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ColorService } from '@app/services/colors.service';
 @Component({
     selector: 'app-event-journal',
     standalone: true,
@@ -11,13 +14,14 @@ import { CommonModule } from '@angular/common';
 export class EventJournalComponent implements AfterViewChecked, OnInit {
     @ViewChild('journalEvents') eventsContainer: ElementRef;
 
-    events: { event: string; associatedPlayers: string[] }[] = this.journalService.roomEvents;
-    filteredEvents: { event: string; associatedPlayers: string[] }[] = this.journalService.getFilteredEvents();
+    events: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.roomEvents;
+    filteredEvents: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.getFilteredEvents();
     shouldScroll: boolean = false;
     showMyEvents: boolean = false;
 
     constructor(
         private journalService: EventJournalService,
+        private colorService: ColorService,
         private cdr: ChangeDetectorRef,
     ) {}
 
@@ -38,8 +42,8 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
         }
     }
 
-    addEvent(event: string, associatedPlayers: string[]): void {
-        this.events.push({ event, associatedPlayers });
+    getPlayerClass(socketId: string): string {
+        return this.colorService.getColor(socketId); // Use ColorService to get the color based on socket ID
     }
 
     private scrollToBottom(): void {

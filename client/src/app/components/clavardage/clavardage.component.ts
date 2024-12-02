@@ -2,30 +2,34 @@ import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetec
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-// import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { RoomMessage } from '@common/interfaces/roomMessage';
+import { ColorService } from '@app/services/colors.service'; // Import ColorService
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+
 
 @Component({
     selector: 'app-clavardage',
     standalone: true,
     imports: [FormsModule, CommonModule],
     templateUrl: './clavardage.component.html',
-    styleUrl: './clavardage.component.scss',
+    styleUrls: ['./clavardage.component.scss'],
 })
 export class ClavardageComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     messageToSend: string = '';
-    messages = this.chatService.roomMessages;
-    playerName: string = '';
+    messages: RoomMessage[] = this.chatService.roomMessages;
+    player: PlayerCharacter = this.chatService.player;
+    playerID: string;
     shouldScroll: boolean = false;
 
     constructor(
         private chatService: ChatService,
+        private colorService: ColorService,
         private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {
-        this.playerName = this.chatService.playerName;
         this.chatService.messageReceived$.subscribe(() => {
             this.shouldScroll = true;
             this.cdr.detectChanges();
@@ -49,6 +53,10 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
         this.chatService.broadcastMessageToAll(this.messageToSend);
         this.messageToSend = '';
         this.shouldScroll = true;
+    }
+
+    getPlayerClass(socketId: string): string {
+        return this.colorService.getColor(socketId); // Use ColorService to get the color based on socket ID
     }
 
     private scrollToBottom(): void {

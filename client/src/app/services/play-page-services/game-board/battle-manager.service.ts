@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
@@ -39,6 +40,7 @@ export class BattleManagerService {
     constructor(
         private debugService: DebugService,
         private webSocketService: WebSocketService,
+        private eventJournalService: EventJournalService,
     ) {}
     init(currentPlayer: PlayerCharacter, opponentPlayer: PlayerCharacter) {
         this.currentPlayer = currentPlayer;
@@ -68,7 +70,8 @@ export class BattleManagerService {
         if (this.isValidAction()) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
             const playerHasTotem = !!this.currentPlayer && this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem);
-
+            if(this.currentPlayer&& this.opponentPlayer)
+                this.eventJournalService.broadcastEvent('bigattack', [this.currentPlayer, this.opponentPlayer]);
             this.signalUserAttacked.next({ attackResult, playerHasTotem });
         }
     }

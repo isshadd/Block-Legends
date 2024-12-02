@@ -74,6 +74,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             roomId: room.id,
             accessCode: room.accessCode,
             isLocked: room.isLocked,
+            socketId: client.id,
         });
         this.updateRoomState(accessCode);
     }

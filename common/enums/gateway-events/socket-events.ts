@@ -26,6 +26,7 @@ export const enum SocketEvents {
     USER_THREW_ITEM = 'userThrewItem',
     TOGGLE_DEBUG_MODE = 'toggleDebugMode',
     DEBUG_MODE_OFF = 'debugModeOff',
+    CONNEXION = 'connexion',
 
     // RECUS
     ROOM_STATE = 'roomState',

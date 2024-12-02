@@ -302,7 +302,7 @@ export class PlayGameBoardManagerService {
                 }
                 this.possibleItems.push(terrainTile.item);
             }
-            this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${terrainTile.item.type}`, [currentPlayer.name]);
+            this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${terrainTile.item.type}`, [currentPlayer]);
             return true;
         }
         return false;
@@ -434,7 +434,7 @@ export class PlayGameBoardManagerService {
         if (tileType === TileType.Ice) {
             const result = 0.1;
             if (Math.random() < result) {
-                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.playerName]);
+                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.player]);
                 return true;
             }
         }

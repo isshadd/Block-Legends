@@ -58,6 +58,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
+        this.chatService.initialize();
+        this.eventJournalService.initialize();
 
         this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
             this.gameId = params.roomId;
@@ -65,8 +67,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!character) return;
-            this.isOrganizer = character.isOrganizer;
-            this.chatService.setCharacter(character);
+            this.isOrganizer = character.isOrganizer; 
+            //this.chatService.setCharacter(character);
             this.eventJournalService.setCharacter(character);
             if (!this.gameId) return;
             if (character.isOrganizer) {
@@ -84,6 +86,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                     this.changeRoomId(this.accessCode);
                 });
             }
+            
         });
 
         this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
@@ -180,6 +183,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent('toggleView', []);
+        this.eventJournalService.broadcastEvent(`${this.chatService.player.socketId}`, []);
     }
 }
