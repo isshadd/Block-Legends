@@ -135,7 +135,6 @@ export class BattleManagerService {
                 }
             }
             if (this.debugService.isDebugMode) {
-                this.webSocketService.sendLog(`defense dice is of value ${this.opponentPlayer.defenseDice}`);
                 return this.opponentDefence + this.opponentPlayer.defenseDice;
             }
             return this.opponentDefence + Math.floor(Math.random() * this.opponentPlayer.defenseDice) + 1;

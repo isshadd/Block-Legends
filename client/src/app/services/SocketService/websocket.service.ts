@@ -48,8 +48,8 @@ export class WebSocketService {
     init() {
         this.socket = io(environment.socketIoUrl);
         this.setupSocketListeners();
-        // this.chatService.initialize();
-        // this.eventJournalService.initialize();
+        this.chatService.initialize();
+        this.eventJournalService.initialize();
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -76,6 +76,7 @@ export class WebSocketService {
     // }
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
+        //player.textColor = this.colorService.getColor(player.socketId);
         this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
 
@@ -165,13 +166,11 @@ export class WebSocketService {
                 roomId: string;
                 accessCode: number;
                 isLocked: boolean;
-                socketId: string;
                 playerName: string;
                 takenAvatars: string[];
             }) => {
                 if (response.valid) {
                     this.gameService.setAccessCode(response.accessCode);
-                    this.chatService.setPlayerId(response.socketId);
                     this.isLockedSubject.next(response.isLocked);
                     this.maxPlayersSubject.next(response.isLocked ? response.accessCode : this.maxPlayersSubject.value);
                     this.takenAvatarsSubject.next(response.takenAvatars);
@@ -191,8 +190,6 @@ export class WebSocketService {
         this.socket.on(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, (player: PlayerCharacter) => {
             if (!player.isVirtual) {
                 this.gameService.setCharacter(player);
-                this.chatService.setCharacter(player);
-                this.sendLog(`allo`);
             }
 
             this.router.navigate(['/waiting-view']);
@@ -305,6 +302,12 @@ export class WebSocketService {
         this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
             this.debugService.isPlayerMoving = false;
         });
+
+        // this.socket.on(SocketEvents.INCREMENT_COLOR_COUNTER, (data : string) => {
+        //     this.sendLog('Incrementing color counter' + `${data}`);
+        //     this.colorService.colorIndex++;
+
+        // });
 
         /*
         this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {

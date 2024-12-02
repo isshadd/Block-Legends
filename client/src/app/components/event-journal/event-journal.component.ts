@@ -3,7 +3,7 @@ import { EventJournalService } from '@app/services/journal-services/event-journa
 import { CommonModule } from '@angular/common';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { ColorService } from '@app/services/colors.service';
+//import { ColorService } from '@app/services/colors.service';
 @Component({
     selector: 'app-event-journal',
     standalone: true,
@@ -21,7 +21,7 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
 
     constructor(
         private journalService: EventJournalService,
-        private colorService: ColorService,
+       // private colorService: ColorService,
         private cdr: ChangeDetectorRef,
     ) {}
 
@@ -42,9 +42,9 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
         }
     }
 
-    getPlayerClass(socketId: string): string {
-        return this.colorService.getColor(socketId); // Use ColorService to get the color based on socket ID
-    }
+    // getPlayerClass(socketId: string): string {
+    //     return this.colorService.colors[this.colorService.colorIndex]; // Use ColorService to get the color based on socket ID
+    // }
 
     private scrollToBottom(): void {
         this.eventsContainer.nativeElement.scrollTop = this.eventsContainer.nativeElement.scrollHeight;

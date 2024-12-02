@@ -17,7 +17,6 @@ export class ChatService {
     serverClock: Date;
     roomMessages: RoomMessage[] = [];
     player: PlayerCharacter;
-    playerId: string;
     accessCode: number;
     roomID: string;
 
@@ -54,12 +53,12 @@ export class ChatService {
         this.roomID = code.toString();
     }
 
-    setPlayerId(playerId: string) {
-        this.playerId = playerId;
-    }
-
     clearMessages() {
         this.roomMessages = [];
+    }
+
+    sendMSG(message :string ) {
+        this.socket?.sendLog(message);
     }
 
     broadcastMessageToAll(roomMessage: string): void {
@@ -72,4 +71,6 @@ export class ChatService {
             this.socket.sendMsgToRoom(message);
         }
     }
+
+    
 }

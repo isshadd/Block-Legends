@@ -68,13 +68,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         }
 
         client.join(accessCode.toString());
+        // this.server.to(accessCode.toString()).emit(SocketEvents.INCREMENT_COLOR_COUNTER , client.id as string);
         client.emit(SocketEvents.JOIN_GAME_RESPONSE, {
             valid: true,
             message: 'Rejoint avec succès',
             roomId: room.id,
             accessCode: room.accessCode,
             isLocked: room.isLocked,
-            socketId: client.id,
         });
         this.updateRoomState(accessCode);
     }

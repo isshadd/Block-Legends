@@ -94,7 +94,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.toggleDebugMode();
         }
         if (event.key === 't') {
-            this.eventJournalService.broadcastEvent(`${this.eventJournalService.player.socketId}`, []);
+            if(this.playGameBoardManagerService.getCurrentPlayerCharacter())
+                this.eventJournalService.broadcastEvent(`${this.playGameBoardManagerService.getCurrentPlayerCharacter()?.socketId}`, []);
+
         }
     }
 
@@ -125,7 +127,6 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             if (!character) return;
             this.myPlayer = character;
             if(this.myPlayer.isOrganizer) {
-                this.webSocketService.sendLog(`${this.myPlayer.name}`);
                 this.totalLifePoints = this.myPlayer.attributes.life;
             }
         });

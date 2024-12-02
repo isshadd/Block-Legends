@@ -26,6 +26,7 @@ export class PlayerCharacter implements Character {
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
     inventory: Item[] = [new EmptyItem(), new EmptyItem()];
+    textColor: string;
 
     currentMovePoints: number = 0;
     currentActionPoints: number = 0;

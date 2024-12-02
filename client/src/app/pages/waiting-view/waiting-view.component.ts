@@ -68,7 +68,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!character) return;
             this.isOrganizer = character.isOrganizer; 
-            //this.chatService.setCharacter(character);
+            this.chatService.setCharacter(character);
             this.eventJournalService.setCharacter(character);
             if (!this.gameId) return;
             if (character.isOrganizer) {
@@ -81,6 +81,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 });
             } else {
                 this.playersCounter++;
+                this.chatService.setCharacter(character);
+                this.eventJournalService.setCharacter(character);
                 this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
