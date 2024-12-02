@@ -10,6 +10,7 @@ describe('PlayGameStatisticsService', () => {
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
 
     beforeEach(async () => {
+        jest.useFakeTimers();
         const mockGameSocketRoomService = {
             gameStatisticsRooms: new Map<number, GameStatistics>(),
             getRoomByAccessCode: jest.fn(),
@@ -27,6 +28,7 @@ describe('PlayGameStatisticsService', () => {
     afterEach(() => {
         jest.clearAllTimers();
         jest.clearAllMocks();
+        gameSocketRoomService.gameStatisticsRooms.clear();
     });
 
     it('should be defined', () => {
@@ -37,7 +39,7 @@ describe('PlayGameStatisticsService', () => {
         const gameStatistics = { isGameOn: true, totalGameTime: 0 } as GameStatistics;
         gameSocketRoomService.gameStatisticsRooms.set(1, gameStatistics);
 
-        service.secondPassed();
+        jest.advanceTimersByTime(1000);
 
         expect(gameStatistics.totalGameTime).toBe(1);
     });
