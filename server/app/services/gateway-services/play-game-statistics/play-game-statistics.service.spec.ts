@@ -24,6 +24,11 @@ describe('PlayGameStatisticsService', () => {
         gameSocketRoomService = module.get(GameSocketRoomService);
     });
 
+    afterEach(() => {
+        jest.clearAllTimers();
+        jest.clearAllMocks();
+    });
+
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
