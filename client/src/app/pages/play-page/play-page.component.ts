@@ -27,6 +27,7 @@ import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { DebugService } from '@app/services/debug.service';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 
 const TIMEOUT_DURATION = 500;
 
@@ -43,6 +44,7 @@ const TIMEOUT_DURATION = 500;
         PlayGameSideViewBarComponent,
         ItemListContainerComponent,
         ItemChooseComponent,
+        TabContainerComponent,
     ],
     templateUrl: './play-page.component.html',
     styleUrl: './play-page.component.scss',
