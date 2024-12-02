@@ -16,6 +16,7 @@ import { GameSocketRoomService } from './services/gateway-services/game-socket-r
 import { PlayGameBoardBattleService } from './services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from './services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from './services/gateway-services/play-game-board-time/play-game-board-time.service';
+import { PlayGameStatisticsService } from './services/gateway-services/play-game-statistics/play-game-statistics.service';
 
 @Module({
     imports: [
@@ -43,6 +44,7 @@ import { PlayGameBoardTimeService } from './services/gateway-services/play-game-
         PlayGameBoardSocketService,
         PlayGameBoardTimeService,
         PlayGameBoardBattleService,
+        PlayGameStatisticsService,
     ],
 })
 export class AppModule {}

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService, VP_NUMBER } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -24,6 +25,7 @@ describe('WaitingViewComponent', () => {
     let chatServiceSpy: jasmine.SpyObj<ChatService>;
     let eventJournalServiceSpy: jasmine.SpyObj<EventJournalService>;
     let mockActivatedRoute: Partial<ActivatedRoute>;
+    let playGameBoardManagerServiceSpy: jasmine.SpyObj<PlayGameBoardManagerService>;
 
     const mockCharacter = {
         isOrganizer: true,
@@ -65,6 +67,8 @@ describe('WaitingViewComponent', () => {
             queryParams: of({ roomId: '1234' }),
         };
 
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['init']);
+
         await TestBed.configureTestingModule({
             imports: [WaitingViewComponent],
             providers: [
@@ -75,6 +79,7 @@ describe('WaitingViewComponent', () => {
                 { provide: SocketStateService, useValue: socketStateServiceSpy },
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: EventJournalService, useValue: eventJournalServiceSpy },
+                { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy },
             ],
         }).compileComponents();
 

@@ -4,11 +4,13 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
+import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
@@ -32,6 +34,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
         public router: Router,
         public virtualPlayerManagerService: VirtualPlayerManagerService,
         public virtualPlayerBattleManagerService: VirtualPlayerBattleManagerService,
+        public gameStatisticsService: GameStatisticsService,
     ) {
         this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
             this.socket.emit(SocketEvents.USER_MOVED, data);
@@ -103,6 +106,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
         this.playGameBoardManagerService.resetManager();
         this.playPageMouseHandlerService.clearUI();
         this.router.navigate(['/home']);
+    }
+
+    goToStatisticsPage(): void {
+        this.router.navigate(['/statistics-page']);
     }
 
     private setupSocketListeners(): void {
@@ -245,17 +252,21 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.virtualPlayerManagerService.lostBattle(playerId);
         });
 
-        this.socket.on(SocketEvents.GAME_BOARD_PLAYER_WON, (playerId: string) => {
-            this.playGameBoardManagerService.endGame(playerId);
+        this.socket.on(SocketEvents.GAME_BOARD_PLAYER_WON, (data: { playerTurnId: string; gameStatistics: GameStatistics }) => {
+            this.playGameBoardManagerService.endGame(data.playerTurnId);
+            this.gameStatisticsService.initGameStatistics(data.gameStatistics);
+            this.webSocketService.isGameFinished = true;
             const wait = 5000;
             setTimeout(() => {
-                this.leaveGame();
+                this.goToStatisticsPage();
             }, wait);
         });
 
         this.socket.on(SocketEvents.LAST_PLAYER_STANDING, () => {
-            alert('Tous les autres joueurs ont quitté la partie. Fin de partie');
-            this.leaveGame();
+            if (!this.playGameBoardManagerService.winnerPlayer) {
+                alert('Tous les autres joueurs ont quitté la partie. Fin de partie');
+                this.leaveGame();
+            }
         });
     }
 }
