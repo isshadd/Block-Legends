@@ -41,9 +41,6 @@ export class PlaceableEntityContainerComponent {
     }
 
     getItemLimit(entity: PlaceableEntity): number {
-        if (entity.isItem()) {
-            return (entity as Item).itemLimit;
-        }
-        return 0;
+        return entity.isItem() ? (entity as Item).itemLimit : 0;
     }
 }

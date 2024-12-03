@@ -59,16 +59,10 @@ export class MapComponent {
     }
 
     getTerrainItem(tile: Tile): Item | null {
-        if (tile.isTerrain()) {
-            return (tile as TerrainTile).item;
-        }
-        return null;
+        return tile.isTerrain() ? (tile as TerrainTile).item : null;
     }
 
     getPlayer(tile: Tile): PlayerMapEntity | null {
-        if (tile.isWalkable()) {
-            return (tile as WalkableTile).player;
-        }
-        return null;
+        return tile.isWalkable() ? (tile as WalkableTile).player : null;
     }
 }

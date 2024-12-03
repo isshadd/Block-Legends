@@ -46,42 +46,24 @@ export class AttributesComponent {
         return new Array(this.character.attributes.defense);
     }
     assignAttackDice(event: Event): void {
-        const target = event.target as HTMLSelectElement;
-        const dice = target.value;
+        const dice = (event.target as HTMLSelectElement).value;
         this.selectedAttackDice = dice;
         this.character.assignAttackDice();
-        if (dice === 'dice6') {
-            this.selectedDefenseDice = 'dice4';
-        } else {
-            this.selectedDefenseDice = 'dice6';
-        }
+        this.selectedDefenseDice = dice === 'dice6' ? 'dice4' : 'dice6';
     }
 
     assignDefenseDice(event: Event): void {
-        const target = event.target as HTMLSelectElement;
-        const dice = target.value;
+        const dice = (event.target as HTMLSelectElement).value;
         this.selectedDefenseDice = dice;
         this.character.assignDefenseDice();
-        if (dice === 'dice4') {
-            this.selectedAttackDice = 'dice6';
-        } else {
-            this.selectedAttackDice = 'dice4';
-        }
+        this.selectedAttackDice = dice === 'dice4' ? 'dice6' : 'dice4';
     }
 
     buttonClicked(type: ButtonType): void {
         if (this.isFirstClick) {
             this.isBlinking = false;
         }
-        switch (type) {
-            case ButtonType.HEALTH:
-                this.isHealthDisabled = !this.isHealthDisabled;
-                this.isSpeedDisabled = true;
-                break;
-            case ButtonType.SPEED:
-                this.isSpeedDisabled = !this.isSpeedDisabled;
-                this.isHealthDisabled = true;
-                break;
-        }
+        this.isHealthDisabled = type !== ButtonType.HEALTH;
+        this.isSpeedDisabled = type !== ButtonType.SPEED;
     }
 }

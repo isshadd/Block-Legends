@@ -64,19 +64,13 @@ export class PlayPageMouseHandlerService implements OnDestroy {
     onMapTileMouseLeave(tile: Tile) {
         if (this.lastTilePath.length) {
             for (const pathTile of this.lastTilePath) {
-                if (!this.actionTiles.includes(pathTile)) {
-                    pathTile.visibleState = VisibleState.Valid;
-                }
+                pathTile.visibleState = VisibleState.Valid;
             }
             this.lastTilePath = [];
-        } else if (!this.actionTiles.includes(tile)) {
+        } else {
             const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
-            if (possibleTileMove) {
-                tile.visibleState = VisibleState.Valid;
-            } else {
-                tile.visibleState = VisibleState.NotSelected;
-            }
+            tile.visibleState = possibleTileMove ? VisibleState.Valid : VisibleState.NotSelected;
         }
     }
 
@@ -123,19 +117,13 @@ export class PlayPageMouseHandlerService implements OnDestroy {
                 if (!userTile) return;
 
                 this.actionTiles = this.playGameBoardManagerService.getAdjacentActionTiles(userTile);
-                for (const tile of this.actionTiles) {
-                    tile.visibleState = VisibleState.Action;
-                }
+                this.actionTiles.forEach((tile) => (tile.visibleState = VisibleState.Action));
             } else {
-                for (const tile of this.actionTiles) {
-                    const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
-
-                    if (possibleTileMove) {
-                        tile.visibleState = VisibleState.Valid;
-                    } else {
-                        tile.visibleState = VisibleState.NotSelected;
-                    }
-                }
+                this.actionTiles.forEach((tile) => {
+                    tile.visibleState = this.playGameBoardManagerService.userCurrentPossibleMoves.has(tile)
+                        ? VisibleState.Valid
+                        : VisibleState.NotSelected;
+                });
                 this.actionTiles = [];
             }
         }
