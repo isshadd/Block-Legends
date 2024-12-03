@@ -6,7 +6,6 @@ import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 
-
 const MAX_STRING_LENGTH = 200;
 
 @Injectable({
@@ -35,13 +34,11 @@ export class ChatService {
                 this.socket = null;
             }
         });
-
     }
 
     setCharacter(character: PlayerCharacter) {
         this.player = character;
     }
-    
 
     setAccessCode(code: number | undefined) {
         if (!code) {
@@ -68,6 +65,4 @@ export class ChatService {
             this.socket.sendMsgToRoom(message);
         }
     }
-
-    
 }

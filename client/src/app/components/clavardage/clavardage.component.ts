@@ -17,7 +17,7 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
 
     messageToSend: string = '';
     messages: RoomMessageReceived[] = this.chatService.roomMessages;
-    
+
     playerName: string = '';
     shouldScroll: boolean = false;
 

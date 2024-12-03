@@ -48,7 +48,6 @@ export const enum SocketEvents {
     ROOM_CLOSED = 'roomClosed',
     ERROR = 'error',
     CLOCK = 'clock',
-    MASS_MESSAGE = 'massMessage',
     ORGANIZER_LEFT = 'organizerLeft',
     GAME_PARAMETERS = 'gameParameters',
     CLIENT_CONNECTED = 'clientConnected',

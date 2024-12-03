@@ -74,9 +74,6 @@ export class WebSocketService {
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
-
-    
-
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
         this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
@@ -264,7 +261,6 @@ export class WebSocketService {
                 }
             });
         });
-
 
         this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);

@@ -4,7 +4,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
-import { RoomEvent} from '@common/interfaces/RoomEvent';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
 
 @Injectable({
     providedIn: 'root',
@@ -36,8 +36,6 @@ export class EventJournalService {
     setCharacter(character: PlayerCharacter) {
         this.player = character;
     }
-
-    
 
     setAccessCode(code: number | undefined) {
         if (!code) {

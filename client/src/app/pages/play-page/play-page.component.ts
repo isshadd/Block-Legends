@@ -102,9 +102,8 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.toggleDebugMode();
         }
         if (event.key === 't') {
-            if(this.playGameBoardManagerService.getCurrentPlayerCharacter())
+            if (this.playGameBoardManagerService.getCurrentPlayerCharacter())
                 this.eventJournalService.broadcastEvent(`${this.playGameBoardManagerService.getCurrentPlayerCharacter()?.socketId}`, []);
-
         }
     }
 
@@ -133,7 +132,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!character) return;
             this.myPlayer = character;
-            if(this.myPlayer.isOrganizer) {
+            if (this.myPlayer.isOrganizer) {
                 this.totalLifePoints = this.myPlayer.attributes.life;
             }
         });
@@ -211,5 +210,4 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.webSocketService.debugModeOff();
         }
     }
-
 }
