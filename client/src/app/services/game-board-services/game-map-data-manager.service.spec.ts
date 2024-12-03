@@ -11,7 +11,6 @@ import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
-import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
@@ -726,7 +725,7 @@ describe('GameMapDataManagerService', () => {
         });
     });
 
-    describe('#getClosestTerrainTileWithoutItemAt', () => {
+    describe('getClosestTerrainTileWithoutItemAt', () => {
         let startTile = new GrassTile();
         beforeEach(() => {
             service['currentGrid'] = [
@@ -770,9 +769,67 @@ describe('GameMapDataManagerService', () => {
         });
 
         it('should throw error if no terrain tile found', () => {
-            service['currentGrid'] = [[new WallTile()], [new WallTile()]];
+            startTile.item = new DiamondSword();
+            spyOn(service, 'getNeighbours').and.returnValue([]);
 
             expect(() => service.getClosestTerrainTileWithoutItemAt(startTile)).toThrowError('No terrain tile found');
+        });
+    });
+
+    describe('getClosestWalkableTileWithoutPlayerAt', () => {
+        let spawnTile = new GrassTile();
+        let playerMapEntity = new PlayerMapEntity('player');
+        playerMapEntity.spawnCoordinates = { x: 0, y: 0 };
+
+        beforeEach(() => {
+            service['currentGrid'] = [
+                [spawnTile, new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+            ];
+            for (let row = 0; row < service['currentGrid'].length; row++) {
+                for (let col = 0; col < service['currentGrid'][row].length; col++) {
+                    service['currentGrid'][row][col].coordinates = { x: row, y: col };
+                }
+            }
+        });
+
+        it('should return the spawnTile if it is a wlakable tile and has no player', () => {
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).toBe(spawnTile);
+        });
+
+        it('should return a neighbor tile if spawnTile has another player', () => {
+            let otherMapEntity = new PlayerMapEntity('player2');
+            spawnTile.player = otherMapEntity;
+
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).not.toBe(spawnTile);
+        });
+
+        it('should return a far neighbor tile, if all direct neighbors have players', () => {
+            let otherMapEntity = new PlayerMapEntity('player2');
+            let otherMapEntity2 = new PlayerMapEntity('player3');
+            let otherMapEntity3 = new PlayerMapEntity('player4');
+            spawnTile.player = otherMapEntity;
+            (service['currentGrid'][0][1] as TerrainTile).player = otherMapEntity2;
+            (service['currentGrid'][1][0] as TerrainTile).player = otherMapEntity3;
+
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).not.toBe(spawnTile);
+            expect(result).not.toBe(service['currentGrid'][0][1] as TerrainTile);
+            expect(result).not.toBe(service['currentGrid'][1][0] as TerrainTile);
+        });
+
+        it('should throw error if no walkable tile found', () => {
+            let otherMapEntity = new PlayerMapEntity('player2');
+            spawnTile.player = otherMapEntity;
+            spyOn(service, 'getNeighbours').and.returnValue([]);
+
+            expect(() => service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity)).toThrowError('No walkable tile found');
         });
     });
 
