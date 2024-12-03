@@ -39,23 +39,45 @@ describe('PlayGameBoardManagerService', () => {
     mockPlayerCharacter.currentActionPoints = 0;
     mockPlayerCharacter.currentMovePoints = 0;
 
-    describe('Subjects and Observables', () => {
-        let service: PlayGameBoardManagerService;
+    let service: PlayGameBoardManagerService;
+    let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+    let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
+    let battleManagerServiceSpy: jasmine.SpyObj<BattleManagerService>;
 
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
+    beforeEach(() => {
+        gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', [
+            'initGameBoard',
+            'init',
+            'getTilesWithSpawn',
+            'getPossibleMovementTiles',
+            'getTileAt',
+            'isGameModeCTF',
+            'setTileAt',
+            'getClosestWalkableTileWithoutPlayerAt',
+            'getCurrentGrid',
+            'getNeighbours',
+        ]);
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo'], {
+            socket: { id: 'userSocketId' },
+        });
+        tileFactoryServiceSpy = jasmine.createSpyObj('TileFactoryService', ['createTile']);
+        battleManagerServiceSpy = jasmine.createSpyObj('BattleManagerService', ['init']);
 
-            service = TestBed.inject(PlayGameBoardManagerService);
+        TestBed.configureTestingModule({
+            providers: [
+                PlayGameBoardManagerService,
+                { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: TileFactoryService, useValue: tileFactoryServiceSpy },
+                { provide: BattleManagerService, useValue: battleManagerServiceSpy },
+            ],
         });
 
+        service = TestBed.inject(PlayGameBoardManagerService);
+    });
+
+    describe('Subjects and Observables', () => {
         it('should emit and subscribe to signalManagerFinishedInit$', (done) => {
             service.signalManagerFinishedInit$.subscribe(() => {
                 expect(true).toBeTrue();
@@ -148,26 +170,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('init', () => {
-        let service: PlayGameBoardManagerService;
-
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['initGameBoard']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} }, // Directly provide an empty object
-                    { provide: WebSocketService, useValue: {} }, // Directly provide an empty object
-                    { provide: BattleManagerService, useValue: {} }, // Directly provide an empty object
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should initialize game board, characters, set turnOrder, and emit signalManagerFinishedInit', (done) => {
             const mockGame = {} as GameShared;
             const mockSpawnPlaces: [number, string][] = [[0, '0']];
@@ -194,25 +196,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('initGameBoard', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['init']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should call gameMapDataManagerService.init with the provided game', () => {
             const mockGame = {} as GameShared;
 
@@ -223,27 +206,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('initCharacters', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTilesWithSpawn']);
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should assign players to specified spawn tiles and clear items from remaining tiles', () => {
             const tile1 = new TerrainTile();
             const tile2 = new TerrainTile();
@@ -280,27 +242,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('startTurn', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', [], {
-                socket: { id: 'userSocketId' },
-            });
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should set move points, action points, and call setupPossibleMoves if it is the user’s turn and player is found', () => {
             const mockPlayerCharacter = {
                 attributes: { speed: 3 },
@@ -347,22 +288,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('setupPossibleMoves', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should call setPossibleMoves and showPossibleMoves if move points are available and it is user’s turn', () => {
             const mockPlayerCharacter = new PlayerCharacter('player1');
             mockPlayerCharacter.currentMovePoints = 2;
@@ -407,25 +332,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('setPossibleMoves', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getPossibleMovementTiles']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should call getPossibleMovementTiles with the correct coordinates and move points, and set userCurrentPossibleMoves', () => {
             const playerCoordinates: Vec2 = { x: 1, y: 2 };
             const mockPlayerCharacter = {
@@ -447,22 +353,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('showPossibleMoves', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should set visibleState of each tile in userCurrentPossibleMoves to Valid', () => {
             const tile1 = new Tile();
             const tile2 = new Tile();
@@ -480,22 +370,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('endTurn', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should set userCurrentMovePoints to 0 and call hidePossibleMoves if it is the user’s turn and player is found', () => {
             const mockPlayerCharacter = new PlayerCharacter('player1');
 
@@ -534,22 +408,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('hidePossibleMoves', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should set visibleState of each tile in userCurrentPossibleMoves to NotSelected and clear userCurrentPossibleMoves', () => {
             const tile1 = new Tile();
             const tile2 = new Tile();
@@ -568,21 +426,8 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('moveUserPlayer', () => {
-        let service: PlayGameBoardManagerService;
-
         beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-            spyOn(service, 'waitInterval').and.returnValue(Promise.resolve()); // Mock waitInterval to skip delays
+            spyOn(service, 'waitInterval').and.returnValue(Promise.resolve());
         });
 
         it('should move the user along the path without tripping and call setupPossibleMoves at the end', async () => {
@@ -654,23 +499,7 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('movePlayer', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
         beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'isGameModeCTF']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
         });
 
@@ -719,20 +548,7 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('waitInterval', () => {
-        let service: PlayGameBoardManagerService;
-
         beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
             jasmine.clock().install();
         });
 
@@ -760,22 +576,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('handlePlayerAction', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should handle battle action when user has action points and it is user’s turn', () => {
             const mockTile = new WalkableTile();
             const mockActionPlayer = new PlayerCharacter('player1');
@@ -800,24 +600,7 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
     describe('checkIfPLayerDidEverything', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
         beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-
             const mockTile = new Tile();
             gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTile);
         });
@@ -872,27 +655,7 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('toggleDoor', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-        let tileFactoryServiceSpy: jasmine.SpyObj<TileFactoryService>;
-
         beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'setTileAt']);
-            tileFactoryServiceSpy = jasmine.createSpyObj('TileFactoryService', ['createTile']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: tileFactoryServiceSpy },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-
-            // Mock the player character with required properties
             spyOn(service, 'getCurrentPlayerCharacter').and.returnValue({
                 id: 'player1',
                 mapEntity: { coordinates: { x: 1, y: 1 } },
@@ -912,7 +675,7 @@ describe('PlayGameBoardManagerService', () => {
             tileFactoryServiceSpy.createTile.and.callFake((type: TileType) => {
                 const newTile = new Tile();
                 newTile.type = type;
-                newTile.coordinates = tileCoordinate; // Mock the coordinates
+                newTile.coordinates = tileCoordinate;
                 return newTile;
             });
 
@@ -957,29 +720,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('startBattle', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-        let battleManagerServiceSpy: jasmine.SpyObj<BattleManagerService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', [], {
-                socket: { id: 'userSocketId' },
-            });
-            battleManagerServiceSpy = jasmine.createSpyObj('BattleManagerService', ['init']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: battleManagerServiceSpy },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should initialize battle if user is the playerId', () => {
             const mockCurrentPlayer = { socketId: 'userSocketId' } as PlayerCharacter;
             const mockOpponent = { socketId: 'enemySocketId' } as PlayerCharacter;
@@ -1023,22 +763,7 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('continueTurn', () => {
-        let service: PlayGameBoardManagerService;
-
         beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-
-            // Mock getCurrentPlayerCharacter in every test
             spyOn(service, 'getCurrentPlayerCharacter').and.returnValue({ id: 'player1' } as unknown as PlayerCharacter);
         });
 
@@ -1067,25 +792,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('endBattleByDeath', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getClosestWalkableTileWithoutPlayerAt']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should increment fightWins, call checkIfPlayerWonGame, and emit signalUserRespawned if loser is the current player', () => {
             const winnerPlayer = new PlayerCharacter('winner');
             const loserPlayer = new PlayerCharacter('loser');
@@ -1180,27 +886,7 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('checkIfPlayerWonClassicGame', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
         beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', [
-                'getTileAt',
-                'getClosestWalkableTileWithoutPlayerAt',
-                'isGameModeCTF',
-            ]);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
             gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
         });
 
@@ -1244,22 +930,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('endGame', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should set winnerPlayer to the found player', () => {
             const mockPlayer = new PlayerCharacter('player1');
             spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayer);
@@ -1280,22 +950,6 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
     describe('getWinnerPlayer', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return winnerPlayer if it is set', () => {
             const mockWinner = new PlayerCharacter('winnerPlayer');
             service.winnerPlayer = mockWinner;
@@ -1314,27 +968,6 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
     describe('removePlayerFromMap', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-        let battleManagerServiceSpy: jasmine.SpyObj<BattleManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt']);
-            battleManagerServiceSpy = jasmine.createSpyObj('BattleManagerService', ['init']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: battleManagerServiceSpy },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should remove player from map and call continueTurn if isBattleOn is false', () => {
             const mockPlayerCharacter = new PlayerCharacter('player1');
             mockPlayerCharacter.mapEntity = {
@@ -1399,25 +1032,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('getCurrentGrid', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getCurrentGrid']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the current grid from gameMapDataManagerService', () => {
             const mockGrid: Tile[][] = [
                 [new Tile(), new Tile()],
@@ -1434,25 +1048,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('getPlayerTile', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the tile at the player’s coordinates if player is found', () => {
             const mockPlayer = new PlayerCharacter('player1');
             const playerCoordinates: Vec2 = { x: 1, y: 1 };
@@ -1477,25 +1072,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('getAdjacentActionTiles', () => {
-        let service: PlayGameBoardManagerService;
-        let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
-
-        beforeEach(() => {
-            gameMapDataManagerServiceSpy = jasmine.createSpyObj('GameMapDataManagerService', ['getNeighbours']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: gameMapDataManagerServiceSpy },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return adjacent tiles that are walkable with a player or are doors', () => {
             const tile = new Tile();
 
@@ -1547,25 +1123,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('findPlayerFromPlayerMapEntity', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the player if a matching playerMapEntity is found', () => {
             const playerMapEntity = new PlayerMapEntity('avatar');
             const mockPlayer = new PlayerCharacter('player1');
@@ -1610,25 +1167,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('findPlayerFromName', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the player if a matching name is found', () => {
             const playerName = 'player1';
             const mockPlayer = new PlayerCharacter(playerName);
@@ -1671,25 +1209,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('findPlayerFromSocketId', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return null if socketId is undefined', () => {
             const result = service.findPlayerFromSocketId(undefined);
 
@@ -1741,25 +1260,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('getCurrentPlayerTurnName', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getRoomInfo']);
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the name of the player with the currentPlayerIdTurn', () => {
             const currentPlayerIdTurn = 'socket123';
             service.currentPlayerIdTurn = currentPlayerIdTurn;
@@ -1809,34 +1309,13 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('getCurrentPlayerCharacter', () => {
-        let service: PlayGameBoardManagerService;
-        let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-
-        beforeEach(() => {
-            webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', [], {
-                socket: { id: 'socket123' },
-            });
-
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: webSocketServiceSpy },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should return the current player character if a matching player is found', () => {
             const mockPlayer = new PlayerCharacter('player1');
             spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayer);
 
             const result = service.getCurrentPlayerCharacter();
 
-            expect(service.findPlayerFromSocketId).toHaveBeenCalledWith('socket123');
+            expect(service.findPlayerFromSocketId).toHaveBeenCalledWith('userSocketId');
             expect(result).toBe(mockPlayer);
         });
 
@@ -1845,28 +1324,12 @@ describe('PlayGameBoardManagerService', () => {
 
             const result = service.getCurrentPlayerCharacter();
 
-            expect(service.findPlayerFromSocketId).toHaveBeenCalledWith('socket123');
+            expect(service.findPlayerFromSocketId).toHaveBeenCalledWith('userSocketId');
             expect(result).toBeNull();
         });
     });
 
     describe('resetManager', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should reset all manager properties to their initial values', () => {
             // Set properties to non-default values to verify reset
             service.currentTime = 100;
@@ -1889,22 +1352,6 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('continueTurn', () => {
-        let service: PlayGameBoardManagerService;
-
-        beforeEach(() => {
-            TestBed.configureTestingModule({
-                providers: [
-                    PlayGameBoardManagerService,
-                    { provide: GameMapDataManagerService, useValue: {} },
-                    { provide: TileFactoryService, useValue: {} },
-                    { provide: WebSocketService, useValue: {} },
-                    { provide: BattleManagerService, useValue: {} },
-                ],
-            });
-
-            service = TestBed.inject(PlayGameBoardManagerService);
-        });
-
         it('should call checkIfPLayerDidEverything and setupPossibleMoves if it is user’s turn and player character is present', () => {
             const mockPlayerCharacter = {} as PlayerCharacter;
 
