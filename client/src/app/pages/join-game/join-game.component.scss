@@ -105,9 +105,13 @@ body {
             background-color: darken($secondary, 10%);
         }
     }
+}
 
-    .error {
-        color: rgb(255, 77, 77);
-        margin-top: 10px;
-    }
+.error {
+    color: black;
+    margin-top: 10px;
+    position: fixed;
+    left: 50%;
+    bottom: 20%;
+    transform: translateX(-50%);
 }

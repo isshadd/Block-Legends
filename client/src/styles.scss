@@ -1,9 +1,21 @@
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
-// Plus imports for other components in your app.
+@use 'src/material-page.component.theme' as material-page;
 @import 'src/_variables.scss';
 
+@include mat.core();
+
+$indigo-pink-theme: mat.m2-define-light-theme(
+    (
+        color: (
+            primary: mat.m2-define-palette(mat.$m2-indigo-palette),
+            accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400),
+            warn: mat.m2-define-palette(mat.$m2-red-palette),
+        ),
+    )
+);
+
+@include mat.all-component-themes($indigo-pink-theme);
+@include material-page.theme($indigo-pink-theme);
 
 @font-face {
     font-family: 'Minercraftory';

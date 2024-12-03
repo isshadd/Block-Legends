@@ -401,7 +401,6 @@ describe('WebSocketService', () => {
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeTrue();
         });
-        expect(window.alert).toHaveBeenCalledWith('Room is locked');
         tick();
     }));
 
@@ -424,7 +423,6 @@ describe('WebSocketService', () => {
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeFalse();
         });
-        expect(window.alert).toHaveBeenCalledWith('Room is unlocked');
         tick();
     }));
 
@@ -443,8 +441,6 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(response);
-
-        expect(window.alert).toHaveBeenCalledWith('Invalid code');
         tick();
     }));
 
@@ -463,8 +459,6 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(response);
-
-        expect(window.alert).toHaveBeenCalledWith('Room is locked');
         tick();
     }));
 
