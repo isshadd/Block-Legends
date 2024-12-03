@@ -1,5 +1,3 @@
-// src/app/services/item-factory.service.spec.ts
-
 import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';

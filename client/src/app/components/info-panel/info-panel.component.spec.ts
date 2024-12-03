@@ -95,7 +95,6 @@ describe('InfoPanelComponent', () => {
         fixture.detectChanges(); // Trigger change detection after setting tile
 
         expect(component.getPlayer()).toBe(mockPlayerCharacter);
-        // expect(mockPlayGameBoardManagerService.findPlayerFromPlayerMapEntity).toHaveBeenCalledWith(mockPlayerCharacter.mapEntity);
     });
 
     it('should return null if getPlayer() is called on WalkableTile with no player', () => {

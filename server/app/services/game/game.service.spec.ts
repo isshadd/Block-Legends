@@ -11,7 +11,6 @@ import { GameService } from './game.service';
 describe('GameService', () => {
     let gameService: GameService;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    // let gameValidationService: GameValidationService;
     let mockGameModel: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const mockValidationService = {
@@ -40,7 +39,6 @@ describe('GameService', () => {
         }).compile();
 
         gameService = module.get<GameService>(GameService);
-        // gameValidationService = module.get<GameValidationService>(GameValidationService);
     });
 
     it('should be defined', () => {
