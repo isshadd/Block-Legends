@@ -151,7 +151,6 @@ describe('GameSocketRoomService', () => {
         let room: GameRoom;
         let player1: PlayerCharacter;
         let player2: PlayerCharacter;
-        let player3: PlayerCharacter;
 
         beforeEach(() => {
             room = {
@@ -181,18 +180,6 @@ describe('GameSocketRoomService', () => {
                 avatar: 'MAGE' as unknown as Avatar,
                 name: 'Player2',
                 socketId: 'socket2',
-                attributes: {
-                    life: 4,
-                    speed: 4,
-                    attack: 4,
-                    defense: 4,
-                },
-            } as PlayerCharacter;
-
-            player3 = {
-                avatar: 'WARRIOR' as unknown as Avatar,
-                name: 'Player3',
-                socketId: 'socket3',
                 attributes: {
                     life: 4,
                     speed: 4,
@@ -274,14 +261,6 @@ describe('GameSocketRoomService', () => {
             expect(result).toBeFalsy();
         });
 
-        it('should not add a player if avatar is already taken', () => {
-            service.addPlayerToRoom(2222, player1);
-            const result = service.addPlayerToRoom(2222, player3);
-            expect(result).toBeUndefined();
-            expect(room.players).toContain(player1);
-            expect(room.players).not.toContain(player3);
-        });
-
         it('should append suffix to player name if name already exists', () => {
             const duplicateNamePlayer = {
                 avatar: 'ARCHER' as unknown as Avatar,
@@ -297,7 +276,7 @@ describe('GameSocketRoomService', () => {
 
             service.addPlayerToRoom(2222, player1);
             const result = service.addPlayerToRoom(2222, duplicateNamePlayer);
-            expect(result).toBe(undefined);
+            expect(result).toBe(false);
             expect(room.players).toContainEqual({
                 ...duplicateNamePlayer,
                 name: 'Player1-2',

@@ -35,7 +35,7 @@ export class GameStatisticsService {
     };
     currentGrid: Tile[][] = [];
 
-    private readonly percentageMutltiplier = 100;
+    readonly percentageMutltiplier = 100;
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
@@ -101,6 +101,10 @@ export class GameStatisticsService {
     }
 
     getGameDoorsInteractedPercentage(): number {
+        if (this.gameMapDataManagerService.getDoorsCount() === 0) {
+            return 0;
+        }
+
         return Math.round(
             (this.gameStatistics.totalDoorsInteracted.length / this.gameMapDataManagerService.getDoorsCount()) * this.percentageMutltiplier,
         );

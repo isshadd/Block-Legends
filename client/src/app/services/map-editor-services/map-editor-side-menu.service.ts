@@ -93,11 +93,7 @@ export class MapEditorSideMenuService {
         foundItem.itemLimit += amount;
         if (this.isNormalItem(item)) this.updateTotalItemLimitCounter(amount);
 
-        if (foundItem.itemLimit === 0) {
-            foundItem.visibleState = VisibleState.Disabled;
-        } else {
-            foundItem.visibleState = VisibleState.NotSelected;
-        }
+        foundItem.visibleState = foundItem.itemLimit === 0 ? VisibleState.Disabled : VisibleState.NotSelected;
 
         return foundItem;
     }
@@ -121,12 +117,7 @@ export class MapEditorSideMenuService {
     }
 
     sideMenuTileFinder(tileType: TileType): Tile | null {
-        for (const searchedTile of this.placeableEntitiesSections[0].entities) {
-            if ((searchedTile as Tile).type === tileType) {
-                return searchedTile as Tile;
-            }
-        }
-        return null;
+        return (this.placeableEntitiesSections[0].entities.find((searchedTile) => (searchedTile as Tile).type === tileType) as Tile) || null;
     }
 
     sideMenuItemFinder(itemType: ItemType): Item | null {
@@ -139,29 +130,23 @@ export class MapEditorSideMenuService {
     }
 
     sideMenuEntityFinder(entity: PlaceableEntity) {
-        const foundTile = this.sideMenuTileFinder((entity as Tile).type) as Tile | null;
-        if (foundTile) return foundTile;
-
-        const foundItem = this.sideMenuItemFinder((entity as Item).type) as Item | null;
-        if (foundItem) return foundItem;
-
-        return null;
+        return this.sideMenuTileFinder((entity as Tile).type) || this.sideMenuItemFinder((entity as Item).type);
     }
 
     sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
-            if (item.visibleState === VisibleState.NotSelected && (item as Item).type !== ItemType.Spawn && (item as Item).type !== ItemType.Flag) {
+            if (item.visibleState === VisibleState.NotSelected && this.isNormalItem(item as Item)) {
                 item.visibleState = VisibleState.Disabled;
             }
         }
     }
 
     sideMenuItemsEnabler() {
-        for (const item of this.placeableEntitiesSections[1].entities) {
+        this.placeableEntitiesSections[1].entities.forEach((item) => {
             if ((item as Item).itemLimit > 0) {
                 item.visibleState = VisibleState.NotSelected;
             }
-        }
+        });
     }
 
     onSideMenuMouseEnter(entity: PlaceableEntity) {
