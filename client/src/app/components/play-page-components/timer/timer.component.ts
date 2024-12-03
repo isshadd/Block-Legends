@@ -12,9 +12,6 @@ export class TimerComponent {
     @Input() isBattle: boolean = false;
 
     formatTime(): string {
-        if (this.isBattle) {
-            return 'Combat en cours';
-        }
-        return `${this.playerTurnName} ${this.seconds.toString()}`;
+        return this.isBattle ? 'Combat en cours' : `${this.playerTurnName} ${this.seconds}`;
     }
 }

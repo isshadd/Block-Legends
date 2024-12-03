@@ -92,6 +92,10 @@ export class GameSocketRoomService {
                 isUnique = true;
             }
         }
+        return this.getNewRoom(accessCode, gameId, playerOrganizer);
+    }
+
+    getNewRoom(accessCode: number, gameId: string, playerOrganizer: PlayerCharacter): GameRoom {
         const newRoom: GameRoom = {
             id: gameId,
             accessCode,
@@ -101,6 +105,7 @@ export class GameSocketRoomService {
             maxPlayers: 0,
             currentPlayerTurn: playerOrganizer.socketId,
         };
+
         this.rooms.set(accessCode, newRoom);
         this.playerRooms.set(playerOrganizer.socketId, accessCode);
         this.initRoomGameBoard(accessCode);
@@ -114,6 +119,7 @@ export class GameSocketRoomService {
             totalDoorsInteracted: [],
             totalPlayersThatGrabbedFlag: [],
         });
+
         return newRoom;
     }
 
@@ -131,54 +137,56 @@ export class GameSocketRoomService {
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && !room.isLocked) {
-            const existingAvatars = room.players.map((p) => p.avatar.name);
-            if (existingAvatars.includes(player.avatar.name)) {
-                return;
-            }
-
-            const existingNames = room.players.map((p) => p.name);
-            const baseName = player.name;
-            let suffix = 1;
-            while (existingNames.includes(player.name)) {
-                suffix++;
-                player.name = `${baseName}-${suffix}`;
-            }
-
-            room.players.push(player);
-            this.playerRooms.set(player.socketId, accessCode);
-            return true;
+        if (!room || room.isLocked) {
+            return false;
         }
-        return false;
+
+        if (room.players.some((p) => p.avatar.name === player.avatar.name)) {
+            return false;
+        }
+
+        player.name = this.getUniquePlayerName(player, room);
+
+        room.players.push(player);
+        this.playerRooms.set(player.socketId, accessCode);
+        return true;
+    }
+
+    getUniquePlayerName(player: PlayerCharacter, room: GameRoom): string {
+        let uniqueName = player.name;
+        let suffix = 1;
+        while (room.players.some((p) => p.name === uniqueName)) {
+            uniqueName = `${player.name}-${suffix++}`;
+        }
+        return uniqueName;
     }
 
     removePlayerFromRoom(socketId: string): void {
         const accessCode = this.playerRooms.get(socketId);
-        if (accessCode) {
-            const room = this.rooms.get(accessCode);
+        if (!accessCode) return;
 
-            if (room) {
-                this.signalPlayerLeftRoom.next({ accessCode, playerSocketId: socketId });
+        const room = this.rooms.get(accessCode);
+        if (!room) return;
 
-                room.players = room.players.filter((player) => player.socketId !== socketId);
-                this.playerRooms.delete(socketId);
+        this.signalPlayerLeftRoom.next({ accessCode, playerSocketId: socketId });
 
-                if (room.players.length === 0) {
-                    this.rooms.delete(accessCode);
-                    this.gameBoardRooms.delete(accessCode);
-                    this.gameTimerRooms.delete(accessCode);
-                    this.gameBattleRooms.delete(accessCode);
-                    this.gameStatisticsRooms.delete(accessCode);
-                } else if (room.organizer === socketId) {
-                    room.organizer = room.players[0].socketId;
-                }
-            }
+        room.players = room.players.filter((player) => player.socketId !== socketId);
+        this.playerRooms.delete(socketId);
+
+        if (room.players.length === 0) {
+            this.rooms.delete(accessCode);
+            this.gameBoardRooms.delete(accessCode);
+            this.gameTimerRooms.delete(accessCode);
+            this.gameBattleRooms.delete(accessCode);
+            this.gameStatisticsRooms.delete(accessCode);
+        } else if (room.organizer === socketId) {
+            room.organizer = room.players[0].socketId;
         }
     }
 
     lockRoom(accessCode: number, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId) {
+        if (room?.organizer === clientId) {
             room.isLocked = true;
             return true;
         }
@@ -187,7 +195,7 @@ export class GameSocketRoomService {
 
     unlockRoom(accessCode: number, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
+        if (room?.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
             return true;
         }
@@ -196,7 +204,7 @@ export class GameSocketRoomService {
 
     kickPlayer(accessCode: number, playerSocketId: string, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId) {
+        if (room?.organizer === clientId) {
             this.removePlayerFromRoom(playerSocketId);
             return true;
         }

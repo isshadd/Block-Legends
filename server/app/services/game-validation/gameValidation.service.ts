@@ -55,15 +55,7 @@ export class GameValidationService {
     }
 
     async getNumberOfSpawnPoints(game: Game): Promise<number> {
-        let count = 0;
-        for (const row of game.tiles) {
-            for (const tile of row) {
-                if (tile.item && tile.item.type === ItemType.Spawn) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return game.tiles.flat().filter((tile) => tile.item?.type === ItemType.Spawn).length;
     }
 
     async assignGameToRightType(game: Game | UpdateGameDto): Promise<Game> {
@@ -179,56 +171,30 @@ export class GameValidationService {
     }
 
     async validateGameName(game: Game): Promise<boolean> {
-        const normalizedName = game.name.trim();
-        const existingGame = await this.gameService.getGameByName(normalizedName);
-
-        if (!existingGame || (game._id && game._id === existingGame._id)) {
-            return true; // Name is unique
-        }
-
-        return false;
+        const existingGame = await this.gameService.getGameByName(game.name.trim());
+        return !existingGame || existingGame._id === game._id;
     }
+
     async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
         const normalizedName = game.name.trim();
         const foundGame = await this.gameService.getGameByName(normalizedName);
-
-        if (foundGame) {
-            const valid = JSON.stringify(foundGame._id) === JSON.stringify(id);
-            return valid;
-        } else {
-            return !foundGame;
-        }
+        return !foundGame || foundGame._id === id;
     }
 
     async validateDescription(game: Game | UpdateGameDto): Promise<boolean> {
-        const description = game.description.trim();
-        const descriptionValid = description.length > 0;
-        if (game.name.length === 0) {
-            return false;
-        }
-        return descriptionValid;
+        return game.name.length > 0 && game.description.trim().length > 0;
     }
-
     async isHalfMapTilesValid(game: Game | UpdateGameDto): Promise<boolean> {
-        let terrainTileCount = 0;
         const gameToValidate = await this.assignGameToRightType(game);
-        gameToValidate.tiles.forEach((row) => {
-            row.forEach((tile) => {
-                if (tile.type === TileType.Grass || tile.type === TileType.Water || tile.type === TileType.Ice) {
-                    terrainTileCount++;
-                }
-            });
-        });
-
-        const totalTiles = gameToValidate.size * gameToValidate.size;
+        const terrainTileCount = gameToValidate.tiles
+            .flat()
+            .filter((tile) => [TileType.Grass, TileType.Water, TileType.Ice].includes(tile.type)).length;
+        const totalTiles = gameToValidate.size ** 2;
         return terrainTileCount > totalTiles / 2;
     }
 
     async isTileTerrain(tile: Tile) {
-        let isTerrain = tile.type === TileType.Grass;
-        isTerrain = isTerrain || tile.type === TileType.Water;
-        isTerrain = isTerrain || tile.type === TileType.Ice;
-        return isTerrain;
+        return [TileType.Grass, TileType.Water, TileType.Ice].includes(tile.type);
     }
 
     async isTileWall(tile: Tile) {
@@ -236,10 +202,8 @@ export class GameValidationService {
     }
 
     async isDoorPlacementValid(game: Game | UpdateGameDto): Promise<boolean> {
-        for (let i = 0; i < game.tiles.length; i++) {
-            for (let j = 0; j < game.tiles[i].length; j++) {
-                const tile = game.tiles[i][j];
-
+        for (const [i, row] of game.tiles.entries()) {
+            for (const [j, tile] of row.entries()) {
                 if (tile.type === TileType.Door) {
                     if (this.isEdgeTile(game, i, j) || !(await this.isDoorValid(game, i, j))) {
                         return false;
@@ -264,12 +228,12 @@ export class GameValidationService {
             return false;
         }
 
-        const wallLeft = await this.isTileWall(game.tiles[i - 1][j]); // Wall to the left
-        const wallRight = await this.isTileWall(game.tiles[i + 1][j]); // Wall to the right
-        const terrainAbove = await this.isTileTerrain(game.tiles[i][j - 1]); // Terrain above
-        const terrainBelow = await this.isTileTerrain(game.tiles[i][j + 1]); // Terrain below
-
-        return wallLeft && wallRight && terrainAbove && terrainBelow;
+        return (
+            (await this.isTileWall(game.tiles[i - 1][j])) &&
+            (await this.isTileWall(game.tiles[i + 1][j])) &&
+            (await this.isTileTerrain(game.tiles[i][j - 1])) &&
+            (await this.isTileTerrain(game.tiles[i][j + 1]))
+        );
     }
 
     async isVerticalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
