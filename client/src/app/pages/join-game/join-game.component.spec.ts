@@ -16,7 +16,7 @@ describe('JoinGameComponent', () => {
 
     beforeEach(async () => {
         avatarTakenErrorSubject = new Subject<string>();
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['init', 'joinGame'], {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['init', 'joinGame', 'on'], {
             avatarTakenError$: avatarTakenErrorSubject.asObservable(),
             socket: jasmine.createSpyObj('Socket', ['on']),
         });
@@ -42,7 +42,6 @@ describe('JoinGameComponent', () => {
     // Test for ngOnInit and error subscription
     it('should handle avatar taken error message', fakeAsync(() => {
         const errorMessage = 'Avatar already taken';
-        spyOn(window, 'alert');
 
         avatarTakenErrorSubject.next(errorMessage);
         tick();
@@ -52,7 +51,6 @@ describe('JoinGameComponent', () => {
 
     // Tests for joinGame method
     it('should show error message when access code is null', () => {
-        component.accessCode = null;
         component.joinGame();
         expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
         expect(webSocketServiceSpy.joinGame).not.toHaveBeenCalled();
