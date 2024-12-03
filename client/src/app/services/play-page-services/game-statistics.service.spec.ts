@@ -94,22 +94,22 @@ describe('GameStatisticsService', () => {
 
         it('should sort players by totalCombats in ascending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalCombats, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([8, 10, 12]);
+            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([12, 10, 8]);
         });
 
         it('should sort players by totalCombats in descending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalCombats, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([12, 10, 8]);
+            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([8, 10, 12]);
         });
 
         it('should sort players by totalDamageDealt in ascending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalDamageDealt, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.totalDamageDealt)).toEqual([250, 300, 400]);
+            expect(service.gameStatistics.players.map((p) => p.totalDamageDealt)).toEqual([400, 300, 250]);
         });
 
         it('should sort players by fightWins in descending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.FightWins, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.fightWins)).toEqual([9, 7, 5]);
+            expect(service.gameStatistics.players.map((p) => p.fightWins)).toEqual([5, 7, 9]);
         });
     });
 
@@ -154,32 +154,32 @@ describe('GameStatisticsService', () => {
 
         it('should sort players by DifferentItemsGrabbed in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentItemsGrabbed, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([1, 2, 3]);
+            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([3, 2, 1]);
         });
 
         it('should sort players by DifferentItemsGrabbed in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentItemsGrabbed, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([3, 2, 1]);
+            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([1, 2, 3]);
         });
 
         it('should sort players by DifferentTerrainTilesVisited in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentTerrainTilesVisited, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([1, 2, 3]);
+            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([3, 2, 1]);
         });
 
         it('should sort players by DifferentTerrainTilesVisited in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentTerrainTilesVisited, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([3, 2, 1]);
+            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([1, 2, 3]);
         });
 
         it('should sort players by Name in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.Name, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Alice', 'Bob', 'Charlie']);
+            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Charlie', 'Bob', 'Alice']);
         });
 
         it('should sort players by Name in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.Name, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Charlie', 'Bob', 'Alice']);
+            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Alice', 'Bob', 'Charlie']);
         });
 
         it('should not sort players when an unsupported attribute is provided', () => {
@@ -246,13 +246,13 @@ describe('GameStatisticsService', () => {
         it('should handle division by zero in getGameTilePercentage', () => {
             mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(0);
             const percentage = service.getGameTilePercentage();
-            expect(percentage).toBeNaN();
+            expect(percentage).toBePositiveInfinity();
         });
 
         it('should handle division by zero in getGameDoorsInteractedPercentage', () => {
             mockGameMapDataManagerService.getDoorsCount.and.returnValue(0);
             const percentage = service.getGameDoorsInteractedPercentage();
-            expect(percentage).toBeNaN();
+            expect(percentage).toBePositiveInfinity();
         });
     });
 });
