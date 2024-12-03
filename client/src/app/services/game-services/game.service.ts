@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { AvatarService } from '@app/services/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
+import { DiceType } from '@common/enums/dice-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, Subject } from 'rxjs';
 
@@ -68,13 +69,12 @@ export class GameService {
 
         virtualPlayer.socketId = `${Math.random().toString(THIRTY_SIX).substr(1, NINE)}_${Math.random().toString(THIRTY_SIX).substr(2, NINE)}`;
 
-        const diceOptions = ['attack', 'defense'];
-        const bonusDice = diceOptions[Math.floor(Math.random() * diceOptions.length)];
+        const bonusDice = Math.random() > 0.5 ? DiceType.Attack : DiceType.Defense;
         switch (bonusDice) {
-            case 'attack':
+            case DiceType.Attack:
                 virtualPlayer.assignAttackDice();
                 break;
-            case 'defense':
+            case DiceType.Defense:
                 virtualPlayer.assignDefenseDice();
                 break;
         }
