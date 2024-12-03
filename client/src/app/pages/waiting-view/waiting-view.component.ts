@@ -81,6 +81,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 });
             } else {
                 this.playersCounter++;
+                this.chatService.setCharacter(character);
+                this.eventJournalService.setCharacter(character);
                 this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
@@ -184,6 +186,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent('toggleView', []);
+        this.eventJournalService.broadcastEvent(`${this.chatService.player.socketId}`, []);
     }
 }

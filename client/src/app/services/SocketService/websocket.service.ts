@@ -9,7 +9,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
-import { RoomMessage } from '@common/interfaces/roomMessage';
+import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -17,6 +17,7 @@ import { AvatarService } from '../avatar.service';
 // eslint-disable-next-line no-restricted-imports
 // This line is necessary for the import of WebsocketService
 import { DebugService } from '../debug.service';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
 
 @Injectable({
     providedIn: 'root',
@@ -35,8 +36,8 @@ export class WebSocketService {
     avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
 
     currentRoom: GameRoom;
-    chatRoom: GameRoom;
     isGameFinished = false;
+    colorCounter = 0;
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,
@@ -63,7 +64,7 @@ export class WebSocketService {
         this.socket.emit(ChatEvents.RoomMessage, roomMessage);
     }
 
-    sendEventToRoom(event: string, players: string[]): void {
+    sendEventToRoom(event: string, players: PlayerCharacter[]): void {
         const time = this.eventJournalService.serverClock;
         const roomID = this.eventJournalService.roomID;
         const content = event;
@@ -73,11 +74,6 @@ export class WebSocketService {
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
-
-    registerPlayer(playerName: string): void {
-        this.socket.emit(ChatEvents.RegisterPlayer, playerName);
-    }
-
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
         this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
@@ -193,6 +189,7 @@ export class WebSocketService {
             if (!player.isVirtual) {
                 this.gameService.setCharacter(player);
             }
+
             this.router.navigate(['/waiting-view']);
         });
 
@@ -265,10 +262,6 @@ export class WebSocketService {
             });
         });
 
-        // this.socket.on('avatarTakenError', (data) => {
-        //     this.avatarTakenErrorSubject.next(data.message);
-        // });
-
         this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);
         });
@@ -278,12 +271,12 @@ export class WebSocketService {
             this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
+        this.socket.on(ChatEvents.EventReceived, (data: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
         });
 
-        this.socket.on(ChatEvents.RoomMessage, (message: string) => {
+        this.socket.on(ChatEvents.RoomMessage, (message: RoomMessageReceived) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });

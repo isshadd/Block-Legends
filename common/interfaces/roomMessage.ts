@@ -4,3 +4,7 @@ export interface RoomMessage {
     sender: string; 
     content: string;
 }
+
+export interface RoomMessageReceived extends RoomMessage {
+    senderId: string;
+}
