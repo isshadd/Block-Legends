@@ -341,6 +341,10 @@ export class VirtualPlayerManagerService {
                         priority = this.getDefensivePlayerItemPriority(item.type);
                     }
 
+                    if (this.isInventoryFull(virtualPlayer) && !this.isNewItemBetterThanOthersInInventory(virtualPlayer, item)) {
+                        continue;
+                    }
+
                     const distance = this.calculateDistance(virtualPlayer.mapEntity.coordinates, possibleMove.coordinates);
 
                     if (priority > highestPriority || (priority === highestPriority && distance < minDistance)) {
@@ -353,6 +357,29 @@ export class VirtualPlayerManagerService {
         }
 
         return nearestTile;
+    }
+
+    isInventoryFull(player: PlayerCharacter): boolean {
+        const fullInventorySize = 2;
+        return player.inventory.length >= fullInventorySize;
+    }
+
+    isNewItemBetterThanOthersInInventory(player: PlayerCharacter, item: Item): boolean {
+        if (player.comportement === ProfileEnum.Agressive) {
+            for (const inventoryItem of player.inventory) {
+                if (this.getAggressivePlayerItemPriority(item.type) > this.getAggressivePlayerItemPriority(inventoryItem.type)) {
+                    return true;
+                }
+            }
+        } else if (player.comportement === ProfileEnum.Defensive) {
+            for (const inventoryItem of player.inventory) {
+                if (this.getDefensivePlayerItemPriority(item.type) > this.getDefensivePlayerItemPriority(inventoryItem.type)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     getAggressivePlayerItemPriority(itemType: ItemType): number {
@@ -451,18 +478,17 @@ export class VirtualPlayerManagerService {
     }
 
     throwItemInListAndKeepTheRest(player: PlayerCharacter, possibleItems: Item[], nextPathTile: Tile) {
-        let itemToKeep: Item;
+        let itemToThrow: Item | null = null;
         if (player.comportement === ProfileEnum.Agressive) {
-            itemToKeep = possibleItems.reduce((prev, current) =>
-                this.getAggressivePlayerItemPriority(prev.type) >= this.getAggressivePlayerItemPriority(current.type) ? prev : current,
+            itemToThrow = possibleItems.reduce((prev, current) =>
+                this.getAggressivePlayerItemPriority(prev.type) < this.getAggressivePlayerItemPriority(current.type) ? prev : current,
             );
         } else if (player.comportement === ProfileEnum.Defensive) {
-            itemToKeep = possibleItems.reduce((prev, current) =>
-                this.getDefensivePlayerItemPriority(prev.type) >= this.getDefensivePlayerItemPriority(current.type) ? prev : current,
+            itemToThrow = possibleItems.reduce((prev, current) =>
+                this.getDefensivePlayerItemPriority(prev.type) < this.getDefensivePlayerItemPriority(current.type) ? prev : current,
             );
         }
 
-        const itemToThrow = possibleItems.find((item) => item !== itemToKeep);
         if (itemToThrow) {
             this.throwItem(player, possibleItems, itemToThrow, nextPathTile);
         }
