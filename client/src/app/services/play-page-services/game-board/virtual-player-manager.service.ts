@@ -123,7 +123,6 @@ export class VirtualPlayerManagerService {
             if (targetItemTile) {
                 targetTile = targetItemTile;
             } else {
-                // TODO : Check for closed Doors
                 const targetDoorTile = this.findNearestClosedDoor(player, possibleMoves);
                 if (targetDoorTile) {
                     targetTile = targetDoorTile;
@@ -134,12 +133,6 @@ export class VirtualPlayerManagerService {
                     } else {
                         this.signalVirtualPlayerEndedTurn.next(player.socketId);
                     }
-                }
-                if (didTurnStarted) {
-                    const possibleMovesArray = Array.from(possibleMoves.keys());
-                    targetTile = possibleMovesArray[Math.floor(Math.random() * possibleMovesArray.length)];
-                } else {
-                    this.signalVirtualPlayerEndedTurn.next(player.socketId);
                 }
             }
         }
@@ -266,7 +259,6 @@ export class VirtualPlayerManagerService {
         let nearestOpenDoor: OpenDoor | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
-        // TODO: Fix this
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove instanceof OpenDoor) {
                 const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
@@ -293,35 +285,17 @@ export class VirtualPlayerManagerService {
         return nearestOpenDoor;
     }
 
-    findNearestClosedDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): DoorTile | null {
-        let nearestDoor: DoorTile | null = null;
-        let minDistance = Number.MAX_SAFE_INTEGER;
-
+    findNearestClosedDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
         for (const possibleMove of possibleMoves.keys()) {
-            if (possibleMove instanceof DoorTile) {
-                const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestDoor = possibleMove;
+            const adjacentTiles = this.gameMapDataManagerService.getNeighbours(possibleMove);
+            for (const adjacentTile of adjacentTiles) {
+                if (adjacentTile instanceof DoorTile) {
+                    return possibleMove as WalkableTile;
                 }
             }
         }
 
-        if (nearestDoor) {
-            const adjacentTiles = this.gameMapDataManagerService.getNeighbours(nearestDoor);
-            const accessibleTiles = adjacentTiles.filter(
-                (tile) =>
-                    tile instanceof WalkableTile &&
-                    (!tile.hasPlayer() || (tile.player && this.playGameBoardManagerService.findPlayerFromPlayerMapEntity(tile.player) !== player)) &&
-                    Array.from(possibleMoves.keys()).some((possibleMoveTile) => this.areTilesEqual(possibleMoveTile, tile)),
-            );
-
-            if (accessibleTiles.length > 0) {
-                nearestDoor = accessibleTiles[0] as OpenDoor;
-            }
-        }
-
-        return nearestDoor;
+        return null;
     }
 
     findNearestPossiblePlayer(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
