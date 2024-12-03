@@ -32,7 +32,6 @@ const mockLogger = {
     warn: jest.fn(),
 };
 
-// Création d'un mock serveur Socket.io
 const mockServer: Partial<Server> = {
     to: jest.fn().mockReturnThis(),
     emit: jest.fn(),

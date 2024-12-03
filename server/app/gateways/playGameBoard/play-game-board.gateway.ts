@@ -1,3 +1,4 @@
+//this file is responsible for handling the game board events and managing the game board state, because of that it cannot be refactored, so next line is necessary
 /* eslint-disable max-lines */
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';

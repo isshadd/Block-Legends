@@ -112,19 +112,6 @@ describe('EventJournalComponent', () => {
                 associatedPlayers,
             });
         });
-
-        // it('should handle null associated players', () => {
-        //     const newEvent = 'testEvent';
-        //     const nullPlayers = null as unknown;
-
-        //     component.addEvent(newEvent, nullPlayers);
-
-        //     expect(component.events.length).toBe(1);
-        //     expect(component.events[0]).toEqual({
-        //         event: newEvent,
-        //         associatedPlayers: nullPlayers,
-        //     });
-        // });
     });
 
     describe('filtered events update', () => {

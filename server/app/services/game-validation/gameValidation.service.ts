@@ -128,7 +128,7 @@ export class GameValidationService {
         visited[initialX][initialY] = true;
 
         while (queue.length > 0) {
-            const [x, y] = queue.shift(); // Obtenir la première case de la file
+            const [x, y] = queue.shift(); 
             for (const [dx, dy] of Directions) {
                 const nx = x + dx;
                 const ny = y + dy;

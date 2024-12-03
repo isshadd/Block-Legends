@@ -1,3 +1,4 @@
+// next line necessary for testing the service
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Game } from '@app/model/database/game';
 import { CreateGameDto } from '@app/model/dto/game/create-game.dto';
