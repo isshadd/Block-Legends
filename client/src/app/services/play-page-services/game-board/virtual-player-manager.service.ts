@@ -229,17 +229,14 @@ export class VirtualPlayerManagerService {
         let maxDistance = 0;
 
         for (const possibleMove of possibleMoves.keys()) {
-            let minDistanceToAnyPlayer = Number.MAX_SAFE_INTEGER;
-
-            for (const otherPlayer of players) {
-                if (otherPlayer.socketId !== player.socketId) {
-                    const playerTile = this.gameMapDataManagerService.getTileAt(otherPlayer.mapEntity.coordinates) as Tile;
-                    const distance = this.calculateDistance(possibleMove.coordinates, playerTile.coordinates);
-                    if (distance < minDistanceToAnyPlayer) {
-                        minDistanceToAnyPlayer = distance;
-                    }
-                }
-            }
+            const minDistanceToAnyPlayer = Math.min(
+                ...players
+                    .filter((otherPlayer) => otherPlayer.socketId !== player.socketId)
+                    .map((otherPlayer) => {
+                        const playerTile = this.gameMapDataManagerService.getTileAt(otherPlayer.mapEntity.coordinates) as Tile;
+                        return this.calculateDistance(possibleMove.coordinates, playerTile.coordinates);
+                    }),
+            );
 
             if (minDistanceToAnyPlayer > maxDistance) {
                 maxDistance = minDistanceToAnyPlayer;
@@ -257,17 +254,15 @@ export class VirtualPlayerManagerService {
 
     findNearestOpenDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): OpenDoor | null {
         let nearestOpenDoor: OpenDoor | null = null;
-        let minDistance = Number.MAX_SAFE_INTEGER;
 
-        for (const possibleMove of possibleMoves.keys()) {
-            if (possibleMove instanceof OpenDoor) {
-                const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestOpenDoor = possibleMove;
-                }
-            }
-        }
+        nearestOpenDoor = Array.from(possibleMoves.keys())
+            .filter((tile) => tile instanceof OpenDoor)
+            .reduce((closest: OpenDoor | null, tile: Tile) => {
+                const distance = this.calculateDistance(player.mapEntity.coordinates, tile.coordinates);
+                return distance < (closest ? this.calculateDistance(player.mapEntity.coordinates, closest.coordinates) : Number.MAX_SAFE_INTEGER)
+                    ? (tile as OpenDoor)
+                    : closest;
+            }, null);
 
         if (nearestOpenDoor) {
             const adjacentTiles = this.gameMapDataManagerService.getNeighbours(nearestOpenDoor);
@@ -286,16 +281,10 @@ export class VirtualPlayerManagerService {
     }
 
     findNearestClosedDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
-        for (const possibleMove of possibleMoves.keys()) {
-            const adjacentTiles = this.gameMapDataManagerService.getNeighbours(possibleMove);
-            for (const adjacentTile of adjacentTiles) {
-                if (adjacentTile instanceof DoorTile) {
-                    return possibleMove as WalkableTile;
-                }
-            }
-        }
-
-        return null;
+        const moves = Array.from(possibleMoves.keys()).find((move) =>
+            this.gameMapDataManagerService.getNeighbours(move).some((tile) => tile instanceof DoorTile),
+        );
+        return moves as WalkableTile | null;
     }
 
     findNearestPossiblePlayer(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
@@ -303,24 +292,21 @@ export class VirtualPlayerManagerService {
         let nearestTile: WalkableTile | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
-        for (const player of players) {
-            if (player.socketId !== virtualPlayer.socketId) {
+        players
+            .filter((player) => player.socketId !== virtualPlayer.socketId)
+            .forEach((player) => {
                 const playerTile = this.gameMapDataManagerService.getTileAt(player.mapEntity.coordinates) as Tile;
-                const adjacentTilesToPlayer = this.gameMapDataManagerService.getNeighbours(playerTile);
-
-                const reachableAdjacentTiles = adjacentTilesToPlayer.filter((adjacentTile) =>
-                    Array.from(possibleMoves.keys()).some((possibleMoveTile) => this.areTilesEqual(possibleMoveTile, adjacentTile)),
-                );
-
-                for (const reachableAdjacentTile of reachableAdjacentTiles) {
-                    const distance = this.calculateDistance(virtualPlayer.mapEntity.coordinates, reachableAdjacentTile.coordinates);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestTile = reachableAdjacentTile as WalkableTile;
-                    }
-                }
-            }
-        }
+                this.gameMapDataManagerService
+                    .getNeighbours(playerTile)
+                    .filter((tile) => possibleMoves.has(tile))
+                    .forEach((tile) => {
+                        const distance = this.calculateDistance(virtualPlayer.mapEntity.coordinates, tile.coordinates);
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            nearestTile = tile as WalkableTile;
+                        }
+                    });
+            });
 
         return nearestTile;
     }
@@ -366,17 +352,13 @@ export class VirtualPlayerManagerService {
 
     isNewItemBetterThanOthersInInventory(player: PlayerCharacter, item: Item): boolean {
         if (player.comportement === ProfileEnum.Agressive) {
-            for (const inventoryItem of player.inventory) {
-                if (this.getAggressivePlayerItemPriority(item.type) > this.getAggressivePlayerItemPriority(inventoryItem.type)) {
-                    return true;
-                }
-            }
+            return player.inventory.some(
+                (inventoryItem) => this.getAggressivePlayerItemPriority(item.type) > this.getAggressivePlayerItemPriority(inventoryItem.type),
+            );
         } else if (player.comportement === ProfileEnum.Defensive) {
-            for (const inventoryItem of player.inventory) {
-                if (this.getDefensivePlayerItemPriority(item.type) > this.getDefensivePlayerItemPriority(inventoryItem.type)) {
-                    return true;
-                }
-            }
+            return player.inventory.some(
+                (inventoryItem) => this.getDefensivePlayerItemPriority(item.type) > this.getDefensivePlayerItemPriority(inventoryItem.type),
+            );
         }
 
         return false;
@@ -389,7 +371,7 @@ export class VirtualPlayerManagerService {
             [ItemType.Totem]: 8,
         };
 
-        return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;
+        return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 1;
     }
 
     getDefensivePlayerItemPriority(itemType: ItemType): number {
@@ -400,7 +382,7 @@ export class VirtualPlayerManagerService {
             [ItemType.EnchantedBook]: 8,
         };
 
-        return DEFENSIVE_PRIORITY[itemType as keyof typeof DEFENSIVE_PRIORITY] || 0;
+        return DEFENSIVE_PRIORITY[itemType as keyof typeof DEFENSIVE_PRIORITY] || 1;
     }
 
     calculateDistance(from: Vec2, to: Vec2): number {

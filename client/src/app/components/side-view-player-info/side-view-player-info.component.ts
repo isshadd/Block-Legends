@@ -33,12 +33,7 @@ export class SideViewPlayerInfoComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.playerCharacter.dice === DiceType.Attack) {
-            this.attackDice = 'D6';
-            this.defenseDice = 'D4';
-        } else {
-            this.attackDice = 'D4';
-            this.defenseDice = 'D6';
-        }
+        this.attackDice = this.playerCharacter.dice === DiceType.Attack ? 'D6' : 'D4';
+        this.defenseDice = this.playerCharacter.dice === DiceType.Attack ? 'D4' : 'D6';
     }
 }
