@@ -117,9 +117,7 @@ export class MapEditorSideMenuService {
     }
 
     sideMenuTileFinder(tileType: TileType): Tile | null {
-        return this.placeableEntitiesSections[0].entities.find(
-            (searchedTile) => (searchedTile as Tile).type === tileType
-        ) as Tile || null;
+        return (this.placeableEntitiesSections[0].entities.find((searchedTile) => (searchedTile as Tile).type === tileType) as Tile) || null;
     }
 
     sideMenuItemFinder(itemType: ItemType): Item | null {
@@ -138,15 +136,15 @@ export class MapEditorSideMenuService {
     sideMenuItemsDisabler() {
         for (const item of this.placeableEntitiesSections[1].entities) {
             if (item.visibleState === VisibleState.NotSelected && this.isNormalItem(item as Item)) {
-            item.visibleState = VisibleState.Disabled;
+                item.visibleState = VisibleState.Disabled;
             }
         }
     }
 
     sideMenuItemsEnabler() {
-        this.placeableEntitiesSections[1].entities.forEach(item => {
+        this.placeableEntitiesSections[1].entities.forEach((item) => {
             if ((item as Item).itemLimit > 0) {
-            item.visibleState = VisibleState.NotSelected;
+                item.visibleState = VisibleState.NotSelected;
             }
         });
     }

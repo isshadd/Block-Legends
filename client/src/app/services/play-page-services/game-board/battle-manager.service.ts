@@ -61,44 +61,32 @@ export class BattleManagerService {
     }
 
     onUserAttack() {
-        if (this.isValidAction()) {
+        if (this.isValidAction() && this.currentPlayer?.socketId) {
             const attackResult = this.attackDiceResult() - this.defenseDiceResult();
             const playerHasTotem =
-                !!this.currentPlayer &&
+                this.currentPlayer &&
                 this.doesPlayerHaveItem(this.currentPlayer, ItemType.Totem) &&
                 !this.isPlayerHealthMax(this.currentPlayer, this.userRemainingHealth);
 
-            if (this.currentPlayer?.socketId) {
-                this.signalUserAttacked.next({ playerTurnId: this.currentPlayer?.socketId, attackResult, playerHasTotem });
-            }
+            this.signalUserAttacked.next({ playerTurnId: this.currentPlayer.socketId, attackResult, playerHasTotem });
         }
     }
 
     onUserEscape() {
         if (this.isValidAction() && this.userEvasionAttempts > 0) {
             this.userEvasionAttempts--;
-
-            if (this.currentPlayer?.socketId) {
-                this.signalUserTriedEscape.next(this.currentPlayer?.socketId);
-            }
+            this.signalUserTriedEscape.next(this.currentPlayer!.socketId);
         }
     }
 
     onOpponentAttack(attackResult: number) {
-        if (!this.currentPlayer || !this.opponentPlayer) {
-            return;
-        }
+        if (!this.currentPlayer || !this.opponentPlayer) return;
 
         if (!this.isUserTurn) {
-            if (attackResult > 0) {
-                if (
-                    this.opponentPlayer &&
-                    this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) &&
-                    !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)
-                ) {
+            if (attackResult > 0 && this.opponentPlayer) {
+                if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) && !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)) {
                     this.opponentRemainingHealth++;
                 }
-
                 this.userRemainingHealth--;
             }
             this.signalOpponentAttacked.next(attackResult);
@@ -106,11 +94,7 @@ export class BattleManagerService {
     }
 
     onOpponentEscape() {
-        if (!this.currentPlayer || !this.opponentPlayer) {
-            return;
-        }
-
-        if (!this.isUserTurn) {
+        if (this.currentPlayer && this.opponentPlayer && !this.isUserTurn) {
             this.opponentEvasionAttempts--;
             this.signalOpponentTriedEscape.next();
         }
@@ -119,9 +103,7 @@ export class BattleManagerService {
     attackDiceResult(): number {
         if (this.currentPlayer) {
             let currentPlayerAttack: number = this.currentPlayer.attributes.attack;
-            if (this.hasIcePenalty(this.currentPlayer)) {
-                currentPlayerAttack -= this.icePenalty;
-            }
+            currentPlayerAttack -= this.hasIcePenalty(this.currentPlayer) ? this.icePenalty : 0;
             if (this.debugService.isDebugMode) {
                 return currentPlayerAttack + this.currentPlayer.attackDice;
             }

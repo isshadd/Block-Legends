@@ -98,21 +98,18 @@ export class PlayGameBoardManagerService {
         const tilesWithSpawn = this.gameMapDataManagerService.getTilesWithSpawn();
         const availableTiles = [...tilesWithSpawn];
 
-        for (const spawnPlace of spawnPlaces) {
-            const [index, playerSocketId] = spawnPlace;
+        spawnPlaces.forEach(([index, playerSocketId]) => {
             const player = this.webSocketService.getRoomInfo().players.find((p) => p.socketId === playerSocketId);
             const tile = tilesWithSpawn[index];
 
             if (player && tile) {
-                player.mapEntity = new PlayerMapEntity(player.avatar.headImage);
-                tile.setPlayer(player.mapEntity);
-                player.mapEntity.setSpawnCoordinates(tile.coordinates);
-                availableTiles.splice(availableTiles.indexOf(tile), 1);
+            player.mapEntity = new PlayerMapEntity(player.avatar.headImage);
+            tile.setPlayer(player.mapEntity);
+            player.mapEntity.setSpawnCoordinates(tile.coordinates);
+            availableTiles.splice(availableTiles.indexOf(tile), 1);
             }
-        }
-        for (const tile of availableTiles) {
-            tile.item = null;
-        }
+        });
+        availableTiles.forEach(tile => tile.item = null);
     }
 
     startTurn() {
@@ -125,15 +122,13 @@ export class PlayGameBoardManagerService {
         player.currentMovePoints = player.attributes.speed;
         player.currentActionPoints = 1;
 
-        if (!this.isUserTurn) {
-            return;
-        }
+        if (!this.isUserTurn) return;
 
         this.setupPossibleMoves(player);
     }
 
     setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
-        if (userPlayerCharacter.currentMovePoints <= 0 || !this.isUserTurn) {
+        if (!this.isUserTurn || userPlayerCharacter.currentMovePoints <= 0) {
             return;
         }
 
@@ -144,7 +139,7 @@ export class PlayGameBoardManagerService {
     setPossibleMoves(playerCharacter: PlayerCharacter) {
         this.userCurrentPossibleMoves = this.gameMapDataManagerService.getPossibleMovementTiles(
             playerCharacter.mapEntity.coordinates,
-            playerCharacter.currentMovePoints,
+            playerCharacter.currentMovePoints
         );
     }
 
