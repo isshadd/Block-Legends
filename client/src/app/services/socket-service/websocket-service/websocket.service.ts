@@ -2,20 +2,18 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
+import { DebugService } from '@app/services/debug-service/debug.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
 import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-// eslint-disable-next-line no-restricted-imports
-// This line is necessary for the import of WebsocketService
-import { DebugService } from '@app/services/debug.service';
-import { RoomEvent } from '@common/interfaces/RoomEvent';
 
 @Injectable({
     providedIn: 'root',
