@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
+import { DebugService } from '@app/services/debug.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { ITEM_LIMITS } from '@common/constants/game_constants';
 import { GameMode } from '@common/enums/game-mode';
 import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
@@ -17,10 +19,6 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
-// this line is necessary for the code to work
-// eslint-disable-next-line no-restricted-imports
-import { DebugService } from '../debug.service';
-
 @Injectable({
     providedIn: 'root',
 })
@@ -319,12 +317,6 @@ export class GameMapDataManagerService {
     }
 
     itemLimit(): number {
-        const ITEM_LIMITS = {
-            [MapSize.SMALL]: 2,
-            [MapSize.MEDIUM]: 4,
-            [MapSize.LARGE]: 6,
-        };
-
         return ITEM_LIMITS[this.gameSize() || MapSize.SMALL];
     }
 

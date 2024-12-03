@@ -13,6 +13,7 @@ import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { ICE_FALL_POSSIBILTY, NECESSARY_WIN_NUMBER } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
@@ -429,8 +430,7 @@ export class PlayGameBoardManagerService {
         }
 
         if (tileType === TileType.Ice) {
-            const result = 0.1;
-            if (Math.random() < result) {
+            if (Math.random() < ICE_FALL_POSSIBILTY) {
                 this.eventJournal.broadcastEvent('glissement', [this.eventJournal.player]);
                 return true;
             }
@@ -573,8 +573,7 @@ export class PlayGameBoardManagerService {
 
         const currentPlayer = this.getCurrentPlayerCharacter();
 
-        const value = 3;
-        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= value) {
+        if (currentPlayer === playerCharacter && playerCharacter.fightWins >= NECESSARY_WIN_NUMBER) {
             this.signalUserWon.next(currentPlayer.socketId);
         }
     }
