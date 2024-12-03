@@ -2,7 +2,8 @@ import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetec
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { RoomMessage } from '@common/interfaces/roomMessage';
+import { RoomMessageReceived } from '@common/interfaces/roomMessage';
+import { ColorService } from '@app/services/colors.service';
 
 @Component({
     selector: 'app-clavardage',
@@ -15,12 +16,14 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     messageToSend: string = '';
-    messages: RoomMessage[] = this.chatService.roomMessages;
+    messages: RoomMessageReceived[] = this.chatService.roomMessages;
+    
     playerName: string = '';
     shouldScroll: boolean = false;
 
     constructor(
         private chatService: ChatService,
+        private colorService: ColorService,
         private cdr: ChangeDetectorRef,
     ) {}
 
@@ -49,6 +52,10 @@ export class ClavardageComponent implements OnInit, AfterViewChecked {
         this.chatService.broadcastMessageToAll(this.messageToSend);
         this.messageToSend = '';
         this.shouldScroll = true;
+    }
+
+    getPlayerClass(playerId: string): string {
+        return this.colorService.getColor(playerId); // Use ChatService to get the color based on player ID
     }
 
     private scrollToBottom(): void {

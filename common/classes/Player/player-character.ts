@@ -21,13 +21,14 @@ export class PlayerCharacter implements Character {
     dice: string = 'attack';
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
+    messageColor: string;
 
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
     inventory: Item[] = [new EmptyItem(), new EmptyItem()];
-    textColor: string;
+    textColor: string = '#006D77';
 
     currentMovePoints: number = 0;
     currentActionPoints: number = 0;

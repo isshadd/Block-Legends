@@ -9,7 +9,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
-import { RoomMessage } from '@common/interfaces/roomMessage';
+import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -36,6 +36,7 @@ export class WebSocketService {
 
     currentRoom: GameRoom;
     isGameFinished = false;
+    colorCounter = 0;
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,
@@ -73,12 +74,9 @@ export class WebSocketService {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
 
-    // registerPlayer(playerName: string): void {
-    //     this.socket.emit(ChatEvents.RegisterPlayer, playerName);
-    // }
+    
 
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
-        //player.textColor = this.colorService.getColor(player.socketId);
         this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
 
@@ -266,9 +264,6 @@ export class WebSocketService {
             });
         });
 
-        // this.socket.on('avatarTakenError', (data) => {
-        //     this.avatarTakenErrorSubject.next(data.message);
-        // });
 
         this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);
@@ -284,7 +279,7 @@ export class WebSocketService {
             this.eventJournalService.messageReceivedSubject.next();
         });
 
-        this.socket.on(ChatEvents.RoomMessage, (message: RoomMessage) => {
+        this.socket.on(ChatEvents.RoomMessage, (message: RoomMessageReceived) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });
@@ -304,12 +299,6 @@ export class WebSocketService {
         this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
             this.debugService.isPlayerMoving = false;
         });
-
-        // this.socket.on(SocketEvents.INCREMENT_COLOR_COUNTER, (data : string) => {
-        //     this.sendLog('Incrementing color counter' + `${data}`);
-        //     this.colorService.colorIndex++;
-
-        // });
 
         /*
         this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {

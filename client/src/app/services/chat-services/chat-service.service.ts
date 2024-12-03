@@ -4,7 +4,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
-import { RoomMessage } from '@common/interfaces/roomMessage';
+import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 
 
 const MAX_STRING_LENGTH = 200;
@@ -15,7 +15,7 @@ const MAX_STRING_LENGTH = 200;
 export class ChatService {
     socket: WebSocketService | null = null;
     serverClock: Date;
-    roomMessages: RoomMessage[] = [];
+    roomMessages: RoomMessageReceived[] = [];
     player: PlayerCharacter;
     accessCode: number;
     roomID: string;
@@ -41,6 +41,7 @@ export class ChatService {
     setCharacter(character: PlayerCharacter) {
         this.player = character;
     }
+    
 
     setAccessCode(code: number | undefined) {
         if (!code) {
@@ -55,10 +56,6 @@ export class ChatService {
 
     clearMessages() {
         this.roomMessages = [];
-    }
-
-    sendMSG(message :string ) {
-        this.socket?.sendLog(message);
     }
 
     broadcastMessageToAll(roomMessage: string): void {

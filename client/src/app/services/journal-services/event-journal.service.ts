@@ -27,7 +27,6 @@ export class EventJournalService {
         this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
             if (hasSocket) {
                 this.socket = this.socketStateService.getActiveSocket();
-                //this.socket?.registerPlayer(this.playerName);
             } else {
                 this.socket = null;
             }
@@ -37,6 +36,8 @@ export class EventJournalService {
     setCharacter(character: PlayerCharacter) {
         this.player = character;
     }
+
+    
 
     setAccessCode(code: number | undefined) {
         if (!code) {

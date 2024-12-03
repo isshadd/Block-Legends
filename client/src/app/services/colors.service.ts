@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class ColorService {
     private playerColors: { [key: string]: string } = {}; // Store generated colors for players
-    private colors: string[] = ['#3a86ff', '#ff006e', '#8338ec', '#fb5607', '#ffbe0b', '#00b4d8']; // Predefined set of colors
+    private colors: string[] = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00']; // Predefined set of colors
     private nextColorIndex = 0; // Track the next color to assign
 
     getColor(socketId: string): string {

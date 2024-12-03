@@ -29,7 +29,7 @@ export const enum SocketEvents {
     VIRTUAL_PLAYER_CONTINUE_TURN = 'virtualPlayerContinueTurn',
     TOGGLE_DEBUG_MODE = 'toggleDebugMode',
     DEBUG_MODE_OFF = 'debugModeOff',
-    //INCREMENT_COLOR_COUNTER = 'incrementColorCounter',
+    
 
     // RECUS
     ROOM_STATE = 'roomState',
