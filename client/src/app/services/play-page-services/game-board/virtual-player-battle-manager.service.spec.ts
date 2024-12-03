@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { Subject } from 'rxjs';
 import { BattleManagerService } from './battle-manager.service';
@@ -218,27 +219,75 @@ describe('VirtualPlayerBattleManagerService', () => {
         expect(result - result1).toBeGreaterThanOrEqual(ATTACK_RESULT_2);
     });
 
-    it('should handle agressive comportment', () => {
-        const virtualPlayer = createPlayer(ProfileEnum.Agressive, true);
-        const enemyPlayer = createPlayer(ProfileEnum.Agressive, false);
+    it('should return immediately if the player is not virtual', () => {
+        const player = createPlayer(ProfileEnum.Agressive, false);
+        const enemyPlayer = createPlayer(ProfileEnum.Defensive, false);
 
-        spyOn(service, 'attack');
+        spyOn(service, 'handleAgressiveComportment');
+        spyOn(service, 'handleDefensiveComportment');
 
-        service.handleAgressiveComportment(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+        service.handleVirtualPlayerTurn(player, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
 
-        expect(service.attack).toHaveBeenCalledWith(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+        expect(service.handleAgressiveComportment).not.toHaveBeenCalled();
+        expect(service.handleDefensiveComportment).not.toHaveBeenCalled();
     });
 
-    it('should handle defensive comportment', () => {
-        const virtualPlayer = createPlayer(ProfileEnum.Defensive, true);
+    it('should call handleAgressiveComportment if the player is aggressive', () => {
+        const player = createPlayer(ProfileEnum.Agressive, true);
+        const enemyPlayer = createPlayer(ProfileEnum.Defensive, false);
+
+        spyOn(service, 'handleAgressiveComportment');
+
+        service.handleVirtualPlayerTurn(player, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
+
+        expect(service.handleAgressiveComportment).toHaveBeenCalledWith(player, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+    });
+
+    it('should call handleDefensiveComportment if the player is defensive', () => {
+        const player = createPlayer(ProfileEnum.Defensive, true);
         const enemyPlayer = createPlayer(ProfileEnum.Agressive, false);
 
-        spyOn(service, 'escape');
-        spyOn(service, 'attack');
+        spyOn(service, 'handleDefensiveComportment');
 
-        service.handleDefensiveComportment(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
+        service.handleVirtualPlayerTurn(player, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
 
-        expect(service.escape).toHaveBeenCalledWith(virtualPlayer);
-        expect(service.attack).not.toHaveBeenCalled();
+        expect(service.handleDefensiveComportment).toHaveBeenCalledWith(player, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
+    });
+
+    it('should set playerHasTotem to true if the player has a Totem and health is not max', () => {
+        const virtualPlayer = createPlayer(ProfileEnum.Agressive, true, 'player1');
+        const enemyPlayer = createPlayer(ProfileEnum.Defensive, false, 'enemy1');
+
+        mockBattleManagerService.doesPlayerHaveItem.and.returnValue(true);
+        mockBattleManagerService.isPlayerHealthMax.and.returnValue(false);
+
+        spyOn(mockBattleManagerService.signalUserAttacked, 'next');
+
+        service.attack(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+
+        expect(mockBattleManagerService.doesPlayerHaveItem).toHaveBeenCalledWith(virtualPlayer, ItemType.Totem);
+        expect(mockBattleManagerService.signalUserAttacked.next).toHaveBeenCalledWith({
+            playerTurnId: virtualPlayer.socketId,
+            attackResult: jasmine.any(Number),
+            playerHasTotem: true,
+        });
+    });
+
+    it('should set playerHasTotem to false if the player does not have a Totem', () => {
+        const virtualPlayer = createPlayer(ProfileEnum.Agressive, true, 'player1');
+        const enemyPlayer = createPlayer(ProfileEnum.Defensive, false, 'enemy1');
+
+        mockBattleManagerService.doesPlayerHaveItem.and.returnValue(false);
+
+        spyOn(mockBattleManagerService.signalUserAttacked, 'next');
+
+        service.attack(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+
+        expect(mockBattleManagerService.doesPlayerHaveItem).toHaveBeenCalledWith(virtualPlayer, ItemType.Totem);
+        expect(mockBattleManagerService.signalUserAttacked.next).toHaveBeenCalledWith({
+            playerTurnId: virtualPlayer.socketId,
+            attackResult: jasmine.any(Number),
+            playerHasTotem: false,
+        });
     });
 });
