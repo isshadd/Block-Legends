@@ -121,7 +121,7 @@ describe('VirtualPlayerBattleManagerService', () => {
 
         mockDebugService.isDebugMode = false;
 
-        spyOn(Math, 'random').and.returnValue(10);
+        spyOn(Math, 'random').and.returnValue(ICE_PENALTY);
 
         const result = service.defenseDiceResult(enemyPlayer, REMAINING_HEALTH);
 
