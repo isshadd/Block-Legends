@@ -23,9 +23,6 @@ export class MapTileInfoComponent {
     }
 
     tileMovementCost(tile: Tile): number | null {
-        if (tile.isTerrain()) {
-            return (tile as TerrainTile).moveCost;
-        }
-        return null;
+        return tile.isTerrain() ? (tile as TerrainTile).moveCost : null;
     }
 }

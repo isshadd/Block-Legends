@@ -183,27 +183,11 @@ export class GameMapDataManagerService {
     }
 
     getTerrainTilesCount(): number {
-        let count = 0;
-        for (const row of this.currentGrid) {
-            for (const tile of row) {
-                if (tile.isTerrain()) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return this.currentGrid.reduce((acc, row) => acc.concat(row), []).filter((tile) => tile.isTerrain()).length;
     }
 
     getDoorsCount(): number {
-        let count = 0;
-        for (const row of this.currentGrid) {
-            for (const tile of row) {
-                if (tile.isDoor()) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return this.currentGrid.reduce((count, row) => count + row.filter((tile) => tile.isDoor()).length, 0);
     }
 
     getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {
@@ -238,13 +222,12 @@ export class GameMapDataManagerService {
 
             for (const neighbour of neighbours) {
                 const key = `${neighbour.coordinates.x},${neighbour.coordinates.y}`;
-                if (!visited.has(key)) {
-                    visited.add(key);
-                    if (neighbour.isWalkable() && !(neighbour as WalkableTile).hasPlayer()) {
-                        return neighbour as WalkableTile;
-                    }
-                    queue.push(neighbour.coordinates);
+                if (visited.has(key)) continue;
+                visited.add(key);
+                if (neighbour.isWalkable() && !(neighbour as WalkableTile).hasPlayer()) {
+                    return neighbour as WalkableTile;
                 }
+                queue.push(neighbour.coordinates);
             }
         }
 
@@ -252,7 +235,7 @@ export class GameMapDataManagerService {
     }
 
     getClosestTerrainTileWithoutItemAt(startTile: Tile): TerrainTile {
-        if (startTile && startTile.isTerrain() && !(startTile as TerrainTile).item) {
+        if (startTile?.isTerrain() && !(startTile as TerrainTile).item) {
             return startTile as TerrainTile;
         }
 
@@ -270,13 +253,12 @@ export class GameMapDataManagerService {
 
             for (const neighbour of neighbours) {
                 const key = `${neighbour.coordinates.x},${neighbour.coordinates.y}`;
-                if (!visited.has(key)) {
-                    visited.add(key);
-                    if (neighbour.isTerrain() && !(neighbour as TerrainTile).item && !(neighbour as TerrainTile).hasPlayer()) {
-                        return neighbour as TerrainTile;
-                    }
-                    queue.push(neighbour.coordinates);
+                if (visited.has(key)) continue;
+                visited.add(key);
+                if (neighbour.isTerrain() && !(neighbour as TerrainTile).item) {
+                    return neighbour as TerrainTile;
                 }
+                queue.push(neighbour.coordinates);
             }
         }
 

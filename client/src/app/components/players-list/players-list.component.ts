@@ -16,18 +16,10 @@ export class PlayersListComponent {
     constructor(private playGameBoardManagerService: PlayGameBoardManagerService) {}
 
     isTurn(player: PlayerCharacter): boolean {
-        if (player.socketId === this.playGameBoardManagerService.currentPlayerIdTurn) {
-            return true;
-        }
-        return false;
+        return player.socketId === this.playGameBoardManagerService.currentPlayerIdTurn;
     }
 
     hasFlag(player: PlayerCharacter): boolean {
-        for (const item of player.inventory) {
-            if (item.type === ItemType.Flag) {
-                return true;
-            }
-        }
-        return false;
+        return player.inventory.some((item) => item.type === ItemType.Flag);
     }
 }

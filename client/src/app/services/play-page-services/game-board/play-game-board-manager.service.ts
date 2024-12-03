@@ -98,8 +98,7 @@ export class PlayGameBoardManagerService {
         const tilesWithSpawn = this.gameMapDataManagerService.getTilesWithSpawn();
         const availableTiles = [...tilesWithSpawn];
 
-        for (const spawnPlace of spawnPlaces) {
-            const [index, playerSocketId] = spawnPlace;
+        spawnPlaces.forEach(([index, playerSocketId]) => {
             const player = this.webSocketService.getRoomInfo().players.find((p) => p.socketId === playerSocketId);
             const tile = tilesWithSpawn[index];
 
@@ -109,10 +108,8 @@ export class PlayGameBoardManagerService {
                 player.mapEntity.setSpawnCoordinates(tile.coordinates);
                 availableTiles.splice(availableTiles.indexOf(tile), 1);
             }
-        }
-        for (const tile of availableTiles) {
-            tile.item = null;
-        }
+        });
+        availableTiles.forEach((tile) => (tile.item = null));
     }
 
     startTurn() {
@@ -125,15 +122,13 @@ export class PlayGameBoardManagerService {
         player.currentMovePoints = player.attributes.speed;
         player.currentActionPoints = 1;
 
-        if (!this.isUserTurn) {
-            return;
-        }
+        if (!this.isUserTurn) return;
 
         this.setupPossibleMoves(player);
     }
 
     setupPossibleMoves(userPlayerCharacter: PlayerCharacter) {
-        if (userPlayerCharacter.currentMovePoints <= 0 || !this.isUserTurn) {
+        if (!this.isUserTurn || userPlayerCharacter.currentMovePoints <= 0) {
             return;
         }
 
@@ -204,7 +199,7 @@ export class PlayGameBoardManagerService {
                 });
 
                 const didGrabItem = this.handleTileItem(pathTile, userPlayerCharacter, this.possibleItems);
-                if (this.possibleItems.length > 0) {
+                if (this.possibleItems.length) {
                     this.signalUserFinishedMoving.next(userPlayerCharacter.socketId);
                     return;
                 }
@@ -281,9 +276,7 @@ export class PlayGameBoardManagerService {
         if (tile.isTerrain()) {
             const iceTile = this.tileFactoryService.createTile(TileType.Ice) as IceTile;
             iceTile.coordinates = tile.coordinates;
-            if ((tile as TerrainTile).item) {
-                iceTile.item = (tile as TerrainTile).item;
-            }
+            iceTile.item = (tile as TerrainTile).item;
             this.gameMapDataManagerService.setTileAt(tile.coordinates, iceTile);
         }
     }
@@ -294,19 +287,17 @@ export class PlayGameBoardManagerService {
         }
 
         const terrainTile = tile as TerrainTile;
-        if (terrainTile.item?.isGrabbable()) {
-            if (player.inventory.some((item) => item.type === ItemType.EmptyItem)) {
+        const item = terrainTile.item;
+        if (item?.isGrabbable()) {
+            if (player.inventory.some((invItem) => invItem.type === ItemType.EmptyItem)) {
                 this.signalUserGrabbedItem.next({
-                    itemType: terrainTile.item.type,
+                    itemType: item.type,
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: player.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player]);
+                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${item.type}`, [player]);
             } else {
-                for (const item of player.inventory) {
-                    possibleItems.push(item);
-                }
-                possibleItems.push(terrainTile.item);
+                possibleItems.push(...player.inventory, item);
             }
             return true;
         }
@@ -320,16 +311,14 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        for (let i = 0; i < actionPlayer.inventory.length; i++) {
-            if (actionPlayer.inventory[i].type === ItemType.EmptyItem) {
-                actionPlayer.inventory[i] = this.itemFactoryService.createItem(itemType);
-                this.addItemEffect(actionPlayer, actionPlayer.inventory[i]);
+        const emptySlot = actionPlayer.inventory.findIndex((item) => item.type === ItemType.EmptyItem);
+        if (emptySlot !== -1) {
+            actionPlayer.inventory[emptySlot] = this.itemFactoryService.createItem(itemType);
+            this.addItemEffect(actionPlayer, actionPlayer.inventory[emptySlot]);
 
-                const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
-                if (tile?.isTerrain() && (tile as TerrainTile).item?.type === itemType) {
-                    (tile as TerrainTile).removeItem();
-                }
-                break;
+            const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
+            if (tile?.isTerrain() && (tile as TerrainTile).item?.type === itemType) {
+                (tile as TerrainTile).removeItem();
             }
         }
     }
@@ -341,17 +330,14 @@ export class PlayGameBoardManagerService {
             return;
         }
 
-        for (let i = 0; i < actionPlayer.inventory.length; i++) {
-            if (actionPlayer.inventory[i].type === itemType) {
-                this.removeItemEffect(actionPlayer, actionPlayer.inventory[i]);
-                actionPlayer.inventory[i] = this.itemFactoryService.createItem(ItemType.EmptyItem);
+        const itemIndex = actionPlayer.inventory.findIndex((item) => item.type === itemType);
+        if (itemIndex !== -1) {
+            this.removeItemEffect(actionPlayer, actionPlayer.inventory[itemIndex]);
+            actionPlayer.inventory[itemIndex] = this.itemFactoryService.createItem(ItemType.EmptyItem);
 
-                const item = this.itemFactoryService.createItem(itemType);
-                const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
-                if (tile?.isTerrain()) {
-                    (tile as TerrainTile).item = item;
-                }
-                break;
+            const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
+            if (tile?.isTerrain()) {
+                (tile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
             }
         }
     }
@@ -368,13 +354,14 @@ export class PlayGameBoardManagerService {
         const lastItem = this.possibleItems.pop();
         if (item !== lastItem) {
             this.signalUserThrewItem.next({ itemType: item.type, tileCoordinates: terrainTile.coordinates, playerTurnId: currentPlayer.socketId });
-            if (terrainTile.item) {
+            const grabbedItem = terrainTile.item;
+            if (grabbedItem) {
                 this.signalUserGrabbedItem.next({
-                    itemType: terrainTile.item.type,
+                    itemType: grabbedItem.type,
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: currentPlayer.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer]);
+                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${grabbedItem.type}`, [currentPlayer]);
             }
         }
 
@@ -571,12 +558,12 @@ export class PlayGameBoardManagerService {
     }
 
     userDropAllItems(startTile: Tile, player: PlayerCharacter) {
-        for (const item of player.inventory) {
-            if (item.type !== ItemType.EmptyItem) {
-                const closestTerrainTileWithoutItem = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
-                this.throwItem(player.socketId, item.type, closestTerrainTileWithoutItem.coordinates);
-            }
-        }
+        player.inventory
+            .filter((item) => item.type !== ItemType.EmptyItem)
+            .forEach((item) => {
+                const closestTile = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
+                this.throwItem(player.socketId, item.type, closestTile.coordinates);
+            });
     }
 
     checkIfPlayerWonClassicGame(playerCharacter: PlayerCharacter) {
