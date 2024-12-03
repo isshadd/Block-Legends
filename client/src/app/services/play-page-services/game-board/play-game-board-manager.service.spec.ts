@@ -1,6 +1,6 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // impossible to instantiate the service without these parameters
 /* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-shadow */ // pour les tests, le mocPlayer est réassigné
+/* eslint-disable @typescript-eslint/no-shadow */ // for the tests, the mockPlayer is reassigned
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
