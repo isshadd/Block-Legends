@@ -1,4 +1,4 @@
-// eslint-disable-next-line
+// eslint-disable-next-line //this line is necessary for the import of GameServerCommunicationService
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { GameMode } from '@common/enums/game-mode';

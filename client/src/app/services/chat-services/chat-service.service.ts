@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-imports */
+/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of PlayerCharacter
 import { Injectable } from '@angular/core';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';

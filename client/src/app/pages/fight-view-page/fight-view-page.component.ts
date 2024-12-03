@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-/* eslint-disable max-len */
+/* eslint-disable max-len */ // This line is necessary for the import of FightViewPageComponent
 import { ItemChooseComponent } from '@app/components/item-choose/item-choose.component';
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { Chestplate } from '@common/classes/Items/chestplate';

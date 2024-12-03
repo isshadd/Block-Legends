@@ -227,9 +227,9 @@ export class GameMapDataManagerService {
         visited.add(`${coordinates.x},${coordinates.y}`);
 
         while (queue.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion //this line is necessary for the code to work
             const current = queue.shift()!;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion //this line is necessary for the code to work
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 
             for (const neighbour of neighbours) {
