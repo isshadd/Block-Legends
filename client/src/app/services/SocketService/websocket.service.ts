@@ -14,6 +14,11 @@ import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
+import { AvatarService } from '../avatar.service';
+// eslint-disable-next-line no-restricted-imports
+// This line is necessary for the import of WebsocketService
+import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -38,11 +43,11 @@ export class WebSocketService {
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,
-        private gameService: GameService,
-        private chatService: ChatService,
-        private eventJournalService: EventJournalService,
+        public gameService: GameService,
+        public chatService: ChatService,
+        public eventJournalService: EventJournalService,
         private avatarService: AvatarService,
-        private debugService: DebugService,
+        public debugService: DebugService,
     ) {}
 
     init() {
