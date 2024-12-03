@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
-
-const DELAY = 500;
+import { MOUVEMENT_DELAY } from '@common/constants/game_constants';
 
 @Component({
     selector: 'app-fight-view',
@@ -64,12 +63,12 @@ export class FightViewComponent {
         playerImage?.classList.add('attack-player');
         setTimeout(() => {
             playerImage?.classList.remove('attack-player');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
 
         opponentImage?.classList.add('hit');
         setTimeout(() => {
             opponentImage?.classList.remove('hit');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
     }
 
     opponentAttackAnimation(playerDiceResult: number): void {
@@ -83,12 +82,12 @@ export class FightViewComponent {
         opponentImage?.classList.add('attack-opponent');
         setTimeout(() => {
             opponentImage?.classList.remove('attack-opponent');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
 
         playerImage?.classList.add('hit');
         setTimeout(() => {
             playerImage?.classList.remove('hit');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
     }
 
     onEscape(): void {
@@ -104,7 +103,7 @@ export class FightViewComponent {
         playerImage?.classList.add('escape-player');
         setTimeout(() => {
             playerImage?.classList.remove('escape-player');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
     }
 
     onOpponentEscape(): void {
@@ -112,7 +111,7 @@ export class FightViewComponent {
         opponentImage?.classList.add('escape-opponent');
         setTimeout(() => {
             opponentImage?.classList.remove('escape-opponent');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
     }
 
     onPlayerRollDice(playerDiceResult: number): void {
@@ -121,7 +120,7 @@ export class FightViewComponent {
         diceResult?.classList.add('dice-roll');
         setTimeout(() => {
             diceResult?.classList.remove('dice-roll');
-        }, DELAY);
+        }, MOUVEMENT_DELAY);
     }
 
     isEscapeDisabled(): boolean {

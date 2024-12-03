@@ -1,6 +1,7 @@
 import { Game } from '@app/model/database/game';
 import { GameService } from '@app/services/game/game.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MAX_ACCESS_CODE, MAX_PLAYERS, MED_PLAYERS, MIN_ACCESS_CODE, MIN_PLAYERS } from '@common/constants/game_constants';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
@@ -28,9 +29,6 @@ export class GameSocketRoomService {
     constructor(readonly gameService: GameService) {}
 
     setSpawnCounter(gameSize: MapSize): number {
-        const MIN_PLAYERS = 2;
-        const MED_PLAYERS = 4;
-        const MAX_PLAYERS = 6;
         switch (gameSize) {
             case MapSize.SMALL:
                 return MIN_PLAYERS;
@@ -42,8 +40,6 @@ export class GameSocketRoomService {
     }
 
     generateAccessCode(): number {
-        const MIN_ACCESS_CODE = 1000;
-        const MAX_ACCESS_CODE = 9999;
         let accessCode: number;
         do {
             accessCode = Math.floor(MIN_ACCESS_CODE + Math.random() * (MAX_ACCESS_CODE - MIN_ACCESS_CODE + 1));

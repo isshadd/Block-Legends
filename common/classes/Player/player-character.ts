@@ -8,9 +8,8 @@ import { EmptyItem } from '../Items/empty-item';
 import { Item } from '../Items/item';
 import { PlayerAttributes } from './player-attributes';
 import { PlayerMapEntity } from './player-map-entity';
+import { BASE_DICE_STAT,BONUS_DICE_STAT} from '../../constants/game_constants';
 
-export const BONUS = 6;
-export const BASE_STATS = 4;
 
 export class PlayerCharacter implements Character {
     isLifeBonusAssigned: boolean = false;
@@ -20,8 +19,8 @@ export class PlayerCharacter implements Character {
     isOrganizer: boolean = false;
     socketId: string;
     dice: DiceType = DiceType.Attack;
-    attackDice: number = BONUS;
-    defenseDice: number = BASE_STATS;
+    attackDice: number = BONUS_DICE_STAT;
+    defenseDice: number = BASE_DICE_STAT;
     messageColor: string;
 
     avatar: Avatar;
@@ -52,30 +51,30 @@ export class PlayerCharacter implements Character {
 
     assignAttackDice() {
         this.dice = DiceType.Attack;
-        this.attackDice = BONUS;
-        this.defenseDice = BASE_STATS;
+        this.attackDice = BONUS_DICE_STAT;
+        this.defenseDice = BASE_DICE_STAT;
         this.isAttackBonusAssigned = true;
         this.isDefenseBonusAssigned = true;
     }
 
     assignDefenseDice() {
         this.dice = DiceType.Defense;
-        this.defenseDice = BONUS;
-        this.attackDice = BASE_STATS;
+        this.defenseDice = BONUS_DICE_STAT;
+        this.attackDice = BASE_DICE_STAT;
         this.isDefenseBonusAssigned = true;
         this.isAttackBonusAssigned = true;
     }
 
     assignLifeBonus() {
-        this.attributes.life = BONUS;
-        this.attributes.speed = BASE_STATS;
+        this.attributes.life = BONUS_DICE_STAT;
+        this.attributes.speed = BASE_DICE_STAT;
         this.isLifeBonusAssigned = true;
         this.isSpeedBonusAssigned = true;
     }
 
     assignSpeedBonus() {
-        this.attributes.speed = BONUS;
-        this.attributes.life = BASE_STATS;
+        this.attributes.speed = BONUS_DICE_STAT;
+        this.attributes.life = BASE_DICE_STAT;
         this.isSpeedBonusAssigned = true;
         this.isLifeBonusAssigned = true;
     }

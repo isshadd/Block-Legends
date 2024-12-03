@@ -11,11 +11,10 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MAX_VP_PLAYER_NUMBER } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ProfileEnum } from '@common/enums/profile';
 import { Subject, takeUntil } from 'rxjs';
-
-const FIVE = 5;
 
 @Component({
     selector: 'app-waiting-view',
@@ -40,7 +39,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     profileAggressive = ProfileEnum.Agressive;
     profileDefensive = ProfileEnum.Defensive;
     lastVirtualPlayerProfile: ProfileEnum | null = null;
-    maxVirtualPlayerRetries = FIVE;
+    maxVirtualPlayerRetries = MAX_VP_PLAYER_NUMBER;
     lastVirtualPlayerSocketId: string | null = null;
     virtualPlayerRetryCount = 0;
     errorMessage: string | null = null;

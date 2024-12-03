@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { POTION_DEFENSE_BONUS } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { Subject } from 'rxjs';
 
@@ -120,9 +121,8 @@ export class BattleManagerService {
     defenseDiceResult(): number {
         if (this.opponentPlayer) {
             if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.MagicShield) && this.opponentRemainingHealth === 1) {
-                const potionDefenseBoost = 100;
                 if (Math.random() < 0.5) {
-                    return potionDefenseBoost;
+                    return POTION_DEFENSE_BONUS;
                 }
             }
             if (this.debugService.isDebugMode) {

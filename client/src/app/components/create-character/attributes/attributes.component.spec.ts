@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PlayerAttributes } from '@common/classes/Player/player-attributes';
-import { BASE_STATS, PlayerCharacter } from '@common/classes/Player/player-character';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AttributesComponent } from './attributes.component';
+import { BASE_DICE_STAT } from '@common/constants/game_constants';
 
 describe('AttributesComponent', () => {
     let component: AttributesComponent;
@@ -26,10 +27,10 @@ describe('AttributesComponent', () => {
 
     it('should create new attributes', () => {
         component.character.attributes = new PlayerAttributes();
-        expect(component.character.attributes.attack).toBe(BASE_STATS);
-        expect(component.character.attributes.defense).toBe(BASE_STATS);
-        expect(component.character.attributes.life).toBe(BASE_STATS);
-        expect(component.character.attributes.speed).toBe(BASE_STATS);
+        expect(component.character.attributes.attack).toBe(BASE_DICE_STAT);
+        expect(component.character.attributes.defense).toBe(BASE_DICE_STAT);
+        expect(component.character.attributes.life).toBe(BASE_DICE_STAT);
+        expect(component.character.attributes.speed).toBe(BASE_DICE_STAT);
     });
 
     it('should assign attack dice and update selected defense dice', () => {

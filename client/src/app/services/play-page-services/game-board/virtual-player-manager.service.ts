@@ -10,6 +10,7 @@ import { OpenDoor } from '@common/classes/Tiles/open-door';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { INVENTORY_SIZE, NECESSARY_WIN_NUMBER } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { Vec2 } from '@common/interfaces/vec2';
@@ -346,8 +347,7 @@ export class VirtualPlayerManagerService {
     }
 
     isInventoryFull(player: PlayerCharacter): boolean {
-        const fullInventorySize = 2;
-        return player.inventory.length >= fullInventorySize;
+        return player.inventory.length >= INVENTORY_SIZE;
     }
 
     isNewItemBetterThanOthersInInventory(player: PlayerCharacter, item: Item): boolean {
@@ -521,9 +521,7 @@ export class VirtualPlayerManagerService {
         if (this.gameMapDataManagerService.isGameModeCTF()) {
             return;
         }
-
-        const value = 3;
-        if (player.fightWins >= value) {
+        if (player.fightWins >= NECESSARY_WIN_NUMBER) {
             this.playGameBoardManagerService.signalUserWon.next(player.socketId);
         }
     }
