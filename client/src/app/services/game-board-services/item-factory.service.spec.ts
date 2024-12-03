@@ -83,6 +83,12 @@ describe('ItemFactoryService', () => {
             expect(item.type).toBe(ItemType.Random);
         });
 
+        it('should create an EmptyItem when ItemType.EmptyItem is passed', () => {
+            const item = service.createItem(ItemType.EmptyItem);
+            expect(item).toBeInstanceOf(Item);
+            expect(item.type).toBe(ItemType.EmptyItem);
+        });
+
         it('should create a generic Item when an unknown ItemType is passed', () => {
             const unknownType = 'UnknownType' as ItemType;
             const item = service.createItem(unknownType);
