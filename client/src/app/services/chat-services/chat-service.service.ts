@@ -27,11 +27,7 @@ export class ChatService {
         this.socket = this.socketStateService.getActiveSocket();
 
         this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
-            if (hasSocket) {
-                this.socket = this.socketStateService.getActiveSocket();
-            } else {
-                this.socket = null;
-            }
+            this.socket = hasSocket ? this.socketStateService.getActiveSocket() : null;
         });
     }
 
