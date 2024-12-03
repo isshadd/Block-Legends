@@ -6,7 +6,7 @@ import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameValidationService } from './gameValidation.service';
+import { GameValidationService } from './game-validation.service';
 
 const mockGameService = {
     getGameByName: jest.fn(),
