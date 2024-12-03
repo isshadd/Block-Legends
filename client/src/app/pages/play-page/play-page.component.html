@@ -1,3 +1,6 @@
+@if(debugService.isDebugMode){
+<div class="debug-mod"></div>
+}
 <div id="page-container">
     <div id="side-menu">
         <app-play-game-side-view-bar
@@ -26,12 +29,6 @@
             (mapTileMouseLeave)="onMapTileMouseLeave($event)"
         >
         </app-map>
-        <!-- 
-        <app-timer
-            [playerTurnName]="playGameBoardManagerService.getCurrentPlayerTurnName()"
-            [seconds]="playGameBoardManagerService.currentTime"
-            [isBattle]="playGameBoardManagerService.areOtherPlayersInBattle"
-        ></app-timer> -->
 
         @if (playPageMouseHandlerService.rightSelectedTile && !this.debugService.isDebugMode) {
         <app-info-panel id="info-container" [tile]="playPageMouseHandlerService.rightSelectedTile" (close)="closeTileInfoPanel()"></app-info-panel>
