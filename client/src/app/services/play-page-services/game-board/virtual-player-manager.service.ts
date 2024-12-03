@@ -266,6 +266,7 @@ export class VirtualPlayerManagerService {
         let nearestOpenDoor: OpenDoor | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
+        // TODO: Fix this
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove instanceof OpenDoor) {
                 const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
@@ -385,7 +386,6 @@ export class VirtualPlayerManagerService {
             [ItemType.Sword]: 10,
             [ItemType.Flag]: 10,
             [ItemType.Totem]: 8,
-            [ItemType.Random]: 5,
         };
 
         return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;
