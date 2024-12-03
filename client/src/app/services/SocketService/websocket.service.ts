@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { AvatarService } from '@app/services/avatar.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
@@ -11,11 +12,10 @@ import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { AvatarService } from '../avatar.service';
 // eslint-disable-next-line no-restricted-imports
 // This line is necessary for the import of WebsocketService
+import { DebugService } from '@app/services/debug.service';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
-import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
