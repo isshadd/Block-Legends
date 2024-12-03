@@ -30,7 +30,6 @@ export const enum SocketEvents {
     TOGGLE_DEBUG_MODE = 'toggleDebugMode',
     DEBUG_MODE_OFF = 'debugModeOff',
     //INCREMENT_COLOR_COUNTER = 'incrementColorCounter',
-    CONNEXION = 'connexion',
 
     // RECUS
     ROOM_STATE = 'roomState',
