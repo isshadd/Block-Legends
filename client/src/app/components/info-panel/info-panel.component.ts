@@ -42,6 +42,7 @@ export class InfoPanelComponent {
     }
 
     closePanel() {
+        console.log('closePanel');
         this.closePanelEvent.emit();
     }
 }
