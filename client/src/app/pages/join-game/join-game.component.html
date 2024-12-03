@@ -23,5 +23,8 @@
             <button class="dark-button" (click)="joinGame()">Rejoindre la Partie</button>
             }
         </div>
+        @if(this.isErrorMessageVisible){
+        <div class="error">{{ errorMessage }}</div>
+        }
     </div>
 </body>

@@ -203,7 +203,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const kicked = this.gameSocketRoomService.kickPlayer(accessCode, player.socketId, client.id);
         if (kicked) {
             this.server.to(accessCode.toString()).emit(SocketEvents.PLAYER_KICKED, {
-                message: 'Vous avez été expulsé de la salle',
+                message: `Le joueur ${player.name} a été expulsé de la salle`,
                 kickedPlayerId: player.socketId,
             });
 
