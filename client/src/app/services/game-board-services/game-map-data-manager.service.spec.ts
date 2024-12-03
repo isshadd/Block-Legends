@@ -7,10 +7,12 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Spawn } from '@common/classes/Items/spawn';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
@@ -632,6 +634,40 @@ describe('GameMapDataManagerService', () => {
         expect(result).not.toContain(nonSpawnTile);
     });
 
+    describe('getTerrainTilesCount', () => {
+        it('should return the correct count of terrain tiles', () => {
+            const terrainTile1 = new GrassTile();
+            const terrainTile2 = new GrassTile();
+            const nonTerrainTile = new WallTile();
+
+            service['currentGrid'] = [
+                [terrainTile1, nonTerrainTile],
+                [nonTerrainTile, terrainTile2],
+            ];
+
+            const result = service.getTerrainTilesCount();
+
+            expect(result).toBe(2);
+        });
+    });
+
+    describe('getDoorsCount', () => {
+        it('should return the correct count of door tiles', () => {
+            const doorTile1 = new DoorTile();
+            const doorTile2 = new DoorTile();
+            const nonDoorTile = new GrassTile();
+
+            service['currentGrid'] = [
+                [doorTile1, nonDoorTile],
+                [nonDoorTile, doorTile2],
+            ];
+
+            const result = service.getDoorsCount();
+
+            expect(result).toBe(2);
+        });
+    });
+
     it('should call findAllReachableTiles on Pathfinder with the correct coordinates and movePoints', () => {
         const startCoordinates: Vec2 = { x: 1, y: 1 };
         const movePoints = 3;
@@ -794,7 +830,8 @@ describe('GameMapDataManagerService', () => {
             }
         });
 
-        it('should return the spawnTile if it is a wlakable tile and has no player', () => {
+        it('should return the spawnTile if it is a walkable tile and has no player', () => {
+            spawnTile.player = null;
             const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
 
             expect(result).toBe(spawnTile);
