@@ -11,6 +11,7 @@ import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
@@ -722,6 +723,56 @@ describe('GameMapDataManagerService', () => {
 
             // Act & Assert
             expect(() => service.getClosestWalkableTileWithoutPlayerAt(mockPlayer)).toThrowError('No walkable tile found');
+        });
+    });
+
+    describe('#getClosestTerrainTileWithoutItemAt', () => {
+        let startTile = new GrassTile();
+        beforeEach(() => {
+            service['currentGrid'] = [
+                [startTile, new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+            ];
+            for (let row = 0; row < service['currentGrid'].length; row++) {
+                for (let col = 0; col < service['currentGrid'][row].length; col++) {
+                    service['currentGrid'][row][col].coordinates = { x: row, y: col };
+                }
+            }
+        });
+
+        it('should return the startTile if it is a terrain tile and has no item', () => {
+            startTile.item = null;
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).toBe(startTile);
+        });
+
+        it('should return a neighbor tile if start tile has an item', () => {
+            startTile.item = new DiamondSword();
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).not.toBe(startTile);
+        });
+
+        it('should return a far neighbor tile, if all direct neighbors have items', () => {
+            startTile.item = new DiamondSword();
+            (service['currentGrid'][0][1] as TerrainTile).item = new DiamondSword();
+            (service['currentGrid'][1][0] as TerrainTile).item = new DiamondSword();
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).not.toBe(startTile);
+            expect(result).not.toBe(service['currentGrid'][0][1] as TerrainTile);
+            expect(result).not.toBe(service['currentGrid'][1][0] as TerrainTile);
+        });
+
+        it('should throw error if no terrain tile found', () => {
+            service['currentGrid'] = [[new WallTile()], [new WallTile()]];
+
+            expect(() => service.getClosestTerrainTileWithoutItemAt(startTile)).toThrowError('No terrain tile found');
         });
     });
 
