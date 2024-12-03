@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { POTION_DEFENSE_BONUS } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { BattleManagerService } from './battle-manager.service';
@@ -103,9 +104,8 @@ export class VirtualPlayerBattleManagerService {
 
     defenseDiceResult(enemyPlayer: PlayerCharacter, enemyRemainingHealth: number): number {
         if (this.battleManagerService.doesPlayerHaveItem(enemyPlayer, ItemType.MagicShield) && enemyRemainingHealth === 1) {
-            const potionDefenseBoost = 100;
             if (Math.random() < 0.5) {
-                return potionDefenseBoost;
+                return POTION_DEFENSE_BONUS;
             }
         }
         let enemyPlayerDefence: number = enemyPlayer.attributes.defense;

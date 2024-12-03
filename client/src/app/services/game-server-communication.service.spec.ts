@@ -142,7 +142,6 @@ describe('GameServerCommunicationService', () => {
     });
 
     it('should throw error messages for "addGame" operation with error.errors', () => {
-        // const operation: 'addGame' = 'addGame';
         const error = { error: { errors: ['Error1', 'Error2'] } };
 
         const handleErrorsFn = (service as GameServerCommunicationService)['handleErrors']();

@@ -5,11 +5,9 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER, SUBSTRACT_ONE, SUBSTRACT_TWO } from '@common/constants/game_constants';
 
-const NINE = 9;
-const ONE = 1;
-const THIRTY_SIX = 36;
-const TWO = 2;
+
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -82,7 +80,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!player.isVirtual) {
             player.socketId = client.id;
         } else {
-            player.socketId = `${Math.random().toString(THIRTY_SIX).substr(ONE, NINE)}_${Math.random().toString(THIRTY_SIX).substr(TWO, NINE)}`;
+            player.socketId = `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_ONE, RANDOM_NUMBER)}_${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_TWO, RANDOM_NUMBER)}`;
         }
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 

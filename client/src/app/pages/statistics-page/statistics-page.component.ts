@@ -5,6 +5,7 @@ import { ClavardageComponent } from '@app/components/clavardage/clavardage.compo
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { GameStatisticsService, SortAttribute, SortDirection } from '@app/services/play-page-services/game-statistics.service';
+import { SECONDS_IN_A_MINUTE, SECONDS_IN_AN_HOUR } from '@common/constants/game_constants';
 
 @Component({
     selector: 'app-statistics-page',
@@ -23,9 +24,6 @@ export class StatisticsPageComponent {
     ) {}
 
     formatGameTime(totalGameTime: number): string {
-        const SECONDS_IN_AN_HOUR = 3600;
-        const SECONDS_IN_A_MINUTE = 60;
-
         const hours = Math.floor(totalGameTime / SECONDS_IN_AN_HOUR);
         const minutes = Math.floor((totalGameTime % SECONDS_IN_AN_HOUR) / SECONDS_IN_A_MINUTE);
         const seconds = totalGameTime % SECONDS_IN_A_MINUTE;

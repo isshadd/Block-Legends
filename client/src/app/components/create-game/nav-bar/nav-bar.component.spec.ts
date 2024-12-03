@@ -22,8 +22,8 @@ describe('NavBarComponent', () => {
     });
 
     it('should select a mode', () => {
-        const mode = GameMode.Classique;
-        component.selectMode(mode);
-        expect(component.selectedMode).toEqual(mode);
+        const gameMode = GameMode.Classique;
+        component.selectMode(gameMode);
+        expect(component.selectedMode).toEqual(gameMode);
     });
 });
