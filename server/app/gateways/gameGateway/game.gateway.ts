@@ -7,8 +7,6 @@ import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGa
 import { Server, Socket } from 'socket.io';
 import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER, SUBSTRACT_ONE, SUBSTRACT_TWO } from '@common/constants/game_constants';
 
-
-
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
@@ -80,7 +78,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         if (!player.isVirtual) {
             player.socketId = client.id;
         } else {
-            player.socketId = `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_ONE, RANDOM_NUMBER)}_${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_TWO, RANDOM_NUMBER)}`;
+            player.socketId = `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_ONE, RANDOM_NUMBER)}_${Math.random()
+                .toString(RANDOM_SOCKET_NUMBER)
+                .substr(SUBSTRACT_TWO, RANDOM_NUMBER)}`;
         }
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
