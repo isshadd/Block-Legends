@@ -347,7 +347,8 @@ export class VirtualPlayerManagerService {
 
     isInventoryFull(player: PlayerCharacter): boolean {
         const fullInventorySize = 2;
-        return player.inventory.length >= fullInventorySize;
+        const nonEmptyItems = player.inventory.filter((inventoryItem) => inventoryItem.type !== ItemType.EmptyItem).length;
+        return nonEmptyItems >= fullInventorySize;
     }
 
     isNewItemBetterThanOthersInInventory(player: PlayerCharacter, item: Item): boolean {
