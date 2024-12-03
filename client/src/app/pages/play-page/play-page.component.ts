@@ -194,7 +194,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     turnOffDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            this.eventJournalService.broadcastEvent('Mode débogage désactivé (Abandon de l\'organisateur)', []);
+            this.eventJournalService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
             this.webSocketService.debugModeOff();
         }
     }

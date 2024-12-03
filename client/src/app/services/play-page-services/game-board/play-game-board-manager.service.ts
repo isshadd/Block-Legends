@@ -290,14 +290,14 @@ export class PlayGameBoardManagerService {
         const item = terrainTile.item;
         if (item?.isGrabbable()) {
             if (player.inventory.some((invItem) => invItem.type === ItemType.EmptyItem)) {
-            this.signalUserGrabbedItem.next({
-                itemType: item.type,
-                tileCoordinates: terrainTile.coordinates,
-                playerTurnId: player.socketId,
-            });
-            this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${item.type}`, [player]);
+                this.signalUserGrabbedItem.next({
+                    itemType: item.type,
+                    tileCoordinates: terrainTile.coordinates,
+                    playerTurnId: player.socketId,
+                });
+                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${item.type}`, [player]);
             } else {
-            possibleItems.push(...player.inventory, item);
+                possibleItems.push(...player.inventory, item);
             }
             return true;
         }
@@ -318,7 +318,7 @@ export class PlayGameBoardManagerService {
 
             const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
             if (tile?.isTerrain() && (tile as TerrainTile).item?.type === itemType) {
-            (tile as TerrainTile).removeItem();
+                (tile as TerrainTile).removeItem();
             }
         }
     }
@@ -337,7 +337,7 @@ export class PlayGameBoardManagerService {
 
             const tile = this.gameMapDataManagerService.getTileAt(tileCoordinate);
             if (tile?.isTerrain()) {
-            (tile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
+                (tile as TerrainTile).item = this.itemFactoryService.createItem(itemType);
             }
         }
     }
@@ -356,12 +356,12 @@ export class PlayGameBoardManagerService {
             this.signalUserThrewItem.next({ itemType: item.type, tileCoordinates: terrainTile.coordinates, playerTurnId: currentPlayer.socketId });
             const grabbedItem = terrainTile.item;
             if (grabbedItem) {
-            this.signalUserGrabbedItem.next({
-                itemType: grabbedItem.type,
-                tileCoordinates: terrainTile.coordinates,
-                playerTurnId: currentPlayer.socketId,
-            });
-            this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${grabbedItem.type}`, [currentPlayer]);
+                this.signalUserGrabbedItem.next({
+                    itemType: grabbedItem.type,
+                    tileCoordinates: terrainTile.coordinates,
+                    playerTurnId: currentPlayer.socketId,
+                });
+                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${grabbedItem.type}`, [currentPlayer]);
             }
         }
 
@@ -559,10 +559,10 @@ export class PlayGameBoardManagerService {
 
     userDropAllItems(startTile: Tile, player: PlayerCharacter) {
         player.inventory
-            .filter(item => item.type !== ItemType.EmptyItem)
-            .forEach(item => {
-            const closestTile = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
-            this.throwItem(player.socketId, item.type, closestTile.coordinates);
+            .filter((item) => item.type !== ItemType.EmptyItem)
+            .forEach((item) => {
+                const closestTile = this.gameMapDataManagerService.getClosestTerrainTileWithoutItemAt(startTile);
+                this.throwItem(player.socketId, item.type, closestTile.coordinates);
             });
     }
 

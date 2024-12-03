@@ -51,10 +51,10 @@ export class PlayPageMouseHandlerService implements OnDestroy {
 
         if (possibleTileMove) {
             this.lastTilePath = possibleTileMove;
-            this.lastTilePath.forEach(possibleTile => {
-            if (!this.actionTiles.includes(possibleTile)) {
-                possibleTile.visibleState = VisibleState.Selected;
-            }
+            this.lastTilePath.forEach((possibleTile) => {
+                if (!this.actionTiles.includes(possibleTile)) {
+                    possibleTile.visibleState = VisibleState.Selected;
+                }
             });
         } else if (!this.actionTiles.includes(tile)) {
             tile.visibleState = VisibleState.Hovered;

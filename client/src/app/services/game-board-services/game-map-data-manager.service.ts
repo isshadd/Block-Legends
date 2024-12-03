@@ -183,11 +183,11 @@ export class GameMapDataManagerService {
     }
 
     getTerrainTilesCount(): number {
-        return this.currentGrid.reduce((acc, row) => acc.concat(row), []).filter(tile => tile.isTerrain()).length;
+        return this.currentGrid.reduce((acc, row) => acc.concat(row), []).filter((tile) => tile.isTerrain()).length;
     }
 
     getDoorsCount(): number {
-        return this.currentGrid.reduce((count, row) => count + row.filter(tile => tile.isDoor()).length, 0);
+        return this.currentGrid.reduce((count, row) => count + row.filter((tile) => tile.isDoor()).length, 0);
     }
 
     getPossibleMovementTiles(coordinates: Vec2, movePoints: number): Map<Tile, Tile[]> {

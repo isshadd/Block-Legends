@@ -281,10 +281,10 @@ export class VirtualPlayerManagerService {
     }
 
     findNearestClosedDoor(player: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
-        const move = Array.from(possibleMoves.keys()).find((move) =>
+        const moves = Array.from(possibleMoves.keys()).find((move) =>
             this.gameMapDataManagerService.getNeighbours(move).some((tile) => tile instanceof DoorTile),
         );
-        return move as WalkableTile | null;
+        return moves as WalkableTile | null;
     }
 
     findNearestPossiblePlayer(virtualPlayer: PlayerCharacter, possibleMoves: Map<Tile, Tile[]>): WalkableTile | null {
@@ -371,7 +371,7 @@ export class VirtualPlayerManagerService {
             [ItemType.Totem]: 8,
         };
 
-        return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;
+        return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 1;
     }
 
     getDefensivePlayerItemPriority(itemType: ItemType): number {
@@ -382,7 +382,7 @@ export class VirtualPlayerManagerService {
             [ItemType.EnchantedBook]: 8,
         };
 
-        return DEFENSIVE_PRIORITY[itemType as keyof typeof DEFENSIVE_PRIORITY] || 0;
+        return DEFENSIVE_PRIORITY[itemType as keyof typeof DEFENSIVE_PRIORITY] || 1;
     }
 
     calculateDistance(from: Vec2, to: Vec2): number {
