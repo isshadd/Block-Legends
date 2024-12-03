@@ -557,6 +557,73 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
+    describe('grabItem', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockTile: GrassTile;
+        let mockItem: Item;
+
+        beforeEach(() => {
+            mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.inventory = [new EmptyItem(), new Chestplate(), new EmptyItem()];
+            mockTile = new GrassTile();
+            mockTile.coordinates = { x: 1, y: 1 } as Vec2;
+            mockItem = new DiamondSword();
+
+            spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayer);
+            spyOn(service, 'addItemEffect');
+            spyOn(service.itemFactoryService, 'createItem').and.callFake((type: ItemType) => {
+                if (type === ItemType.EmptyItem) {
+                    return new EmptyItem();
+                }
+                return mockItem;
+            });
+            gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTile);
+        });
+
+        it('should do nothing if player is not found', () => {
+            (service.findPlayerFromSocketId as jasmine.Spy).and.returnValue(null);
+
+            service.grabItem('player1', ItemType.Sword, { x: 1, y: 1 });
+
+            expect(service.addItemEffect).not.toHaveBeenCalled();
+            expect(service.itemFactoryService.createItem).not.toHaveBeenCalled();
+            expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();
+        });
+
+        it('should add item to inventory, apply item effect, and remove item from tile if empty slot is found', () => {
+            mockTile.item = mockItem;
+            spyOn(mockTile, 'removeItem');
+            service.grabItem('player1', ItemType.Sword, { x: 1, y: 1 });
+
+            expect(service.itemFactoryService.createItem).toHaveBeenCalledWith(ItemType.Sword);
+            expect(mockPlayer.inventory[0].type).toBe(ItemType.Sword);
+            expect(service.addItemEffect).toHaveBeenCalledWith(mockPlayer, mockItem);
+            expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith({ x: 1, y: 1 });
+            expect(mockTile.removeItem).toHaveBeenCalled();
+        });
+
+        it('should not add item to inventory or apply item effect if no empty slot is found', () => {
+            mockPlayer.inventory = [new DiamondSword(), new Chestplate(), new Totem()];
+
+            service.grabItem('player1', ItemType.Sword, { x: 1, y: 1 });
+
+            expect(service.itemFactoryService.createItem).not.toHaveBeenCalled();
+            expect(service.addItemEffect).not.toHaveBeenCalled();
+            expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();
+        });
+
+        it('should not remove item from tile if tile is not terrain or item type does not match', () => {
+            const wallTile = new WallTile();
+            gameMapDataManagerServiceSpy.getTileAt.and.returnValue(wallTile);
+
+            service.grabItem('player1', ItemType.Sword, { x: 1, y: 1 });
+
+            expect(service.itemFactoryService.createItem).toHaveBeenCalledWith(ItemType.Sword);
+            expect(mockPlayer.inventory[0].type).toBe(ItemType.Sword);
+            expect(service.addItemEffect).toHaveBeenCalledWith(mockPlayer, mockItem);
+        });
+    });
+
     describe('throwItem', () => {
         let mockPlayer: PlayerCharacter;
         let mockTile: TerrainTile;
