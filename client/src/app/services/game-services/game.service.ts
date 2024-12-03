@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/member-ordering*/
+/* eslint-disable @typescript-eslint/member-ordering*/ // Disabling member ordering is necessary for the `accessCodeSubject` and `characterSubject` to be declared before being used
 
 import { Injectable } from '@angular/core';
 import { AvatarService } from '@app/services/avatar.service';
@@ -9,7 +9,6 @@ import { BehaviorSubject, Subject } from 'rxjs';
 
 export const VP_NUMBER = 5;
 const NINE = 9;
-// const TWO = 2;
 const THIRTY_SIX = 36;
 
 @Injectable({

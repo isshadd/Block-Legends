@@ -59,6 +59,7 @@ export class ListGameComponent {
     }
 
     downloadGameAsJson(game: GameShared): void {
+        // this line is necessary for the code the work
         // eslint-disable-next-line
         const { isVisible: _, ...gameWithoutVisibility } = game;
         const gameJson = JSON.stringify(gameWithoutVisibility, null, 2);

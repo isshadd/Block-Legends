@@ -1,4 +1,4 @@
-/* eslint-disable max-params*/ // impossible d'instancier le service sans ces paramètres
+/* eslint-disable max-params*/ // impossible to instantiate the service without these parameters
 
 import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';

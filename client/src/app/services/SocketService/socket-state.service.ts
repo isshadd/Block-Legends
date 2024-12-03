@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-imports */
+/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of socket-state.service
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { BehaviorSubject } from 'rxjs';

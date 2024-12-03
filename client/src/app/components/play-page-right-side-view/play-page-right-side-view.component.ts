@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+// This line is necessary for the PlayPageRightSideViewComponent to work and should not be refactored. We have to disable max-len
 // eslint-disable-next-line max-len
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
