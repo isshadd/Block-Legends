@@ -9,7 +9,7 @@ import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 // import { GrassTile } from '@common/classes/Tiles/grass-tile';
 // import { ProfileEnum } from '@common/enums/profile';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { PlayGameBoardManagerService } from './play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '../play-game-board-manager/play-game-board-manager.service';
 import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 // import { mock } from 'node:test';
 import { Item } from '@common/classes/Items/item';

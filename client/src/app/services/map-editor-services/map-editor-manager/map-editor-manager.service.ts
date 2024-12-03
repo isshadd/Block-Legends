@@ -9,8 +9,8 @@ import { ItemType } from '@common/enums/item-type';
 import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
-import { MapEditorMouseHandlerService } from './map-editor-mouse-handler.service';
-import { MapEditorSideMenuService } from './map-editor-side-menu.service';
+import { MapEditorMouseHandlerService } from '../map-editor-mouse-handler/map-editor-mouse-handler.service';
+import { MapEditorSideMenuService } from '../map-editor-side-menu/map-editor-side-menu.service';
 
 @Injectable({
     providedIn: 'root',

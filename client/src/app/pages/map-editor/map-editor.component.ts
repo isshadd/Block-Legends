@@ -10,8 +10,8 @@ import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-compon
 // eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
-import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
+import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager/map-editor-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({

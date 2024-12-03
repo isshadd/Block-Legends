@@ -16,7 +16,7 @@ import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
-import { BattleManagerService } from './battle-manager.service';
+import { BattleManagerService } from '../battle-manager-service/battle-manager.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 describe('PlayGameBoardManagerService', () => {

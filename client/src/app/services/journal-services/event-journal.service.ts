@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SocketStateService } from '@app/services/socket-service/socket-state.service';
+import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { RoomEvent } from '@common/interfaces/RoomEvent';

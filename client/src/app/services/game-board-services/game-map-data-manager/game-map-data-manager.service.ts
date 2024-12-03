@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
-import { DebugService } from '@app/services/debug.service';
-import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { DebugService } from '@app/services/debug-service/debug.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
@@ -16,9 +19,6 @@ import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
-import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
-import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 @Injectable({
     providedIn: 'root',
 })

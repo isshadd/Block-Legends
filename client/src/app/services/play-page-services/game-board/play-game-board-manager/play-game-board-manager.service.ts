@@ -1,10 +1,11 @@
 /* eslint-disable max-lines */ // This file is a service and it's expected to have a lot of lines
 import { Injectable } from '@angular/core';
-import { DebugService } from '@app/services/debug.service';
+import { DebugService } from '@app/services/debug-service/debug.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -21,7 +22,6 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { BattleManagerService } from './battle-manager.service';
 
 @Injectable({
     providedIn: 'root',

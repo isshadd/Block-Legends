@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { CreateGameModalComponent } from '@app/components/administration-page-component/create-game-modal/create-game-modal.component';
 import { ListGameComponent } from '@app/components/administration-page-component/list-game/list-game.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
-import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 
 @Component({
     selector: 'app-administration-game',

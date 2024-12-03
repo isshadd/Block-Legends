@@ -15,7 +15,7 @@ import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { PlayGameBoardManagerService } from './play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '../play-game-board-manager/play-game-board-manager.service';
 
 @Injectable({
     providedIn: 'root',

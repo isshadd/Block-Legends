@@ -7,8 +7,8 @@ import { EventJournalComponent } from '@app/components/event-journal/event-journ
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
-import { SocketStateService } from '@app/services/socket-service/socket-state.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { MAX_VP_PLAYER_NUMBER } from '@common/constants/game_constants';

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { ColorService } from '@app/services/colors.service';
+import { ColorService } from '@app/services/colors-service/colors.service';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 
 @Component({

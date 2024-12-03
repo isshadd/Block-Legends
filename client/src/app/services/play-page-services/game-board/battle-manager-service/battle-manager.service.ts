@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DebugService } from '@app/services/debug.service';
+import { DebugService } from '@app/services/debug-service/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { POTION_DEFENSE_BONUS } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';

@@ -3,8 +3,8 @@ import { ArrowDownButtonComponent } from '@app/components/arrow-down-button/arro
 import { ArrowUpButtonComponent } from '@app/components/arrow-up-button/arrow-up-button.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
-import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
-import { GameStatisticsService, SortAttribute, SortDirection } from '@app/services/play-page-services/game-statistics.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket/play-game-board-socket.service';
+import { GameStatisticsService, SortAttribute, SortDirection } from '@app/services/play-page-services/game-statistics/game-statistics.service';
 import { SECONDS_IN_A_MINUTE, SECONDS_IN_AN_HOUR } from '@common/constants/game_constants';
 
 @Component({

@@ -1,10 +1,10 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
-import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
-import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
-import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket/play-game-board-socket.service';
+import { GameStatisticsService } from '@app/services/play-page-services/game-statistics/game-statistics.service';
+import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
@@ -13,8 +13,8 @@ import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { VirtualPlayerBattleManagerService } from './virtual-player-battle-manager.service';
-import { VirtualPlayerManagerService } from './virtual-player-manager.service';
+import { VirtualPlayerBattleManagerService } from '../../virtual-player-battle-manager/virtual-player-battle-manager.service';
+import { VirtualPlayerManagerService } from '../virtual-player-manager/virtual-player-manager.service';
 
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;

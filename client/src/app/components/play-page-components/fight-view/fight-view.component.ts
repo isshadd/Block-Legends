@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
 import { MOUVEMENT_DELAY } from '@common/constants/game_constants';
 
 @Component({

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { AvatarService } from '@app/services/avatar.service';
+import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { DebugService } from '@app/services/debug.service';
+import { DebugService } from '@app/services/debug-service/debug.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
