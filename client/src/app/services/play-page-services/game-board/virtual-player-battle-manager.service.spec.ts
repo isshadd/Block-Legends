@@ -15,6 +15,7 @@ const ICE_PENALTY = 10;
 const CENT = 100;
 const ATTACK_RESULT = 9;
 const ATTACK_RESULT_2 = -12;
+const DEFENSE_RESULT = 67;
 
 describe('VirtualPlayerBattleManagerService', () => {
     let service: VirtualPlayerBattleManagerService;
@@ -111,6 +112,22 @@ describe('VirtualPlayerBattleManagerService', () => {
         expect(result).toEqual(ATTACK_RESULT);
     });
 
+    it('should calculate defense result correctly', () => {
+        const enemyPlayer = createPlayer(ProfileEnum.Defensive, false);
+        enemyPlayer.defenseDice = ATTACK_DICE;
+        enemyPlayer.attributes.defense = ATTACK_DICE;
+
+        mockBattleManagerService.doesPlayerHaveItem.and.returnValue(false);
+
+        mockDebugService.isDebugMode = false;
+
+        spyOn(Math, 'random').and.returnValue(10);
+
+        const result = service.defenseDiceResult(enemyPlayer, REMAINING_HEALTH);
+
+        expect(result).toEqual(DEFENSE_RESULT);
+    });
+
     it('should emit attack signal on attack', () => {
         const virtualPlayer = createPlayer(ProfileEnum.Agressive, true, 'player1');
         const enemyPlayer = createPlayer(ProfileEnum.Defensive, false, 'enemy1');
@@ -199,5 +216,29 @@ describe('VirtualPlayerBattleManagerService', () => {
         const result1 = service.defenseDiceResult(enemyPlayer, 1);
 
         expect(result - result1).toBeGreaterThanOrEqual(ATTACK_RESULT_2);
+    });
+
+    it('should handle agressive comportment', () => {
+        const virtualPlayer = createPlayer(ProfileEnum.Agressive, true);
+        const enemyPlayer = createPlayer(ProfileEnum.Agressive, false);
+
+        spyOn(service, 'attack');
+
+        service.handleAgressiveComportment(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+
+        expect(service.attack).toHaveBeenCalledWith(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH);
+    });
+
+    it('should handle defensive comportment', () => {
+        const virtualPlayer = createPlayer(ProfileEnum.Defensive, true);
+        const enemyPlayer = createPlayer(ProfileEnum.Agressive, false);
+
+        spyOn(service, 'escape');
+        spyOn(service, 'attack');
+
+        service.handleDefensiveComportment(virtualPlayer, enemyPlayer, REMAINING_HEALTH, REMAINING_HEALTH, EVASION_REMAINING);
+
+        expect(service.escape).toHaveBeenCalledWith(virtualPlayer);
+        expect(service.attack).not.toHaveBeenCalled();
     });
 });
