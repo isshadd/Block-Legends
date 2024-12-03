@@ -1,12 +1,10 @@
 import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
+import { MOUVEMENT_DELAY, TURN_DELAY } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Injectable, Logger } from '@nestjs/common';
-
-const DELAY_2000_MS = 2000;
-const DELAY_500_MS = 500;
 
 @Injectable()
 export class PlayGameBoardSocketService {
@@ -142,6 +140,6 @@ export class PlayGameBoardSocketService {
     }
 
     getRandomDelay(): number {
-        return Math.floor(Math.random() * DELAY_2000_MS) + DELAY_500_MS;
+        return Math.floor(Math.random() * TURN_DELAY) + MOUVEMENT_DELAY;
     }
 }

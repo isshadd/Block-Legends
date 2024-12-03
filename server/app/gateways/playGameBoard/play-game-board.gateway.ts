@@ -8,6 +8,7 @@ import {
     PlayerNumberStatisticType,
     PlayGameStatisticsService,
 } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
+import { MOUVEMENT_INTERVAL } from '@common/constants/game_constants';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
@@ -118,12 +119,12 @@ export class PlayGameBoardGateway {
     handleVirtualPlayerChoosedDestination(client: Socket, data: { coordinates: Vec2; virtualPlayerId: string }) {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.virtualPlayerId);
         if (!room) return;
-        const movementInterval = 150;
+
         setTimeout(() => {
             this.server
                 .to(this.playGameBoardSocketService.getRandomClientInRoom(room.accessCode))
                 .emit(SocketEvents.VIRTUAL_PLAYER_MOVED, { destination: data.coordinates, virtualPlayerId: data.virtualPlayerId });
-        }, movementInterval);
+        }, MOUVEMENT_INTERVAL);
     }
 
     @SubscribeMessage(SocketEvents.USER_GRABBED_ITEM)

@@ -7,6 +7,7 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { GameStatisticsService } from '@app/services/play-page-services/game-statistics.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WAIT_TIME } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
@@ -256,10 +257,10 @@ export class PlayGameBoardSocketService implements OnDestroy {
             this.playGameBoardManagerService.endGame(data.playerTurnId);
             this.gameStatisticsService.initGameStatistics(data.gameStatistics);
             this.webSocketService.isGameFinished = true;
-            const wait = 5000;
+
             setTimeout(() => {
                 this.goToStatisticsPage();
-            }, wait);
+            }, WAIT_TIME);
         });
 
         this.socket.on(SocketEvents.LAST_PLAYER_STANDING, () => {

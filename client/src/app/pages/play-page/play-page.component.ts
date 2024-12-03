@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 // Disabling restricted imports is necessary for the import of PlayPage
 /* eslint-disable max-params */
 /* eslint-disable max-len */
@@ -30,11 +29,10 @@ import { PlayPageMouseHandlerService } from '@app/services/play-page-services/pl
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
+import { TIMEOUT_DURATION } from '@common/constants/game_constants';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayPageRightSideViewComponent } from '../../components/play-page-right-side-view/play-page-right-side-view.component';
-import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
-
-const TIMEOUT_DURATION = 500;
+import { PlayPageRightSideViewComponent } from '@app/components/play-page-right-side-view/play-page-right-side-view.component';
+import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 
 @Component({
     selector: 'app-play-page',
