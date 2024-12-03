@@ -1,5 +1,3 @@
-// src/app/services/item-factory.service.spec.ts
-
 import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
@@ -81,6 +79,12 @@ describe('ItemFactoryService', () => {
             const item = service.createItem(ItemType.Random);
             expect(item).toBeInstanceOf(RandomItem);
             expect(item.type).toBe(ItemType.Random);
+        });
+
+        it('should create an EmptyItem when ItemType.EmptyItem is passed', () => {
+            const item = service.createItem(ItemType.EmptyItem);
+            expect(item).toBeInstanceOf(Item);
+            expect(item.type).toBe(ItemType.EmptyItem);
         });
 
         it('should create a generic Item when an unknown ItemType is passed', () => {

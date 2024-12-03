@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // impossible to instantiate the service without these parameters
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -7,10 +7,12 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Spawn } from '@common/classes/Items/spawn';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
@@ -189,6 +191,71 @@ describe('GameMapDataManagerService', () => {
                 data: { message: mockError.join('<br>') },
             });
         });
+    });
+
+    it('should convert JSON file to GameShared object', async () => {
+        const mockJson = {
+            _id: '1',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            updatedAt: '2023-01-02T00:00:00.000Z',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            tiles: [[{ type: TileType.Grass }]],
+        };
+        const mockFile = new File([JSON.stringify(mockJson)], 'test.json', { type: 'application/json' });
+
+        const result = await service.convertJsonToGameShared(mockFile);
+
+        expect(result).toEqual({
+            _id: '1',
+            createdAt: new Date('2023-01-01T00:00:00.000Z'),
+            updatedAt: new Date('2023-01-02T00:00:00.000Z'),
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            isVisible: false,
+            tiles: [[{ type: TileType.Grass }]],
+        });
+    });
+
+    it('should handle JSON file with missing optional fields', async () => {
+        const mockJson = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            tiles: [[{ type: TileType.Grass }]],
+        };
+        const mockFile = new File([JSON.stringify(mockJson)], 'test.json', { type: 'application/json' });
+
+        const result = await service.convertJsonToGameShared(mockFile);
+
+        expect(result).toEqual({
+            _id: '1',
+            createdAt: undefined,
+            updatedAt: undefined,
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            isVisible: false,
+            tiles: [[{ type: TileType.Grass }]],
+        });
+    });
+
+    it('should throw an error for invalid JSON file', async () => {
+        const invalidJson = '{ invalid json }';
+        const mockFile = new File([invalidJson], 'test.json', { type: 'application/json' });
+
+        await expectAsync(service.convertJsonToGameShared(mockFile)).toBeRejectedWithError(SyntaxError);
     });
 
     it('should create a new grid for a new game', () => {
@@ -632,6 +699,40 @@ describe('GameMapDataManagerService', () => {
         expect(result).not.toContain(nonSpawnTile);
     });
 
+    describe('getTerrainTilesCount', () => {
+        it('should return the correct count of terrain tiles', () => {
+            const terrainTile1 = new GrassTile();
+            const terrainTile2 = new GrassTile();
+            const nonTerrainTile = new WallTile();
+
+            service['currentGrid'] = [
+                [terrainTile1, nonTerrainTile],
+                [nonTerrainTile, terrainTile2],
+            ];
+
+            const result = service.getTerrainTilesCount();
+
+            expect(result).toBe(2);
+        });
+    });
+
+    describe('getDoorsCount', () => {
+        it('should return the correct count of door tiles', () => {
+            const doorTile1 = new DoorTile();
+            const doorTile2 = new DoorTile();
+            const nonDoorTile = new GrassTile();
+
+            service['currentGrid'] = [
+                [doorTile1, nonDoorTile],
+                [nonDoorTile, doorTile2],
+            ];
+
+            const result = service.getDoorsCount();
+
+            expect(result).toBe(2);
+        });
+    });
+
     it('should call findAllReachableTiles on Pathfinder with the correct coordinates and movePoints', () => {
         const startCoordinates: Vec2 = { x: 1, y: 1 };
         const movePoints = 3;
@@ -722,6 +823,115 @@ describe('GameMapDataManagerService', () => {
 
             // Act & Assert
             expect(() => service.getClosestWalkableTileWithoutPlayerAt(mockPlayer)).toThrowError('No walkable tile found');
+        });
+    });
+
+    describe('getClosestTerrainTileWithoutItemAt', () => {
+        const startTile = new GrassTile();
+        beforeEach(() => {
+            service['currentGrid'] = [
+                [startTile, new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+            ];
+            for (let row = 0; row < service['currentGrid'].length; row++) {
+                for (let col = 0; col < service['currentGrid'][row].length; col++) {
+                    service['currentGrid'][row][col].coordinates = { x: row, y: col };
+                }
+            }
+        });
+
+        it('should return the startTile if it is a terrain tile and has no item', () => {
+            startTile.item = null;
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).toBe(startTile);
+        });
+
+        it('should return a neighbor tile if start tile has an item', () => {
+            startTile.item = new DiamondSword();
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).not.toBe(startTile);
+        });
+
+        it('should return a far neighbor tile, if all direct neighbors have items', () => {
+            startTile.item = new DiamondSword();
+            (service['currentGrid'][0][1] as TerrainTile).item = new DiamondSword();
+            (service['currentGrid'][1][0] as TerrainTile).item = new DiamondSword();
+
+            const result = service.getClosestTerrainTileWithoutItemAt(startTile);
+
+            expect(result).not.toBe(startTile);
+            expect(result).not.toBe(service['currentGrid'][0][1] as TerrainTile);
+            expect(result).not.toBe(service['currentGrid'][1][0] as TerrainTile);
+        });
+
+        it('should throw error if no terrain tile found', () => {
+            startTile.item = new DiamondSword();
+            spyOn(service, 'getNeighbours').and.returnValue([]);
+
+            expect(() => service.getClosestTerrainTileWithoutItemAt(startTile)).toThrowError('No terrain tile found');
+        });
+    });
+
+    describe('getClosestWalkableTileWithoutPlayerAt', () => {
+        const spawnTile = new GrassTile();
+        const playerMapEntity = new PlayerMapEntity('player');
+        playerMapEntity.spawnCoordinates = { x: 0, y: 0 };
+
+        beforeEach(() => {
+            service['currentGrid'] = [
+                [spawnTile, new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+                [new GrassTile(), new GrassTile(), new GrassTile()],
+            ];
+            for (let row = 0; row < service['currentGrid'].length; row++) {
+                for (let col = 0; col < service['currentGrid'][row].length; col++) {
+                    service['currentGrid'][row][col].coordinates = { x: row, y: col };
+                }
+            }
+        });
+
+        it('should return the spawnTile if it is a walkable tile and has no player', () => {
+            spawnTile.player = null;
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).toBe(spawnTile);
+        });
+
+        it('should return a neighbor tile if spawnTile has another player', () => {
+            const otherMapEntity = new PlayerMapEntity('player2');
+            spawnTile.player = otherMapEntity;
+
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).not.toBe(spawnTile);
+        });
+
+        it('should return a far neighbor tile, if all direct neighbors have players', () => {
+            const otherMapEntity = new PlayerMapEntity('player2');
+            const otherMapEntity2 = new PlayerMapEntity('player3');
+            const otherMapEntity3 = new PlayerMapEntity('player4');
+            spawnTile.player = otherMapEntity;
+            (service['currentGrid'][0][1] as TerrainTile).player = otherMapEntity2;
+            (service['currentGrid'][1][0] as TerrainTile).player = otherMapEntity3;
+
+            const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
+
+            expect(result).not.toBe(spawnTile);
+            expect(result).not.toBe(service['currentGrid'][0][1] as TerrainTile);
+            expect(result).not.toBe(service['currentGrid'][1][0] as TerrainTile);
+        });
+
+        it('should throw error if no walkable tile found', () => {
+            const otherMapEntity = new PlayerMapEntity('player2');
+            spawnTile.player = otherMapEntity;
+            spyOn(service, 'getNeighbours').and.returnValue([]);
+
+            expect(() => service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity)).toThrowError('No walkable tile found');
         });
     });
 

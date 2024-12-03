@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-imports */
+// Disabling restricted imports is necessary for the import of PlayPage
 /* eslint-disable max-params */
 /* eslint-disable max-len */
+// This file is necessary for the PlayPageComponent to work and should not be refactored. We have to disable max-len
 /* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +10,9 @@ import { MapComponent } from '@app/components/game-board-components/map/map.comp
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
+// this line is necessary for the import of PlayPage
 // eslint-disable-next-line
+
 import { ItemChooseComponent } from '@app/components/item-choose/item-choose.component';
 import { PlayGameSideViewBarComponent } from '@app/components/play-game-side-view-bar/play-game-side-view-bar.component';
 import { FightViewComponent } from '@app/components/play-page-components/fight-view/fight-view.component';
@@ -27,8 +31,8 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
-import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 import { PlayPageRightSideViewComponent } from '../../components/play-page-right-side-view/play-page-right-side-view.component';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 
 const TIMEOUT_DURATION = 500;
 

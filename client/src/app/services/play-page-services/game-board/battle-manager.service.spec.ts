@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // Disabling max-lines is necessary for the testing of the battle manager service
 import { TestBed } from '@angular/core/testing';
 import { Totem } from '@common/classes/Items/totem';
 import { PlayerCharacter } from '@common/classes/Player/player-character';

@@ -1,3 +1,4 @@
+// this line is necessary for the import of GameServerCommunicationService
 // eslint-disable-next-line
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
@@ -18,6 +19,7 @@ describe('GameServerCommunicationService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
+            // this is necessary to be able to test the service
             // eslint-disable-next-line
             imports: [HttpClientTestingModule],
             providers: [GameServerCommunicationService],

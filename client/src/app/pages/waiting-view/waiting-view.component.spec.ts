@@ -87,12 +87,12 @@ describe('WaitingViewComponent', () => {
         component = fixture.componentInstance;
     });
 
-    it('devrait créer le composant', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
     describe('ngOnInit', () => {
-        it("devrait initialiser pour l'organisateur", fakeAsync(() => {
+        it('should initialize for the organizer', fakeAsync(() => {
             component.ngOnInit();
             tick();
 
@@ -107,7 +107,7 @@ describe('WaitingViewComponent', () => {
             expect(component.playersCounter).toBe(0);
         }));
 
-        it('devrait initialiser pour un non-organisateur', fakeAsync(() => {
+        it('should initialize for a non-organizer', fakeAsync(() => {
             const nonOrgCharacter = { ...mockCharacter, isOrganizer: false };
             (gameServiceSpy.character$ as BehaviorSubject<PlayerCharacter>).next(nonOrgCharacter as PlayerCharacter);
 
@@ -120,7 +120,7 @@ describe('WaitingViewComponent', () => {
             expect(component.playersCounter).toBe(0);
         }));
 
-        it('devrait retourner tôt si le character est null', fakeAsync(() => {
+        it('should return early if the `character` is null', fakeAsync(() => {
             (gameServiceSpy.character$ as BehaviorSubject<PlayerCharacter | null>).next(null);
             component.ngOnInit();
             tick();
@@ -129,7 +129,7 @@ describe('WaitingViewComponent', () => {
             expect(webSocketServiceSpy.createGame).not.toHaveBeenCalled();
         }));
 
-        it("devrait gérer l'abonnement players$", fakeAsync(() => {
+        it('should handle the subscription to `players$`', fakeAsync(() => {
             component.ngOnInit();
             tick();
             (webSocketServiceSpy.players$ as BehaviorSubject<PlayerCharacter[]>).next([{} as PlayerCharacter, {} as PlayerCharacter]);
@@ -138,7 +138,7 @@ describe('WaitingViewComponent', () => {
             expect(component.playersCounter).toBe(2); // Taille de players
         }));
 
-        it("devrait gérer l'abonnement maxPlayers$", fakeAsync(() => {
+        it('should handle the subscription to `maxPlayers$`', fakeAsync(() => {
             component.ngOnInit();
             tick();
             (webSocketServiceSpy.maxPlayers$ as BehaviorSubject<number>).next(PLAYER6);
@@ -147,11 +147,11 @@ describe('WaitingViewComponent', () => {
             expect(component.maxPlayers).toBe(PLAYER6);
         }));
 
-        it("devrait gérer l'événement organizerLeft quand non-organisateur", fakeAsync(() => {
+        it('should handle the `organizerLeft` event when not the organizer', fakeAsync(() => {
             component.isOrganizer = false;
             component.ngOnInit();
 
-            const socketCallback = mockSocket.on.calls.argsFor(0)[1]; // Récupérer le callback pour ORGANIZER_LEFT
+            const socketCallback = mockSocket.on.calls.argsFor(0)[1];
             socketCallback();
             tick();
 
@@ -159,11 +159,11 @@ describe('WaitingViewComponent', () => {
             expect(routerSpy.navigate).toHaveBeenCalled();
         }));
 
-        it("ne devrait pas gérer l'événement organizerLeft quand organisateur", fakeAsync(() => {
+        it('should not handle the `organizerLeft` event when the organizer', fakeAsync(() => {
             component.isOrganizer = true;
             component.ngOnInit();
 
-            const socketCallback = mockSocket.on.calls.argsFor(0)[1]; // Récupérer le callback pour ORGANIZER_LEFT
+            const socketCallback = mockSocket.on.calls.argsFor(0)[1];
             socketCallback();
             tick();
 
@@ -171,7 +171,7 @@ describe('WaitingViewComponent', () => {
             expect(routerSpy.navigate).toHaveBeenCalled();
         }));
 
-        it("devrait gérer avatarTakenError$ et réessayer d'ajouter un joueur virtuel", fakeAsync(() => {
+        it('should handle `avatarTakenError$` and retry adding a virtual player', fakeAsync(() => {
             component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 0;
             component.maxVirtualPlayerRetries = 2;
@@ -187,7 +187,7 @@ describe('WaitingViewComponent', () => {
             expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalled();
         }));
 
-        it('devrait réinitialiser lastVirtualPlayerProfile quand les tentatives max sont atteintes', fakeAsync(() => {
+        it('should reset `lastVirtualPlayerProfile` when maximum attempts are reached', fakeAsync(() => {
             component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
             component.virtualPlayerRetryCount = 2;
             component.maxVirtualPlayerRetries = 2;
@@ -298,7 +298,7 @@ describe('WaitingViewComponent', () => {
         expect(webSocketServiceSpy.kickPlayer).toHaveBeenCalledWith(playerToKick);
     });
 
-    it('ne devrait pas kickPlayer quand non-organisateur', () => {
+    it('should not kickPlayer when not the organizer', () => {
         const playerToKick = {} as PlayerCharacter;
         component.isOrganizer = false;
 
@@ -307,12 +307,12 @@ describe('WaitingViewComponent', () => {
         expect(webSocketServiceSpy.kickPlayer).not.toHaveBeenCalled();
     });
 
-    it('devrait gérer playGame', () => {
+    it('should handle playGame', () => {
         component.playGame();
         expect(webSocketServiceSpy.startGame).toHaveBeenCalled();
     });
 
-    it('devrait gérer changeRoomId avec newRoomId', () => {
+    it('should handle changeRoomId with newRoomId', () => {
         const newRoomId = 4321;
         component.changeRoomId(newRoomId);
 
@@ -324,13 +324,13 @@ describe('WaitingViewComponent', () => {
         });
     });
 
-    it('ne devrait pas naviguer quand changeRoomId est appelé avec null', () => {
+    it('should not navigate when changeRoomId is called with null', () => {
         component.changeRoomId(null);
 
         expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
-    it('devrait gérer ngOnDestroy', () => {
+    it('should handle ngOnDestroy', () => {
         const destroyNextSpy = spyOn(component['destroy$'], 'next');
         const destroyCompleteSpy = spyOn(component['destroy$'], 'complete');
 
@@ -342,14 +342,14 @@ describe('WaitingViewComponent', () => {
     });
 
     describe('toggleView', () => {
-        it('devrait basculer showClavardage de true à false', () => {
+        it('should toggle showClavardage from true to false', () => {
             component.showClavardage = true;
             component.toggleView();
 
             expect(component.showClavardage).toBeFalse();
         });
 
-        it('devrait basculer showClavardage de false à true', () => {
+        it('should toggle showClavardage from false to true', () => {
             component.showClavardage = false;
             component.toggleView();
 

@@ -2,10 +2,10 @@
 .info-char {
     display: flex;
     flex-direction: row-reverse;
-    justify-content: center; // Centers the content horizontally
-    align-items: center; // Centers the content vertically
+    justify-content: center;
+    align-items: center; 
     background-color: $primary-dark;
-    max-width: fit-content; // Adjusts the width to fit its contents
+    max-width: fit-content; 
     height: 100%;
     padding-right: 15px;
     overflow: hidden;

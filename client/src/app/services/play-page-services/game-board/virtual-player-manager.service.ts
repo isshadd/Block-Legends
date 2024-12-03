@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */ // pour le moment, le service est trop complexe pour être simplifié
+/* eslint-disable max-lines */ // This service is necessary for virtual players to be able to play the game, because it manages the virtual players' turns and movements. Sadly it can not be split into smaller services.
 
 import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -266,6 +266,7 @@ export class VirtualPlayerManagerService {
         let nearestOpenDoor: OpenDoor | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
+        // TODO: Fix this
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove instanceof OpenDoor) {
                 const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
@@ -385,7 +386,6 @@ export class VirtualPlayerManagerService {
             [ItemType.Sword]: 10,
             [ItemType.Flag]: 10,
             [ItemType.Totem]: 8,
-            [ItemType.Random]: 5,
         };
 
         return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;

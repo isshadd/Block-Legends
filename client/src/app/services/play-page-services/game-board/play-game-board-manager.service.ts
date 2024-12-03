@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // This file is a service and it's expected to have a lot of lines
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -649,6 +649,20 @@ export class PlayGameBoardManagerService {
         return neighboursTiles.filter((neighbourTile) => {
             return (neighbourTile instanceof WalkableTile && neighbourTile.hasPlayer()) || neighbourTile.isDoor();
         });
+    }
+
+    canPlayerDoAction(): boolean {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) {
+            return false;
+        }
+
+        const playerTile = this.getPlayerTile(currentPlayer);
+        if (!playerTile) {
+            return false;
+        }
+
+        return this.getAdjacentActionTiles(playerTile).length > 0;
     }
 
     findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {
