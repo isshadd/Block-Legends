@@ -103,13 +103,13 @@ export class PlayGameBoardManagerService {
             const tile = tilesWithSpawn[index];
 
             if (player && tile) {
-            player.mapEntity = new PlayerMapEntity(player.avatar.headImage);
-            tile.setPlayer(player.mapEntity);
-            player.mapEntity.setSpawnCoordinates(tile.coordinates);
-            availableTiles.splice(availableTiles.indexOf(tile), 1);
+                player.mapEntity = new PlayerMapEntity(player.avatar.headImage);
+                tile.setPlayer(player.mapEntity);
+                player.mapEntity.setSpawnCoordinates(tile.coordinates);
+                availableTiles.splice(availableTiles.indexOf(tile), 1);
             }
         });
-        availableTiles.forEach(tile => tile.item = null);
+        availableTiles.forEach((tile) => (tile.item = null));
     }
 
     startTurn() {
@@ -139,7 +139,7 @@ export class PlayGameBoardManagerService {
     setPossibleMoves(playerCharacter: PlayerCharacter) {
         this.userCurrentPossibleMoves = this.gameMapDataManagerService.getPossibleMovementTiles(
             playerCharacter.mapEntity.coordinates,
-            playerCharacter.currentMovePoints
+            playerCharacter.currentMovePoints,
         );
     }
 

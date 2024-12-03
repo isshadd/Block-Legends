@@ -55,7 +55,7 @@ export class GameValidationService {
     }
 
     async getNumberOfSpawnPoints(game: Game): Promise<number> {
-        return game.tiles.flat().filter(tile => tile.item?.type === ItemType.Spawn).length;
+        return game.tiles.flat().filter((tile) => tile.item?.type === ItemType.Spawn).length;
     }
 
     async assignGameToRightType(game: Game | UpdateGameDto): Promise<Game> {
@@ -174,7 +174,7 @@ export class GameValidationService {
         const existingGame = await this.gameService.getGameByName(game.name.trim());
         return !existingGame || existingGame._id === game._id;
     }
-    
+
     async validateUpdatedGameName(id: string, game: UpdateGameDto): Promise<boolean> {
         const normalizedName = game.name.trim();
         const foundGame = await this.gameService.getGameByName(normalizedName);
@@ -186,9 +186,9 @@ export class GameValidationService {
     }
     async isHalfMapTilesValid(game: Game | UpdateGameDto): Promise<boolean> {
         const gameToValidate = await this.assignGameToRightType(game);
-        const terrainTileCount = gameToValidate.tiles.flat().filter(tile =>
-            [TileType.Grass, TileType.Water, TileType.Ice].includes(tile.type)
-        ).length;
+        const terrainTileCount = gameToValidate.tiles
+            .flat()
+            .filter((tile) => [TileType.Grass, TileType.Water, TileType.Ice].includes(tile.type)).length;
         const totalTiles = gameToValidate.size ** 2;
         return terrainTileCount > totalTiles / 2;
     }
@@ -224,20 +224,15 @@ export class GameValidationService {
         return horizontalCondition || verticalCondition;
     }
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
-        if (
-            i <= 0 ||
-            i >= game.tiles.length - 1 ||
-            j <= 0 ||
-            j >= game.tiles[i].length - 1
-        ) {
+        if (i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1) {
             return false;
         }
 
         return (
-            await this.isTileWall(game.tiles[i - 1][j]) &&
-            await this.isTileWall(game.tiles[i + 1][j]) &&
-            await this.isTileTerrain(game.tiles[i][j - 1]) &&
-            await this.isTileTerrain(game.tiles[i][j + 1])
+            (await this.isTileWall(game.tiles[i - 1][j])) &&
+            (await this.isTileWall(game.tiles[i + 1][j])) &&
+            (await this.isTileTerrain(game.tiles[i][j - 1])) &&
+            (await this.isTileTerrain(game.tiles[i][j + 1]))
         );
     }
 

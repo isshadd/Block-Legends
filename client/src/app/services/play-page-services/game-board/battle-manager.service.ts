@@ -75,7 +75,9 @@ export class BattleManagerService {
     onUserEscape() {
         if (this.isValidAction() && this.userEvasionAttempts > 0) {
             this.userEvasionAttempts--;
-            this.signalUserTriedEscape.next(this.currentPlayer!.socketId);
+            if (this.currentPlayer) {
+                this.signalUserTriedEscape.next(this.currentPlayer.socketId);
+            }
         }
     }
 
@@ -84,7 +86,10 @@ export class BattleManagerService {
 
         if (!this.isUserTurn) {
             if (attackResult > 0 && this.opponentPlayer) {
-                if (this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) && !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)) {
+                if (
+                    this.doesPlayerHaveItem(this.opponentPlayer, ItemType.Totem) &&
+                    !this.isPlayerHealthMax(this.opponentPlayer, this.opponentRemainingHealth)
+                ) {
                     this.opponentRemainingHealth++;
                 }
                 this.userRemainingHealth--;

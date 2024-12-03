@@ -117,9 +117,9 @@ export class PlayPageMouseHandlerService implements OnDestroy {
                 if (!userTile) return;
 
                 this.actionTiles = this.playGameBoardManagerService.getAdjacentActionTiles(userTile);
-                this.actionTiles.forEach(tile => tile.visibleState = VisibleState.Action);
+                this.actionTiles.forEach((tile) => (tile.visibleState = VisibleState.Action));
             } else {
-                this.actionTiles.forEach(tile => {
+                this.actionTiles.forEach((tile) => {
                     tile.visibleState = this.playGameBoardManagerService.userCurrentPossibleMoves.has(tile)
                         ? VisibleState.Valid
                         : VisibleState.NotSelected;
