@@ -17,6 +17,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
+// this line is necessary for the code to work
 // eslint-disable-next-line no-restricted-imports
 import { DebugService } from '../debug.service';
 
@@ -29,6 +30,7 @@ export class GameMapDataManagerService {
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
+    // this line is necessary for the code to work
     // eslint-disable-next-line max-params
     constructor(
         public tileFactoryService: TileFactoryService,
@@ -227,9 +229,11 @@ export class GameMapDataManagerService {
         visited.add(`${coordinates.x},${coordinates.y}`);
 
         while (queue.length > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion //this line is necessary for the code to work
+            // this line is necessary for the code to work
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion //this line is necessary for the code to work
+            // this line is necessary for the code to work
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 
             for (const neighbour of neighbours) {

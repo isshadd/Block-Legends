@@ -25,8 +25,8 @@ li {
 }
 
 .map-container:hover ~ .game_info .description {
-    opacity: 1; /* Make it visible */
-    visibility: visible; /* Make it visible */
+    opacity: 1; 
+    visibility: visible; 
     transform: translateX(0);
 }
 

@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // Disabling max-lines is necessary for the tests of large services
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';

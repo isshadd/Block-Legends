@@ -3,8 +3,10 @@ import { Router, RouterLink } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
+// this line is necessary for the import of MapEditorComponent and it is impossible to refactor the address
 // eslint-disable-next-line max-len
 import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
+// this line is necessary for the import of MapEditorComponent and it is impossible to refactor the address
 // eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';

@@ -14,7 +14,8 @@ import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AvatarService } from '../avatar.service';
-// eslint-disable-next-line no-restricted-imports // This import is necessary for the import of WebsocketService
+// eslint-disable-next-line no-restricted-imports
+// This line is necessary for the import of WebsocketService
 import { DebugService } from '../debug.service';
 
 @Injectable({

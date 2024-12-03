@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of PlayerCharacter
+/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of EventJournalService
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';

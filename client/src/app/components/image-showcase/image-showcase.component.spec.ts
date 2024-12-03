@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers*/
+/* eslint-disable @typescript-eslint/no-magic-numbers*/ // This line is necessary to be able to test image-showcase.component.ts
 /* eslint-disable @typescript-eslint/naming-convention*/
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services/game-services/game.service';
