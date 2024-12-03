@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */ // Disabling max-lines is necessary for the testing of the battle manager service
 import { TestBed } from '@angular/core/testing';
+import { DebugService } from '@app/services/debug.service';
 import { Totem } from '@common/classes/Items/totem';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
@@ -9,13 +10,18 @@ describe('BattleManagerService', () => {
     let service: BattleManagerService;
     let mockCurrentPlayer: PlayerCharacter;
     let mockOpponentPlayer: PlayerCharacter;
+    let debugServiceSpy: jasmine.SpyObj<DebugService>;
 
     beforeEach(() => {
+        const mockDebugService = jasmine.createSpyObj('DebugService', ['isDebugMode']);
+
         TestBed.configureTestingModule({
-            providers: [BattleManagerService],
+            providers: [BattleManagerService, { provide: DebugService, useValue: mockDebugService }],
         });
 
         service = TestBed.inject(BattleManagerService);
+        debugServiceSpy = TestBed.inject(DebugService) as jasmine.SpyObj<DebugService>;
+        debugServiceSpy.isDebugMode = false;
 
         mockCurrentPlayer = new PlayerCharacter('player1');
         mockCurrentPlayer.socketId = 'player1';
@@ -51,13 +57,13 @@ describe('BattleManagerService', () => {
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense);
     });
 
-    it('should apply ice penalty only to players on ice', () => {
-        mockCurrentPlayer.mapEntity.isPlayerOnIce = false;
+    it('should apply ice penalty to players on ice', () => {
+        mockCurrentPlayer.mapEntity.isPlayerOnIce = true;
         mockOpponentPlayer.mapEntity.isPlayerOnIce = true;
 
         service.init(mockCurrentPlayer, mockOpponentPlayer);
 
-        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense);
+        expect(service.userDefence).toBe(mockCurrentPlayer.attributes.defense - service.icePenalty);
         expect(service.opponentDefence).toBe(mockOpponentPlayer.attributes.defense - service.icePenalty);
     });
 
@@ -228,6 +234,21 @@ describe('BattleManagerService', () => {
             expect(service.userRemainingHealth).toBe(result);
             expect(signalSpy).not.toHaveBeenCalled();
         });
+
+        it('should not emit signal or decrease health if currentPlayer or opponentPlayer is null', () => {
+            service.isUserTurn = false;
+            service.userRemainingHealth = 1;
+            service.currentPlayer = null;
+            service.opponentPlayer = null;
+            const attackResult = 5;
+            const signalSpy = spyOn(service.signalOpponentAttacked, 'next');
+
+            service.onOpponentAttack(attackResult);
+
+            const result = 1;
+            expect(service.userRemainingHealth).toBe(result);
+            expect(signalSpy).not.toHaveBeenCalled();
+        });
     });
 
     describe('onOpponentEscape', () => {
@@ -245,6 +266,19 @@ describe('BattleManagerService', () => {
         it('should not emit signal or decrease evasion attempts if it is user’s turn', () => {
             service.isUserTurn = true;
             service.opponentEvasionAttempts = 2;
+            const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
+
+            service.onOpponentEscape();
+
+            expect(service.opponentEvasionAttempts).toBe(2);
+            expect(signalSpy).not.toHaveBeenCalled();
+        });
+
+        it('should not emit signal or decrease evasion attempts if currentPlayer or opponentPlayer is null', () => {
+            service.isUserTurn = false;
+            service.opponentEvasionAttempts = 2;
+            service.currentPlayer = null;
+            service.opponentPlayer = null;
             const signalSpy = spyOn(service.signalOpponentTriedEscape, 'next');
 
             service.onOpponentEscape();
@@ -293,6 +327,22 @@ describe('BattleManagerService', () => {
 
             expect(result).toBe(0);
         });
+
+        it('should handle debug mode', () => {
+            service.currentPlayer = {
+                attributes: { attack: 10 },
+                attackDice: 6,
+                mapEntity: { isPlayerOnIce: false },
+            } as PlayerCharacter;
+
+            debugServiceSpy.isDebugMode = true;
+            spyOn(Math, 'random').and.returnValue(0.5);
+
+            const result = service.attackDiceResult();
+
+            const expectedResult = 16;
+            expect(result).toBe(expectedResult);
+        });
     });
     describe('defenseDiceResult', () => {
         it('should calculate defense result based on opponentDefense and defense dice when opponent player is set', () => {
@@ -333,6 +383,23 @@ describe('BattleManagerService', () => {
             const result = service.defenseDiceResult();
 
             expect(result).toBe(0);
+        });
+
+        it('should handle debug mode', () => {
+            service.opponentPlayer = {
+                defenseDice: 6,
+            } as PlayerCharacter;
+            service.opponentDefence = 4;
+            service.opponentRemainingHealth = 1;
+
+            debugServiceSpy.isDebugMode = true;
+            spyOn(Math, 'random').and.returnValue(0);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+
+            const result = service.defenseDiceResult();
+
+            const expectedResult = 5;
+            expect(result).toBe(expectedResult);
         });
     });
 

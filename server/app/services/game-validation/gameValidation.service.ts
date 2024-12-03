@@ -131,35 +131,35 @@ export class GameValidationService {
             }
         }
     }
-
     async mapIsValid(game: Game | UpdateGameDto): Promise<boolean> {
         const map = await this.mapToMatrix(game);
         const n = map.length;
         const m = map[0].length;
         const visited: boolean[][] = Array.from({ length: n }, () => Array(m).fill(false));
 
-        let initX = -1;
-        let initY = -1;
+        const [initX, initY] = this.findStartingPoint(map, n, m);
 
-        // Find a valid starting point in the map
-        for (let i = 0; i < n; i++) {
-            for (let j = 0; j < m; j++) {
-                if (map[i][j] === 0) {
-                    initX = i;
-                    initY = j;
-                    break;
-                }
-            }
-            if (initX !== -1) break;
-        }
-
-        // If no valid starting point is found, return false
         if (initX === -1 || initY === -1) {
             return false; // Invalid map
         }
 
         await this.bfs(map, initX, initY, visited);
 
+        return this.areAllTerrainTilesVisited(map, visited, n, m);
+    }
+
+    findStartingPoint(map: number[][], n: number, m: number): [number, number] {
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < m; j++) {
+                if (map[i][j] === 0) {
+                    return [i, j];
+                }
+            }
+        }
+        return [-1, -1];
+    }
+
+    areAllTerrainTilesVisited(map: number[][], visited: boolean[][], n: number, m: number): boolean {
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0 && !visited[i][j]) {
@@ -205,13 +205,7 @@ export class GameValidationService {
         for (const [i, row] of game.tiles.entries()) {
             for (const [j, tile] of row.entries()) {
                 if (tile.type === TileType.Door) {
-                    if (i === 0 || i === game.tiles.length - 1 || j === 0 || j === row.length - 1) {
-                        return false;
-                    }
-
-                    const horizontal = await this.isHorizontalAxeDoorValid(game, i, j);
-                    const vertical = await this.isVerticalAxeDoorValid(game, i, j);
-                    if (!horizontal && !vertical) {
+                    if (this.isEdgeTile(game, i, j) || !(await this.isDoorValid(game, i, j))) {
                         return false;
                     }
                 }
@@ -220,6 +214,15 @@ export class GameValidationService {
         return true;
     }
 
+    isEdgeTile(game: Game | UpdateGameDto, i: number, j: number): boolean {
+        return i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1;
+    }
+
+    async isDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
+        const horizontalCondition = await this.isHorizontalAxeDoorValid(game, i, j);
+        const verticalCondition = await this.isVerticalAxeDoorValid(game, i, j);
+        return horizontalCondition || verticalCondition;
+    }
     async isHorizontalAxeDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
         if (
             i <= 0 ||
