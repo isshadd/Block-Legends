@@ -9,6 +9,7 @@ import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { EmptyItem } from '@common/classes/Items/empty-item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
+import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
@@ -602,7 +603,44 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.signalUserDidBattleAction.next).toHaveBeenCalledWith({ playerTurnId: 'player1', enemyPlayerId: 'player2' });
             expect(service.hidePossibleMoves).toHaveBeenCalled();
         });
+
+        it('should handle door action when user has action points and it is user’s turn', () => {
+            const mockTile = new DoorTile();
+            const mockActionPlayer = new PlayerCharacter('player1');
+            mockActionPlayer.socketId = 'player1';
+            mockActionPlayer.currentActionPoints = 1;
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockActionPlayer);
+            spyOn(service.signalUserDidDoorAction, 'next');
+            spyOn(service, 'hidePossibleMoves');
+            spyOn(service, 'checkIfPLayerDidEverything').and.callFake(() => {});
+
+            service.isUserTurn = true;
+
+            service.handlePlayerAction(mockTile);
+
+            expect(service.signalUserDidDoorAction.next).toHaveBeenCalledWith({ tileCoordinate: mockTile.coordinates, playerTurnId: 'player1' });
+            expect(service.hidePossibleMoves).toHaveBeenCalled();
+            expect(service.checkIfPLayerDidEverything).toHaveBeenCalledWith(mockActionPlayer);
+        });
+
+        it('should not handle action if user does not have action points', () => {
+            const mockTile = new WalkableTile();
+            const mockActionPlayer = new PlayerCharacter('player1');
+            mockActionPlayer.socketId = 'player1';
+            mockActionPlayer.currentActionPoints = 0;
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockActionPlayer);
+            spyOn(service.signalUserDidDoorAction, 'next');
+            spyOn(service, 'hidePossibleMoves');
+
+            service.isUserTurn = true;
+
+            service.handlePlayerAction(mockTile);
+
+            expect(service.signalUserDidDoorAction.next).not.toHaveBeenCalled();
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+        });
     });
+
     describe('checkIfPLayerDidEverything', () => {
         beforeEach(() => {
             const mockTile = new Tile();
@@ -660,10 +698,7 @@ describe('PlayGameBoardManagerService', () => {
 
     describe('toggleDoor', () => {
         beforeEach(() => {
-            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue({
-                id: 'player1',
-                mapEntity: { coordinates: { x: 1, y: 1 } },
-            } as unknown as PlayerCharacter);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
         });
 
         it('should replace Door with OpenDoor and call setTileAt', () => {
@@ -683,6 +718,8 @@ describe('PlayGameBoardManagerService', () => {
                 return newTile;
             });
 
+            service.isUserTurn = true;
+            spyOn(service, 'setupPossibleMoves').and.callFake(() => {});
             gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockDoorTile);
 
             service.toggleDoor(tileCoordinate);
@@ -692,6 +729,7 @@ describe('PlayGameBoardManagerService', () => {
                 tileCoordinate,
                 jasmine.objectContaining({ type: TileType.OpenDoor, coordinates: tileCoordinate }),
             );
+            expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
         });
 
         it('should replace OpenDoor with Door and call setTileAt', () => {
@@ -763,6 +801,37 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.getCurrentPlayerCharacter).toHaveBeenCalled();
             expect(service.findPlayerFromSocketId).toHaveBeenCalledWith('enemySocketId');
             expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
+        });
+
+        it('should set areOtherPlayersInBattle to true if currentPlayer is not one of them', () => {
+            const playerId = 'player10';
+            const enemyPlayerId = 'player20';
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+
+            service.startBattle(playerId, enemyPlayerId);
+
+            expect(service.areOtherPlayersInBattle).toBeTrue();
+            expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('playerUsedAction', () => {
+        it('should decrement player action points', () => {
+            mockPlayerCharacter.currentActionPoints = 1;
+            spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayerCharacter);
+
+            service.playerUsedAction(mockPlayerCharacter.socketId);
+
+            expect(mockPlayerCharacter.currentActionPoints).toBe(0);
+        });
+
+        it('should not decrement player action points if player is not found', () => {
+            mockPlayerCharacter.currentActionPoints = 1;
+            spyOn(service, 'findPlayerFromSocketId').and.returnValue(null);
+
+            service.playerUsedAction(mockPlayerCharacter.socketId);
+
+            expect(mockPlayerCharacter.currentActionPoints).toBe(1);
         });
     });
 
