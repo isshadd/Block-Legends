@@ -141,49 +141,52 @@ export class GameSocketRoomService {
             return false;
         }
 
-        if (room.players.some(p => p.avatar.name === player.avatar.name)) {
+        if (room.players.some((p) => p.avatar.name === player.avatar.name)) {
             return false;
         }
 
-        let uniqueName = player.name;
-        let suffix = 1;
-        while (room.players.some(p => p.name === uniqueName)) {
-            uniqueName = `${player.name}-${suffix++}`;
-        }
-        player.name = uniqueName;
+        player.name = this.getUniquePlayerName(player, room);
 
         room.players.push(player);
         this.playerRooms.set(player.socketId, accessCode);
         return true;
     }
 
+    getUniquePlayerName(player: PlayerCharacter, room: GameRoom): string {
+        let uniqueName = player.name;
+        let suffix = 1;
+        while (room.players.some((p) => p.name === uniqueName)) {
+            uniqueName = `${player.name}-${suffix++}`;
+        }
+        return uniqueName;
+    }
+
     removePlayerFromRoom(socketId: string): void {
         const accessCode = this.playerRooms.get(socketId);
-        if (accessCode) {
-            const room = this.rooms.get(accessCode);
+        if (!accessCode) return;
 
-            if (room) {
-                this.signalPlayerLeftRoom.next({ accessCode, playerSocketId: socketId });
+        const room = this.rooms.get(accessCode);
+        if (!room) return;
 
-                room.players = room.players.filter((player) => player.socketId !== socketId);
-                this.playerRooms.delete(socketId);
+        this.signalPlayerLeftRoom.next({ accessCode, playerSocketId: socketId });
 
-                if (room.players.length === 0) {
-                    this.rooms.delete(accessCode);
-                    this.gameBoardRooms.delete(accessCode);
-                    this.gameTimerRooms.delete(accessCode);
-                    this.gameBattleRooms.delete(accessCode);
-                    this.gameStatisticsRooms.delete(accessCode);
-                } else if (room.organizer === socketId) {
-                    room.organizer = room.players[0].socketId;
-                }
-            }
+        room.players = room.players.filter((player) => player.socketId !== socketId);
+        this.playerRooms.delete(socketId);
+
+        if (room.players.length === 0) {
+            this.rooms.delete(accessCode);
+            this.gameBoardRooms.delete(accessCode);
+            this.gameTimerRooms.delete(accessCode);
+            this.gameBattleRooms.delete(accessCode);
+            this.gameStatisticsRooms.delete(accessCode);
+        } else if (room.organizer === socketId) {
+            room.organizer = room.players[0].socketId;
         }
     }
 
     lockRoom(accessCode: number, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId) {
+        if (room?.organizer === clientId) {
             room.isLocked = true;
             return true;
         }
@@ -192,7 +195,7 @@ export class GameSocketRoomService {
 
     unlockRoom(accessCode: number, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId && room.players.length < room.maxPlayers) {
+        if (room?.organizer === clientId && room.players.length < room.maxPlayers) {
             room.isLocked = false;
             return true;
         }
@@ -201,7 +204,7 @@ export class GameSocketRoomService {
 
     kickPlayer(accessCode: number, playerSocketId: string, clientId: string): boolean {
         const room = this.rooms.get(accessCode);
-        if (room && room.organizer === clientId) {
+        if (room?.organizer === clientId) {
             this.removePlayerFromRoom(playerSocketId);
             return true;
         }
