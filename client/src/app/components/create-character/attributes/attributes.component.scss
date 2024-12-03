@@ -42,11 +42,51 @@
     display: flex;
     flex-direction: row;
 }
+.dark-button {
+    margin: 0.5vh;
+    width: 25vh;
+    height: 6vh;
+    background-color: $primary-dark;
+    color: $primary-light;
+    border: 0.2vh solid darken($primary-dark, 10%);
+    font-weight: bold;
+    transition:
+        transform 0.3s,
+        background-color 0.3s,
+        box-shadow 0.3s;
 
+    &:hover:enabled {
+        background-color: lighten($primary-dark, 10%);
+    }
+
+    &:active {
+        background-color: darken($primary-dark, 10%);
+        transform: scale(0.95);
+        animation: none; /* Stop animation when button is clicked */
+    }
+
+    @keyframes attention {
+        0%,
+        100% {
+            background-color: $primary-dark;
+        }
+        50% {
+            background-color: lighten($primary, 20%);
+        }
+    }
+
+    &:disabled {
+        animation: none;
+    }
+}
+.blinking {
+    animation: attention 1s infinite;
+}
 button[disabled] {
-    background-color: $secondary;
+    background-color: lighten($primary-dark, 10%);
     cursor: not-allowed;
-    border: 0.2vh solid $secondary;
+    border: 0.2vh solid lighten($primary-dark, 5%);
+    color: darken($primary-light, 10%);
 }
 
 .large-emojis {
@@ -97,12 +137,6 @@ select:hover {
             color: #000;
         }
     }
-}
-
-.dark-button {
-    margin: 0.5vh;
-    width: 25vh;
-    height: 6vh;
 }
 
 .icon-container {
