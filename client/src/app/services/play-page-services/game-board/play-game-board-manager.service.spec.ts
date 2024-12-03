@@ -6,7 +6,10 @@ import { TileFactoryService } from '@app/services/game-board-services/tile-facto
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { Elytra } from '@common/classes/Items/elytra';
 import { EmptyItem } from '@common/classes/Items/empty-item';
+import { Item } from '@common/classes/Items/item';
+import { Totem } from '@common/classes/Items/totem';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
@@ -15,6 +18,7 @@ import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
+import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -549,6 +553,260 @@ describe('PlayGameBoardManagerService', () => {
 
             expect(service.findPlayerFromSocketId).toHaveBeenCalledWith(playerId);
             expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('userThrewItem', () => {
+        let mockItem: Item;
+        let mockTerrainTile: TerrainTile;
+
+        beforeEach(() => {
+            mockItem = new DiamondSword();
+            mockTerrainTile = new TerrainTile();
+            mockTerrainTile.coordinates = { x: 1, y: 1 } as Vec2;
+            mockTerrainTile.type = TileType.Grass;
+
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockTerrainTile);
+            spyOn(service.signalUserThrewItem, 'next');
+            spyOn(service.signalUserGrabbedItem, 'next');
+            spyOn(service.eventJournal, 'broadcastEvent');
+            spyOn(service, 'didPlayerTripped').and.returnValue(false);
+            spyOn(service, 'checkIfPLayerDidEverything');
+            spyOn(service, 'setupPossibleMoves');
+        });
+
+        it('should do nothing if currentPlayer is not found', () => {
+            (service.getCurrentPlayerCharacter as jasmine.Spy).and.returnValue(null);
+
+            service.userThrewItem(mockItem);
+
+            expect(service.signalUserThrewItem.next).not.toHaveBeenCalled();
+            expect(service.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(service.eventJournal.broadcastEvent).not.toHaveBeenCalled();
+            expect(service.checkIfPLayerDidEverything).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should emit signalUserThrewItem and signalUserGrabbedItem if item is not the last item in possibleItems', () => {
+            const grabbedItem = new Elytra();
+            mockTerrainTile.item = grabbedItem;
+            service.possibleItems = [new Chestplate(), mockItem, grabbedItem];
+
+            service.userThrewItem(mockItem);
+
+            expect(service.signalUserThrewItem.next).toHaveBeenCalledWith({
+                itemType: mockItem.type,
+                tileCoordinates: mockTerrainTile.coordinates,
+                playerTurnId: mockPlayerCharacter.socketId,
+            });
+            expect(service.signalUserGrabbedItem.next).toHaveBeenCalledWith({
+                itemType: grabbedItem.type,
+                tileCoordinates: mockTerrainTile.coordinates,
+                playerTurnId: mockPlayerCharacter.socketId,
+            });
+            expect(service.eventJournal.broadcastEvent).toHaveBeenCalledWith(`${mockPlayerCharacter.name} a ramassé l'objet ${grabbedItem.type}`, [
+                mockPlayerCharacter,
+            ]);
+        });
+
+        it('should not emit signalUserThrewItem if item is the last item in possibleItems', () => {
+            service.possibleItems = [mockItem];
+
+            service.userThrewItem(mockItem);
+
+            expect(service.signalUserThrewItem.next).not.toHaveBeenCalled();
+            expect(service.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(service.eventJournal.broadcastEvent).not.toHaveBeenCalled();
+        });
+
+        it('should clear possibleItems after processing', () => {
+            service.possibleItems = [new Chestplate(), mockItem];
+
+            service.userThrewItem(mockItem);
+
+            expect(service.possibleItems.length).toBe(0);
+        });
+
+        it('should emit signalUserGotTurnEnded if player trips', () => {
+            (service.didPlayerTripped as jasmine.Spy).and.returnValue(true);
+            spyOn(service.signalUserGotTurnEnded, 'next');
+
+            service.userThrewItem(mockItem);
+
+            expect(service.signalUserGotTurnEnded.next).toHaveBeenCalledWith(mockPlayerCharacter.socketId);
+            expect(service.checkIfPLayerDidEverything).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should call checkIfPLayerDidEverything and setupPossibleMoves if player does not trip', () => {
+            service.userThrewItem(mockItem);
+
+            expect(service.checkIfPLayerDidEverything).toHaveBeenCalledWith(mockPlayerCharacter);
+            expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockPlayerCharacter);
+        });
+    });
+
+    describe('addItemEffect', () => {
+        it('should increase attack by 2 and decrease defense by 1 when item is Sword', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const sword = new DiamondSword();
+
+            service.addItemEffect(mockPlayer, sword);
+
+            expect(mockPlayer.attributes.attack).toBe(7);
+            expect(mockPlayer.attributes.defense).toBe(2);
+        });
+
+        it('should increase defense by 2 and decrease speed by 1 when item is Chestplate', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const chestplate = new Chestplate();
+
+            service.addItemEffect(mockPlayer, chestplate);
+
+            expect(mockPlayer.attributes.defense).toBe(5);
+            expect(mockPlayer.attributes.speed).toBe(1);
+        });
+
+        it('should decrease defense by 2 when item is Totem', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const totem = new Totem();
+
+            service.addItemEffect(mockPlayer, totem);
+
+            expect(mockPlayer.attributes.defense).toBe(1);
+        });
+
+        it('should increase speed by 1 when item is Elytra', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const elytra = new Elytra();
+
+            service.addItemEffect(mockPlayer, elytra);
+
+            expect(mockPlayer.attributes.speed).toBe(3);
+        });
+
+        it('should not change attributes when item type is not recognized', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const unknownItem = new EmptyItem();
+
+            service.addItemEffect(mockPlayer, unknownItem);
+
+            expect(mockPlayer.attributes.attack).toBe(5);
+            expect(mockPlayer.attributes.defense).toBe(3);
+            expect(mockPlayer.attributes.speed).toBe(2);
+        });
+    });
+
+    describe('removeItemEffect', () => {
+        it('should decrease attack by 2 and increase defense by 1 when item is Sword', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const sword = new DiamondSword();
+
+            service.removeItemEffect(mockPlayer, sword);
+
+            expect(mockPlayer.attributes.attack).toBe(3);
+            expect(mockPlayer.attributes.defense).toBe(4);
+        });
+
+        it('should decrease defense by 2 and increase speed by 1 when item is Chestplate', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const chestplate = new Chestplate();
+
+            service.removeItemEffect(mockPlayer, chestplate);
+
+            expect(mockPlayer.attributes.defense).toBe(1);
+            expect(mockPlayer.attributes.speed).toBe(3);
+        });
+
+        it('should increase defense by 2 when item is Totem', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const totem = new Totem();
+
+            service.removeItemEffect(mockPlayer, totem);
+
+            expect(mockPlayer.attributes.defense).toBe(5);
+        });
+
+        it('should decrease speed by 1 when item is Elytra', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const elytra = new Elytra();
+
+            service.removeItemEffect(mockPlayer, elytra);
+
+            expect(mockPlayer.attributes.speed).toBe(1);
+        });
+
+        it('should not change attributes when item type is not recognized', () => {
+            const mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
+            const unknownItem = new EmptyItem();
+
+            service.removeItemEffect(mockPlayer, unknownItem);
+
+            expect(mockPlayer.attributes.attack).toBe(5);
+            expect(mockPlayer.attributes.defense).toBe(3);
+            expect(mockPlayer.attributes.speed).toBe(2);
+        });
+    });
+
+    describe('didPlayerTripped', () => {
+        it('should return false if player has Elytra item', () => {
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+
+            const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
+
+            expect(service.doesPlayerHaveItem).toHaveBeenCalledWith(mockPlayerCharacter, ItemType.Elytra);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if debug mode is enabled', () => {
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            service.debugService.isDebugMode = true;
+
+            const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return true if tile type is Ice and random value is less than ICE_FALL_POSSIBILTY', () => {
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            service.debugService.isDebugMode = false;
+            spyOn(Math, 'random').and.returnValue(0.05);
+            spyOn(service.eventJournal, 'broadcastEvent');
+
+            const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
+
+            expect(service.eventJournal.broadcastEvent).toHaveBeenCalledWith('glissement', [service.eventJournal.player]);
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if tile type is Ice and random value is greater than or equal to ICE_FALL_POSSIBILTY', () => {
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            service.debugService.isDebugMode = false;
+            spyOn(Math, 'random').and.returnValue(0.2);
+
+            const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if tile type is not Ice', () => {
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            service.debugService.isDebugMode = false;
+
+            const result = service.didPlayerTripped(TileType.Grass, mockPlayerCharacter);
+
+            expect(result).toBeFalse();
         });
     });
 
