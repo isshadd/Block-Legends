@@ -8,6 +8,7 @@ import { ImageShowcaseComponent } from '@app/components/image-showcase/image-sho
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 
 @Component({
     selector: 'app-player-create-character',
@@ -61,6 +62,9 @@ export class PlayerCreateCharacterComponent {
         } else {
             this.gameService.setCharacter(this.character);
             this.webSocketService.addPlayerToRoom(parseInt(this.gameId as string, 10), this.character);
+            this.webSocketService.socket.on(SocketEvents.AVATAR_TAKEN_ERROR, (response: { message: string }) => {
+                this.characterStatus = response.message;
+            });
         }
     }
 

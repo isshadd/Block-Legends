@@ -126,29 +126,10 @@ describe('GameController', () => {
 
             await controller.create(createGameDto, mockResponse as Response);
 
-            // expect(gameValidationService.validateGame).toHaveBeenCalledWith(createGameDto);
-            // expect(gameValidationService.isHalfMapTilesValid).toHaveBeenCalledWith(createGameDto, createGameDto.size);
             expect(gameService.addGame).toHaveBeenCalledWith(createGameDto);
             expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
             expect(mockResponse.json).toHaveBeenCalledWith(mockGame);
         });
-
-        // it('should handle validation errors when creating a game', async () => {
-        //     jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: false, errors: ['Validation error'] });
-        //     await controller.create(createGameDto, mockResponse as Response);
-        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-        //     expect(mockResponse.json).toHaveBeenCalledWith({ errors: ['Validation error'] });
-        // });
-
-        // it('should handle tile validation errors when creating a game', async () => {
-        //     jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: true, errors: [] });
-        //     jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(false);
-        //     await controller.create(createGameDto, mockResponse as Response);
-        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-        //     expect(mockResponse.json).toHaveBeenCalledWith({
-        //         errors: ['Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.'],
-        //     });
-        // });
     });
 
     describe('patchGame', () => {
@@ -158,27 +139,10 @@ describe('GameController', () => {
             jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: true, errors: [] });
             await controller.patchGame('1', updateGameDto, mockResponse as Response);
             expect(gameService.modifyGame).toHaveBeenCalled();
-            // expect(gameValidationService.isHalfMapTilesValid).toHaveBeenCalledWith(expect.any(Object), mockGame.size);
             expect(gameService.modifyGame).toHaveBeenCalledWith('1', updateGameDto);
             expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.OK);
             expect(mockResponse.send).toHaveBeenCalled();
         });
-
-        // it('should handle validation errors when updating a game', async () => {
-        //     jest.spyOn(gameService, 'getGame').mockResolvedValue(mockGame);
-        //     jest.spyOn(gameValidationService, 'isHalfMapTilesValid').mockResolvedValue(true);
-        //     jest.spyOn(gameValidationService, 'validateGame').mockResolvedValue({ isValid: false, errors: ['Validation error'] });
-        //     await controller.patchGame('1', updateGameDto, mockResponse as Response);
-        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
-        //     expect(mockResponse.json).toHaveBeenCalledWith('Validation error');
-        // });
-
-        // it('should handle errors when updating a game', async () => {
-        //     jest.spyOn(gameService, 'modifyGame').mockRejectedValue(new Error('Update failed'));
-        //     await controller.patchGame('1', updateGameDto, mockResponse as Response);
-        //     expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
-        //     expect(mockResponse.send).toHaveBeenCalledWith('Update failed');
-        // });
     });
 
     describe('deleteGame', () => {

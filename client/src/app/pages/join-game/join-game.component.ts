@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 
 export const MIN_CHAR = 48;
 export const MAX_CHAR = 57;
@@ -18,6 +19,7 @@ const MAX_VALUE = 4;
 export class JoinGameComponent implements OnInit {
     accessCode: number | null;
     errorMessage: string | null;
+    isErrorMessageVisible: boolean = false;
 
     constructor(
         private webSocketService: WebSocketService,
@@ -28,19 +30,23 @@ export class JoinGameComponent implements OnInit {
         this.webSocketService.avatarTakenError$.subscribe((message) => {
             if (message) {
                 this.errorMessage = message;
-                alert(message); // Display the error message in an alert
             }
         });
     }
 
     joinGame(): void {
-        if (!this.accessCode) {
-            this.errorMessage = "Le code d'accès est invalide !";
-        } else {
-            this.errorMessage = null;
+        if (this.accessCode) {
             this.webSocketService.init();
             this.webSocketService.joinGame(this.accessCode);
         }
+        this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_CODE_INVALID, (response: { message: string }) => {
+            this.isErrorMessageVisible = true;
+            this.errorMessage = response.message;
+        });
+        this.webSocketService.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_ROOM, (response: { message: string }) => {
+            this.isErrorMessageVisible = true;
+            this.errorMessage = response.message;
+        });
     }
 
     allowOnlyNumbers(event: KeyboardEvent) {
@@ -61,6 +67,6 @@ export class JoinGameComponent implements OnInit {
     }
 
     goHome(): void {
-        this.router.navigate(['/']); // Navigate to home route
+        this.router.navigate(['/']);
     }
 }

@@ -1,12 +1,13 @@
-/* eslint-disable import/no-deprecated */ // This line is necessary for the import of CreateGameComponents
+// this import is necessary for this file to work
+/* eslint-disable-next-line */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
 import { NavBarComponent } from '@app/components/create-game/nav-bar/nav-bar.component';
+import { CreateGameComponent } from '@app/pages/create-game/create-game.component';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
-import { CreateGameComponent } from './create-game.component';
 
 describe('CreateGameComponent', () => {
     let component: CreateGameComponent;
@@ -18,6 +19,8 @@ describe('CreateGameComponent', () => {
         mockNavBarComponent = jasmine.createSpyObj('NavBarComponent', ['selectMode']);
         mockGameListComponent = jasmine.createSpyObj('GameListComponent', ['selectGame']);
         await TestBed.configureTestingModule({
+            // this is necessary to be able to test the component
+            /* eslint-disable-next-line */
             imports: [CreateGameComponent, HttpClientTestingModule],
             providers: [
                 { provide: NavBarComponent, useValue: mockNavBarComponent },

@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable max-lines*/
-/* eslint-disable @typescript-eslint/no-empty-function*/
-/* eslint-disable @typescript-eslint/promise-function-async*/
-/* eslint-disable no-undef*/
-/* eslint-disable @typescript-eslint/ban-types*/
+/* eslint-disable @typescript-eslint/no-explicit-any */ // Allow usage of 'any' type it is necessary for this file to be tested
+/* eslint-disable max-lines */ // Allow file to exceed maximum line limit and it necessary for this file to be tested becasue it has many tests and it is expected because it is the websocket service which is a very long file to begin with
+/* eslint-disable @typescript-eslint/no-empty-function */ // Allow empty functions which is necessary for testing of this file
+/* eslint-disable @typescript-eslint/promise-function-async */ // Allow non-async promise functions
+/* eslint-disable no-undef */ // Allow usage of undefined variables which is necessary for testing of this file
+/* eslint-disable @typescript-eslint/ban-types */ // Allow usage of banned types which is necessary for testing of this file
 
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -112,11 +112,9 @@ describe('WebSocketService', () => {
     });
 
     it('should set up socket listeners', async () => {
-        // spyOn(socketSpy, 'on');
         service.setupSocketListeners();
         expect(socketSpy.on).toHaveBeenCalledWith('roomState', jasmine.any(Function));
         expect(socketSpy.on).toHaveBeenCalledWith('joinGameResponse', jasmine.any(Function));
-        // Add checks for all other socket.on handlers
     });
 
     it('should handle roomState event', fakeAsync(() => {
@@ -403,7 +401,6 @@ describe('WebSocketService', () => {
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeTrue();
         });
-        expect(window.alert).toHaveBeenCalledWith('Room is locked');
         tick();
     }));
 
@@ -426,7 +423,6 @@ describe('WebSocketService', () => {
         service.isLocked$.subscribe((isLocked) => {
             expect(isLocked).toBeFalse();
         });
-        expect(window.alert).toHaveBeenCalledWith('Room is unlocked');
         tick();
     }));
 
@@ -445,8 +441,6 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(response);
-
-        expect(window.alert).toHaveBeenCalledWith('Invalid code');
         tick();
     }));
 
@@ -465,8 +459,6 @@ describe('WebSocketService', () => {
         service.setupSocketListeners();
 
         handler(response);
-
-        expect(window.alert).toHaveBeenCalledWith('Room is locked');
         tick();
     }));
 

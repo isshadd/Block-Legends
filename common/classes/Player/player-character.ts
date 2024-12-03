@@ -2,6 +2,7 @@ import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Avatar } from '../../enums/avatar-enum';
+import { DiceType } from '../../enums/dice-type';
 import { Character } from '../../interfaces/character';
 import { EmptyItem } from '../Items/empty-item';
 import { Item } from '../Items/item';
@@ -18,7 +19,7 @@ export class PlayerCharacter implements Character {
     isDefenseBonusAssigned: boolean = true;
     isOrganizer: boolean = false;
     socketId: string;
-    dice: string = 'attack';
+    dice: DiceType = DiceType.Attack;
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
     messageColor: string;
@@ -44,15 +45,13 @@ export class PlayerCharacter implements Character {
     differentItemsGrabbed: ItemType[] = [];
     differentTerrainTilesVisited: Vec2[] = [];
 
-    // Pour JV:
-
     isVirtual: boolean = false;
     comportement: ProfileEnum | null = null;
 
     constructor(public name: string) {}
 
     assignAttackDice() {
-        this.dice = 'attack';
+        this.dice = DiceType.Attack;
         this.attackDice = BONUS;
         this.defenseDice = BASE_STATS;
         this.isAttackBonusAssigned = true;
@@ -60,7 +59,7 @@ export class PlayerCharacter implements Character {
     }
 
     assignDefenseDice() {
-        this.dice = 'defense';
+        this.dice = DiceType.Defense;
         this.defenseDice = BONUS;
         this.attackDice = BASE_STATS;
         this.isDefenseBonusAssigned = true;

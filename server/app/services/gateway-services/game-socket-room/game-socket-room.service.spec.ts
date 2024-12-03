@@ -85,12 +85,11 @@ describe('GameSocketRoomService', () => {
             service['rooms'].set(1234, {} as GameRoom);
             service['rooms'].set(5678, {} as GameRoom);
 
-            jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.234).mockReturnValueOnce(0.567).mockReturnValueOnce(0.23); // 3069 (disponible)
+            jest.spyOn(global.Math, 'random').mockReturnValueOnce(0.234).mockReturnValueOnce(0.567).mockReturnValueOnce(0.23);
 
             const accessCode = service.generateAccessCode();
             expect(accessCode).toBe(3106);
 
-            // Restore Math.random
             (global.Math.random as jest.Mock).mockRestore();
         });
     });
@@ -224,13 +223,11 @@ describe('GameSocketRoomService', () => {
                 },
             } as PlayerCharacter;
 
-            // const room = service.createGame('game123', playerOrganizer);
             const addedFirstPlayer = service.addPlayerToRoom(accessCode, playerOrganizer);
             expect(addedFirstPlayer).toBeFalsy();
 
-            // Définir le joueur à ajouter avec le même avatar
             const playerDuplicateAvatar = {
-                avatar: AvatarEnum.Alex, // Même avatar que l'organisateur
+                avatar: AvatarEnum.Alex,
                 name: 'Player2',
                 socketId: 'socket2',
                 attributes: {
@@ -721,8 +718,8 @@ describe('GameSocketRoomService', () => {
         });
 
         it('initRoomGameBoard() should return early if room is undefined', () => {
-            const accessCode = 9999; // Un accessCode qui n'existe pas dans rooms
-            jest.spyOn(service.gameService, 'getGame'); // Espionner gameService.getGame pour s'assurer qu'il n'est pas appelé
+            const accessCode = 9999; // An accessCode that does not exist in rooms
+            jest.spyOn(service.gameService, 'getGame');
             service.initRoomGameBoard(accessCode);
             expect(service.gameService.getGame).not.toHaveBeenCalled();
         });
