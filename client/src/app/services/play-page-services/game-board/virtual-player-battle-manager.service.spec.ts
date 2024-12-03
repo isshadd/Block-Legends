@@ -14,6 +14,7 @@ const NO_EVASION = 0;
 const ICE_PENALTY = 10;
 const CENT = 100;
 const ATTACK_RESULT = 9;
+const ATTACK_RESULT_2 = -12;
 
 describe('VirtualPlayerBattleManagerService', () => {
     let service: VirtualPlayerBattleManagerService;
@@ -183,7 +184,7 @@ describe('VirtualPlayerBattleManagerService', () => {
         const result = service.attackDiceResult(virtualPlayer);
         const result1 = service.attackDiceResult(virtualPlayer);
 
-        expect(result - result1).toBeGreaterThanOrEqual(-12);
+        expect(result - result1).toBeGreaterThanOrEqual(ATTACK_RESULT_2);
     });
 
     it('should penalize if ice penalty on defense', () => {
@@ -197,6 +198,6 @@ describe('VirtualPlayerBattleManagerService', () => {
         const result = service.defenseDiceResult(enemyPlayer, 1);
         const result1 = service.defenseDiceResult(enemyPlayer, 1);
 
-        expect(result - result1).toBeGreaterThanOrEqual(-12);
+        expect(result - result1).toBeGreaterThanOrEqual(ATTACK_RESULT_2);
     });
 });
