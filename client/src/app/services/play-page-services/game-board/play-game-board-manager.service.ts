@@ -300,7 +300,7 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: player.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player.name]);
+                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player]);
             } else {
                 for (const item of player.inventory) {
                     possibleItems.push(item);
@@ -373,7 +373,7 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: currentPlayer.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer.name]);
+                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer]);
             }
         }
 
@@ -443,7 +443,7 @@ export class PlayGameBoardManagerService {
         if (tileType === TileType.Ice) {
             const result = 0.1;
             if (Math.random() < result) {
-                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.playerName]);
+                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.player]);
                 return true;
             }
         }

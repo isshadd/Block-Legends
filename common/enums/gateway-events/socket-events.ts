@@ -29,6 +29,7 @@ export const enum SocketEvents {
     VIRTUAL_PLAYER_CONTINUE_TURN = 'virtualPlayerContinueTurn',
     TOGGLE_DEBUG_MODE = 'toggleDebugMode',
     DEBUG_MODE_OFF = 'debugModeOff',
+    
 
     // RECUS
     ROOM_STATE = 'roomState',
@@ -47,7 +48,6 @@ export const enum SocketEvents {
     ROOM_CLOSED = 'roomClosed',
     ERROR = 'error',
     CLOCK = 'clock',
-    MASS_MESSAGE = 'massMessage',
     ORGANIZER_LEFT = 'organizerLeft',
     GAME_PARAMETERS = 'gameParameters',
     CLIENT_CONNECTED = 'clientConnected',

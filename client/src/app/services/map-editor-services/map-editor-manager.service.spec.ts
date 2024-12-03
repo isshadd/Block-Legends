@@ -489,6 +489,20 @@ describe('MapEditorManagerService', () => {
         expect(service.itemPlacer).toHaveBeenCalledWith(mockItem, mockTile);
     });
 
+    it('should handle itemPlacerWithCoordinates when getTileAt returns null', () => {
+        const mockItem = { type: ItemType.Sword } as unknown as Item;
+        const mockCoordinates: Vec2 = { x: -1, y: -1 }; // Invalid coordinates
+
+        gameMapDataManagerServiceSpy.getTileAt.and.returnValue(null);
+
+        spyOn(service, 'itemPlacer');
+
+        service['itemPlacerWithCoordinates'](mockItem, mockCoordinates);
+
+        expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockCoordinates);
+        expect(service.itemPlacer).not.toHaveBeenCalled();
+    });
+
     it('should remove the item from a terrain tile and update the item limit', () => {
         const mockItem = new DiamondSword();
         const mockTile = new GrassTile();

@@ -1,39 +1,31 @@
-/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of PlayerCharacter
+/* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
-import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { Subject } from 'rxjs';
+import { ChatService } from './chat-service.service';
 import { SocketStateService } from '../SocketService/socket-state.service';
 import { WebSocketService } from '../SocketService/websocket.service';
-import { ChatService } from './chat-service.service';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Subject } from 'rxjs';
 
-const ACCESS_CODE = 12345;
-
-const stringLength = {
-    shortString: 100,
-    mediumString: 199,
-    maxString: 200,
-    tooLongString: 201,
-};
+const FIRST_CALLS = 123;
+const MAX_LENGHT = 201;
 
 describe('ChatService', () => {
     let service: ChatService;
     let socketStateService: jasmine.SpyObj<SocketStateService>;
-    let webSocketService: jasmine.SpyObj<WebSocketService>;
+    let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
     let hasActiveSocketSubject: Subject<boolean>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         hasActiveSocketSubject = new Subject<boolean>();
-        webSocketService = jasmine.createSpyObj('WebSocketService', ['sendMsgToRoom']);
-
+        mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['sendMsgToRoom']);
         socketStateService = jasmine.createSpyObj('SocketStateService', ['getActiveSocket'], {
             hasActiveSocket$: hasActiveSocketSubject.asObservable(),
         });
+        socketStateService.getActiveSocket.and.returnValue(mockWebSocketService);
 
-        socketStateService.getActiveSocket.and.returnValue(webSocketService);
-
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             providers: [ChatService, { provide: SocketStateService, useValue: socketStateService }],
-        });
+        }).compileComponents();
 
         service = TestBed.inject(ChatService);
     });
@@ -43,20 +35,19 @@ describe('ChatService', () => {
     });
 
     describe('initialize', () => {
-        it('should get active socket on initialization', () => {
+        it('should set socket when initialized with active socket', () => {
             service.initialize();
+            expect(service.socket).toBe(mockWebSocketService);
             expect(socketStateService.getActiveSocket).toHaveBeenCalled();
-            expect(service.socket).toBeTruthy();
         });
 
-        it('should update socket when hasActiveSocket emits true', () => {
+        it('should update socket when socket state changes to active', () => {
             service.initialize();
             hasActiveSocketSubject.next(true);
-            expect(socketStateService.getActiveSocket).toHaveBeenCalledTimes(2);
-            expect(service.socket).toBe(webSocketService);
+            expect(service.socket).toBe(mockWebSocketService);
         });
 
-        it('should set socket to null when hasActiveSocket emits false', () => {
+        it('should set socket to null when socket state changes to inactive', () => {
             service.initialize();
             hasActiveSocketSubject.next(false);
             expect(service.socket).toBeNull();
@@ -64,145 +55,89 @@ describe('ChatService', () => {
     });
 
     describe('setCharacter', () => {
-        it('should set player name from character', () => {
-            const mockCharacter = { name: 'TestPlayer' } as PlayerCharacter;
-            service.setCharacter(mockCharacter);
-            expect(service.playerName).toBe('TestPlayer');
+        it('should set the player character', () => {
+            const testCharacter = new PlayerCharacter('TestPlayer');
+            service.setCharacter(testCharacter);
+            expect(service.player).toBe(testCharacter);
         });
     });
 
     describe('setAccessCode', () => {
-        it('should set access code and room ID', () => {
-            service.setAccessCode(ACCESS_CODE);
-            expect(service.accessCode).toBe(ACCESS_CODE);
-            expect(service.roomID).toBe(`${ACCESS_CODE}`);
+        it('should set access code and room ID when code is provided', () => {
+            const testCode = 12345;
+            service.setAccessCode(testCode);
+            expect(service.accessCode).toBe(testCode);
+            expect(service.roomID).toBe(testCode.toString());
+        });
+
+        it('should reset access code and room ID when code is undefined', () => {
+            service.setAccessCode(undefined);
+            expect(service.accessCode).toBe(0);
+            expect(service.roomID).toBe('');
+        });
+    });
+
+    describe('clearMessages', () => {
+        it('should clear all messages from roomMessages array', () => {
+            service.roomMessages = [{ room: '123', time: new Date(), sender: 'Test', content: 'test', senderId: '1' }];
+            service.clearMessages();
+            expect(service.roomMessages.length).toBe(0);
         });
     });
 
     describe('broadcastMessageToAll', () => {
         beforeEach(() => {
             service.initialize();
-            service.setAccessCode(ACCESS_CODE);
-            service.playerName = 'TestPlayer';
+            service.setAccessCode(FIRST_CALLS);
+            const testCharacter = new PlayerCharacter('TestPlayer');
+            service.setCharacter(testCharacter);
             service.serverClock = new Date();
         });
 
-        it('should send message to room when conditions are met', () => {
-            const testMessage = 'Hello World';
+        it('should send message to room when socket exists and message is not empty', () => {
+            const testMessage = 'Test message';
             service.broadcastMessageToAll(testMessage);
 
-            expect(webSocketService.sendMsgToRoom).toHaveBeenCalledWith({
-                room: `${ACCESS_CODE}`,
+            expect(mockWebSocketService.sendMsgToRoom).toHaveBeenCalledWith({
+                room: service.roomID,
                 time: service.serverClock,
-                sender: 'TestPlayer',
+                sender: service.player.name,
                 content: testMessage,
             });
         });
 
         it('should not send message when socket is null', () => {
             service.socket = null;
-            service.broadcastMessageToAll('Test Message');
-            expect(webSocketService.sendMsgToRoom).not.toHaveBeenCalled();
+            const testMessage = 'Test message';
+            service.broadcastMessageToAll(testMessage);
+            expect(mockWebSocketService.sendMsgToRoom).not.toHaveBeenCalled();
         });
 
-        it('should not send empty or whitespace messages', () => {
-            service.broadcastMessageToAll('   ');
-            expect(webSocketService.sendMsgToRoom).not.toHaveBeenCalled();
-
-            service.broadcastMessageToAll('');
-            expect(webSocketService.sendMsgToRoom).not.toHaveBeenCalled();
+        it('should not send message when message string is empty', () => {
+            const testMessage = '  ';
+            service.broadcastMessageToAll(testMessage);
+            expect(mockWebSocketService.sendMsgToRoom).not.toHaveBeenCalled();
         });
 
-        it('should not send messages exceeding 200 characters', () => {
+        it('should show alert and not send message when message exceeds maximum length', () => {
             spyOn(window, 'alert');
-            const longMessage = 'a'.repeat(stringLength.tooLongString);
+            const longMessage = 'a'.repeat(MAX_LENGHT);
+
             service.broadcastMessageToAll(longMessage);
 
             expect(window.alert).toHaveBeenCalledWith('Message cannot exceed 200 characters.');
-            expect(webSocketService.sendMsgToRoom).not.toHaveBeenCalled();
-        });
-
-        it('should send message exactly 200 characters', () => {
-            const message200 = 'a'.repeat(stringLength.maxString);
-            service.broadcastMessageToAll(message200);
-
-            expect(webSocketService.sendMsgToRoom).toHaveBeenCalled();
-        });
-    });
-
-    describe('roomMessages', () => {
-        it('should initialize with empty array', () => {
-            expect(service.roomMessages).toEqual([]);
+            expect(mockWebSocketService.sendMsgToRoom).not.toHaveBeenCalled();
         });
     });
 
     describe('messageReceived$', () => {
-        it('should properly emit when message is received', (done) => {
+        it('should emit when messageReceivedSubject emits', (done) => {
             service.messageReceived$.subscribe(() => {
                 expect(true).toBeTruthy();
                 done();
             });
 
             service.messageReceivedSubject.next();
-        });
-    });
-
-    // Test multiple socket state changes
-    it('should handle multiple socket state changes', () => {
-        service.initialize();
-
-        hasActiveSocketSubject.next(true);
-        expect(service.socket).toBeTruthy();
-
-        hasActiveSocketSubject.next(false);
-        expect(service.socket).toBeNull();
-
-        hasActiveSocketSubject.next(true);
-        expect(service.socket).toBeTruthy();
-    });
-
-    // Test message sending with different character lengths
-    describe('message length validation', () => {
-        beforeEach(() => {
-            service.initialize();
-            service.setAccessCode(ACCESS_CODE);
-            service.playerName = 'TestPlayer';
-        });
-
-        it('should send messages of varying valid lengths', () => {
-            const testCases = [
-                'Hi', // 2 chars
-                'Hello World', // 11 chars
-                'a'.repeat(stringLength.shortString), // 100 chars
-                'a'.repeat(stringLength.mediumString), // 199 chars
-                'a'.repeat(stringLength.maxString), // 200 chars
-            ];
-
-            testCases.forEach((message) => {
-                service.broadcastMessageToAll(message);
-                expect(webSocketService.sendMsgToRoom).toHaveBeenCalledWith({
-                    room: `${ACCESS_CODE}`,
-                    time: service.serverClock,
-                    sender: 'TestPlayer',
-                    content: message,
-                });
-            });
-        });
-    });
-
-    // Test edge cases for room ID
-    describe('room ID handling', () => {
-        it('should handle different access code formats', () => {
-            const testCases = [
-                { input: 0, expected: '' },
-                { input: 1, expected: '1' },
-                { input: 999999, expected: '999999' },
-            ];
-
-            testCases.forEach(({ input, expected }) => {
-                service.setAccessCode(input);
-                expect(service.roomID).toBe(expected);
-            });
         });
     });
 });

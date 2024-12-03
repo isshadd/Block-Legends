@@ -1,6 +1,9 @@
 import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { CommonModule } from '@angular/common';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+
 @Component({
     selector: 'app-event-journal',
     standalone: true,
@@ -11,8 +14,8 @@ import { CommonModule } from '@angular/common';
 export class EventJournalComponent implements AfterViewChecked, OnInit {
     @ViewChild('journalEvents') eventsContainer: ElementRef;
 
-    events: { event: string; associatedPlayers: string[] }[] = this.journalService.roomEvents;
-    filteredEvents: { event: string; associatedPlayers: string[] }[] = this.journalService.getFilteredEvents();
+    events: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.roomEvents;
+    filteredEvents: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.getFilteredEvents();
     shouldScroll: boolean = false;
     showMyEvents: boolean = false;
 
@@ -36,10 +39,6 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
                 this.shouldScroll = false;
             }, 1);
         }
-    }
-
-    addEvent(event: string, associatedPlayers: string[]): void {
-        this.events.push({ event, associatedPlayers });
     }
 
     private scrollToBottom(): void {
