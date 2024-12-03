@@ -29,11 +29,11 @@ describe('MapTileInfoComponent', () => {
     });
 
     it('should emit close event when closePanel is called', () => {
-        spyOn(component.closeP, 'emit');
+        spyOn(component.closePanelOutput, 'emit'); // Corrected: Ensure the EventEmitter is properly referenced
 
-        component.closePanel();
+        component.closePanel(); // Call the method that should emit the event
 
-        expect(component.closeP.emit).toHaveBeenCalled();
+        expect(component.closePanelOutput.emit).toHaveBeenCalled(); // Check if the event was emitted
     });
 
     it('should return the movement cost for a terrain tile in tileMovementCost', () => {

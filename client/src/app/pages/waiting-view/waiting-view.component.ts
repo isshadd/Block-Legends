@@ -1,5 +1,5 @@
-/* eslint-disable max-params */
-/* eslint-disable no-restricted-imports */
+/* eslint-disable max-params */ // The `max-params` rule is disabled because the `onMapTileMouseDown` function requires many parameters
+/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of PlayerCharacter
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';

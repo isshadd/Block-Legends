@@ -7,7 +7,6 @@ import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';
 import { AvatarSelectionComponent } from './avatar-selection.component';
 
-// Mock du WebSocketService
 class MockWebSocketService {
     takenAvatarsSubject = new Subject<string[]>();
     takenAvatars$ = this.takenAvatarsSubject.asObservable();
@@ -35,7 +34,7 @@ describe('AvatarSelectionComponent', () => {
         fixture = TestBed.createComponent(AvatarSelectionComponent);
         component = fixture.componentInstance;
         component.character = { avatar: null } as unknown as PlayerCharacter; // Initialiser l'@Input
-        fixture.detectChanges(); // Déclencher ngOnInit
+        fixture.detectChanges();
     });
 
     it('should create the component', () => {
@@ -48,80 +47,61 @@ describe('AvatarSelectionComponent', () => {
     });
 
     it('should filter out taken avatars from the avatarList', () => {
-        // Arrange
         component.takenAvatars = [AvatarEnum.Steve.name];
         component.avatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
 
-        // Act
         component.filterAvatars();
 
-        // Assert
         expect(component.avatarList).not.toContain(AvatarEnum.Steve);
         expect(component.avatarList).toContain(AvatarEnum.Alex);
     });
 
     it('should initialize avatarList with all avatars before any taken avatars are emitted', () => {
-        // Arrange
         const allAvatars = Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]);
 
-        // Act & Assert
         expect(component.avatarList).toEqual(allAvatars);
     });
 
     it('should set the selected avatar on the player character', () => {
-        // Arrange
         const mockCharacter = { avatar: null } as unknown as PlayerCharacter;
         component.character = mockCharacter;
         const selectedAvatar = AvatarEnum.Steve;
 
-        // Act
         component.selectAvatar(selectedAvatar);
 
-        // Assert
         expect(component.character.avatar).toBe(selectedAvatar);
     });
 
     it('should update takenAvatars and filter avatarList when takenAvatars$ emits', () => {
-        // Arrange
         const takenAvatars = [AvatarEnum.Arlina.name];
         const expectedFilteredAvatars = Object.keys(AvatarEnum)
             .map((key) => AvatarEnum[key as keyof typeof AvatarEnum])
             .filter((avatar) => avatar !== AvatarEnum.Arlina);
 
-        // Act
         mockWebSocketService.emitTakenAvatars(takenAvatars);
         fixture.detectChanges(); // Mettre à jour le DOM si nécessaire
 
-        // Assert
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(expectedFilteredAvatars);
     });
 
     it('should not modify avatarList if takenAvatars is empty', () => {
-        // Arrange
         const takenAvatars: string[] = [];
         const expectedAvatars = Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]);
 
-        // Act
         mockWebSocketService.emitTakenAvatars(takenAvatars);
         fixture.detectChanges();
 
-        // Assert
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(expectedAvatars);
     });
 
     it('should handle null or undefined takenAvatars gracefully', () => {
-        // Arrange
-        // Si le composant doit accepter null ou undefined, ajustez le type en conséquence
-        // Sinon, utilisez un tableau vide pour éviter l'erreur TypeScript
-        const takenAvatars: string[] = []; // Remplacer null par un tableau vide
+        const takenAvatars: string[] = [];
 
-        // Act
         mockWebSocketService.emitTakenAvatars(takenAvatars);
         fixture.detectChanges();
 
-        // Assert
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]));
     });

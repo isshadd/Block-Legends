@@ -101,17 +101,17 @@
     background-color: darken($primary-dark, 10%);
     color: $primary-light;
     padding: 5px 10px;
-    box-shadow: 0 4px 8px black; /* Optional shadow */
-    // width: 100%;
-    white-space: normal; // Ensures that the text wraps and preserves whitespace
+    box-shadow: 0 4px 8px black; 
+  
+    white-space: normal;
     overflow: visible;
     word-wrap: break-word;
     word-break: break-all;
 }
 
 .map-container:hover ~ .game-details .description {
-    opacity: 1; /* Make it visible */
-    visibility: visible; /* Make it visible */
+    opacity: 1; 
+    visibility: visible;
     transform: translateX(0);
 }
 

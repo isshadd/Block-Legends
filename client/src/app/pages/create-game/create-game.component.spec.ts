@@ -1,4 +1,4 @@
-/* eslint-disable import/no-deprecated */
+/* eslint-disable import/no-deprecated */ // This line is necessary for the import of CreateGameComponents
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';

@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // Disabling max-lines is necessary for the tests of the MapEditorMouseHandlerService
 import { TestBed } from '@angular/core/testing';
 import { Item } from '@common/classes/Items/item';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
