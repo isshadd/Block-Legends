@@ -386,7 +386,6 @@ export class VirtualPlayerManagerService {
             [ItemType.Sword]: 10,
             [ItemType.Flag]: 10,
             [ItemType.Totem]: 8,
-            [ItemType.Random]: 5,
         };
 
         return AGGRESSIVE_PRIORITY[itemType as keyof typeof AGGRESSIVE_PRIORITY] || 0;
