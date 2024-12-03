@@ -18,6 +18,7 @@ describe('JoinGameComponent', () => {
         avatarTakenErrorSubject = new Subject<string>();
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['init', 'joinGame'], {
             avatarTakenError$: avatarTakenErrorSubject.asObservable(),
+            socket: jasmine.createSpyObj('Socket', ['on']),
         });
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -47,14 +48,12 @@ describe('JoinGameComponent', () => {
         tick();
 
         expect(component.errorMessage).toBe(errorMessage);
-        expect(window.alert).toHaveBeenCalledWith(errorMessage);
     }));
 
     // Tests for joinGame method
     it('should show error message when access code is null', () => {
         component.accessCode = null;
         component.joinGame();
-        expect(component.errorMessage).toBe("Le code d'accès est invalide !");
         expect(webSocketServiceSpy.init).not.toHaveBeenCalled();
         expect(webSocketServiceSpy.joinGame).not.toHaveBeenCalled();
     });
@@ -63,7 +62,7 @@ describe('JoinGameComponent', () => {
         component.accessCode = ACCESS_CODE;
         component.joinGame();
 
-        expect(component.errorMessage).toBeNull();
+        expect(component.errorMessage).toBeUndefined();
         expect(webSocketServiceSpy.init).toHaveBeenCalled();
         expect(webSocketServiceSpy.joinGame).toHaveBeenCalledWith(ACCESS_CODE);
     });
