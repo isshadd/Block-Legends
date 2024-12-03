@@ -50,12 +50,12 @@ export class PlayPageMouseHandlerService implements OnDestroy {
         const possibleTileMove = this.playGameBoardManagerService.userCurrentPossibleMoves.get(tile);
 
         if (possibleTileMove) {
-            for (const possibleTile of possibleTileMove) {
+            this.lastTilePath = possibleTileMove;
+            this.lastTilePath.forEach((possibleTile) => {
                 if (!this.actionTiles.includes(possibleTile)) {
                     possibleTile.visibleState = VisibleState.Selected;
                 }
-            }
-            this.lastTilePath = possibleTileMove;
+            });
         } else if (!this.actionTiles.includes(tile)) {
             tile.visibleState = VisibleState.Hovered;
         }
