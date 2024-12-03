@@ -14,6 +14,7 @@ import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 // import { mock } from 'node:test';
 import { Item } from '@common/classes/Items/item';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
+import { OpenDoor } from '@common/classes/Tiles/open-door';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
@@ -671,6 +672,340 @@ describe('VirtualPlayerManagerService', () => {
                 coordinates: { x: 5, y: 5 },
                 virtualPlayerId: 'player123',
             });
+        });
+    });
+
+    describe('handleDefensiveComportment', () => {
+        let mockPlayer: jasmine.SpyObj<PlayerCharacter>;
+
+        beforeEach(() => {
+            service = TestBed.inject(VirtualPlayerManagerService);
+            mockPlayer = jasmine.createSpyObj('PlayerCharacter', ['someMethodIfNeeded']);
+            spyOn(service, 'handleDefensiveMovement');
+        });
+
+        it('should call handleDefensiveActions and not call handleDefensiveMovement if action is taken', () => {
+            spyOn(service, 'handleDefensiveActions').and.returnValue(true);
+
+            service.handleDefensiveComportment(mockPlayer, true);
+
+            expect(service.handleDefensiveActions).toHaveBeenCalledWith(mockPlayer, true);
+            expect(service.handleDefensiveMovement).not.toHaveBeenCalled();
+        });
+
+        it('should call handleDefensiveActions and then handleDefensiveMovement if no action is taken', () => {
+            spyOn(service, 'handleDefensiveActions').and.returnValue(false);
+
+            service.handleDefensiveComportment(mockPlayer, false);
+
+            expect(service.handleDefensiveActions).toHaveBeenCalledWith(mockPlayer, false);
+            expect(service.handleDefensiveMovement).toHaveBeenCalledWith(mockPlayer, false);
+        });
+
+        it('should handle false didTurnStarted parameter correctly', () => {
+            spyOn(service, 'handleDefensiveActions').and.returnValue(false);
+
+            service.handleDefensiveComportment(mockPlayer, false);
+
+            expect(service.handleDefensiveActions).toHaveBeenCalledWith(mockPlayer, false);
+            expect(service.handleDefensiveMovement).toHaveBeenCalledWith(mockPlayer, false);
+        });
+
+        it('should handle true didTurnStarted parameter correctly', () => {
+            spyOn(service, 'handleDefensiveActions').and.returnValue(false);
+
+            service.handleDefensiveComportment(mockPlayer, true);
+
+            expect(service.handleDefensiveActions).toHaveBeenCalledWith(mockPlayer, true);
+            expect(service.handleDefensiveMovement).toHaveBeenCalledWith(mockPlayer, true);
+        });
+    });
+
+    describe('handleDefensiveActions', () => {
+        let mockPlayer: jasmine.SpyObj<PlayerCharacter>;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = jasmine.createSpyObj('PlayerCharacter', [], {
+                socketId: 'player123',
+                mapEntity: mockPlayerEntity,
+                currentActionPoints: 1,
+            });
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj(
+                'PlayGameBoardManagerService',
+                ['getAdjacentActionTiles', 'checkIfPLayerDidEverything'],
+                {
+                    signalUserDidDoorAction: jasmine.createSpyObj('Subject', ['next']),
+                    signalUserStartedMoving: jasmine.createSpyObj('Subject', ['next']),
+                },
+            );
+
+            // Initialize getAdjacentActionTiles to return empty array by default
+            mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([]);
+
+            // Setup GameMapDataManagerService mock
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt']);
+
+            // Initialize service with mocks
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+            service.signalVirtualPlayerContinueTurn = jasmine.createSpyObj('Subject', ['next']);
+        });
+
+        it('should return false if player has no action points', () => {
+            mockPlayer.currentActionPoints = 0;
+            const result = service.handleDefensiveActions(mockPlayer, false);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if turn has already started', () => {
+            const result = service.handleDefensiveActions(mockPlayer, true);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if no action tiles are available', () => {
+            // Setup
+            const currentTile = new WalkableTile();
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([]);
+
+            // Execute
+            const result = service.handleDefensiveActions(mockPlayer, false);
+
+            // Assert
+            expect(result).toBeFalse();
+            expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith(mockPlayer.mapEntity.coordinates);
+            expect(mockPlayGameBoardManagerService.getAdjacentActionTiles).toHaveBeenCalledWith(currentTile);
+        });
+
+        it('should perform door action on adjacent open door and return true', () => {
+            // Create current tile and open door tile
+            const currentTile = new WalkableTile();
+            const openDoorTile = new OpenDoor();
+            openDoorTile.coordinates = { x: 1, y: 0 };
+
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([openDoorTile]);
+
+            const result = service.handleDefensiveActions(mockPlayer, false);
+
+            expect(result).toBeTrue();
+            expect(mockPlayGameBoardManagerService.signalUserDidDoorAction.next).toHaveBeenCalledWith({
+                tileCoordinate: openDoorTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+            expect(mockPlayGameBoardManagerService.checkIfPLayerDidEverything).toHaveBeenCalledWith(mockPlayer);
+            expect(service.signalVirtualPlayerContinueTurn.next).toHaveBeenCalledWith(mockPlayer.socketId);
+        });
+
+        it('should return false if open door tile has a player on it', () => {
+            // Create current tile and open door tile with player
+            const currentTile = new WalkableTile();
+            const openDoorTile = new OpenDoor();
+            openDoorTile.coordinates = { x: 1, y: 0 };
+            openDoorTile.player = new PlayerMapEntity('other-player.png');
+
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([openDoorTile]);
+
+            const result = service.handleDefensiveActions(mockPlayer, false);
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if no valid actions are available', () => {
+            // Create current tile and regular walkable tile
+            const currentTile = new WalkableTile();
+            const adjacentTile = new WalkableTile();
+
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([adjacentTile]);
+
+            const result = service.handleDefensiveActions(mockPlayer, false);
+
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('handleDefensiveMovement', () => {
+        let mockPlayerEntity: PlayerMapEntity;
+        let mockPlayer: PlayerCharacter;
+
+        beforeEach(() => {
+            // Setup player entity and character
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+            mockPlayer = {
+                socketId: 'player123',
+                mapEntity: mockPlayerEntity,
+            } as PlayerCharacter;
+
+            // Setup WebSocketService mock
+            mockWebSocketService.getRoomInfo.and.returnValue({
+                players: [],
+                id: '',
+                accessCode: 0,
+                isLocked: false,
+                maxPlayers: 0,
+                currentPlayerTurn: '',
+                organizer: '',
+            });
+
+            // Setup mock services with signals
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', ['getAdjacentActionTiles'], {
+                signalUserStartedMoving: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            // Setup signals
+            service.signalMoveVirtualPlayer = jasmine.createSpyObj('Subject', ['next']);
+            service.signalVirtualPlayerEndedTurn = jasmine.createSpyObj('Subject', ['next']);
+
+            // Setup service with mocks
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+        });
+
+        it('should move towards nearest item if available', () => {
+            // Create current tile
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            // Create item tile
+            const itemTile = new TerrainTile();
+            itemTile.coordinates = { x: 1, y: 1 };
+            itemTile.item = { type: ItemType.MagicShield } as Item;
+
+            // Setup mocks
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            spyOn(service, 'findNearestPossibleItem').and.returnValue(itemTile);
+            spyOn(service, 'findNearestOpenDoor').and.returnValue(null);
+            spyOn(service, 'findFurthestTileFromPlayers').and.returnValue(null);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(itemTile, []);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            // Execute
+            service.handleDefensiveMovement(mockPlayer, true);
+
+            // Assert
+            expect(service.playGameBoardManagerService.signalUserStartedMoving.next).toHaveBeenCalledWith('player123');
+            expect(service.signalMoveVirtualPlayer.next).toHaveBeenCalledWith({
+                coordinates: { x: 1, y: 1 },
+                virtualPlayerId: 'player123',
+            });
+        });
+
+        it('should move towards nearest open door if no items available', () => {
+            // Create current tile
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            // Create open door tile
+            const openDoorTile = new OpenDoor();
+            openDoorTile.coordinates = { x: 2, y: 2 };
+
+            // Setup mocks
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            spyOn(service, 'findNearestPossibleItem').and.returnValue(null);
+            spyOn(service, 'findNearestOpenDoor').and.returnValue(openDoorTile);
+            spyOn(service, 'findFurthestTileFromPlayers').and.returnValue(null);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(openDoorTile, []);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            // Execute
+            service.handleDefensiveMovement(mockPlayer, true);
+
+            // Assert
+            expect(service.playGameBoardManagerService.signalUserStartedMoving.next).toHaveBeenCalledWith('player123');
+            expect(service.signalMoveVirtualPlayer.next).toHaveBeenCalledWith({
+                coordinates: { x: 2, y: 2 },
+                virtualPlayerId: 'player123',
+            });
+        });
+
+        it('should move to furthest tile from players if no items or doors available', () => {
+            // Create current tile
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            // Create furthest tile
+            const furthestTile = new WalkableTile();
+            furthestTile.coordinates = { x: 3, y: 3 };
+
+            // Setup mocks
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            spyOn(service, 'findNearestPossibleItem').and.returnValue(null);
+            spyOn(service, 'findNearestOpenDoor').and.returnValue(null);
+            spyOn(service, 'findFurthestTileFromPlayers').and.returnValue(furthestTile);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(furthestTile, []);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            // Execute
+            service.handleDefensiveMovement(mockPlayer, true);
+
+            // Assert
+            expect(service.playGameBoardManagerService.signalUserStartedMoving.next).toHaveBeenCalledWith('player123');
+            expect(service.signalMoveVirtualPlayer.next).toHaveBeenCalledWith({
+                coordinates: { x: 3, y: 3 },
+                virtualPlayerId: 'player123',
+            });
+        });
+
+        it('should end turn if no valid moves available and turn not started', () => {
+            // Create current tile
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            // Setup mocks
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            spyOn(service, 'findNearestPossibleItem').and.returnValue(null);
+            spyOn(service, 'findNearestOpenDoor').and.returnValue(null);
+            spyOn(service, 'findFurthestTileFromPlayers').and.returnValue(null);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            // Execute
+            service.handleDefensiveMovement(mockPlayer, false);
+
+            // Assert
+            expect(service.signalVirtualPlayerEndedTurn.next).toHaveBeenCalledWith('player123');
+            expect(service.signalMoveVirtualPlayer.next).not.toHaveBeenCalled();
+        });
+
+        it('should not move if player is already at target tile', () => {
+            // Create current tile
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            // Create target tile as TerrainTile with item
+            const targetTile = new TerrainTile();
+            targetTile.coordinates = { x: 0, y: 0 };
+            targetTile.item = { type: ItemType.MagicShield } as Item; // Add an item
+
+            // Setup mocks
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            spyOn(service, 'findNearestPossibleItem').and.returnValue(targetTile);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(targetTile, []);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            // Execute
+            service.handleDefensiveMovement(mockPlayer, true);
+
+            // Assert
+            expect(service.signalVirtualPlayerEndedTurn.next).toHaveBeenCalledWith('player123');
+            expect(service.signalMoveVirtualPlayer.next).not.toHaveBeenCalled();
         });
     });
 });
