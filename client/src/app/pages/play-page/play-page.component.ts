@@ -27,8 +27,8 @@ import { SocketStateService } from '@app/services/SocketService/socket-state.ser
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { Subject, takeUntil } from 'rxjs';
-import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 import { PlayPageRightSideViewComponent } from '../../components/play-page-right-side-view/play-page-right-side-view.component';
+import { TabContainerComponent } from '../../components/tab-container/tab-container.component';
 
 const TIMEOUT_DURATION = 500;
 
