@@ -14,7 +14,6 @@ import { TileShared } from '@common/interfaces/tile-shared';
 import { BehaviorSubject, of } from 'rxjs';
 import { GameListComponent } from './game-list.component';
 
-// Mocks pour les composants enfants
 @Component({
     selector: 'app-modal-one-option',
     template: '',
@@ -39,7 +38,6 @@ describe('GameListComponent', () => {
     let modeServiceSpy: jasmine.SpyObj<ModeService>;
 
     beforeEach(async () => {
-        // Création des mocks pour les services
         const modeService = jasmine.createSpyObj('ModeService', [], {
             selectedMode$: new BehaviorSubject<GameMode>(GameMode.Classique),
         });
@@ -55,12 +53,7 @@ describe('GameListComponent', () => {
         const gameServerCommunicationService = jasmine.createSpyObj('GameServerCommunicationService', ['getGame']);
 
         await TestBed.configureTestingModule({
-            imports: [
-                CommonModule,
-                GameListComponent, // Import du composant standalone
-                MockModalOneOptionComponent, // Import des composants mock
-                MockMapComponent,
-            ],
+            imports: [CommonModule, GameListComponent, MockModalOneOptionComponent, MockMapComponent],
             providers: [
                 { provide: ModeService, useValue: modeService },
                 { provide: Router, useValue: router },
@@ -73,7 +66,6 @@ describe('GameListComponent', () => {
         fixture = TestBed.createComponent(GameListComponent);
         component = fixture.componentInstance;
 
-        // Injection des spies
         routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
         tileFactoryServiceSpy = TestBed.inject(TileFactoryService) as jasmine.SpyObj<TileFactoryService>;
         administrationServiceSpy = TestBed.inject(AdministrationPageManagerService) as jasmine.SpyObj<AdministrationPageManagerService>;
@@ -242,20 +234,4 @@ describe('GameListComponent', () => {
         expect(component.isModalOpen).toBeFalse();
         expect(component.gameStatus).toBeNull();
     });
-
-    // it('confirmBack() should call closeModal and reload the window', () => {
-    //     spyOn(component, 'closeModal');
-
-    //     // Spy sur la méthode reloadWindow
-    //     spyOn(window.location, 'reload');
-
-    //     // Appeler la méthode confirmBack
-    //     component.confirmBack();
-
-    //     // Vérifier que closeModal a été appelé
-    //     expect(component.closeModal).toHaveBeenCalled();
-
-    //     // Vérifier que reloadWindow a été appelé
-    //     expect(window.location.reload).toHaveBeenCalled();
-    // });
 });

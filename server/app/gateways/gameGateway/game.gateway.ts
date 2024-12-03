@@ -5,7 +5,6 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
 
 const NINE = 9;
 const ONE = 1;
@@ -16,14 +15,13 @@ const TWO = 2;
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
     private readonly connectedClients = new Set<string>();
-    private logger = new Logger(GameGateway.name);
 
     constructor(
         private readonly gameSocketRoomService: GameSocketRoomService,
         private readonly playGameBoardGateway: PlayGameBoardGateway,
     ) {}
 
-    @SubscribeMessage(SocketEvents.GET_ROOM_STATE) // QU'EST C'EST QUE CA ???
+    @SubscribeMessage(SocketEvents.GET_ROOM_STATE)
     handleGetRoomState(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (room) {

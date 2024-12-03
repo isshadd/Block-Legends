@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { BehaviorSubject } from 'rxjs';

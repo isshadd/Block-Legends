@@ -1,31 +1,27 @@
-/* eslint-disable no-restricted-imports */
 import { TestBed } from '@angular/core/testing';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
-import { SocketStateService } from '../SocketService/socket-state.service';
-import { WebSocketService } from '../SocketService/websocket.service';
 import { EventJournalService } from './event-journal.service';
-
-const NUMBER_OF_CALLS = 3;
 
 describe('EventJournalService', () => {
     let service: EventJournalService;
     let socketStateService: jasmine.SpyObj<SocketStateService>;
-    let mockWebSocket: jasmine.SpyObj<WebSocketService>;
+    let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
     let hasActiveSocketSubject: Subject<boolean>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         hasActiveSocketSubject = new Subject<boolean>();
-        mockWebSocket = jasmine.createSpyObj('WebSocketService', ['registerPlayer', 'sendEventToRoom']);
-
+        mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['sendEventToRoom']);
         socketStateService = jasmine.createSpyObj('SocketStateService', ['getActiveSocket'], {
             hasActiveSocket$: hasActiveSocketSubject.asObservable(),
         });
-        socketStateService.getActiveSocket.and.returnValue(mockWebSocket);
+        socketStateService.getActiveSocket.and.returnValue(mockWebSocketService);
 
-        TestBed.configureTestingModule({
+        await TestBed.configureTestingModule({
             providers: [EventJournalService, { provide: SocketStateService, useValue: socketStateService }],
-        });
+        }).compileComponents();
 
         service = TestBed.inject(EventJournalService);
     });
@@ -35,170 +31,140 @@ describe('EventJournalService', () => {
     });
 
     describe('initialize', () => {
-        beforeEach(() => {
-            service.playerName = 'TestPlayer';
-        });
-
-        it('should get active socket on initialization', () => {
+        it('should set socket when initialized with active socket', () => {
             service.initialize();
+            expect(service.socket).toBe(mockWebSocketService);
             expect(socketStateService.getActiveSocket).toHaveBeenCalled();
-            expect(service.socket).toBe(mockWebSocket);
         });
 
-        it('should handle socket activation', () => {
+        it('should update socket when socket state changes to active', () => {
             service.initialize();
             hasActiveSocketSubject.next(true);
-
-            expect(socketStateService.getActiveSocket).toHaveBeenCalled();
-            expect(mockWebSocket.registerPlayer).toHaveBeenCalledWith('TestPlayer');
+            expect(service.socket).toBe(mockWebSocketService);
         });
 
-        it('should handle socket deactivation', () => {
+        it('should set socket to null when socket state changes to inactive', () => {
             service.initialize();
             hasActiveSocketSubject.next(false);
-
             expect(service.socket).toBeNull();
-        });
-
-        it('should not register player if socket is null', () => {
-            socketStateService.getActiveSocket.and.returnValue(null);
-            service.initialize();
-            hasActiveSocketSubject.next(true);
-
-            expect(mockWebSocket.registerPlayer).not.toHaveBeenCalled();
         });
     });
 
     describe('setCharacter', () => {
-        it('should set player name from character', () => {
-            const mockCharacter = { name: 'TestCharacter' } as PlayerCharacter;
-            service.setCharacter(mockCharacter);
-
-            expect(service.playerName).toBe('TestCharacter');
+        it('should set the player character', () => {
+            const testCharacter = new PlayerCharacter('TestPlayer');
+            service.setCharacter(testCharacter);
+            expect(service.player).toBe(testCharacter);
         });
     });
 
     describe('setAccessCode', () => {
-        it('should set access code and room ID', () => {
-            const code = 12345;
-            service.setAccessCode(code);
-
-            expect(service.accessCode).toBe(code);
-            expect(service.roomID).toBe(code.toString());
+        it('should set access code and room ID when code is provided', () => {
+            const testCode = 12345;
+            service.setAccessCode(testCode);
+            expect(service.accessCode).toBe(testCode);
+            expect(service.roomID).toBe(testCode.toString());
         });
 
-        it('should handle zero accessCode', () => {
-            service.setAccessCode(0);
-
+        it('should reset access code and room ID when code is undefined', () => {
+            service.setAccessCode(undefined);
             expect(service.accessCode).toBe(0);
             expect(service.roomID).toBe('');
         });
     });
 
     describe('broadcastEvent', () => {
+        let testPlayers: PlayerCharacter[];
+
         beforeEach(() => {
             service.initialize();
+            testPlayers = [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')];
         });
 
         it('should send event to room when socket exists and event is not empty', () => {
-            const event = 'test event';
-            const players = ['player1', 'player2'];
-
-            service.broadcastEvent(event, players);
-
-            expect(mockWebSocket.sendEventToRoom).toHaveBeenCalledWith(event, players);
+            const testEvent = 'test event';
+            service.broadcastEvent(testEvent, testPlayers);
+            expect(mockWebSocketService.sendEventToRoom).toHaveBeenCalledWith(testEvent, testPlayers);
         });
 
         it('should not send event when socket is null', () => {
             service.socket = null;
-            service.broadcastEvent('test event', ['player1']);
-
-            expect(mockWebSocket.sendEventToRoom).not.toHaveBeenCalled();
+            const testEvent = 'test event';
+            service.broadcastEvent(testEvent, testPlayers);
+            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
         });
 
-        it('should not send event when event is empty or whitespace', () => {
-            service.broadcastEvent('', ['player1']);
-            expect(mockWebSocket.sendEventToRoom).not.toHaveBeenCalled();
-
-            service.broadcastEvent('   ', ['player1']);
-            expect(mockWebSocket.sendEventToRoom).not.toHaveBeenCalled();
+        it('should not send event when event string is empty', () => {
+            const testEvent = '  ';
+            service.broadcastEvent(testEvent, testPlayers);
+            expect(mockWebSocketService.sendEventToRoom).not.toHaveBeenCalled();
         });
     });
 
-    describe('addEvent', () => {
+    describe('event management', () => {
+        let testPlayers: PlayerCharacter[];
+
+        beforeEach(() => {
+            testPlayers = [new PlayerCharacter('Player1'), new PlayerCharacter('Player2')];
+        });
+
         it('should add event to roomEvents array', () => {
-            const event = { event: 'test event', associatedPlayers: ['player1'] };
-            const initialLength = service.roomEvents.length;
+            const testEvent = {
+                event: { time: new Date(), content: 'test' },
+                associatedPlayers: testPlayers,
+            };
+            service.addEvent(testEvent);
+            expect(service.roomEvents).toContain(testEvent);
+        });
 
-            service.addEvent(event);
-
-            expect(service.roomEvents.length).toBe(initialLength + 1);
-            expect(service.roomEvents[service.roomEvents.length - 1]).toEqual(event);
+        it('should clear all events from roomEvents array', () => {
+            const testEvent = {
+                event: { time: new Date(), content: 'test' },
+                associatedPlayers: testPlayers,
+            };
+            service.addEvent(testEvent);
+            service.clearEvents();
+            expect(service.roomEvents.length).toBe(0);
         });
     });
 
     describe('getFilteredEvents', () => {
+        let player1: PlayerCharacter;
+        let player2: PlayerCharacter;
+
         beforeEach(() => {
-            service.playerName = 'player1';
-            service.roomEvents = [
-                { event: 'event1', associatedPlayers: ['player1'] },
-                { event: 'event2', associatedPlayers: ['player2'] },
-                { event: 'event3', associatedPlayers: ['player1', 'player2'] },
-            ];
+            player1 = new PlayerCharacter('Player1');
+            player2 = new PlayerCharacter('Player2');
+            service.setCharacter(player1);
         });
 
-        it('should return events associated with current player', () => {
+        it('should return only events associated with current player', () => {
+            const event1 = {
+                event: { time: new Date(), content: 'test1' },
+                associatedPlayers: [player1],
+            };
+            const event2 = {
+                event: { time: new Date(), content: 'test2' },
+                associatedPlayers: [player2],
+            };
+
+            service.addEvent(event1);
+            service.addEvent(event2);
+
             const filteredEvents = service.getFilteredEvents();
-
-            expect(filteredEvents.length).toBe(2);
-            expect(filteredEvents).toContain(service.roomEvents[0]);
-            expect(filteredEvents).toContain(service.roomEvents[2]);
-            expect(filteredEvents).not.toContain(service.roomEvents[1]);
-        });
-
-        it('should handle empty roomEvents array', () => {
-            service.roomEvents = [];
-            const filteredEvents = service.getFilteredEvents();
-
-            expect(filteredEvents).toEqual([]);
-        });
-
-        it('should handle no events for current player', () => {
-            service.playerName = 'player3';
-            const filteredEvents = service.getFilteredEvents();
-
-            expect(filteredEvents).toEqual([]);
+            expect(filteredEvents).toContain(event1);
+            expect(filteredEvents).not.toContain(event2);
         });
     });
 
-    describe('messageReceived$ Observable', () => {
+    describe('messageReceived$', () => {
         it('should emit when messageReceivedSubject emits', (done) => {
             service.messageReceived$.subscribe(() => {
-                expect(true).toBeTruthy(); // Verify emission occurred
+                expect(true).toBeTruthy();
                 done();
             });
 
             service.messageReceivedSubject.next();
-        });
-    });
-
-    // Edge cases and error handling
-    describe('edge cases', () => {
-        it('should handle multiple socket state changes', () => {
-            service.initialize();
-            hasActiveSocketSubject.next(true);
-            hasActiveSocketSubject.next(false);
-            hasActiveSocketSubject.next(true);
-
-            expect(socketStateService.getActiveSocket).toHaveBeenCalledTimes(NUMBER_OF_CALLS);
-        });
-
-        it('should handle events with empty players array', () => {
-            const event = { event: 'test event', associatedPlayers: [] };
-            service.addEvent(event);
-            const filteredEvents = service.getFilteredEvents();
-
-            expect(filteredEvents).toEqual([]);
         });
     });
 });

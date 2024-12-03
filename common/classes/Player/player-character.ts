@@ -21,12 +21,14 @@ export class PlayerCharacter implements Character {
     dice: string = 'attack';
     attackDice: number = BONUS;
     defenseDice: number = BASE_STATS;
+    messageColor: string;
 
     avatar: Avatar;
     attributes = new PlayerAttributes();
     mapEntity: PlayerMapEntity;
     isAbsent: boolean = false;
     inventory: Item[] = [new EmptyItem(), new EmptyItem()];
+    textColor: string = '#006D77';
 
     currentMovePoints: number = 0;
     currentActionPoints: number = 0;
@@ -41,8 +43,6 @@ export class PlayerCharacter implements Character {
     totalDamageDealt: number = 0;
     differentItemsGrabbed: ItemType[] = [];
     differentTerrainTilesVisited: Vec2[] = [];
-
-    // Pour JV:
 
     isVirtual: boolean = false;
     comportement: ProfileEnum | null = null;

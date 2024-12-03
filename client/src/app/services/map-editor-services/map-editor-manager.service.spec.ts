@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // Disabling max-lines is necessary for the tests of large services
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
@@ -487,6 +487,20 @@ describe('MapEditorManagerService', () => {
 
         expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockCoordinates);
         expect(service.itemPlacer).toHaveBeenCalledWith(mockItem, mockTile);
+    });
+
+    it('should handle itemPlacerWithCoordinates when getTileAt returns null', () => {
+        const mockItem = { type: ItemType.Sword } as unknown as Item;
+        const mockCoordinates: Vec2 = { x: -1, y: -1 }; // Invalid coordinates
+
+        gameMapDataManagerServiceSpy.getTileAt.and.returnValue(null);
+
+        spyOn(service, 'itemPlacer');
+
+        service['itemPlacerWithCoordinates'](mockItem, mockCoordinates);
+
+        expect(gameMapDataManagerServiceSpy.getTileAt).toHaveBeenCalledWith(mockCoordinates);
+        expect(service.itemPlacer).not.toHaveBeenCalled();
     });
 
     it('should remove the item from a terrain tile and update the item limit', () => {

@@ -1,12 +1,11 @@
-/* timer.component.scss */
 .timer {
     position: absolute;
-    top: 20px; // Adjust as necessary
-    right: 20px; // Adjust as necessary
-    font-size: 1.5rem; // Adjust font size as necessary
-    background-color: rgba(0, 0, 0, 0.7); // Semi-transparent background for visibility
-    color: white; // Text color
-    padding: 10px; // Padding around the text
-    border-radius: 8px; // Rounded corners
-    z-index: 20; // Ensure it is above other content
+    top: 20px;
+    right: 20px;
+    font-size: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 20;
 }

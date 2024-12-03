@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-// import { Router } from '@angular/router';
-/* import { BASE_STATS, DICE_4, DICE_6 } from '@app/pages/create-character/create-character.component';*/
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 
 export const MIN_CHAR = 48;
@@ -22,7 +20,6 @@ export class JoinGameComponent implements OnInit {
     errorMessage: string | null;
 
     constructor(
-        // private gameService: GameService, // private router: Router,
         private webSocketService: WebSocketService,
         private router: Router,
     ) {}
@@ -31,7 +28,7 @@ export class JoinGameComponent implements OnInit {
         this.webSocketService.avatarTakenError$.subscribe((message) => {
             if (message) {
                 this.errorMessage = message;
-                alert(message); // Display the error message in an alert
+                alert(message);
             }
         });
     }
@@ -64,6 +61,6 @@ export class JoinGameComponent implements OnInit {
     }
 
     goHome(): void {
-        this.router.navigate(['/']); // Navigate to home route
+        this.router.navigate(['/']);
     }
 }

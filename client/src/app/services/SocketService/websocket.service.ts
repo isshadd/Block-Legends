@@ -1,21 +1,19 @@
-/* eslint-disable @typescript-eslint/member-ordering*/
-/* eslint-disable no-restricted-imports */
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { AvatarService } from '@app/services/avatar.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
+import { DebugService } from '@app/services/debug.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
-import { RoomMessage } from '@common/interfaces/roomMessage';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { AvatarService } from '../avatar.service';
-// eslint-disable-next-line no-restricted-imports
-import { DebugService } from '../debug.service';
 
 @Injectable({
     providedIn: 'root',
@@ -30,12 +28,13 @@ export class WebSocketService {
     maxPlayers$ = this.maxPlayersSubject.asObservable();
     takenAvatarsSubject = new BehaviorSubject<string[]>([]);
     takenAvatars$ = this.takenAvatarsSubject.asObservable();
-    private avatarTakenErrorSubject = new BehaviorSubject<string>('');
+    avatarTakenErrorSubject = new BehaviorSubject<string>('');
     avatarTakenError$ = this.avatarTakenErrorSubject.asObservable();
 
     currentRoom: GameRoom;
-    chatRoom: GameRoom;
     isGameFinished = false;
+    colorCounter = 0;
+    // this constructor is used to inject the services that are used in the class, so it is impossible to refactor
     // eslint-disable-next-line max-params
     constructor(
         private router: Router,
@@ -62,7 +61,7 @@ export class WebSocketService {
         this.socket.emit(ChatEvents.RoomMessage, roomMessage);
     }
 
-    sendEventToRoom(event: string, players: string[]): void {
+    sendEventToRoom(event: string, players: PlayerCharacter[]): void {
         const time = this.eventJournalService.serverClock;
         const roomID = this.eventJournalService.roomID;
         const content = event;
@@ -72,11 +71,6 @@ export class WebSocketService {
     joinGame(accessCode: number) {
         this.socket.emit(SocketEvents.JOIN_GAME, accessCode);
     }
-
-    registerPlayer(playerName: string): void {
-        this.socket.emit(ChatEvents.RegisterPlayer, playerName);
-    }
-
     addPlayerToRoom(accessCode: number, player: PlayerCharacter) {
         this.socket.emit(SocketEvents.ADD_PLAYER_TO_ROOM, { accessCode, player });
     }
@@ -133,7 +127,6 @@ export class WebSocketService {
         this.socket.emit('log', message);
     }
 
-    // Ajouté par Nihal
     getTotalPlayers(): PlayerCharacter[] {
         let players: PlayerCharacter[] = [];
         this.players$.subscribe((data) => {
@@ -192,6 +185,7 @@ export class WebSocketService {
             if (!player.isVirtual) {
                 this.gameService.setCharacter(player);
             }
+
             this.router.navigate(['/waiting-view']);
         });
 
@@ -264,10 +258,6 @@ export class WebSocketService {
             });
         });
 
-        // this.socket.on('avatarTakenError', (data) => {
-        //     this.avatarTakenErrorSubject.next(data.message);
-        // });
-
         this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);
         });
@@ -277,12 +267,12 @@ export class WebSocketService {
             this.eventJournalService.serverClock = serverClock;
         });
 
-        this.socket.on(ChatEvents.EventReceived, (data: { event: string; associatedPlayers: string[] }) => {
+        this.socket.on(ChatEvents.EventReceived, (data: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }) => {
             this.eventJournalService.addEvent(data);
             this.eventJournalService.messageReceivedSubject.next();
         });
 
-        this.socket.on(ChatEvents.RoomMessage, (message: string) => {
+        this.socket.on(ChatEvents.RoomMessage, (message: RoomMessageReceived) => {
             this.chatService.roomMessages.push(message);
             this.chatService.messageReceivedSubject.next();
         });
@@ -302,13 +292,5 @@ export class WebSocketService {
         this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
             this.debugService.isPlayerMoving = false;
         });
-
-        /*
-        this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
-            if (!this.currentRoom.players.find((player) => player.isOrganizer)) {
-                this.router.navigate(['/home']);
-            }
-        });
-        */
     }
 }

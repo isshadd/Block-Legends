@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // Disabling max-lines is necessary to be able to test all the methods in the file
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';

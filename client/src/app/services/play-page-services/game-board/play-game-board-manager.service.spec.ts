@@ -1,6 +1,5 @@
-/* eslint-disable max-lines */
-/* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-shadow */ // pour les tests, le mocPlayer est réassigné
+/* eslint-disable max-lines */ // impossible to test this file, which is a manager file so it is expected to be long, without using less than this many tests so it can not be refactored
+/* eslint-disable @typescript-eslint/no-shadow */ // for the tests, the mockPlayer is reassigned
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
@@ -12,7 +11,6 @@ import { IceTile } from '@common/classes/Tiles/ice-tile';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
-import { AvatarEnum } from '@common/enums/avatar-enum';
 import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
@@ -25,7 +23,16 @@ describe('PlayGameBoardManagerService', () => {
     const mockPlayerCharacter = new PlayerCharacter('player1');
     mockPlayerCharacter.socketId = 'player1';
     mockPlayerCharacter.name = 'player1';
-    mockPlayerCharacter.avatar = AvatarEnum.Steve;
+    mockPlayerCharacter.avatar = {
+        name: 'Steve',
+        headImage: 'assets/images/avatar/Steve_head.png',
+        fullImage: 'assets/images/avatar/Steve.png',
+        mineshaftImage: 'assets/images/Skins/STeve/steve_mineshaft.jpg',
+        standing: 'assets/images/Skins/STeve/standing.jpg',
+        dogPetting: 'assets/images/Skins/Steve/dog_petting.jpg',
+        lost: 'assets/images/Skins/Steve/lost.jpg',
+        fight: 'assets/images/Skins/Steve/fight.jpg',
+    };
     mockPlayerCharacter.attributes = { life: 3, speed: 3, attack: 3, defense: 3 };
     mockPlayerCharacter.mapEntity = new PlayerMapEntity('avatar.png');
     mockPlayerCharacter.mapEntity.coordinates = { x: 0, y: 0 } as Vec2;
@@ -142,7 +149,6 @@ describe('PlayGameBoardManagerService', () => {
 
     describe('init', () => {
         let service: PlayGameBoardManagerService;
-        // let gameBoardParameters: GameBoardParameters;
 
         let gameMapDataManagerServiceSpy: jasmine.SpyObj<GameMapDataManagerService>;
 
@@ -973,15 +979,6 @@ describe('PlayGameBoardManagerService', () => {
 
             service = TestBed.inject(PlayGameBoardManagerService);
         });
-
-        // it('should set areOtherPlayersInBattle to true if user is not involved in battle', () => {
-        //     service.areOtherPlayersInBattle = false;
-
-        //     service.startBattle('player1', 'player2'); // User is neither player1 nor player2
-
-        //     expect(service.areOtherPlayersInBattle).toBeTrue();
-        //     expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
-        // });
 
         it('should initialize battle if user is the playerId', () => {
             const mockCurrentPlayer = { socketId: 'userSocketId' } as PlayerCharacter;

@@ -1,4 +1,4 @@
-/* eslint-disable no-undef*/
+/* eslint-disable no-undef*/ // This is necessary to be able to test game service
 
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -27,7 +27,6 @@ describe('GameService', () => {
         });
         service.character$.subscribe((character) => {
             expect(character).toEqual(new PlayerCharacter(''));
-            // done();
         });
     });
 

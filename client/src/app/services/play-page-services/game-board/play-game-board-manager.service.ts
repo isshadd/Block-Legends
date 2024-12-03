@@ -1,4 +1,4 @@
-/* eslint-disable max-lines */
+/* eslint-disable max-lines */ // This file is a service and it's expected to have a lot of lines
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
@@ -71,6 +71,7 @@ export class PlayGameBoardManagerService {
     winnerPlayer: PlayerCharacter | null = null;
 
     readonly movingTimeInterval = 150;
+    // this is a manager file so it is necessary to have a lot of parameters, so it is impossible to reduce the number of parameters
     /* eslint-disable max-params */
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,
@@ -300,7 +301,7 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: player.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player.name]);
+                this.eventJournal.broadcastEvent(`${player.name} a ramassé l'objet ${terrainTile.item.type}`, [player]);
             } else {
                 for (const item of player.inventory) {
                     possibleItems.push(item);
@@ -373,7 +374,7 @@ export class PlayGameBoardManagerService {
                     tileCoordinates: terrainTile.coordinates,
                     playerTurnId: currentPlayer.socketId,
                 });
-                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer.name]);
+                this.eventJournal.broadcastEvent(`${currentPlayer.name} a ramassé l'objet ${item.type}`, [currentPlayer]);
             }
         }
 
@@ -443,7 +444,7 @@ export class PlayGameBoardManagerService {
         if (tileType === TileType.Ice) {
             const result = 0.1;
             if (Math.random() < result) {
-                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.playerName]);
+                this.eventJournal.broadcastEvent('glissement', [this.eventJournal.player]);
                 return true;
             }
         }

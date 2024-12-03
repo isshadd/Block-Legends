@@ -1,6 +1,8 @@
 /* eslint-disable no-restricted-imports */
+// Disabling restricted imports is necessary for the import of PlayPage
 /* eslint-disable max-params */
 /* eslint-disable max-len */
+// This file is necessary for the PlayPageComponent to work and should not be refactored. We have to disable max-len
 /* eslint-disable  @typescript-eslint/prefer-for-of */
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +10,9 @@ import { MapComponent } from '@app/components/game-board-components/map/map.comp
 import { InfoPanelComponent } from '@app/components/info-panel/info-panel.component';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
+// this line is necessary for the import of PlayPage
 // eslint-disable-next-line
+
 import { ItemChooseComponent } from '@app/components/item-choose/item-choose.component';
 import { PlayGameSideViewBarComponent } from '@app/components/play-game-side-view-bar/play-game-side-view-bar.component';
 import { FightViewComponent } from '@app/components/play-page-components/fight-view/fight-view.component';
@@ -74,7 +78,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private webSocketService: WebSocketService,
         private gameService: GameService,
         private socketStateService: SocketStateService,
-        private eventService: EventJournalService,
+        private eventJournalService: EventJournalService,
     ) {
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
@@ -98,7 +102,8 @@ export class PlayPageComponent implements OnInit, OnDestroy {
             this.toggleDebugMode();
         }
         if (event.key === 't') {
-            // this.webSocketService.sendLog(`${this.myPlayer.currentMovePoints}`)
+            if (this.playGameBoardManagerService.getCurrentPlayerCharacter())
+                this.eventJournalService.broadcastEvent(`${this.playGameBoardManagerService.getCurrentPlayerCharacter()?.socketId}`, []);
         }
     }
 
@@ -109,6 +114,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     getPlayersTurn(): void {
         let playerName: string;
         let player: PlayerCharacter | null;
+        // this line is necessary for the code to work and cannot be refactored
         // eslint-disable-next-line
         for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
             playerName = this.playGameBoardManagerService.turnOrder[i];
@@ -127,7 +133,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (!character) return;
             this.myPlayer = character;
-            this.totalLifePoints = this.myPlayer.attributes.life;
+            if (this.myPlayer.isOrganizer) {
+                this.totalLifePoints = this.myPlayer.attributes.life;
+            }
         });
     }
 
@@ -176,11 +184,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     handlePlayerAbandon(): void {
-        // Mettez à jour la liste des joueurs pour mettre le joueur absent en bas
-        this.players = [
-            ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
-            this.myPlayer,
-        ]; // Ajouter le joueur absent en bas
+        this.players = [...this.players.filter((player) => player !== this.myPlayer), this.myPlayer];
     }
 
     itemThrow(item: Item): void {
@@ -189,9 +193,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     toggleDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            if (this.debugService.isDebugMode) this.eventService.broadcastEvent('Mode débogage désactivé', []);
+            if (this.debugService.isDebugMode) this.eventJournalService.broadcastEvent('Mode débogage désactivé', []);
             else {
-                this.eventService.broadcastEvent('Mode débogage activé', []);
+                this.eventJournalService.broadcastEvent('Mode débogage activé', []);
             }
             this.webSocketService.debugMode();
         }
@@ -199,13 +203,8 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     turnOffDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            this.eventService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
+            this.eventJournalService.broadcastEvent("Mode débogage désactivé (Abandon de l'organisateur)", []);
             this.webSocketService.debugModeOff();
         }
-    }
-
-    deactivateDebugMode(): void {
-        // if(this.myPlayer.isOrganizer)
-        // this.webSocketService.deactivateDebugMode();
     }
 }

@@ -1,5 +1,4 @@
-/* eslint-disable max-params */
-/* eslint-disable no-restricted-imports */
+/* eslint-disable max-params */ // The `max-params` rule is disabled because the `onMapTileMouseDown` function requires many parameters
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -81,6 +80,8 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
                 });
             } else {
                 this.playersCounter++;
+                this.chatService.setCharacter(character);
+                this.eventJournalService.setCharacter(character);
                 this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
                     this.accessCode = code;
                     this.changeRoomId(this.accessCode);
@@ -184,6 +185,6 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     }
     toggleView(): void {
         this.showClavardage = !this.showClavardage;
-        this.eventJournalService.broadcastEvent('toggleView', []);
+        this.eventJournalService.broadcastEvent(`${this.chatService.player.socketId}`, []);
     }
 }

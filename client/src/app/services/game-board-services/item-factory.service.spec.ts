@@ -1,5 +1,3 @@
-// src/app/services/item-factory.service.spec.ts
-
 import { TestBed } from '@angular/core/testing';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
@@ -83,6 +81,12 @@ describe('ItemFactoryService', () => {
             expect(item.type).toBe(ItemType.Random);
         });
 
+        it('should create an EmptyItem when ItemType.EmptyItem is passed', () => {
+            const item = service.createItem(ItemType.EmptyItem);
+            expect(item).toBeInstanceOf(Item);
+            expect(item.type).toBe(ItemType.EmptyItem);
+        });
+
         it('should create a generic Item when an unknown ItemType is passed', () => {
             const unknownType = 'UnknownType' as ItemType;
             const item = service.createItem(unknownType);
@@ -94,8 +98,8 @@ describe('ItemFactoryService', () => {
     describe('copyItem', () => {
         it('should create a new item of the same type', () => {
             const originalItem = service.createItem(ItemType.Sword);
-            originalItem.setCoordinates({ x: 10, y: 20 }); // Assuming setCoordinates is defined
-            originalItem.itemLimit = 5; // Assuming itemLimit is a property
+            originalItem.setCoordinates({ x: 10, y: 20 });
+            originalItem.itemLimit = 5;
             const copiedItem = service.copyItem(originalItem);
 
             expect(copiedItem).toBeInstanceOf(DiamondSword);

@@ -10,6 +10,12 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow-y: visible;
 
+    .event-time {
+        color: #E0A458; 
+        margin-right: 5px;
+        font-size: 0.8em;
+    }
+
     button {
         align-self: flex-start;
         margin-bottom: 16px;
@@ -31,9 +37,9 @@
     }
 
     .journal-container {
-        height: 40vh;
+        height: 30vh;
         overflow-y: auto;
-        padding: 12px;
+        padding: 8px;
         margin-bottom: 16px;
         border: 1px solid #555;
         background-color: lighten($primary-dark, 20%);

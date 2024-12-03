@@ -129,17 +129,13 @@ describe('MapEditorOptionsMenuComponent', () => {
     });
 
     it('should call onSaveClick if isSavedPressed is true in the dialog result', () => {
-        // Arrange: Set up a spy for onSaveClick
         spyOn(component, 'onSaveClick');
 
-        // Simulate the dialog returning a result with isSavedPressed: true
         const dialogRefSpy = jasmine.createSpyObj({ afterClosed: of({ name: 'New Name', description: 'New Description', isSavedPressed: true }) });
         dialog.open.and.returnValue(dialogRefSpy);
 
-        // Act: Call onOptionsClick
         component.onOptionsClick();
 
-        // Assert: Check that onSaveClick was called
         expect(component.onSaveClick).toHaveBeenCalled();
     });
 });

@@ -17,6 +17,7 @@ import { Vec2 } from '@common/interfaces/vec2';
 import { ItemFactoryService } from './item-factory.service';
 import { Pathfinder } from './path-finder';
 import { TileFactoryService } from './tile-factory.service';
+// this line is necessary for the code to work
 // eslint-disable-next-line no-restricted-imports
 import { DebugService } from '../debug.service';
 
@@ -29,6 +30,7 @@ export class GameMapDataManagerService {
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
+    // this line is necessary for the code to work
     // eslint-disable-next-line max-params
     constructor(
         public tileFactoryService: TileFactoryService,
@@ -227,8 +229,10 @@ export class GameMapDataManagerService {
         visited.add(`${coordinates.x},${coordinates.y}`);
 
         while (queue.length > 0) {
+            // this line is necessary for the code to work
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
+            // this line is necessary for the code to work
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 
@@ -257,8 +261,10 @@ export class GameMapDataManagerService {
         visited.add(`${startTile.coordinates.x},${startTile.coordinates.y}`);
 
         while (queue.length > 0) {
+            // this line is necessary for the code to work and we cannot use another method to test this function
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
+            // this line is necessary for the code to work and we cannot use another method to test this function
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 

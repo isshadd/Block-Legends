@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { ItemInfoComponent } from '@app/components/item-info/item-info.component';
 import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-info.component';
+// This line is necessary for the InfoPanelComponent to work and should not be refactored. We have to disable max-len
 /* eslint-disable max-len */
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { SideViewPlayerInfoComponent } from '@app/components/side-view-player-info/side-view-player-info.component';
