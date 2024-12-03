@@ -249,10 +249,10 @@ describe('GameStatisticsService', () => {
             expect(percentage).toBePositiveInfinity();
         });
 
-        it('should handle division by zero in getGameDoorsInteractedPercentage', () => {
+        it('should handle zero doors getGameDoorsInteractedPercentage', () => {
             mockGameMapDataManagerService.getDoorsCount.and.returnValue(0);
             const percentage = service.getGameDoorsInteractedPercentage();
-            expect(percentage).toBePositiveInfinity();
+            expect(percentage).toBe(0);
         });
     });
 });
