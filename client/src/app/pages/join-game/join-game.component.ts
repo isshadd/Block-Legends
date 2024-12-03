@@ -3,11 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GAME_CODE_MAX_VALUE } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
-
-export const MIN_CHAR = 48;
-export const MAX_CHAR = 57;
-const MAX_VALUE = 4;
 
 @Component({
     selector: 'app-join-game',
@@ -59,7 +56,7 @@ export class JoinGameComponent implements OnInit {
         }
 
         const currentValue = input.value;
-        if (currentValue.length >= MAX_VALUE) {
+        if (currentValue.length >= GAME_CODE_MAX_VALUE) {
             if (!['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(char)) {
                 event.preventDefault();
             }

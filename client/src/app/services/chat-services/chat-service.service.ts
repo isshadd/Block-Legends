@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MAX_STRING_LENGTH } from '@common/constants/game_constants';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { Subject } from 'rxjs';
-
-const MAX_STRING_LENGTH = 200;
 
 @Injectable({
     providedIn: 'root',

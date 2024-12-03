@@ -2,11 +2,12 @@
 
 import { TestBed } from '@angular/core/testing';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MAX_VP_PLAYER_NUMBER } from '@common/constants/game_constants';
 import { ProfileEnum } from '@common/enums/profile';
-import { GameService, VP_NUMBER } from './game.service';
+import { GameService } from './game.service';
 
 const ACCESS_CODE = 5678;
-const CINQ = 5;
+const FIVE = 5;
 
 describe('GameService', () => {
     let service: GameService;
@@ -79,6 +80,6 @@ describe('GameService', () => {
     });
 
     it('should return VP_NUMBER correctly', () => {
-        expect(VP_NUMBER).toBe(CINQ);
+        expect(MAX_VP_PLAYER_NUMBER).toBe(FIVE);
     });
 });

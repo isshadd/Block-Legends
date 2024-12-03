@@ -3,14 +3,11 @@
 import { Injectable } from '@angular/core';
 import { AvatarService } from '@app/services/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER } from '@common/constants/game_constants';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { DiceType } from '@common/enums/dice-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, Subject } from 'rxjs';
-
-export const VP_NUMBER = 5;
-const NINE = 9;
-const THIRTY_SIX = 36;
 
 @Injectable({
     providedIn: 'root',
@@ -70,7 +67,9 @@ export class GameService {
         };
         virtualPlayer.name = randomAvatar.name;
 
-        virtualPlayer.socketId = `${Math.random().toString(THIRTY_SIX).substr(1, NINE)}_${Math.random().toString(THIRTY_SIX).substr(2, NINE)}`;
+        virtualPlayer.socketId = `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(1, RANDOM_NUMBER)}_${Math.random()
+            .toString(RANDOM_SOCKET_NUMBER)
+            .substr(2, RANDOM_NUMBER)}`;
 
         const bonusDice = Math.random() > 0.5 ? DiceType.Attack : DiceType.Defense;
         switch (bonusDice) {
