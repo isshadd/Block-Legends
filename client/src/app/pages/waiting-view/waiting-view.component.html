@@ -44,7 +44,13 @@
                 >
                     Deverouiller la salle
                 </button>
-                <button class="dark-button" type="button" id="start-button" (click)="playGame()" [disabled]="(isLocked$ | async) === false">
+                <button
+                    class="dark-button"
+                    type="button"
+                    id="start-button"
+                    (click)="playGame()"
+                    [disabled]="(isLocked$ | async) === false || (players$ | async)?.length === 1"
+                >
                     Lancer la partie!
                 </button>
             </div>

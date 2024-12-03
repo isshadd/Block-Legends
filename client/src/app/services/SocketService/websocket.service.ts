@@ -133,7 +133,6 @@ export class WebSocketService {
         this.socket.emit('log', message);
     }
 
-    // Ajouté par Nihal
     getTotalPlayers(): PlayerCharacter[] {
         let players: PlayerCharacter[] = [];
         this.players$.subscribe((data) => {
@@ -199,14 +198,6 @@ export class WebSocketService {
             this.avatarTakenErrorSubject.next(data.message);
         });
 
-        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_CODE_INVALID, (response: { message: string }) => {
-            alert(response.message);
-        });
-
-        this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_ROOM, (response: { message: string }) => {
-            alert(response.message);
-        });
-
         this.socket.on(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, (response: { message: string }) => {
             alert(response.message);
             this.router.navigate(['join-game']);
@@ -220,12 +211,10 @@ export class WebSocketService {
         this.socket.on(SocketEvents.ROOM_LOCKED, (data: { message: string; isLocked: boolean }) => {
             this.isLockedSubject.next(data.isLocked);
             this.maxPlayersSubject.next(this.maxPlayersSubject.value);
-            alert(data.message);
         });
 
         this.socket.on(SocketEvents.ROOM_UNLOCKED, (data: { message: string; isLocked: boolean }) => {
             this.isLockedSubject.next(data.isLocked);
-            alert(data.message);
         });
 
         this.socket.on(SocketEvents.PLAYER_KICKED, async (data: { message: string; kickedPlayerId: string }) => {
@@ -264,10 +253,6 @@ export class WebSocketService {
             });
         });
 
-        // this.socket.on('avatarTakenError', (data) => {
-        //     this.avatarTakenErrorSubject.next(data.message);
-        // });
-
         this.socket.on(SocketEvents.ERROR, (message: string) => {
             alert(message);
         });
@@ -302,13 +287,5 @@ export class WebSocketService {
         this.socket.on(SocketEvents.USER_FINISHED_MOVE, () => {
             this.debugService.isPlayerMoving = false;
         });
-
-        /*
-        this.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
-            if (!this.currentRoom.players.find((player) => player.isOrganizer)) {
-                this.router.navigate(['/home']);
-            }
-        });
-        */
     }
 }

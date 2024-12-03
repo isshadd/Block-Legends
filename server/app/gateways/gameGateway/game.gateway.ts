@@ -3,9 +3,9 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
+import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
 
 const NINE = 9;
 const ONE = 1;
@@ -150,7 +150,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             });
             this.updateRoomState(accessCode);
         } else {
-            client.emit(SocketEvents.ERROR, { message: 'Pas authorisé ou room non trouvé' });
+            client.emit(SocketEvents.ERROR, { message: 'Pas autorisé ou room non trouvé' });
         }
     }
 
@@ -205,7 +205,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const kicked = this.gameSocketRoomService.kickPlayer(accessCode, player.socketId, client.id);
         if (kicked) {
             this.server.to(accessCode.toString()).emit(SocketEvents.PLAYER_KICKED, {
-                message: 'Vous avez été expulsé de la salle',
+                message: `Le joueur ${player.name} a été expulsé de la salle`,
                 kickedPlayerId: player.socketId,
             });
 

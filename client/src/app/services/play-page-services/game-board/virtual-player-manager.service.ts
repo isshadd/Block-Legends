@@ -451,9 +451,21 @@ export class VirtualPlayerManagerService {
     }
 
     throwItemInListAndKeepTheRest(player: PlayerCharacter, possibleItems: Item[], nextPathTile: Tile) {
-        // TODO: Choose item to throw based on priority
-        const item = possibleItems[Math.floor(Math.random() * possibleItems.length)];
-        this.throwItem(player, possibleItems, item, nextPathTile);
+        let itemToKeep: Item;
+        if (player.comportement === ProfileEnum.Agressive) {
+            itemToKeep = possibleItems.reduce((prev, current) =>
+                this.getAggressivePlayerItemPriority(prev.type) >= this.getAggressivePlayerItemPriority(current.type) ? prev : current,
+            );
+        } else if (player.comportement === ProfileEnum.Defensive) {
+            itemToKeep = possibleItems.reduce((prev, current) =>
+                this.getDefensivePlayerItemPriority(prev.type) >= this.getDefensivePlayerItemPriority(current.type) ? prev : current,
+            );
+        }
+
+        const itemToThrow = possibleItems.find((item) => item !== itemToKeep);
+        if (itemToThrow) {
+            this.throwItem(player, possibleItems, itemToThrow, nextPathTile);
+        }
     }
 
     throwItem(player: PlayerCharacter, possibleItems: Item[], item: Item, nextPathTile: Tile) {
