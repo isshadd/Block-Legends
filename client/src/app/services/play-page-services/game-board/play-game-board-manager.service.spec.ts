@@ -4,6 +4,9 @@ import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { Chestplate } from '@common/classes/Items/chestplate';
+import { DiamondSword } from '@common/classes/Items/diamond-sword';
+import { EmptyItem } from '@common/classes/Items/empty-item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
@@ -55,6 +58,7 @@ describe('PlayGameBoardManagerService', () => {
             'isGameModeCTF',
             'setTileAt',
             'getClosestWalkableTileWithoutPlayerAt',
+            'getClosestTerrainTileWithoutItemAt',
             'getCurrentGrid',
             'getNeighbours',
         ]);
@@ -885,6 +889,21 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
+    describe('userDropAllItems', () => {
+        it('should call trowItem for each item in the player inventory that is not emptyItem', () => {
+            const startTile = new GrassTile();
+            startTile.coordinates = { x: 1, y: 1 };
+            mockPlayerCharacter.inventory = [new DiamondSword(), new Chestplate(), new EmptyItem()];
+
+            gameMapDataManagerServiceSpy.getClosestTerrainTileWithoutItemAt.and.returnValue(startTile);
+            spyOn(service, 'throwItem').and.callFake(() => {});
+
+            service.userDropAllItems(startTile, mockPlayerCharacter);
+
+            expect(service.throwItem).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe('checkIfPlayerWonClassicGame', () => {
         beforeEach(() => {
             gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
@@ -922,6 +941,19 @@ describe('PlayGameBoardManagerService', () => {
             spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(differentPlayer);
             spyOn(service.signalUserWon, 'next');
             gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
+
+            service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit signalUserWon if is CTF mode', () => {
+            const mockPlayerCharacter = new PlayerCharacter('player1');
+            mockPlayerCharacter.fightWins = 3;
+
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service.signalUserWon, 'next');
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
 
             service.checkIfPlayerWonClassicGame(mockPlayerCharacter);
 
