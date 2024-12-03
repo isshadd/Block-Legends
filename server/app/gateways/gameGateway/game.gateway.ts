@@ -21,7 +21,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly playGameBoardGateway: PlayGameBoardGateway,
     ) {}
 
-    @SubscribeMessage(SocketEvents.GET_ROOM_STATE) // QU'EST C'EST QUE CA ???
+    @SubscribeMessage(SocketEvents.GET_ROOM_STATE)
     handleGetRoomState(client: Socket, accessCode: number) {
         const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
         if (room) {

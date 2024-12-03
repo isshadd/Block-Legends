@@ -63,7 +63,7 @@ export class GameService {
     async modifyGame(id: string, game: UpdateGameDto): Promise<void> {
         // Validate the game data
         const isOnlyIsVisibleModified = Object.keys(game).length === 1 && 'isVisible' in game;
-        
+
         const errors: string[] = [];
         if (!isOnlyIsVisibleModified) {
             const isNameValid = await this.gameValidationService.validateUpdatedGameName(id, game);

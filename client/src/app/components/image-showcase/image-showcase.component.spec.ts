@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention*/
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { Avatar } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';
-import { ImageShowcaseComponent } from './image-showcase.component';
 
 describe('ImageShowcaseComponent', () => {
     let component: ImageShowcaseComponent;
@@ -14,7 +13,7 @@ describe('ImageShowcaseComponent', () => {
     const mockAvatar = {
         mineshaftImage: 'mock-mineshaft.jpg',
         standing: 'mock-standing.jpg',
-        dog_petting: 'mock-dog-petting.jpg',
+        dogPetting: 'mock-dog-petting.jpg',
         lost: 'mock-lost.jpg',
         fight: 'mock-fight.jpg',
     } as Avatar;
@@ -72,7 +71,7 @@ describe('ImageShowcaseComponent', () => {
         it('should return dog_petting image when random is 2', () => {
             const returnValue = 0.4;
             randomSpy.and.returnValue(returnValue);
-            expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.dog_petting);
+            expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.dogPetting);
         });
 
         it('should return lost image when random is 3', () => {

@@ -92,7 +92,6 @@ describe('GameGateway', () => {
         jest.spyOn(gateway, 'updateRoomState').mockImplementation(undefined);
         jest.spyOn(gameSocketRoomService, 'lockRoom').mockReturnValue(true);
 
-        // Assignation du serveur mocké
         (gateway as GameGateway).server = mockServer as Server;
     });
 
@@ -100,7 +99,6 @@ describe('GameGateway', () => {
         jest.clearAllMocks();
     });
 
-    // Fonction pour créer un socket mocké
     const createMockSocket = (id: string): Socket =>
         ({
             id,
@@ -109,7 +107,6 @@ describe('GameGateway', () => {
             leave: jest.fn(),
         }) as unknown as Socket;
 
-    // Tests pour handleGetRoomState
     describe('handleGetRoomState', () => {
         it("devrait émettre l'état de la salle si elle existe", () => {
             const client = createMockSocket('client1');
@@ -158,7 +155,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleCreateGame
     describe('handleCreateGame', () => {
         it("devrait créer une nouvelle salle et mettre à jour l'état de la salle", () => {
             const client = createMockSocket('client3');
@@ -192,7 +188,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleJoinGame
     describe('handleJoinGame', () => {
         it("devrait permettre au client de rejoindre la salle si elle existe et n'est pas verrouillée", () => {
             const client = createMockSocket('client4');
@@ -261,7 +256,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleAddPlayerToRoom
     describe('handleAddPlayerToRoom', () => {
         it('devrait ajouter un joueur à la salle et émettre les réponses appropriées', () => {
             const client = createMockSocket('client8');
@@ -404,14 +398,12 @@ describe('GameGateway', () => {
                 players: [{ avatar: { name: 'Steve' } }, { avatar: { name: 'Arlina' } }, { avatar: { name: 'Alex' } }],
             };
 
-            // Assuming the method we're testing is `getTakenAvatars`
             const result = mockRoom.players.map((p) => p.avatar.name); // Directly using the logic to be tested
 
             expect(result).toEqual(['Steve', 'Arlina', 'Alex']);
         });
     });
 
-    // Tests pour handleLockRoom
     describe('handleLockRoom', () => {
         it("devrait verrouiller la salle et émettre l'événement roomLocked", () => {
             const client = createMockSocket('client11');
@@ -443,7 +435,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleUnlockRoom
     describe('handleUnlockRoom', () => {
         it("devrait déverrouiller la salle et émettre l'événement roomUnlocked", () => {
             const client = createMockSocket('client13');
@@ -475,7 +466,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handlePlayerLeave
     describe('handlePlayerLeave', () => {
         it("devrait gérer le départ de l'organisateur et émettre l'événement organizerLeft", () => {
             const client = createMockSocket('client15');
@@ -554,7 +544,7 @@ describe('GameGateway', () => {
             expect(gameSocketRoomService.removePlayerFromRoom).toHaveBeenCalledWith(client.id);
             expect(client.emit).toHaveBeenCalledWith('playerLeft');
             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
-            expect(gameSocketRoomService.unlockRoom).not.toHaveBeenCalled(); // Puisque la salle n'était pas verrouillée
+            expect(gameSocketRoomService.unlockRoom).not.toHaveBeenCalled();
         });
 
         it("devrait émettre l'événement roomUnlocked si la salle était verrouillée et que le nombre de joueurs est en dessous du maximum", () => {
@@ -669,7 +659,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleStartGame
     describe('handleStartGame', () => {
         it("devrait démarrer le jeu si le client est l'organisateur", () => {
             const client = createMockSocket('client24');
@@ -728,7 +717,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleKickPlayer
     describe('handleKickPlayer', () => {
         it('devrait expulser un joueur et émettre les événements appropriés', () => {
             const client = createMockSocket('client28');
@@ -864,7 +852,7 @@ describe('GameGateway', () => {
 
             gameSocketRoomService.getRoomBySocketId.mockReturnValueOnce(mockRoom);
 
-            client.emit = jest.fn(); // Ensure client.emit is properly mocked
+            client.emit = jest.fn();
 
             gateway.handleKickPlayer(client, playerToKick);
 
@@ -873,7 +861,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour sendGameParameters
     describe('sendGameParameters', () => {
         it('devrait envoyer les paramètres du jeu si la salle existe', () => {
             const accessCode = 9999;
@@ -913,7 +900,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleConnection
     describe('handleConnection', () => {
         it('should add client ID to connectedClients when handleConnection is called', () => {
             const mockClient = { id: 'client1234' } as Socket;
@@ -934,7 +920,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour handleDisconnect
     describe('handleDisconnect', () => {
         it('should remove client ID from connectedClients when handleDisconnect is called', () => {
             const mockClient = { id: 'client1234' } as Socket;
@@ -965,7 +950,6 @@ describe('GameGateway', () => {
         });
     });
 
-    // Tests pour updateRoomState
     describe('updateRoomState', () => {
         beforeEach(async () => {
             const module: TestingModule = await Test.createTestingModule({

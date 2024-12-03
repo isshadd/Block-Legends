@@ -1,5 +1,5 @@
 export const enum SocketEvents {
-    // EMIS
+    // EMITTED
     CREATE_GAME = 'createGame',
     JOIN_GAME = 'joinGame',
     ADD_PLAYER_TO_ROOM = 'addPlayerToRoom',
@@ -31,7 +31,7 @@ export const enum SocketEvents {
     DEBUG_MODE_OFF = 'debugModeOff',
     
 
-    // RECUS
+    // RECEIVED
     ROOM_STATE = 'roomState',
     JOIN_GAME_RESPONSE = 'joinGameResponse',
     JOIN_WAITING_ROOM_SUCCESS = 'joinWaitingRoomSuccess',

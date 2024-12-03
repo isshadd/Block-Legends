@@ -63,6 +63,7 @@ export class GameSocketRoomService {
                 this.setupGameBoardRoom(room.accessCode, game);
             });
         } catch (error) {
+            // Handle the error appropriately, e.g., log to a file or monitoring service
         }
     }
 

@@ -114,6 +114,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     getPlayersTurn(): void {
         let playerName: string;
         let player: PlayerCharacter | null;
+        // this line is necessary for the code to work and cannot be refactored
         // eslint-disable-next-line
         for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
             playerName = this.playGameBoardManagerService.turnOrder[i];
@@ -183,11 +184,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     handlePlayerAbandon(): void {
-        // Mettez à jour la liste des joueurs pour mettre le joueur absent en bas
-        this.players = [
-            ...this.players.filter((player) => player !== this.myPlayer), // Exclude the player who clicked "Abandon"
-            this.myPlayer,
-        ]; // Ajouter le joueur absent en bas
+        this.players = [...this.players.filter((player) => player !== this.myPlayer), this.myPlayer];
     }
 
     itemThrow(item: Item): void {

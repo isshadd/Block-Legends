@@ -66,7 +66,7 @@ describe('MapEditorModalComponent', () => {
         expect(descriptionControl?.valid).toBeFalse();
         expect(descriptionControl?.hasError('required')).toBeTrue();
 
-        const longDescription = 'a'.repeat(component.descriptionMaxLenght + 1); // Corrected property name
+        const longDescription = 'a'.repeat(component.descriptionMaxLenght + 1);
         descriptionControl?.setValue(longDescription);
         expect(descriptionControl?.valid).toBeFalse();
         expect(descriptionControl?.hasError('maxlength')).toBeTrue();

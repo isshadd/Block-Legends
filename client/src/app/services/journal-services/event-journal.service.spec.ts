@@ -1,11 +1,9 @@
-/* eslint-disable no-restricted-imports */
-
 import { TestBed } from '@angular/core/testing';
-import { EventJournalService } from './event-journal.service';
-import { SocketStateService } from '../SocketService/socket-state.service';
-import { WebSocketService } from '../SocketService/websocket.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
+import { EventJournalService } from './event-journal.service';
 
 describe('EventJournalService', () => {
     let service: EventJournalService;

@@ -38,7 +38,7 @@ export class ImageShowcaseComponent {
             case AvatarImages.Standing:
                 return avatar.standing;
             case AvatarImages.DogPetting:
-                return avatar.dog_petting;
+                return avatar.dogPetting;
             case AvatarImages.Lost:
                 return avatar.lost;
             case AvatarImages.Fight:

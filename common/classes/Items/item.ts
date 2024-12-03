@@ -5,7 +5,7 @@ import { Vec2 } from '../../interfaces/vec2';
 export class Item implements PlaceableEntity {
     type: ItemType;
     description: string;
-    imageUrl: string; // minecraftWiki
+    imageUrl: string;
     coordinates: Vec2 = { x: -1, y: -1 };
     visibleState: VisibleState = VisibleState.NotSelected;
     isPlaced: boolean = false;

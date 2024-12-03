@@ -1,7 +1,7 @@
+// this is a test file for the virtual player manager service, which is a service that manages the virtual players in the game, so it is a very long ts file and its test file is expected to be very long
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-// import { Subject } from 'rxjs';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
@@ -157,7 +157,6 @@ describe('VirtualPlayerManagerService', () => {
     describe('handleVirtualPlayerTurn', () => {
         beforeEach(() => {
             spyOn(service, 'setPossibleMoves');
-            // spyOn(service, 'handleVirtualPlayerTurn');
             spyOn(service, 'handleAgressiveComportment');
             spyOn(service, 'handleDefensiveComportment');
         });
@@ -523,69 +522,5 @@ describe('VirtualPlayerManagerService', () => {
 
             expect(result).toBeFalse();
         });
-
-        // it('should trigger battle action when adjacent tile has an enemy player', () => {
-        //   // Create a mock walkable tile with an enemy player
-        //   const enemyPlayerMapEntity = new PlayerMapEntity('enemy-avatar.png');
-        //   enemyPlayerMapEntity.coordinates = { x: 1, y: 1 } as Vec2;
-
-        //   const enemyPlayer = new PlayerCharacter('enemy-1');
-        //   enemyPlayer.socketId = 'enemy-1';
-        //   enemyPlayer.comportement = ProfileEnum.Defensive; // Assuming defensive avatar
-        //   enemyPlayer.attributes = { life: 2, speed: 2, attack: 2, defense: 2 };
-        //   enemyPlayer.mapEntity = enemyPlayerMapEntity;
-        //   enemyPlayer.currentActionPoints = 2;
-        //   enemyPlayer.currentMovePoints = 0;
-
-        //   const enemyTile = new GrassTile();
-        //   enemyTile.player = enemyPlayerMapEntity;
-
-        //   mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([enemyTile]);
-        //   mockPlayGameBoardManagerService.findPlayerFromPlayerMapEntity.and.returnValue(enemyPlayer);
-
-        //   const result = service.handleAggressiveActions(player);
-
-        //   expect(result).toBeTrue();
-        //   expect(mockPlayGameBoardManagerService.signalUserDidBattleAction.next).toHaveBeenCalledWith({
-        //     playerTurnId: player.socketId,
-        //     enemyPlayerId: enemyPlayer.socketId
-        //   });
-        // });
-
-        // it('should trigger door action when adjacent tile is a door', () => {
-        //   const doorTile = new DoorTile({x: 1, y: 0});
-
-        //   mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([doorTile]);
-
-        //   const result = service.handleAggressiveActions(player);
-
-        //   expect(result).toBeTrue();
-        //   expect(mockPlayGameBoardManagerService.signalUserDidDoorAction.next).toHaveBeenCalledWith({
-        //     tileCoordinate: doorTile.coordinates,
-        //     playerTurnId: player.socketId
-        //   });
-        //   expect(mockPlayGameBoardManagerService.checkIfPLayerDidEverything).toHaveBeenCalledWith(player);
-        // });
-
-        // it('should continue virtual player turn after door action', () => {
-        //   const doorTile = new DoorTile({x: 1, y: 0});
-
-        //   mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([doorTile]);
-
-        //   const result = service.handleAggressiveActions(player);
-
-        //   expect(result).toBeTrue();
-        //   expect(service.signalVirtualPlayerContinueTurn.next).toHaveBeenCalledWith(player.socketId);
-        // });
-
-        // it('should return false if no battle or door actions are possible', () => {
-        //   const grassTile = new GrassTile({x: 1, y: 0});
-
-        //   mockPlayGameBoardManagerService.getAdjacentActionTiles.and.returnValue([grassTile]);
-
-        //   const result = service.handleAggressiveActions(player);
-
-        //   expect(result).toBeFalse();
-        // });
     });
 });

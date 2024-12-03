@@ -22,5 +22,4 @@
             "@app/*": ["./app/*"]
         }
     }
-    //"include": ["src/**/*.ts", "tests/**/*.ts"]
 }

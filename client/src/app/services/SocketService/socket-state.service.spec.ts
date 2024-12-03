@@ -1,6 +1,5 @@
-/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of socket-state.service
 import { TestBed } from '@angular/core/testing';
-import { SocketStateService } from './socket-state.service';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { first } from 'rxjs/operators';
 
