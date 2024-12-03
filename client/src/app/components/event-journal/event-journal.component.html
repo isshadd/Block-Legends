@@ -6,9 +6,12 @@
     <div class="journal-container" #journalEvents>
         <ul class="events">
             <li *ngFor="let event of showMyEvents ? filteredEvents : events">
-                <div>{{ event.event }}</div>
+                <div class="event-time">{{ event.event.time }}</div>
+                <div class="event-content">{{ event.event.content }}</div>
                 <ul>
-                    <li *ngFor="let player of event.associatedPlayers">{{ player }}</li>
+                    <li *ngFor="let player of event.associatedPlayers">
+                        <span>{{ player.name }}</span>
+                    </li>
                 </ul>
             </li>
         </ul>

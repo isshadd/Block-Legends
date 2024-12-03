@@ -10,6 +10,21 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     overflow-y: visible;
 
+    .message-time {
+        color: #E0A458; /* Color for the time */
+        margin-right: 5px;
+        font-size: 0.8em;
+    }
+
+    .message-sender {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
+    .message-content {
+        color: #333; /* Color for the message content */
+    }
+
     .messages-container {
         height: 40vh;
         overflow-y: auto;
@@ -43,19 +58,19 @@
             li {
                 padding: 10px 14px;
                 margin-bottom: 10px;
-                background-color: #f0f0f0; // Light background for messages
-                border-radius: 6px; // Rounded message bubbles
-                font-size: 0.95rem; // Slightly smaller font for messages
-                color: #333; // Dark text for readability
-                word-wrap: break-word; // Ensure long words wrap
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); // Subtle shadow for messages
+                background-color: #f0f0f0; 
+                border-radius: 6px; 
+                font-size: 0.95rem; 
+                color: #333; 
+                word-wrap: break-word; 
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
                 transition:
                     background-color 0.3s,
-                    transform 0.3s; // Smooth transitions
+                    transform 0.3s;
 
                 &:hover {
-                    background-color: #e0e0e0; // Slightly darker on hover
-                    transform: translateY(-2px); // Lift effect on hover
+                    background-color: #e0e0e0; 
+                    transform: translateY(-2px); 
                 }
             }
         }
@@ -70,20 +85,20 @@
         padding: 12px;
         font-size: 1rem;
         color: #333;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); // Inner shadow for depth
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); 
         transition:
             border-color 0.3s,
-            box-shadow 0.3s; // Smooth transitions on focus
+            box-shadow 0.3s; 
 
         &::placeholder {
-            color: #aaa; // Lighter placeholder text
-            font-style: italic; // Italic for placeholder
+            color: #aaa; 
+            font-style: italic; 
         }
 
         &:focus {
-            border-color: #3498db; // Highlight border on focus
-            box-shadow: inset 0 2px 4px rgba(52, 152, 219, 0.2); // Enhanced inner shadow
-            outline: none; // Remove default outline
+            border-color: #3498db; 
+            box-shadow: inset 0 2px 4px rgba(52, 152, 219, 0.2); 
+            outline: none; 
         }
     }
 }

@@ -1,10 +1,12 @@
 <div class="chat">
   <div class="messages-container" #chatMessages>
     <ul class="messages">
-      <li *ngFor="let msg of messages; trackBy: trackByIndex">{{ msg }}</li>
+      <li *ngFor="let msg of messages; trackBy: trackByIndex">
+        <span class="message-time">{{ msg.time }} </span>
+        <span [ngStyle]="{'color': getPlayerClass(msg.senderId)}" class="message-sender">{{ msg.sender }} </span>:
+        <span class="message-content">{{ msg.content }} </span>
+      </li>
     </ul>
   </div>
-  <input [(ngModel)]="messageToSend" (keydown.enter)="sendMessage()" type="text" [placeholder] = "playerName" />
+  <input [(ngModel)]="messageToSend" (keydown.enter)="sendMessage()" type="text" [placeholder]="playerName" />
 </div>
-
-

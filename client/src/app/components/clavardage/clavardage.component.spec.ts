@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { ChangeDetectorRef, ElementRef } from '@angular/core';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 
 describe('ClavardageComponent', () => {
     let component: ClavardageComponent;
@@ -15,15 +16,20 @@ describe('ClavardageComponent', () => {
     beforeEach(async () => {
         messageReceivedSubject = new Subject<void>();
 
+        const playerMock: PlayerCharacter = {
+            name: 'TestPlayer',
+            socketId: '12345',
+            // Add other properties as needed
+        } as PlayerCharacter;
+
         const chatServiceSpy = jasmine.createSpyObj('ChatService', ['initialize', 'broadcastMessageToAll'], {
             roomMessages: [],
-            playerName: 'TestPlayer',
+            player: playerMock,
             messageReceived$: messageReceivedSubject.asObservable(),
         });
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule, CommonModule],
-            declarations: [],
+            imports: [FormsModule, CommonModule, ClavardageComponent],
             providers: [{ provide: ChatService, useValue: chatServiceSpy }, ChangeDetectorRef],
         }).compileComponents();
 
