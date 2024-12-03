@@ -156,7 +156,7 @@ export class GameValidationService {
         return this.areAllTerrainTilesVisited(map, visited, n, m);
     }
 
-    private findStartingPoint(map: number[][], n: number, m: number): [number, number] {
+    findStartingPoint(map: number[][], n: number, m: number): [number, number] {
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0) {
@@ -167,7 +167,7 @@ export class GameValidationService {
         return [-1, -1];
     }
 
-    private areAllTerrainTilesVisited(map: number[][], visited: boolean[][], n: number, m: number): boolean {
+    areAllTerrainTilesVisited(map: number[][], visited: boolean[][], n: number, m: number): boolean {
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < m; j++) {
                 if (map[i][j] === 0 && !visited[i][j]) {
@@ -287,11 +287,11 @@ export class GameValidationService {
         return true;
     }
 
-    private isEdgeTile(game: Game | UpdateGameDto, i: number, j: number): boolean {
+    isEdgeTile(game: Game | UpdateGameDto, i: number, j: number): boolean {
         return i <= 0 || i >= game.tiles.length - 1 || j <= 0 || j >= game.tiles[i].length - 1;
     }
 
-    private async isDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
+    async isDoorValid(game: Game | UpdateGameDto, i: number, j: number): Promise<boolean> {
         const horizontalCondition = await this.isHorizontalAxeDoorValid(game, i, j);
         const verticalCondition = await this.isVerticalAxeDoorValid(game, i, j);
         return horizontalCondition || verticalCondition;
