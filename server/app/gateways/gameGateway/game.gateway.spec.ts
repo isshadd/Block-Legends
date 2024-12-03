@@ -760,7 +760,7 @@ describe('GameGateway', () => {
             expect(gameSocketRoomService.kickPlayer).toHaveBeenCalledWith(accessCode, playerToKick.socketId, client.id);
             expect(mockServer.to).toHaveBeenCalledWith(accessCode.toString());
             expect(mockEmit).toHaveBeenCalledWith('playerKicked', {
-                message: 'Vous avez été expulsé de la salle',
+                message: `Le joueur ${playerToKick.name} a été expulsé de la salle`,
                 kickedPlayerId: playerToKick.socketId,
             });
             expect(gateway.updateRoomState).toHaveBeenCalledWith(accessCode);
