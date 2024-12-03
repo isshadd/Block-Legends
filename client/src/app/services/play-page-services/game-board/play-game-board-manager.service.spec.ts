@@ -929,6 +929,68 @@ describe('PlayGameBoardManagerService', () => {
         });
     });
 
+    describe('checkIfPlayerWonCTFGame', () => {
+        it('should emit signalUserWon if playerCharacter is current player and has captured the flag and is on spawn', () => {
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
+            spyOn(mockPlayerCharacter.mapEntity, 'isOnSpawn').and.returnValue(true);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service.signalUserWon, 'next');
+
+            service.checkIfPlayerWonCTFGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).toHaveBeenCalledWith(mockPlayerCharacter.socketId);
+        });
+
+        it('should not emit signalUserWon if playerCharacter is not on spawn', () => {
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
+            spyOn(mockPlayerCharacter.mapEntity, 'isOnSpawn').and.returnValue(false);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service.signalUserWon, 'next');
+
+            service.checkIfPlayerWonCTFGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit signalUserWon if playerCharacter does not have the flag', () => {
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
+            spyOn(mockPlayerCharacter.mapEntity, 'isOnSpawn').and.returnValue(true);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service.signalUserWon, 'next');
+
+            service.checkIfPlayerWonCTFGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit signalUserWon if playerCharacter is not the current player', () => {
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(true);
+            spyOn(mockPlayerCharacter.mapEntity, 'isOnSpawn').and.returnValue(true);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(new PlayerCharacter('anotherPlayer'));
+            spyOn(service.signalUserWon, 'next');
+
+            service.checkIfPlayerWonCTFGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit signalUserWon if is not CTF mode', () => {
+            gameMapDataManagerServiceSpy.isGameModeCTF.and.returnValue(false);
+            spyOn(mockPlayerCharacter.mapEntity, 'isOnSpawn').and.returnValue(true);
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service.signalUserWon, 'next');
+
+            service.checkIfPlayerWonCTFGame(mockPlayerCharacter);
+
+            expect(service.signalUserWon.next).not.toHaveBeenCalled();
+        });
+    });
+
     describe('endGame', () => {
         it('should set winnerPlayer to the found player', () => {
             const mockPlayer = new PlayerCharacter('player1');
@@ -1119,6 +1181,48 @@ describe('PlayGameBoardManagerService', () => {
 
             expect(gameMapDataManagerServiceSpy.getNeighbours).toHaveBeenCalledWith(tile);
             expect(result).toEqual([]);
+        });
+    });
+
+    describe('canPlayerDoAction', () => {
+        it('should return true if player exists and has adjacent actions tiles', () => {
+            const playerTile = new GrassTile();
+            spyOn(service, 'getPlayerTile').and.returnValue(playerTile);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service, 'getAdjacentActionTiles').and.returnValue([new Tile()]);
+
+            const result = service.canPlayerDoAction();
+
+            expect(result).toBeTrue();
+        });
+
+        it('should return false if player exists but has no adjacent action tiles', () => {
+            const playerTile = new GrassTile();
+            spyOn(service, 'getPlayerTile').and.returnValue(playerTile);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service, 'getAdjacentActionTiles').and.returnValue([]);
+
+            const result = service.canPlayerDoAction();
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if playerTile does not exists', () => {
+            spyOn(service, 'getPlayerTile').and.returnValue(null);
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+
+            const result = service.canPlayerDoAction();
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return false if player does not exists', () => {
+            spyOn(service, 'getPlayerTile').and.returnValue(new GrassTile());
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(null);
+
+            const result = service.canPlayerDoAction();
+
+            expect(result).toBeFalse();
         });
     });
 
