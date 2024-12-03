@@ -1,10 +1,10 @@
 /* eslint-disable max-lines */ // Disabling max-lines is necessary to be able to test all the methods in the file
 import { TestBed } from '@angular/core/testing';
+import { DebugService } from '@app/services/debug.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { of, Subject } from 'rxjs';
-import { DebugService } from '../debug.service';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from './play-page-mouse-handler.service';
 

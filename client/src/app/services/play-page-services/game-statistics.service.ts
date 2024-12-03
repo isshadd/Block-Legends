@@ -35,7 +35,7 @@ export class GameStatisticsService {
     };
     currentGrid: Tile[][] = [];
 
-    private readonly percentageMutltiplier = 100;
+    readonly percentageMutltiplier = 100;
 
     constructor(public gameMapDataManagerService: GameMapDataManagerService) {}
 
