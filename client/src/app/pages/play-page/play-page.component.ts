@@ -112,17 +112,9 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
 
     getPlayersTurn(): void {
-        let playerName: string;
-        let player: PlayerCharacter | null;
-        // this line is necessary for the code to work and cannot be refactored
-        // eslint-disable-next-line
-        for (let i = 0; i < this.playGameBoardManagerService.turnOrder.length; i++) {
-            playerName = this.playGameBoardManagerService.turnOrder[i];
-            player = this.playGameBoardManagerService.findPlayerFromSocketId(playerName);
-            if (playerName && player) {
-                this.players.push(player);
-            }
-        }
+        this.players = this.playGameBoardManagerService.turnOrder
+            .map((playerName) => this.playGameBoardManagerService.findPlayerFromSocketId(playerName))
+            .filter((player): player is PlayerCharacter => !!player);
     }
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
@@ -131,10 +123,11 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         });
 
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
-            if (!character) return;
-            this.myPlayer = character;
-            if (this.myPlayer.isOrganizer) {
-                this.totalLifePoints = this.myPlayer.attributes.life;
+            if (character) {
+                this.myPlayer = character;
+                if (this.myPlayer.isOrganizer) {
+                    this.totalLifePoints = this.myPlayer.attributes.life;
+                }
             }
         });
     }
@@ -193,10 +186,8 @@ export class PlayPageComponent implements OnInit, OnDestroy {
 
     toggleDebugMode(): void {
         if (this.myPlayer.isOrganizer) {
-            if (this.debugService.isDebugMode) this.eventJournalService.broadcastEvent('Mode débogage désactivé', []);
-            else {
-                this.eventJournalService.broadcastEvent('Mode débogage activé', []);
-            }
+            const message = this.debugService.isDebugMode ? 'Mode débogage désactivé' : 'Mode débogage activé';
+            this.eventJournalService.broadcastEvent(message, []);
             this.webSocketService.debugMode();
         }
     }

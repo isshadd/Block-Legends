@@ -15,7 +15,7 @@ export class FightViewComponent {
     playerDiceResult = 0;
     constructor(public battleManagerService: BattleManagerService) {
         this.battleManagerService.signalUserAttacked$.subscribe((data) => {
-            if (battleManagerService.isUserTurn) {
+            if (this.battleManagerService.isUserTurn) {
                 this.attackAnimation(data.attackResult);
             }
         });
