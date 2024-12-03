@@ -266,6 +266,7 @@ export class VirtualPlayerManagerService {
         let nearestOpenDoor: OpenDoor | null = null;
         let minDistance = Number.MAX_SAFE_INTEGER;
 
+        // TODO: Fix this
         for (const possibleMove of possibleMoves.keys()) {
             if (possibleMove instanceof OpenDoor) {
                 const distance = this.calculateDistance(player.mapEntity.coordinates, possibleMove.coordinates);
