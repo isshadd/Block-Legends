@@ -193,6 +193,71 @@ describe('GameMapDataManagerService', () => {
         });
     });
 
+    it('should convert JSON file to GameShared object', async () => {
+        const mockJson = {
+            _id: '1',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            updatedAt: '2023-01-02T00:00:00.000Z',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            tiles: [[{ type: TileType.Grass }]],
+        };
+        const mockFile = new File([JSON.stringify(mockJson)], 'test.json', { type: 'application/json' });
+
+        const result = await service.convertJsonToGameShared(mockFile);
+
+        expect(result).toEqual({
+            _id: '1',
+            createdAt: new Date('2023-01-01T00:00:00.000Z'),
+            updatedAt: new Date('2023-01-02T00:00:00.000Z'),
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            isVisible: false,
+            tiles: [[{ type: TileType.Grass }]],
+        });
+    });
+
+    it('should handle JSON file with missing optional fields', async () => {
+        const mockJson = {
+            _id: '1',
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            tiles: [[{ type: TileType.Grass }]],
+        };
+        const mockFile = new File([JSON.stringify(mockJson)], 'test.json', { type: 'application/json' });
+
+        const result = await service.convertJsonToGameShared(mockFile);
+
+        expect(result).toEqual({
+            _id: '1',
+            createdAt: undefined,
+            updatedAt: undefined,
+            name: 'Test Game',
+            description: 'A test game',
+            size: MapSize.SMALL,
+            mode: GameMode.Classique,
+            imageUrl: 'http://example.com/image.png',
+            isVisible: false,
+            tiles: [[{ type: TileType.Grass }]],
+        });
+    });
+
+    it('should throw an error for invalid JSON file', async () => {
+        const invalidJson = '{ invalid json }';
+        const mockFile = new File([invalidJson], 'test.json', { type: 'application/json' });
+
+        await expectAsync(service.convertJsonToGameShared(mockFile)).toBeRejectedWithError(SyntaxError);
+    });
+
     it('should create a new grid for a new game', () => {
         service['databaseGame'] = {
             _id: undefined,
