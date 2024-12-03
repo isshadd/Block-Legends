@@ -4,6 +4,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { of, Subject } from 'rxjs';
+import { DebugService } from '../debug.service';
 import { PlayGameBoardManagerService } from './game-board/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from './play-page-mouse-handler.service';
 
@@ -251,6 +252,43 @@ describe('PlayPageMouseHandlerService - handleRightClick', () => {
 
         expect(service.discardRightSelectedTile).toHaveBeenCalled();
         expect(service.rightSelectedTile).toBe(tile);
+        expect(mouseEvent.preventDefault).toHaveBeenCalled();
+    });
+});
+
+describe('PlayPageMouseHandlerService - handleDebugRightClick', () => {
+    let service: PlayPageMouseHandlerService;
+    let playGameBoardManagerServiceSpy: jasmine.SpyObj<PlayGameBoardManagerService>;
+    let debugServiceSpy: jasmine.SpyObj<DebugService>;
+
+    beforeEach(() => {
+        playGameBoardManagerServiceSpy = jasmine.createSpyObj('PlayGameBoardManagerService', ['teleportPlayer'], {
+            signalUserStartedMoving$: new Subject<void>().asObservable(),
+        });
+
+        debugServiceSpy = jasmine.createSpyObj('DebugService', ['nothing'], {
+            isPlayerMoving: false,
+        });
+
+        TestBed.configureTestingModule({
+            providers: [
+                PlayPageMouseHandlerService,
+                { provide: PlayGameBoardManagerService, useValue: playGameBoardManagerServiceSpy },
+                { provide: DebugService, useValue: debugServiceSpy },
+            ],
+        });
+
+        service = TestBed.inject(PlayPageMouseHandlerService);
+    });
+
+    it('should call teleportPlayer and preventDefault if isPlayerMoving is false', () => {
+        const tile = new Tile();
+        const mouseEvent = new MouseEvent('mousedown', { button: 2 });
+        spyOn(mouseEvent, 'preventDefault');
+
+        service.handleDebugRightClick(mouseEvent, tile);
+
+        expect(playGameBoardManagerServiceSpy.teleportPlayer).toHaveBeenCalledWith(tile);
         expect(mouseEvent.preventDefault).toHaveBeenCalled();
     });
 });
