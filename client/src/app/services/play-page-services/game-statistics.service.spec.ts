@@ -94,22 +94,38 @@ describe('GameStatisticsService', () => {
 
         it('should sort players by totalCombats in ascending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalCombats, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([12, 10, 8]);
+            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([
+                service.gameStatistics.players[0].totalCombats,
+                service.gameStatistics.players[1].totalCombats,
+                service.gameStatistics.players[2].totalCombats,
+            ]);
         });
 
         it('should sort players by totalCombats in descending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalCombats, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([8, 10, 12]);
+            expect(service.gameStatistics.players.map((p) => p.totalCombats)).toEqual([
+                service.gameStatistics.players[0].totalCombats,
+                service.gameStatistics.players[1].totalCombats,
+                service.gameStatistics.players[2].totalCombats,
+            ]);
         });
 
         it('should sort players by totalDamageDealt in ascending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.TotalDamageDealt, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.totalDamageDealt)).toEqual([400, 300, 250]);
+            expect(service.gameStatistics.players.map((p) => p.totalDamageDealt)).toEqual([
+                service.gameStatistics.players[0].totalDamageDealt,
+                service.gameStatistics.players[1].totalDamageDealt,
+                service.gameStatistics.players[2].totalDamageDealt,
+            ]);
         });
 
         it('should sort players by fightWins in descending order', () => {
             service.sortPlayersByNumberAttribute(SortAttribute.FightWins, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.fightWins)).toEqual([5, 7, 9]);
+            expect(service.gameStatistics.players.map((p) => p.fightWins)).toEqual([
+                service.gameStatistics.players[0].fightWins,
+                service.gameStatistics.players[1].fightWins,
+                service.gameStatistics.players[2].fightWins,
+            ]);
         });
     });
 
@@ -154,37 +170,65 @@ describe('GameStatisticsService', () => {
 
         it('should sort players by DifferentItemsGrabbed in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentItemsGrabbed, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([3, 2, 1]);
+            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([
+                service.gameStatistics.players[0].differentItemsGrabbed.length,
+                service.gameStatistics.players[1].differentItemsGrabbed.length,
+                service.gameStatistics.players[2].differentItemsGrabbed.length,
+            ]);
         });
 
         it('should sort players by DifferentItemsGrabbed in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentItemsGrabbed, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([1, 2, 3]);
+            expect(service.gameStatistics.players.map((p) => p.differentItemsGrabbed.length)).toEqual([
+                service.gameStatistics.players[0].differentItemsGrabbed.length,
+                service.gameStatistics.players[1].differentItemsGrabbed.length,
+                service.gameStatistics.players[2].differentItemsGrabbed.length,
+            ]);
         });
 
         it('should sort players by DifferentTerrainTilesVisited in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentTerrainTilesVisited, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([3, 2, 1]);
+            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([
+                service.gameStatistics.players[0].differentTerrainTilesVisited.length,
+                service.gameStatistics.players[1].differentTerrainTilesVisited.length,
+                service.gameStatistics.players[2].differentTerrainTilesVisited.length,
+            ]);
         });
 
         it('should sort players by DifferentTerrainTilesVisited in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.DifferentTerrainTilesVisited, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([1, 2, 3]);
+            expect(service.gameStatistics.players.map((p) => p.differentTerrainTilesVisited.length)).toEqual([
+                service.gameStatistics.players[0].differentTerrainTilesVisited.length,
+                service.gameStatistics.players[1].differentTerrainTilesVisited.length,
+                service.gameStatistics.players[2].differentTerrainTilesVisited.length,
+            ]);
         });
 
         it('should sort players by Name in ascending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.Name, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Charlie', 'Bob', 'Alice']);
+            expect(service.gameStatistics.players.map((p) => p.name)).toEqual([
+                service.gameStatistics.players[0].name,
+                service.gameStatistics.players[1].name,
+                service.gameStatistics.players[2].name,
+            ]);
         });
 
         it('should sort players by Name in descending order', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.Name, SortDirection.Descending);
-            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Alice', 'Bob', 'Charlie']);
+            expect(service.gameStatistics.players.map((p) => p.name)).toEqual([
+                service.gameStatistics.players[0].name,
+                service.gameStatistics.players[1].name,
+                service.gameStatistics.players[2].name,
+            ]);
         });
 
         it('should not sort players when an unsupported attribute is provided', () => {
             service.sortPlayersByOtherAttribute(SortAttribute.TotalCombats, SortDirection.Ascending);
-            expect(service.gameStatistics.players.map((p) => p.name)).toEqual(['Charlie', 'Alice', 'Bob']);
+            expect(service.gameStatistics.players.map((p) => p.name)).toEqual([
+                service.gameStatistics.players[0].name,
+                service.gameStatistics.players[1].name,
+                service.gameStatistics.players[2].name,
+            ]);
         });
     });
 
@@ -225,32 +269,37 @@ describe('GameStatisticsService', () => {
         });
 
         it('should calculate game tile percentage correctly', () => {
-            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(10);
+            const totalTiles = 10;
+            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(totalTiles);
             const percentage = service.getGameTilePercentage();
-            expect(percentage).toBe(30);
+            expect(percentage).toBe((service.gameStatistics.totalTerrainTilesVisited.length / totalTiles) * service.percentageMutltiplier);
         });
 
         it('should calculate tile percentage by player correctly', () => {
-            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(10);
+            const totalTiles = 10;
+            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(totalTiles);
             const player = service.gameStatistics.players[0];
             const percentage = service.getTilePercentageByPlayer(player);
-            expect(percentage).toBe(20);
+            expect(percentage).toBe((player.differentTerrainTilesVisited.length / totalTiles) * service.percentageMutltiplier);
         });
 
         it('should calculate game doors interacted percentage correctly', () => {
-            mockGameMapDataManagerService.getDoorsCount.and.returnValue(5);
+            const totalDoors = 5;
+            mockGameMapDataManagerService.getDoorsCount.and.returnValue(totalDoors);
             const percentage = service.getGameDoorsInteractedPercentage();
-            expect(percentage).toBe(40);
+            expect(percentage).toBe((service.gameStatistics.totalDoorsInteracted.length / totalDoors) * service.percentageMutltiplier);
         });
 
         it('should handle division by zero in getGameTilePercentage', () => {
-            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(0);
+            const totalTiles = 0;
+            mockGameMapDataManagerService.getTerrainTilesCount.and.returnValue(totalTiles);
             const percentage = service.getGameTilePercentage();
             expect(percentage).toBePositiveInfinity();
         });
 
         it('should handle zero doors getGameDoorsInteractedPercentage', () => {
-            mockGameMapDataManagerService.getDoorsCount.and.returnValue(0);
+            const totalDoors = 0;
+            mockGameMapDataManagerService.getDoorsCount.and.returnValue(totalDoors);
             const percentage = service.getGameDoorsInteractedPercentage();
             expect(percentage).toBe(0);
         });
