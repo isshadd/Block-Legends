@@ -64,7 +64,10 @@ export class GameService {
         const virtualPlayer = new PlayerCharacter('');
         virtualPlayer.isVirtual = true;
         virtualPlayer.comportement = comportement;
-        virtualPlayer.avatar = randomAvatar;
+        virtualPlayer.avatar = {
+            ...randomAvatar,
+            dogPetting: randomAvatar.dogPetting,
+        };
         virtualPlayer.name = randomAvatar.name;
 
         virtualPlayer.socketId = `${Math.random().toString(THIRTY_SIX).substr(1, NINE)}_${Math.random().toString(THIRTY_SIX).substr(2, NINE)}`;

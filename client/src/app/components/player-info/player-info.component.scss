@@ -1,8 +1,8 @@
 @import 'src/_variables.scss';
 .player-container {
     display: flex;
-    align-items: center; /* Aligne l'image et les infos verticalement */
-    gap: 5px; /* Espace entre l'image et les infos */
+    align-items: center; 
+    gap: 5px; 
     background-color: darken($primary-dark, 20);
 }
 
@@ -16,11 +16,11 @@ img.avatar {
 .player-infos {
     display: flex;
     flex-direction: column;
-    text-align: left; /* Aligne le texte des infos à gauche */
+    text-align: left; 
     padding: 5px;
     font-size: x-small;
     color: $primary-light;
 }
 ul li {
-    padding: 5px 0; /* Espace de 5px en haut et en bas */
+    padding: 5px 0; 
 }

@@ -25,7 +25,7 @@ describe('AvatarSelectionComponent', () => {
         mockWebSocketService = new MockWebSocketService();
 
         await TestBed.configureTestingModule({
-            imports: [CommonModule, AvatarSelectionComponent, GameListComponent], // Inclure CommonModule et le composant si standalone
+            imports: [CommonModule, AvatarSelectionComponent, GameListComponent],
             providers: [{ provide: WebSocketService, useValue: mockWebSocketService }],
         }).compileComponents();
     });
@@ -33,7 +33,7 @@ describe('AvatarSelectionComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(AvatarSelectionComponent);
         component = fixture.componentInstance;
-        component.character = { avatar: null } as unknown as PlayerCharacter; // Initialiser l'@Input
+        component.character = { avatar: null } as unknown as PlayerCharacter;
         fixture.detectChanges();
     });
 
@@ -79,7 +79,7 @@ describe('AvatarSelectionComponent', () => {
             .filter((avatar) => avatar !== AvatarEnum.Arlina);
 
         mockWebSocketService.emitTakenAvatars(takenAvatars);
-        fixture.detectChanges(); // Mettre à jour le DOM si nécessaire
+        fixture.detectChanges();
 
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(expectedFilteredAvatars);

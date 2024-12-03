@@ -228,8 +228,6 @@ describe('GameValidationService', () => {
         });
     });
     describe('GameValidationService', () => {
-        // ... (previous test setup remains the same)
-
         describe('assignGameToRightType', () => {
             it('should handle UpdateGameDto type correctly', async () => {
                 const updateDto = new UpdateGameDto();

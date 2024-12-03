@@ -45,8 +45,6 @@ export class PlayerCharacter implements Character {
     differentItemsGrabbed: ItemType[] = [];
     differentTerrainTilesVisited: Vec2[] = [];
 
-    // Pour JV:
-
     isVirtual: boolean = false;
     comportement: ProfileEnum | null = null;
 

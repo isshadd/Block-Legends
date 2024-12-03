@@ -261,8 +261,10 @@ export class GameMapDataManagerService {
         visited.add(`${startTile.coordinates.x},${startTile.coordinates.y}`);
 
         while (queue.length > 0) {
+            // this line is necessary for the code to work and we cannot use another method to test this function
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const current = queue.shift()!;
+            // this line is necessary for the code to work and we cannot use another method to test this function
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const neighbours = this.getNeighbours(this.getTileAt(current)!);
 

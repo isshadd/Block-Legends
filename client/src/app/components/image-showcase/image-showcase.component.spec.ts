@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers*/ // This line is necessary to be able to test image-showcase.component.ts
-/* eslint-disable @typescript-eslint/naming-convention*/
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { Avatar } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';
-import { ImageShowcaseComponent } from './image-showcase.component';
 
 describe('ImageShowcaseComponent', () => {
     let component: ImageShowcaseComponent;
@@ -15,7 +13,7 @@ describe('ImageShowcaseComponent', () => {
     const mockAvatar = {
         mineshaftImage: 'mock-mineshaft.jpg',
         standing: 'mock-standing.jpg',
-        dog_petting: 'mock-dog-petting.jpg',
+        dogPetting: 'mock-dog-petting.jpg',
         lost: 'mock-lost.jpg',
         fight: 'mock-fight.jpg',
     } as Avatar;
@@ -59,32 +57,38 @@ describe('ImageShowcaseComponent', () => {
         });
 
         it('should return mineshaftImage when random is 0', () => {
-            randomSpy.and.returnValue(0);
+            const returnValue = 0;
+            randomSpy.and.returnValue(returnValue);
             expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.mineshaftImage);
         });
 
         it('should return standing image when random is 1', () => {
-            randomSpy.and.returnValue(0.2);
+            const returnValue = 0.2;
+            randomSpy.and.returnValue(returnValue);
             expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.standing);
         });
 
         it('should return dog_petting image when random is 2', () => {
-            randomSpy.and.returnValue(0.4);
-            expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.dog_petting);
+            const returnValue = 0.4;
+            randomSpy.and.returnValue(returnValue);
+            expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.dogPetting);
         });
 
         it('should return lost image when random is 3', () => {
-            randomSpy.and.returnValue(0.6);
+            const returnValue = 0.6;
+            randomSpy.and.returnValue(returnValue);
             expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.lost);
         });
 
         it('should return fight image when random is 4', () => {
-            randomSpy.and.returnValue(0.8);
+            const returnValue = 0.8;
+            randomSpy.and.returnValue(returnValue);
             expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.fight);
         });
 
         it('should return standing image for invalid random value', () => {
-            randomSpy.and.returnValue(0.99);
+            const returnValue = 0.99;
+            randomSpy.and.returnValue(returnValue);
             expect(component.getRandomisedImage(mockAvatar)).toBe(mockAvatar.fight);
         });
     });

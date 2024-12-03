@@ -11,7 +11,6 @@ import { FightViewPageComponent } from '@app/pages/fight-view-page/fight-view-pa
 import { JoinGameComponent } from '@app/pages/join-game/join-game.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MapEditorComponent } from '@app/pages/map-editor/map-editor.component';
-//import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { PlayerCreateCharacterComponent } from '@app/pages/player-create-character/player-create-character.component';
 import { StatisticsPageComponent } from '@app/pages/statistics-page/statistics-page.component';
@@ -25,7 +24,6 @@ if (environment.production) {
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
-    //{ path: 'material', component: MaterialPageComponent },
     { path: 'join-game', component: JoinGameComponent },
     { path: 'administration-game', component: AdministrationGameComponent },
     { path: 'create-game', component: CreateGameComponent },

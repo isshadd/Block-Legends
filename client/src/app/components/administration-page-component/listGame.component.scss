@@ -77,9 +77,9 @@ li {
     background-color: darken($primary-dark, 10%);
     color: $primary-light;
     padding: 5px 10px;
-    box-shadow: 0 4px 8px black; /* Optional shadow */
+    box-shadow: 0 4px 8px black;
     width: 100%;
-    white-space: normal; // Ensures that the text wraps and preserves whitespace
+    white-space: normal; 
     overflow: visible;
     word-wrap: break-word;
     word-break: break-all;
@@ -96,7 +96,7 @@ li {
 
 .action_icons .material-icons {
     font-size: 25px;
-    color: $primary-light; /* Set the icon color */
+    color: $primary-light; 
     cursor: pointer;
     transition:
         color 0.3s ease,
@@ -104,8 +104,8 @@ li {
 }
 
 .action_icons .material-icons:hover {
-    color: $secondary; /* Change color on hover */
-    transform: scale(1.2); /* Enlarge slightly on hover */
+    color: $secondary;
+    transform: scale(1.2); 
 }
 
 .invisible {

@@ -44,6 +44,7 @@ export class AdministrationGameComponent {
                     next: () => {
                         window.location.reload();
                     },
+                    // this is necessary to be able to test the component and cannot be refactored
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     error: (errors: any) => {
                         if (typeof errors === 'string' || Array.isArray(errors)) {
