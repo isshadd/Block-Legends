@@ -19,6 +19,7 @@ import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 describe('PlayGameBoardSocketService', () => {
     let service: PlayGameBoardSocketService;
     let mockSocket: jasmine.SpyObj<Socket>;
+    // this line is necessary for the import of PlayGameBoardSocketService, so it can not be not used
     /* eslint-disable */
     let mockWebSocketService: any;
     let mockPlayGameBoardManagerService: any;
@@ -308,6 +309,7 @@ describe('PlayGameBoardSocketService', () => {
 
     describe('ngOnDestroy', () => {
         it('should complete destroy$ subject', () => {
+            //this line is necessary for the testing of PlayGameBoardSocketService, so it can not be not used
             /* eslint-disable */
             spyOn((service as any).destroy$, 'next').and.callThrough();
             spyOn((service as any).destroy$, 'complete').and.callThrough();

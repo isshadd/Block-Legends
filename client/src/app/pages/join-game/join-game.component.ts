@@ -28,7 +28,7 @@ export class JoinGameComponent implements OnInit {
         this.webSocketService.avatarTakenError$.subscribe((message) => {
             if (message) {
                 this.errorMessage = message;
-                alert(message); // Display the error message in an alert
+                alert(message);
             }
         });
     }
@@ -61,6 +61,6 @@ export class JoinGameComponent implements OnInit {
     }
 
     goHome(): void {
-        this.router.navigate(['/']); // Navigate to home route
+        this.router.navigate(['/']);
     }
 }

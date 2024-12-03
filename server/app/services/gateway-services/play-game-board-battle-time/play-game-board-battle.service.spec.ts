@@ -343,7 +343,6 @@ describe('PlayGameBoardBattleService', () => {
         it('should return false if player has no evades left', () => {
             const accessCode = 9;
             const playerId = 'player1';
-            // const playerId2 = 'player2';
             const battleRoom = {
                 time: 2,
                 firstPlayerId: 'player1',
@@ -361,7 +360,6 @@ describe('PlayGameBoardBattleService', () => {
             expect(battleRoom.firstPlayerRemainingEvades).toBe(0);
             expect(result).toBe(false);
 
-            // const result2 = service.userUsedEvade(accessCode, playerId2);
             expect(battleRoom.secondPlayerRemainingEvades).toBe(0);
             expect(result).toBe(false);
         });

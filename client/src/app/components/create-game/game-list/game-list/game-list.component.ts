@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common'; // Importez CommonModule
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';

@@ -71,6 +71,7 @@ export class PlayGameBoardManagerService {
     winnerPlayer: PlayerCharacter | null = null;
 
     readonly movingTimeInterval = 150;
+    // this is a manager file so it is necessary to have a lot of parameters, so it is impossible to reduce the number of parameters
     /* eslint-disable max-params */
     constructor(
         public gameMapDataManagerService: GameMapDataManagerService,

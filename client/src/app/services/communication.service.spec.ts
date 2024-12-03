@@ -50,6 +50,7 @@ describe('CommunicationService', () => {
         const sentMessage: Message = { body: 'Hello', title: 'World' };
         // subscribe to the mocked call
         service.basicPost(sentMessage).subscribe({
+            // this is necessary to be able to test the service and we cannot use another method to test this function
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             next: () => {},
             error: fail,

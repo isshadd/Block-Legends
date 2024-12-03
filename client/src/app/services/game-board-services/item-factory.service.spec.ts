@@ -98,8 +98,8 @@ describe('ItemFactoryService', () => {
     describe('copyItem', () => {
         it('should create a new item of the same type', () => {
             const originalItem = service.createItem(ItemType.Sword);
-            originalItem.setCoordinates({ x: 10, y: 20 }); // Assuming setCoordinates is defined
-            originalItem.itemLimit = 5; // Assuming itemLimit is a property
+            originalItem.setCoordinates({ x: 10, y: 20 });
+            originalItem.itemLimit = 5;
             const copiedItem = service.copyItem(originalItem);
 
             expect(copiedItem).toBeInstanceOf(DiamondSword);

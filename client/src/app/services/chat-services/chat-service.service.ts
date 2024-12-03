@@ -1,10 +1,9 @@
-/* eslint-disable no-restricted-imports */ // Disabling restricted imports is necessary for the import of ChatService
 import { Injectable } from '@angular/core';
+import { SocketStateService } from '@app/services/SocketService/socket-state.service';
+import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { Subject } from 'rxjs';
-import { SocketStateService } from '../SocketService/socket-state.service';
-import { WebSocketService } from '../SocketService/websocket.service';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
+import { Subject } from 'rxjs';
 
 const MAX_STRING_LENGTH = 200;
 

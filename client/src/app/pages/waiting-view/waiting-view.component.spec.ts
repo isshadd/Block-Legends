@@ -106,7 +106,6 @@ describe('WaitingViewComponent', () => {
             expect(component.gameId).toBe('1234');
             expect(component.isOrganizer).toBeTrue();
             expect(webSocketServiceSpy.init).toHaveBeenCalled();
-            // expect(webSocketServiceSpy.createGame).toHaveBeenCalledWith('1234', mockCharacter);
         }));
 
         it('should initialize for non-organizer', fakeAsync(() => {
@@ -222,7 +221,6 @@ describe('WaitingViewComponent', () => {
 
             component.addVirtualPlayer(ProfileEnum.Agressive);
 
-            // expect(webSocketServiceSpy.addPlayerToRoom).toHaveBeenCalledWith(ACCESS_CODE, virtualPlayer);
             expect(component.playersCounter).toBe(CALLS);
         });
 
@@ -260,8 +258,6 @@ describe('WaitingViewComponent', () => {
             component.toggleView();
 
             expect(component.showClavardage).toBeFalse();
-            // expect(eventJournalServiceSpy.broadcastEvent)
-            //    .toHaveBeenCalledWith(mockCharacter.socketId, []);
         });
     });
 
