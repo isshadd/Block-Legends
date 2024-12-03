@@ -7,7 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 // eslint-disable-next-line
 import { RouterTestingModule } from '@angular/router/testing';
 import { CreateGameModalComponent } from '@app/components/administration-page-component/creatGameModal/createGameModal.component';
-import { ListGameComponent } from '@app/components/administration-page-component/listGame.component';
+import { ListGameComponent } from '@app/components/administration-page-component/list-game/list-game.component';
 import { AdministrationGameComponent } from './administration-game.component';
 
 describe('AdministrationGameComponent', () => {

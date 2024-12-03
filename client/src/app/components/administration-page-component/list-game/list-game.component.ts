@@ -12,8 +12,8 @@ import { GameShared } from '@common/interfaces/game-shared';
 
 @Component({
     selector: 'app-list-game',
-    templateUrl: './listGame.component.html',
-    styleUrls: ['./listGame.component.scss'],
+    templateUrl: './list-game.component.html',
+    styleUrls: ['./list-game.component.scss'],
     imports: [CommonModule, MapComponent],
     standalone: true,
 })

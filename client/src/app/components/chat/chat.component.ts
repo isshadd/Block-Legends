@@ -1,18 +1,18 @@
-import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { ColorService } from '@app/services/colors.service';
+import { RoomMessageReceived } from '@common/interfaces/roomMessage';
 
 @Component({
-    selector: 'app-clavardage',
+    selector: 'app-chat',
     standalone: true,
     imports: [FormsModule, CommonModule],
-    templateUrl: './clavardage.component.html',
-    styleUrls: ['./clavardage.component.scss'],
+    templateUrl: './chat.component.html',
+    styleUrls: ['./chat.component.scss'],
 })
-export class ClavardageComponent implements OnInit, AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewChecked {
     @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     messageToSend: string = '';

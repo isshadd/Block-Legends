@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ArrowDownButtonComponent } from '@app/components/arrow-down-button/arrow-down-button.component';
 import { ArrowUpButtonComponent } from '@app/components/arrow-up-button/arrow-up-button.component';
-import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
 import { GameStatisticsService, SortAttribute, SortDirection } from '@app/services/play-page-services/game-statistics.service';
@@ -10,7 +10,7 @@ import { SECONDS_IN_A_MINUTE, SECONDS_IN_AN_HOUR } from '@common/constants/game_
 @Component({
     selector: 'app-statistics-page',
     standalone: true,
-    imports: [ClavardageComponent, ArrowUpButtonComponent, ArrowDownButtonComponent],
+    imports: [ChatComponent, ArrowUpButtonComponent, ArrowDownButtonComponent],
     templateUrl: './statistics-page.component.html',
     styleUrl: './statistics-page.component.scss',
 })

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ClavardageComponent } from './clavardage.component';
+import { ClavardageComponent } from './chat.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';

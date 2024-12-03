@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
-import { CreateGameModalComponent } from '@app/components/administration-page-component/creatGameModal/createGameModal.component';
-import { ListGameComponent } from '@app/components/administration-page-component/listGame.component';
+import { CreateGameModalComponent } from '@app/components/administration-page-component/create-game-modal/create-game-modal.component';
+import { ListGameComponent } from '@app/components/administration-page-component/list-game/list-game.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 

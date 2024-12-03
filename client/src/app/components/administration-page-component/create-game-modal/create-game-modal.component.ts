@@ -10,8 +10,8 @@ import { MapSize } from '@common/enums/map-size';
 @Component({
     selector: 'app-create-game-modal',
     standalone: true,
-    templateUrl: './createGameModal.component.html',
-    styleUrls: ['./createGameModal.component.scss'],
+    templateUrl: './create-game-modal.component.html',
+    styleUrls: ['./create-game-modal.component.scss'],
     imports: [NavBarComponent, CommonModule],
 })
 export class CreateGameModalComponent {

@@ -2,7 +2,7 @@
 
 import { Injectable } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { DoorTile } from '@common/classes/Tiles/door-tile';

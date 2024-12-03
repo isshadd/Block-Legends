@@ -14,7 +14,7 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Subject } from 'rxjs';
-import { ListGameComponent } from './listGame.component';
+import { ListGameComponent } from './list-game.component';
 
 describe('ListGameComponent', () => {
     let component: ListGameComponent;

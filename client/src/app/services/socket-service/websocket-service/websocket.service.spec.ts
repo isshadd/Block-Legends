@@ -11,7 +11,7 @@ import { GameService } from '@app/services/game-services/game.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Socket } from 'socket.io-client';
-import { WebSocketService } from './websocket.service';
+import { WebSocketService } from '../websocket.service';
 
 const ACCESS_CODE = 1234;
 

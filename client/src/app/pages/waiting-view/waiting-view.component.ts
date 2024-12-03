@@ -2,14 +2,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { SocketStateService } from '@app/services/socket-service/socket-state.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { MAX_VP_PLAYER_NUMBER } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
@@ -19,7 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
     selector: 'app-waiting-view',
     standalone: true,
-    imports: [CommonModule, ClavardageComponent, EventJournalComponent],
+    imports: [CommonModule, ChatComponent, EventJournalComponent],
     templateUrl: './waiting-view.component.html',
     styleUrl: './waiting-view.component.scss',
 })

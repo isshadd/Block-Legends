@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
+import { SocketStateService } from '@app/services/socket-service/socket-state.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { Subject } from 'rxjs';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
