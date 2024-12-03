@@ -15,7 +15,6 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { PlayPageComponent } from '@app/pages/play-page/play-page.component';
 import { PlayerCreateCharacterComponent } from '@app/pages/player-create-character/player-create-character.component';
 import { StatisticsPageComponent } from '@app/pages/statistics-page/statistics-page.component';
-import { UiTestComponent } from '@app/pages/ui-test/ui-test.component';
 import { WaitingViewComponent } from '@app/pages/waiting-view/waiting-view.component';
 import { environment } from './environments/environment';
 
@@ -37,7 +36,6 @@ const routes: Routes = [
     { path: 'player-create-character', component: PlayerCreateCharacterComponent },
     { path: 'fight-view-page', component: FightViewPageComponent },
     { path: 'statistics-page', component: StatisticsPageComponent },
-    { path: 'ui-test', component: UiTestComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

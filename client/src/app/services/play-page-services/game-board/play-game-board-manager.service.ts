@@ -651,6 +651,20 @@ export class PlayGameBoardManagerService {
         });
     }
 
+    canPlayerDoAction(): boolean {
+        const currentPlayer = this.getCurrentPlayerCharacter();
+        if (!currentPlayer) {
+            return false;
+        }
+
+        const playerTile = this.getPlayerTile(currentPlayer);
+        if (!playerTile) {
+            return false;
+        }
+
+        return this.getAdjacentActionTiles(playerTile).length > 0;
+    }
+
     findPlayerFromPlayerMapEntity(playerMapEntity: PlayerMapEntity): PlayerCharacter | null {
         return this.webSocketService.getRoomInfo().players.find((player) => player.mapEntity === playerMapEntity) || null;
     }
