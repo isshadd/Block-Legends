@@ -3,6 +3,10 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
+import {
+    PlayerNumberStatisticType,
+    PlayGameStatisticsService,
+} from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { GameTimerState } from '@common/enums/game.timer.state';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ItemType } from '@common/enums/item-type';
@@ -23,6 +27,7 @@ export class PlayGameBoardGateway {
         private readonly playGameBoardTimeService: PlayGameBoardTimeService,
         private readonly playGameBoardBattleService: PlayGameBoardBattleService,
         private readonly gameSocketRoomService: GameSocketRoomService,
+        private readonly playGameStatisticsService: PlayGameStatisticsService,
     ) {
         this.playGameBoardTimeService.signalRoomTimePassed$.subscribe((accessCode) => {
             this.updateRoomTime(accessCode);
@@ -96,6 +101,10 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+
+        this.playGameStatisticsService.addDifferentTerrainTileVisited(room.accessCode, data.playerTurnId, data.fromTile);
+        this.playGameStatisticsService.addDifferentTerrainTileVisited(room.accessCode, data.playerTurnId, data.toTile);
+
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_MOVED, {
             playerId: data.playerTurnId,
             fromTile: data.fromTile,
@@ -121,6 +130,7 @@ export class PlayGameBoardGateway {
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
         if (!room) return;
 
+        this.playGameStatisticsService.addPlayerDifferentItemGrabbed(room.accessCode, data.playerTurnId, data.itemType);
         this.server.to(room.accessCode.toString()).emit(SocketEvents.ROOM_USER_GRABBED_ITEM, {
             playerId: data.playerTurnId,
             itemType: data.itemType,
@@ -167,6 +177,7 @@ export class PlayGameBoardGateway {
         }
 
         const room = this.gameSocketRoomService.getRoomBySocketId(data.playerTurnId);
+        this.playGameStatisticsService.increaseGameTotalDoorsInteracted(room.accessCode, data.tileCoordinate);
         this.server
             .to(room.accessCode.toString())
             .emit(SocketEvents.ROOM_USER_DID_DOOR_ACTION, { tileCoordinate: data.tileCoordinate, playerId: data.playerTurnId });
@@ -214,6 +225,7 @@ export class PlayGameBoardGateway {
         this.server.to(room.accessCode.toString()).emit(SocketEvents.OPPONENT_TRIED_ESCAPE);
 
         if (this.playGameBoardBattleService.userUsedEvade(room.accessCode, playerTurnId)) {
+            this.playGameStatisticsService.increasePlayerStatistic(room.accessCode, playerTurnId, PlayerNumberStatisticType.TotalEvasions);
             this.handleBattleEndedByEscape(room.accessCode);
             return;
         }
@@ -227,7 +239,8 @@ export class PlayGameBoardGateway {
         if (!room) return;
 
         this.playGameBoardTimeService.pauseTimer(room.accessCode);
-        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, playerTurnId);
+        const gameStatistics = this.playGameStatisticsService.endGameStatistics(room.accessCode);
+        this.server.to(room.accessCode.toString()).emit(SocketEvents.GAME_BOARD_PLAYER_WON, { playerTurnId, gameStatistics });
     }
 
     isClientTurn(clientId: string): boolean {
@@ -262,6 +275,7 @@ export class PlayGameBoardGateway {
 
     startRoomTurn(accessCode: number, playerIdTurn: string) {
         this.server.to(accessCode.toString()).emit(SocketEvents.START_TURN, playerIdTurn);
+        this.playGameStatisticsService.increaseGameTotalPlayerTurns(accessCode);
         if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, playerIdTurn).isVirtual) {
             setTimeout(() => {
                 this.startVirtualPlayerTurn(accessCode, playerIdTurn);
@@ -292,6 +306,9 @@ export class PlayGameBoardGateway {
     handleStartBattle(accessCode: number, playerId: string, enemyPlayerId: string) {
         this.playGameBoardTimeService.pauseTimer(accessCode);
         this.playGameBoardBattleService.createBattleTimer(accessCode, playerId, enemyPlayerId);
+
+        this.playGameStatisticsService.increasePlayerStatistic(accessCode, playerId, PlayerNumberStatisticType.TotalCombats);
+        this.playGameStatisticsService.increasePlayerStatistic(accessCode, enemyPlayerId, PlayerNumberStatisticType.TotalCombats);
 
         const playerTurn = this.playGameBoardBattleService.getPlayerBattleTurn(accessCode);
         this.startBattleTurn(accessCode, playerTurn);
@@ -335,6 +352,8 @@ export class PlayGameBoardGateway {
 
         if (winnerPlayer === firstPlayer) {
             this.server.to(accessCode.toString()).emit(SocketEvents.FIRST_PLAYER_WON_BATTLE, { firstPlayer, loserPlayer: secondPlayer });
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, firstPlayer, PlayerNumberStatisticType.FightWins);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, secondPlayer, PlayerNumberStatisticType.FightLoses);
 
             if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, firstPlayer).isVirtual) {
                 this.server
@@ -353,6 +372,8 @@ export class PlayGameBoardGateway {
             this.server
                 .to(accessCode.toString())
                 .emit(SocketEvents.SECOND_PLAYER_WON_BATTLE, { winnerPlayer: secondPlayer, loserPlayer: firstPlayer });
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, secondPlayer, PlayerNumberStatisticType.FightWins);
+            this.playGameStatisticsService.increasePlayerStatistic(accessCode, firstPlayer, PlayerNumberStatisticType.FightLoses);
 
             if (this.playGameBoardSocketService.getPlayerBySocketId(accessCode, secondPlayer).isVirtual) {
                 this.server

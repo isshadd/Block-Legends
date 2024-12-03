@@ -1,63 +1,43 @@
-import { Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component } from '@angular/core';
 import { ArrowDownButtonComponent } from '@app/components/arrow-down-button/arrow-down-button.component';
 import { ArrowUpButtonComponent } from '@app/components/arrow-up-button/arrow-up-button.component';
 import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
+import { GameStatisticsService, SortAttribute, SortDirection } from '@app/services/play-page-services/game-statistics.service';
 
-export enum SortCharacters {
-    Name = 'name',
-    Fights = 'fights',
-    FightWins = 'fightWins',
-    FightLoses = 'fightLoses',
-}
 @Component({
     selector: 'app-statistics-page',
     standalone: true,
-    imports: [ClavardageComponent, RouterLink, ArrowUpButtonComponent, ArrowDownButtonComponent],
+    imports: [ClavardageComponent, ArrowUpButtonComponent, ArrowDownButtonComponent],
     templateUrl: './statistics-page.component.html',
     styleUrl: './statistics-page.component.scss',
 })
 export class StatisticsPageComponent {
-    @Input() isGameModeCTF: boolean;
-    @Input() playersList: PlayerCharacter[] = [];
-    sortCharacters = SortCharacters;
+    sortAttribute = SortAttribute;
+    sortDirection = SortDirection;
+    constructor(
+        public gameStatisticsService: GameStatisticsService,
+        public gameMapDataManagerService: GameMapDataManagerService,
+        public playGameBoardSocketService: PlayGameBoardSocketService,
+    ) {}
 
-    sortPlayersIncreasing(sort: SortCharacters) {
-        switch (sort) {
-            case SortCharacters.Fights:
-                this.playersList.sort((a, b) => b.fightWins + b.fightLoses - (a.fightWins + a.fightLoses));
-                break;
-            case SortCharacters.Name:
-                this.playersList.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case SortCharacters.FightWins:
-                this.playersList.sort((a, b) => b.fightWins - a.fightWins);
-                break;
-            case SortCharacters.FightLoses:
-                this.playersList.sort((a, b) => b.fightLoses - a.fightLoses);
-                break;
-            default:
-                break;
-        }
+    formatGameTime(totalGameTime: number): string {
+        const SECONDS_IN_AN_HOUR = 3600;
+        const SECONDS_IN_A_MINUTE = 60;
+
+        const hours = Math.floor(totalGameTime / SECONDS_IN_AN_HOUR);
+        const minutes = Math.floor((totalGameTime % SECONDS_IN_AN_HOUR) / SECONDS_IN_A_MINUTE);
+        const seconds = totalGameTime % SECONDS_IN_A_MINUTE;
+
+        return `${this.padWithZero(hours)}:${this.padWithZero(minutes)}:${this.padWithZero(seconds)}`;
     }
 
-    sortPlayersDecreasing(sort: SortCharacters) {
-        switch (sort) {
-            case SortCharacters.Fights:
-                this.playersList.sort((a, b) => a.fightWins + a.fightLoses - (b.fightWins + b.fightLoses));
-                break;
-            case SortCharacters.Name:
-                this.playersList.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            case SortCharacters.FightWins:
-                this.playersList.sort((a, b) => a.fightWins - b.fightWins);
-                break;
-            case SortCharacters.FightLoses:
-                this.playersList.sort((a, b) => a.fightLoses - b.fightLoses);
-                break;
-            default:
-                break;
-        }
+    padWithZero(value: number): string {
+        return value.toString().padStart(2, '0');
+    }
+
+    returnHome(): void {
+        this.playGameBoardSocketService.leaveGame();
     }
 }
