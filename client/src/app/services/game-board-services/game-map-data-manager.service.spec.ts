@@ -827,7 +827,7 @@ describe('GameMapDataManagerService', () => {
     });
 
     describe('getClosestTerrainTileWithoutItemAt', () => {
-        let startTile = new GrassTile();
+        const startTile = new GrassTile();
         beforeEach(() => {
             service['currentGrid'] = [
                 [startTile, new GrassTile(), new GrassTile()],
@@ -878,8 +878,8 @@ describe('GameMapDataManagerService', () => {
     });
 
     describe('getClosestWalkableTileWithoutPlayerAt', () => {
-        let spawnTile = new GrassTile();
-        let playerMapEntity = new PlayerMapEntity('player');
+        const spawnTile = new GrassTile();
+        const playerMapEntity = new PlayerMapEntity('player');
         playerMapEntity.spawnCoordinates = { x: 0, y: 0 };
 
         beforeEach(() => {
@@ -903,7 +903,7 @@ describe('GameMapDataManagerService', () => {
         });
 
         it('should return a neighbor tile if spawnTile has another player', () => {
-            let otherMapEntity = new PlayerMapEntity('player2');
+            const otherMapEntity = new PlayerMapEntity('player2');
             spawnTile.player = otherMapEntity;
 
             const result = service.getClosestWalkableTileWithoutPlayerAt(playerMapEntity);
@@ -912,9 +912,9 @@ describe('GameMapDataManagerService', () => {
         });
 
         it('should return a far neighbor tile, if all direct neighbors have players', () => {
-            let otherMapEntity = new PlayerMapEntity('player2');
-            let otherMapEntity2 = new PlayerMapEntity('player3');
-            let otherMapEntity3 = new PlayerMapEntity('player4');
+            const otherMapEntity = new PlayerMapEntity('player2');
+            const otherMapEntity2 = new PlayerMapEntity('player3');
+            const otherMapEntity3 = new PlayerMapEntity('player4');
             spawnTile.player = otherMapEntity;
             (service['currentGrid'][0][1] as TerrainTile).player = otherMapEntity2;
             (service['currentGrid'][1][0] as TerrainTile).player = otherMapEntity3;
@@ -927,7 +927,7 @@ describe('GameMapDataManagerService', () => {
         });
 
         it('should throw error if no walkable tile found', () => {
-            let otherMapEntity = new PlayerMapEntity('player2');
+            const otherMapEntity = new PlayerMapEntity('player2');
             spawnTile.player = otherMapEntity;
             spyOn(service, 'getNeighbours').and.returnValue([]);
 
