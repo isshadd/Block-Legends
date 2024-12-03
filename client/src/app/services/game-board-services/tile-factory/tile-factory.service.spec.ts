@@ -11,7 +11,7 @@ import { WaterTile } from '@common/classes/Tiles/water-tile';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { TileShared } from '@common/interfaces/tile-shared';
-import { ItemFactoryService } from './item-factory.service';
+import { ItemFactoryService } from '../item-factory/item-factory.service';
 import { TileFactoryService } from './tile-factory.service';
 
 describe('TileFactoryService', () => {

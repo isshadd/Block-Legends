@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { ItemType } from '@common/enums/item-type';

@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */ // Disabling max-lines is necessary for the tests of large services
 import { TestBed } from '@angular/core/testing';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Item } from '@common/classes/Items/item';

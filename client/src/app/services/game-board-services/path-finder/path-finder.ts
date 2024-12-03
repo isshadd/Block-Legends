@@ -1,7 +1,7 @@
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
 import { Vec2 } from '@common/interfaces/vec2';
-import { GameMapDataManagerService } from './game-map-data-manager.service';
 export interface PathNode {
     tile: Tile;
     cost: number;

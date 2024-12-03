@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { Item } from '@common/classes/Items/item';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';

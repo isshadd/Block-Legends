@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
 import { IceTile } from '@common/classes/Tiles/ice-tile';
@@ -9,7 +10,6 @@ import { WallTile } from '@common/classes/Tiles/wall-tile';
 import { WaterTile } from '@common/classes/Tiles/water-tile';
 import { TileType } from '@common/enums/tile-type';
 import { TileShared } from '@common/interfaces/tile-shared';
-import { ItemFactoryService } from './item-factory.service';
 
 @Injectable({
     providedIn: 'root',

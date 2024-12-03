@@ -1,9 +1,9 @@
 /* eslint-disable max-lines */ // This file is a service and it's expected to have a lot of lines
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug.service';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { ItemFactoryService } from '@app/services/game-board-services/item-factory.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';

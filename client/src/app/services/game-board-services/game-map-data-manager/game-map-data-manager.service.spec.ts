@@ -21,8 +21,8 @@ import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of, throwError } from 'rxjs';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
-import { Pathfinder } from './path-finder';
-import { TileFactoryService } from './tile-factory.service';
+import { Pathfinder } from '../path-finder/path-finder';
+import { TileFactoryService } from '../tile-factory/tile-factory.service';
 
 describe('GameMapDataManagerService', () => {
     let service: GameMapDataManagerService;

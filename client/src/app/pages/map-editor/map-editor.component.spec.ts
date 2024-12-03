@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';

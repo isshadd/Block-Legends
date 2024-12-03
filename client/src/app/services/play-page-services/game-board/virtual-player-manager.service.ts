@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */ // This service is necessary for virtual players to be able to play the game, because it manages the virtual players' turns and movements. Sadly it can not be split into smaller services.
 
 import { Injectable } from '@angular/core';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';

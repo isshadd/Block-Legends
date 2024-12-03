@@ -21,7 +21,7 @@ import { PlayPageRightSideViewComponent } from '@app/components/play-page-right-
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
 import { WinPanelComponent } from '@app/components/win-panel/win-panel.component';
 import { DebugService } from '@app/services/debug.service';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { GameService } from '@app/services/game-services/game.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';

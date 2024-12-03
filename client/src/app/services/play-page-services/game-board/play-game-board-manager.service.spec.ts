@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */ // impossible to test this file, which is a manager file so it is expected to be long, without using less than this many tests so it can not be refactored
 /* eslint-disable @typescript-eslint/no-shadow */ // for the tests, the mockPlayer is reassigned
 import { TestBed } from '@angular/core/testing';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { WebSocketService } from '@app/services/SocketService/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';

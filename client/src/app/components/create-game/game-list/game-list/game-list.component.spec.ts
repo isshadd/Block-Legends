@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { ModeService } from '@app/services/game-mode-services/gameMode.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { Tile } from '@common/classes/Tiles/tile';

@@ -9,7 +9,7 @@ import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-compon
 // this line is necessary for the import of MapEditorComponent and it is impossible to refactor the address
 // eslint-disable-next-line max-len
 import { PlaceableEntityFullMenuComponent } from '@app/components/map-editor-components/placeable-entity-full-menu/placeable-entity-full-menu.component';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';

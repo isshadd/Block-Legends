@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { Pathfinder } from '@app/services/game-board-services/path-finder';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
 import { Vec2 } from '@common/interfaces/vec2';

@@ -16,9 +16,9 @@ import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
-import { ItemFactoryService } from './item-factory.service';
-import { Pathfinder } from './path-finder';
-import { TileFactoryService } from './tile-factory.service';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 @Injectable({
     providedIn: 'root',
 })
