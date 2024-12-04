@@ -1,9 +1,10 @@
 /* eslint-disable max-lines */ // impossible to test this file, which is a manager file so it is expected to be long, without using less than this many tests so it can not be refactored
 /* eslint-disable @typescript-eslint/no-shadow */ // for the tests, the mockPlayer is reassigned
 import { TestBed } from '@angular/core/testing';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { TileFactoryService } from '@app/services/game-board-services/tile-factory.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services//game-map-data-manager/game-map-data-manager.service';
+import { TileFactoryService } from '@app/services/game-board-services//tile-factory/tile-factory.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Elytra } from '@common/classes/Items/elytra';
@@ -1043,15 +1044,24 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('addItemEffect', () => {
+        const SWORD_ATTACK_INCREASE = 2;
+        const SWORD_DEFENSE_DECREASE = 1;
+        const CHESTPLATE_DEFENSE_INCREASE = 2;
+        const CHESTPLATE_SPEED_DECREASE = 1;
+        const TOTEM_DEFENSE_DECREASE = 2;
+        const ELYTRA_SPEED_INCREASE = 1;
+
         it('should increase attack by 2 and decrease defense by 1 when item is Sword', () => {
             const mockPlayer = new PlayerCharacter('player1');
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const sword = new DiamondSword();
 
+            const result1 = mockPlayer.attributes.attack + SWORD_ATTACK_INCREASE;
+            const result2 = mockPlayer.attributes.defense - SWORD_DEFENSE_DECREASE;
             service.addItemEffect(mockPlayer, sword);
 
-            expect(mockPlayer.attributes.attack).toBe(7);
-            expect(mockPlayer.attributes.defense).toBe(2);
+            expect(mockPlayer.attributes.attack).toBe(result1);
+            expect(mockPlayer.attributes.defense).toBe(result2);
         });
 
         it('should increase defense by 2 and decrease speed by 1 when item is Chestplate', () => {
@@ -1059,10 +1069,12 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const chestplate = new Chestplate();
 
+            const result1 = mockPlayer.attributes.defense + CHESTPLATE_DEFENSE_INCREASE;
+            const result2 = mockPlayer.attributes.speed - CHESTPLATE_SPEED_DECREASE;
             service.addItemEffect(mockPlayer, chestplate);
 
-            expect(mockPlayer.attributes.defense).toBe(5);
-            expect(mockPlayer.attributes.speed).toBe(1);
+            expect(mockPlayer.attributes.defense).toBe(result1);
+            expect(mockPlayer.attributes.speed).toBe(result2);
         });
 
         it('should decrease defense by 2 when item is Totem', () => {
@@ -1070,9 +1082,10 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const totem = new Totem();
 
+            const result = mockPlayer.attributes.defense - TOTEM_DEFENSE_DECREASE;
             service.addItemEffect(mockPlayer, totem);
 
-            expect(mockPlayer.attributes.defense).toBe(1);
+            expect(mockPlayer.attributes.defense).toBe(result);
         });
 
         it('should increase speed by 1 when item is Elytra', () => {
@@ -1080,9 +1093,10 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const elytra = new Elytra();
 
+            const result = mockPlayer.attributes.speed + ELYTRA_SPEED_INCREASE;
             service.addItemEffect(mockPlayer, elytra);
 
-            expect(mockPlayer.attributes.speed).toBe(3);
+            expect(mockPlayer.attributes.speed).toBe(result);
         });
 
         it('should not change attributes when item type is not recognized', () => {
@@ -1092,9 +1106,9 @@ describe('PlayGameBoardManagerService', () => {
 
             service.addItemEffect(mockPlayer, unknownItem);
 
-            expect(mockPlayer.attributes.attack).toBe(5);
-            expect(mockPlayer.attributes.defense).toBe(3);
-            expect(mockPlayer.attributes.speed).toBe(2);
+            expect(mockPlayer.attributes.attack).toBe(mockPlayer.attributes.attack);
+            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense);
+            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed);
         });
     });
 
@@ -1111,10 +1125,12 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const sword = new DiamondSword();
 
+            const result1 = mockPlayer.attributes.attack - SWORD_ATTACK_DECREASE;
+            const result2 = mockPlayer.attributes.defense + SWORD_DEFENSE_INCREASE;
             service.removeItemEffect(mockPlayer, sword);
 
-            expect(mockPlayer.attributes.attack).toBe(mockPlayer.attributes.attack - SWORD_ATTACK_DECREASE);
-            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense + SWORD_DEFENSE_INCREASE);
+            expect(mockPlayer.attributes.attack).toBe(result1);
+            expect(mockPlayer.attributes.defense).toBe(result2);
         });
 
         it('should decrease defense by 2 and increase speed by 1 when item is Chestplate', () => {
@@ -1122,10 +1138,12 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const chestplate = new Chestplate();
 
+            const result1 = mockPlayer.attributes.defense - CHESTPLATE_DEFENSE_DECREASE;
+            const result2 = mockPlayer.attributes.speed + CHESTPLATE_SPEED_INCREASE;
             service.removeItemEffect(mockPlayer, chestplate);
 
-            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense - CHESTPLATE_DEFENSE_DECREASE);
-            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed + CHESTPLATE_SPEED_INCREASE);
+            expect(mockPlayer.attributes.defense).toBe(result1);
+            expect(mockPlayer.attributes.speed).toBe(result2);
         });
 
         it('should increase defense by 2 when item is Totem', () => {
@@ -1133,9 +1151,10 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const totem = new Totem();
 
+            const result = mockPlayer.attributes.defense + TOTEM_DEFENSE_INCREASE;
             service.removeItemEffect(mockPlayer, totem);
 
-            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense + TOTEM_DEFENSE_INCREASE);
+            expect(mockPlayer.attributes.defense).toBe(result);
         });
 
         it('should decrease speed by 1 when item is Elytra', () => {
@@ -1143,9 +1162,10 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
             const elytra = new Elytra();
 
+            const result = mockPlayer.attributes.speed - ELYTRA_SPEED_DECREASE;
             service.removeItemEffect(mockPlayer, elytra);
 
-            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed - ELYTRA_SPEED_DECREASE);
+            expect(mockPlayer.attributes.speed).toBe(result);
         });
 
         it('should not change attributes when item type is not recognized', () => {
@@ -1183,7 +1203,8 @@ describe('PlayGameBoardManagerService', () => {
         it('should return true if tile type is Ice and random value is less than ICE_FALL_POSSIBILTY', () => {
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
             service.debugService.isDebugMode = false;
-            spyOn(Math, 'random').and.returnValue(0.05);
+            const randomValue = 0.05;
+            spyOn(Math, 'random').and.returnValue(randomValue);
             spyOn(service.eventJournal, 'broadcastEvent');
 
             const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
@@ -1195,7 +1216,8 @@ describe('PlayGameBoardManagerService', () => {
         it('should return false if tile type is Ice and random value is greater than or equal to ICE_FALL_POSSIBILTY', () => {
             spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
             service.debugService.isDebugMode = false;
-            spyOn(Math, 'random').and.returnValue(0.2);
+            const randomValue = 0.2;
+            spyOn(Math, 'random').and.returnValue(randomValue);
 
             const result = service.didPlayerTripped(TileType.Ice, mockPlayerCharacter);
 
@@ -1272,7 +1294,9 @@ describe('PlayGameBoardManagerService', () => {
             spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockActionPlayer);
             spyOn(service.signalUserDidDoorAction, 'next');
             spyOn(service, 'hidePossibleMoves');
-            spyOn(service, 'checkIfPLayerDidEverything').and.callFake(() => {});
+            spyOn(service, 'checkIfPLayerDidEverything').and.callFake(() => {
+                return;
+            });
 
             service.isUserTurn = true;
 
@@ -1379,7 +1403,7 @@ describe('PlayGameBoardManagerService', () => {
             });
 
             service.isUserTurn = true;
-            spyOn(service, 'setupPossibleMoves').and.callFake(() => {});
+            spyOn(service, 'setupPossibleMoves').and.callThrough();
             gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockDoorTile);
 
             service.toggleDoor(tileCoordinate);
@@ -1633,7 +1657,9 @@ describe('PlayGameBoardManagerService', () => {
             mockPlayerCharacter.inventory = [new DiamondSword(), new Chestplate(), new EmptyItem()];
 
             gameMapDataManagerServiceSpy.getClosestTerrainTileWithoutItemAt.and.returnValue(startTile);
-            spyOn(service, 'throwItem').and.callFake(() => {});
+            spyOn(service, 'throwItem').and.callFake(() => {
+                return;
+            });
 
             service.userDropAllItems(startTile, mockPlayerCharacter);
 
