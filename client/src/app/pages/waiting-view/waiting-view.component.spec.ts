@@ -7,9 +7,12 @@ import { PlayGameBoardManagerService } from '@app/services/play-page-services/ga
 import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { WaitingViewComponent } from './waiting-view.component';
+
+/* eslint-disable @typescript-eslint/no-explicit-any*/ // Disabling explicit any is necessary for the spyOn function
 
 const ACCESS_CODE = 1234;
 const PLAYER4 = 4;
@@ -28,9 +31,7 @@ describe('WaitingViewComponent', () => {
     let mockActivatedRoute: Partial<ActivatedRoute>;
     let playGameBoardManagerServiceSpy: jasmine.SpyObj<PlayGameBoardManagerService>;
 
-    const mockSocket = {
-        on: jasmine.createSpy('on'),
-    };
+    const socket = jasmine.createSpyObj('Socket', ['emit', 'on', 'disconnect']);
 
     const mockCharacter: Partial<PlayerCharacter> = {
         isOrganizer: true,
@@ -51,7 +52,7 @@ describe('WaitingViewComponent', () => {
                 players$: new BehaviorSubject<PlayerCharacter[]>([mockCharacter as PlayerCharacter]),
                 isLocked$: new BehaviorSubject<boolean>(false),
                 maxPlayers$: new BehaviorSubject<number>(PLAYER4),
-                socket: mockSocket,
+                socket,
                 avatarTakenError$: new Subject<string>(),
             },
         );
@@ -138,6 +139,67 @@ describe('WaitingViewComponent', () => {
 
             expect(component.playersCounter).toBe(2);
         }));
+        it('should broadcast event when ROOM_LOCKED is received and user is organizer', fakeAsync(() => {
+            const response = { message: 'Room has been locked' };
+            component.isOrganizer = true;
+
+            socket.on.and.callFake((event: string, callback: any) => {
+                if (event === SocketEvents.ROOM_LOCKED) {
+                    callback(response);
+                }
+                return socket;
+            });
+
+            component.ngOnInit();
+
+            expect(eventJournalServiceSpy.broadcastEvent).toHaveBeenCalledWith('Room has been locked', []);
+            tick();
+        }));
+
+        it('should broadcast event when ROOM_UNLOCKED is received', fakeAsync(() => {
+            const response = { message: 'Room has been unlocked' };
+            socket.on.and.callFake((event: string, callback: any) => {
+                if (event === SocketEvents.ROOM_UNLOCKED) {
+                    callback(response);
+                }
+                return socket;
+            });
+
+            component.ngOnInit();
+
+            expect(eventJournalServiceSpy.broadcastEvent).toHaveBeenCalledWith('Room has been unlocked', []);
+            tick();
+        }));
+
+        it('should update playersCounter and reset virtual player variables if needed', fakeAsync(() => {
+            const player1 = new PlayerCharacter('player1');
+            const player2 = new PlayerCharacter('player2');
+            const players = [player1, player2];
+            component.lastVirtualPlayerSocketId = 'virtualPlayerId';
+            component.lastVirtualPlayerProfile = ProfileEnum.Agressive;
+
+            (webSocketServiceSpy.players$ as BehaviorSubject<PlayerCharacter[]>).next(players);
+
+            expect(component.playersCounter).toBe(1);
+            expect(component.lastVirtualPlayerProfile).toBe(ProfileEnum.Agressive);
+            expect(component.virtualPlayerRetryCount).toBe(0);
+            tick();
+        }));
+
+        it('should add a virtual player and broadcast an event if player count is below max', () => {
+            const virtualPlayer = new PlayerCharacter('VirtualPlayer');
+
+            component.playersCounter = 2;
+            component.maxPlayers = 4;
+            component.accessCode = 1234;
+
+            component.addVirtualPlayer(ProfileEnum.Defensive);
+
+            expect(gameServiceSpy.generateVirtualCharacter).not.toHaveBeenCalledWith(2, ProfileEnum.Defensive);
+            expect(webSocketServiceSpy.addPlayerToRoom).not.toHaveBeenCalledWith(component.accessCode, virtualPlayer);
+            expect(component.playersCounter).toBe(2);
+            expect(eventJournalServiceSpy.broadcastEvent).not.toHaveBeenCalledWith('Joueur virtuel VirtualPlayer ajouté', []);
+        });
     });
 
     describe('Room Management', () => {
