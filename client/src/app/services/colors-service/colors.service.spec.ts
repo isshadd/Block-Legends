@@ -15,30 +15,53 @@ describe('ColorService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should assign the same color for the same socketId', () => {
-        const socketId = 'socket1';
-        const color1 = service.getColor(socketId);
-        const color2 = service.getColor(socketId);
-        expect(color1).toBe(color2); // Ensure the same color is returned for the same socketId
-    });
+    describe('getColor', () => {
+        it('should assign a color to a new socket ID', () => {
+            const socketId = 'test-socket-1';
+            const color = service.getColor(socketId);
+            expect(color).toBe('#006D77'); // First color in the array
+        });
 
-    it('should assign different colors for different socketIds', () => {
-        const socketId1 = 'socket1';
-        const socketId2 = 'socket2';
-        const color1 = service.getColor(socketId1);
-        const color2 = service.getColor(socketId2);
-        expect(color1).not.toBe(color2); // Ensure different socketIds get different colors
-    });
+        it('should return the same color for the same socket ID', () => {
+            const socketId = 'test-socket-2';
+            const firstCall = service.getColor(socketId);
+            const secondCall = service.getColor(socketId);
+            expect(firstCall).toBe(secondCall);
+        });
 
-    it('should cycle through predefined colors and loop back when exhausted', () => {
-        const predefinedColors = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00'];
-        const socketIds = predefinedColors.map((_, index) => `socket${index + 1}`);
-        const assignedColors = socketIds.map((socketId) => service.getColor(socketId));
+        it('should cycle through colors for different socket IDs', () => {
+            const colors = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00'];
 
-        expect(assignedColors).toEqual(predefinedColors); // Ensure it assigns all predefined colors
+            // Test first cycle of colors
+            for (let i = 0; i < colors.length; i++) {
+                const socketId = `test-socket-${i}`;
+                const color = service.getColor(socketId);
+                expect(color).toBe(colors[i]);
+            }
+        });
 
-        const additionalSocketId = 'socket7';
-        const color = service.getColor(additionalSocketId);
-        expect(color).toBe(predefinedColors[0]); // Ensure it loops back to the first color
+        it('should wrap around to first color after all colors are used', () => {
+            const colors = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00'];
+
+            // Assign all colors first
+            for (let i = 0; i < colors.length; i++) {
+                service.getColor(`test-socket-${i}`);
+            }
+
+            // Next socket should get first color again
+            const newSocketId = 'test-socket-next';
+            const color = service.getColor(newSocketId);
+            expect(color).toBe(colors[0]);
+        });
+
+        it('should maintain different colors for different sockets', () => {
+            const socket1 = 'test-socket-1';
+            const socket2 = 'test-socket-2';
+
+            const color1 = service.getColor(socket1);
+            const color2 = service.getColor(socket2);
+
+            expect(color1).not.toBe(color2);
+        });
     });
 });
