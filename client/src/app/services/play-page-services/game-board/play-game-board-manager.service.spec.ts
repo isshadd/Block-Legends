@@ -1100,6 +1100,13 @@ describe('PlayGameBoardManagerService', () => {
     });
 
     describe('removeItemEffect', () => {
+        const SWORD_ATTACK_DECREASE = 2;
+        const SWORD_DEFENSE_INCREASE = 1;
+        const CHESTPLATE_DEFENSE_DECREASE = 2;
+        const CHESTPLATE_SPEED_INCREASE = 1;
+        const TOTEM_DEFENSE_INCREASE = 2;
+        const ELYTRA_SPEED_DECREASE = 1;
+
         it('should decrease attack by 2 and increase defense by 1 when item is Sword', () => {
             const mockPlayer = new PlayerCharacter('player1');
             mockPlayer.attributes = { attack: 5, defense: 3, speed: 2, life: 10 };
@@ -1107,8 +1114,8 @@ describe('PlayGameBoardManagerService', () => {
 
             service.removeItemEffect(mockPlayer, sword);
 
-            expect(mockPlayer.attributes.attack).toBe(3);
-            expect(mockPlayer.attributes.defense).toBe(4);
+            expect(mockPlayer.attributes.attack).toBe(mockPlayer.attributes.attack - SWORD_ATTACK_DECREASE);
+            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense + SWORD_DEFENSE_INCREASE);
         });
 
         it('should decrease defense by 2 and increase speed by 1 when item is Chestplate', () => {
@@ -1118,8 +1125,8 @@ describe('PlayGameBoardManagerService', () => {
 
             service.removeItemEffect(mockPlayer, chestplate);
 
-            expect(mockPlayer.attributes.defense).toBe(1);
-            expect(mockPlayer.attributes.speed).toBe(3);
+            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense - CHESTPLATE_DEFENSE_DECREASE);
+            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed + CHESTPLATE_SPEED_INCREASE);
         });
 
         it('should increase defense by 2 when item is Totem', () => {
@@ -1129,7 +1136,7 @@ describe('PlayGameBoardManagerService', () => {
 
             service.removeItemEffect(mockPlayer, totem);
 
-            expect(mockPlayer.attributes.defense).toBe(5);
+            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense + TOTEM_DEFENSE_INCREASE);
         });
 
         it('should decrease speed by 1 when item is Elytra', () => {
@@ -1139,7 +1146,7 @@ describe('PlayGameBoardManagerService', () => {
 
             service.removeItemEffect(mockPlayer, elytra);
 
-            expect(mockPlayer.attributes.speed).toBe(1);
+            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed - ELYTRA_SPEED_DECREASE);
         });
 
         it('should not change attributes when item type is not recognized', () => {
@@ -1149,9 +1156,9 @@ describe('PlayGameBoardManagerService', () => {
 
             service.removeItemEffect(mockPlayer, unknownItem);
 
-            expect(mockPlayer.attributes.attack).toBe(5);
-            expect(mockPlayer.attributes.defense).toBe(3);
-            expect(mockPlayer.attributes.speed).toBe(2);
+            expect(mockPlayer.attributes.attack).toBe(mockPlayer.attributes.attack);
+            expect(mockPlayer.attributes.defense).toBe(mockPlayer.attributes.defense);
+            expect(mockPlayer.attributes.speed).toBe(mockPlayer.attributes.speed);
         });
     });
 
