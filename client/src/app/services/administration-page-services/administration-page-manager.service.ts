@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { Subject } from 'rxjs';
 

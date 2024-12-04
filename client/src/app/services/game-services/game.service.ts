@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering*/ // Disabling member ordering is necessary for the `accessCodeSubject` and `characterSubject` to be declared before being used
 
 import { Injectable } from '@angular/core';
-import { AvatarService } from '@app/services/avatar.service';
+import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER } from '@common/constants/game_constants';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';

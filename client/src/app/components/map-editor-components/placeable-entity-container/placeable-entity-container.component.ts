@@ -4,8 +4,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlaceableEntityComponent } from '@app/components/game-board-components/placeable-entity/placeable-entity.component';
 import { VisibleStateComponent } from '@app/components/game-board-components/visible-state/visible-state.component';
 import { ItemLimitCounterComponent } from '@app/components/map-editor-components/item-limit-counter/item-limit-counter.component';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu/map-editor-side-menu.service';
 import { Item } from '@common/classes/Items/item';
 import { PlaceableEntity } from '@common/interfaces/placeable-entity';
 @Component({

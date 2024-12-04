@@ -1,6 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core'; // Import NO_ERRORS_SCHEMA to ignore unknown elements
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';

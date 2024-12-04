@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 
