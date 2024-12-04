@@ -12,7 +12,7 @@ import { PlayerNumberStatisticType, PlayGameStatisticsService } from './play-gam
 describe('PlayGameStatisticsService', () => {
     let service: PlayGameStatisticsService;
     let gameSocketRoomService: jest.Mocked<GameSocketRoomService>;
-    let mockPlayer = new PlayerCharacter('player1');
+    const mockPlayer = new PlayerCharacter('player1');
     mockPlayer.socketId = 'player1';
 
     beforeEach(async () => {
@@ -335,7 +335,6 @@ describe('PlayGameStatisticsService', () => {
     it('should log an error if gameStatisticsRoom is not found during increaseGameTotalTerrainTilesVisited', () => {
         const accessCode = 1;
         const tilePosition = { x: 0, y: 0 };
-        const gameStatistics = { totalTerrainTilesVisited: [] } as GameStatistics;
         const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
 
         service.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
