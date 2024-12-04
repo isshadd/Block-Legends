@@ -105,4 +105,30 @@ describe('AvatarSelectionComponent', () => {
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]));
     });
+
+    it('should return early and not modify avatarList if takenAvatars is null or undefined', () => {
+        // Set up initial avatarList
+        const initialAvatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+        component.avatarList = [...initialAvatarList];
+
+        // Test with null
+        component.takenAvatars = [];
+        component.filterAvatars();
+        expect(component.avatarList).toEqual(initialAvatarList);
+    });
+
+    it('should return early and not filter avatarList if takenAvatars is null or undefined', () => {
+        const initialAvatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+        component.avatarList = [...initialAvatarList];
+
+        component.takenAvatars = [];
+        component.filterAvatars();
+
+        expect(component.avatarList).toEqual(initialAvatarList);
+
+        (component as AvatarSelectionComponent).takenAvatars = [];
+        component.filterAvatars();
+
+        expect(component.avatarList).toEqual(initialAvatarList);
+    });
 });
