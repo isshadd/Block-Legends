@@ -4,9 +4,9 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { TimerComponent } from '@app/components/play-page-components/timer/timer.component';
 import { TabContainerComponent } from '@app/components/tab-container/tab-container.component';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
-import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket.service';
-import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { PlayGameBoardSocketService } from '@app/services/play-page-services/game-board/play-game-board-socket/play-game-board-socket.service';
+import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler/play-page-mouse-handler.service';
 
 @Component({
     selector: 'app-play-page-right-side-view',

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { ItemType } from '@common/enums/item-type';

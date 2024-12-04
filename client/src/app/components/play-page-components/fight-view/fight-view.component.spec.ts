@@ -1,5 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { BehaviorSubject } from 'rxjs';
 import { FightViewComponent } from './fight-view.component';
