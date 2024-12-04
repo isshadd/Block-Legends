@@ -62,6 +62,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;
+    private subscriptions: Subscription = new Subscription();
 
     private destroy$ = new Subject<void>();
     // eslint-disable-next-line
@@ -77,24 +78,25 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private gameService: GameService,
         private socketStateService: SocketStateService,
         private eventJournalService: EventJournalService,
-        private subscriptions: Subscription = new Subscription();
     ) {
         this.subscriptions.add(
-        this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
-            this.onPlayGameBoardManagerInit();
-        }));
+            this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
+                this.onPlayGameBoardManagerInit();
+            }),
+        );
 
         this.playGameBoardSocketService.init();
         this.subscriptions.add(
-        this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
-            const abandonPlayer = this.players.find((p) => p.socketId === socketId);
-            if (!abandonPlayer) throw new Error('Player not found');
-            abandonPlayer.isAbsent = true;
-            this.players = [
-                ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
-                abandonPlayer,
-            ];
-        }));
+            this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
+                const abandonPlayer = this.players.find((p) => p.socketId === socketId);
+                if (!abandonPlayer) throw new Error('Player not found');
+                abandonPlayer.isAbsent = true;
+                this.players = [
+                    ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
+                    abandonPlayer,
+                ];
+            }),
+        );
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -120,25 +122,26 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
         this.subscriptions.add(
-        this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
-            this.actualPlayers = updatedPlayers;
-        }));
+            this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
+                this.actualPlayers = updatedPlayers;
+            }),
+        );
 
         this.subscriptions.add(
-        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
-            if (character) {
-                this.myPlayer = character;
-                if (this.myPlayer.isOrganizer) {
-                    this.totalLifePoints = this.myPlayer.attributes.life;
+            this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+                if (character) {
+                    this.myPlayer = character;
+                    if (this.myPlayer.isOrganizer) {
+                        this.totalLifePoints = this.myPlayer.attributes.life;
+                    }
                 }
-            }
-        }));
+            }),
+        );
     }
 
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
-        this.subscriptions.unsubscribe();
     }
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         this.playPageMouseHandlerService.onMapTileMouseDown(event, tile);

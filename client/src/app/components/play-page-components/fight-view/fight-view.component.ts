@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 })
 export class FightViewComponent implements OnDestroy {
     playerDiceResult = 0;
-    private subscriptions: Subscription = new Subscription();
+    subscriptions: Subscription = new Subscription();
     constructor(public battleManagerService: BattleManagerService) {
         this.subscriptions.add(
             this.battleManagerService.signalUserAttacked$.subscribe((data) => {
@@ -40,10 +40,6 @@ export class FightViewComponent implements OnDestroy {
             }),
         );
     }
-    
-    ngOnDestroy(): void {
-        this.subscriptions.unsubscribe();
-    }
 
     get opponentPlayerHealthArray(): unknown[] {
         return this.battleManagerService.opponentPlayer ? new Array(this.battleManagerService.opponentRemainingHealth) : [];
@@ -59,6 +55,10 @@ export class FightViewComponent implements OnDestroy {
 
     get playerDefenseArray(): unknown[] {
         return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.userDefence) : [];
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     onAttack() {

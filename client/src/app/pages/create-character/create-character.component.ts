@@ -20,12 +20,11 @@ import { Subscription } from 'rxjs';
 export class CreateCharacterComponent implements OnInit, OnDestroy {
     character = new PlayerCharacter('');
     gameId: string | null;
-    private subscriptions: Subscription = new Subscription();
 
     isModalOpen = false;
 
     characterStatus: string | null;
-
+    private subscriptions: Subscription = new Subscription();
     constructor(
         private router: Router,
         private gameService: GameService,

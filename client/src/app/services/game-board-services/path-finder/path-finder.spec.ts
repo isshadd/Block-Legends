@@ -11,7 +11,8 @@ describe('Pathfinder', () => {
 
     beforeEach(() => {
         mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getNeighbours']);
-        pathfinder = new Pathfinder(mockGameMapDataManagerService, 5);
+        const pathfinderMaxValue = 5;
+        pathfinder = new Pathfinder(mockGameMapDataManagerService, pathfinderMaxValue);
 
         mockTile = jasmine.createSpyObj('Tile', ['isWalkable']);
         mockWalkableTile = jasmine.createSpyObj('WalkableTile', ['isWalkable', 'hasPlayer'], { moveCost: 1 });

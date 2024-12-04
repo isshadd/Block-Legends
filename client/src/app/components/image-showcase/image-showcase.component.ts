@@ -16,7 +16,7 @@ enum AvatarImages {
     templateUrl: './image-showcase.component.html',
     styleUrl: './image-showcase.component.scss',
 })
-export class ImageShowcaseComponent implements OnDestroy  {
+export class ImageShowcaseComponent implements OnDestroy {
     currentImage: string;
     private subscriptions: Subscription = new Subscription();
 

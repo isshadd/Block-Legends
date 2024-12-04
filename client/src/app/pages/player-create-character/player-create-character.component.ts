@@ -25,24 +25,25 @@ export class PlayerCreateCharacterComponent implements OnDestroy {
     isModalOpen = false;
 
     characterStatus: string | null;
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private router: Router,
         private route: ActivatedRoute,
         private webSocketService: WebSocketService,
         private gameService: GameService,
-        private subscriptions: Subscription = new Subscription();
     ) {}
 
     ngOnDestroy(): void {
         this.subscriptions.unsubscribe();
     }
-    
+
     createPlayerCharacter() {
         this.subscriptions.add(
-        this.route.queryParams.subscribe((params) => {
-            this.gameId = params.roomId;
-        }));
+            this.route.queryParams.subscribe((params) => {
+                this.gameId = params.roomId;
+            }),
+        );
         const missingFields: string[] = [];
         const fieldsToCheck = [
             { field: this.character.name, label: 'Nom' },

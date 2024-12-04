@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { DebugService } from '@app/services/debug-service/debug.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
-import { Subject, takeUntil } from 'rxjs';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 enum MouseButton {
     Left = 0,
@@ -23,19 +23,23 @@ export class PlayPageMouseHandlerService implements OnDestroy {
     isActionOpen: boolean = false;
 
     private destroy$ = new Subject<void>();
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         public playGameBoardManagerService: PlayGameBoardManagerService,
         public debugService: DebugService,
     ) {
-        playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            this.clearUI();
-        });
+        this.subscriptions.add(
+            playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+                this.clearUI();
+            }),
+        );
     }
 
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
+        this.subscriptions.unsubscribe();
     }
 
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {

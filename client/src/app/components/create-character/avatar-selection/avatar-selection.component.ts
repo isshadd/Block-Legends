@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs';
     templateUrl: './avatar-selection.component.html',
     styleUrl: './avatar-selection.component.scss',
 })
-export class AvatarSelectionComponent implements OnInit {
+export class AvatarSelectionComponent implements OnInit, OnDestroy {
     @Input() character: PlayerCharacter;
     avatarList: Avatar[] = [];
     takenAvatars: string[] = [];

@@ -10,13 +10,14 @@ import { Tile } from '@common/classes/Tiles/tile';
 import { ItemType } from '@common/enums/item-type';
 import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class MapEditorManagerService implements OnDestroy {
     private destroy$ = new Subject<void>();
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         public tileFactoryService: TileFactoryService,
@@ -25,21 +26,40 @@ export class MapEditorManagerService implements OnDestroy {
         public sideMenuService: MapEditorSideMenuService,
         public mouseHandlerService: MapEditorMouseHandlerService,
     ) {
-        this.sideMenuService.signalSideMenuMouseEnter$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseEnter(entity));
-        this.sideMenuService.signalSideMenuMouseLeave$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseLeave(entity));
-        this.sideMenuService.signalSideMenuMouseDown$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseDownSideMenu(entity));
-
-        this.mouseHandlerService.signalTileCopy$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.tileCopyCreator(data.tile, data.entity));
-        this.mouseHandlerService.signalItemPlacer$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.itemPlacer(data.item, data.entity));
-        this.mouseHandlerService.signalItemRemover$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.itemRemover(entity));
-        this.mouseHandlerService.signalCancelSelection$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.cancelSelection(entity));
-        this.mouseHandlerService.signalItemDragged$.pipe(takeUntil(this.destroy$)).subscribe((itemType) => this.onMapItemDragged(itemType));
-        this.mouseHandlerService.signalItemPlacerWithCoordinates$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates));
-        this.mouseHandlerService.signalItemInPlace$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates));
+        this.subscriptions.add(
+            this.sideMenuService.signalSideMenuMouseEnter$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseEnter(entity)),
+        );
+        this.subscriptions.add(
+            this.sideMenuService.signalSideMenuMouseLeave$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseLeave(entity)),
+        );
+        this.subscriptions.add(
+            this.sideMenuService.signalSideMenuMouseDown$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.onMouseDownSideMenu(entity)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalTileCopy$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.tileCopyCreator(data.tile, data.entity)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalItemPlacer$.pipe(takeUntil(this.destroy$)).subscribe((data) => this.itemPlacer(data.item, data.entity)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalItemRemover$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.itemRemover(entity)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalCancelSelection$.pipe(takeUntil(this.destroy$)).subscribe((entity) => this.cancelSelection(entity)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalItemDragged$.pipe(takeUntil(this.destroy$)).subscribe((itemType) => this.onMapItemDragged(itemType)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalItemPlacerWithCoordinates$
+                .pipe(takeUntil(this.destroy$))
+                .subscribe((data) => this.itemPlacerWithCoordinates(data.item, data.coordinates)),
+        );
+        this.subscriptions.add(
+            this.mouseHandlerService.signalItemInPlace$
+                .pipe(takeUntil(this.destroy$))
+                .subscribe((data) => this.itemPlacedInSideMenu(data.item, data.coordinates)),
+        );
     }
 
     init() {
@@ -49,6 +69,7 @@ export class MapEditorManagerService implements OnDestroy {
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
+        this.subscriptions.unsubscribe();
     }
 
     itemCheckup() {

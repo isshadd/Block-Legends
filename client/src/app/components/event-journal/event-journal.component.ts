@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
     templateUrl: './event-journal.component.html',
     styleUrl: './event-journal.component.scss',
 })
-export class EventJournalComponent implements AfterViewChecked, OnInit ,OnDestroy  {
+export class EventJournalComponent implements AfterViewChecked, OnInit, OnDestroy {
     @ViewChild('journalEvents') eventsContainer: ElementRef;
 
     events: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.roomEvents;

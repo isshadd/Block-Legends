@@ -58,15 +58,13 @@ export class MapEditorComponent implements OnDestroy {
             );
         }
     }
-
-    ngOnDestroy(): void {
-        this.subscriptions.unsubscribe();
-    }
-
     @HostListener('document:mouseup')
     onMouseUp() {
         this.mapEditorManagerService.onMouseUp();
         this.isDragging = false;
+    }
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     onMapMouseEnter() {

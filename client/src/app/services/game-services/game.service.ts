@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/member-ordering*/ // Disabling member ordering is necessary for the `accessCodeSubject` and `characterSubject` to be declared before being used
 
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER } from '@common/constants/game_constants';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { DiceType } from '@common/enums/dice-type';
 import { ProfileEnum } from '@common/enums/profile';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GameService {
+export class GameService implements OnDestroy {
     constructor(private avatarService: AvatarService) {}
 
     accessCodeSubject = new BehaviorSubject<number | null>(null);
@@ -28,6 +28,12 @@ export class GameService {
     signalAvatarSelected$ = this.signalAvatarSelected.asObservable();
 
     usedNames: Set<string> = new Set();
+
+    private subscriptions: Subscription = new Subscription();
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+    }
 
     setAccessCode(code: number) {
         this.accessCodeSubject.next(code);
@@ -50,9 +56,11 @@ export class GameService {
     generateVirtualCharacter(index: number, comportement: ProfileEnum): PlayerCharacter {
         let takenAvatars: string[] = [];
 
-        this.avatarService.takenAvatars$.pipe().subscribe((avatarst) => {
-            takenAvatars = avatarst;
-        });
+        this.subscriptions.add(
+            this.avatarService.takenAvatars$.pipe().subscribe((avatarst) => {
+                takenAvatars = avatarst;
+            }),
+        );
 
         const avatars = Object.values(AvatarEnum);
         const availableAvatars = avatars.filter((avatar) => !takenAvatars.includes(avatar.name));

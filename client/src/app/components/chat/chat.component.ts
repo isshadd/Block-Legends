@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { ColorService } from '@app/services/colors-service/colors.service';
@@ -13,16 +13,15 @@ import { Subscription } from 'rxjs';
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent implements OnInit, AfterViewChecked {
+export class ChatComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('chatMessages') messagesContainer: ElementRef;
 
     messageToSend: string = '';
     messages: RoomMessageReceived[] = this.chatService.roomMessages;
 
-    private subscriptions: Subscription = new Subscription();
-
     playerName: string = '';
     shouldScroll: boolean = false;
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private chatService: ChatService,
