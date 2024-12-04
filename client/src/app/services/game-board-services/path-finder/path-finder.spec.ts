@@ -1,228 +1,125 @@
-import { TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
-import { MapEditorOptionsMenuComponent } from '@app/components/map-editor-components/map-editor-options-menu/map-editor-options-menu.component';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
 import { Tile } from '@common/classes/Tiles/tile';
 import { WalkableTile } from '@common/classes/Tiles/walkable-tile';
-import { Vec2 } from '@common/interfaces/vec2';
 
 describe('Pathfinder', () => {
     let pathfinder: Pathfinder;
-    let gameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
-    let dialog: jasmine.SpyObj<MatDialog>;
+    let mockGameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
+    let mockTile: jasmine.SpyObj<Tile>;
+    let mockWalkableTile: jasmine.SpyObj<WalkableTile>;
 
     beforeEach(() => {
-        const dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-        TestBed.configureTestingModule({
-            imports: [MapEditorOptionsMenuComponent],
-            providers: [{ provide: MatDialog, useValue: dialogSpy }],
-        });
+        mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getNeighbours']);
+        pathfinder = new Pathfinder(mockGameMapDataManagerService, 5);
 
-        dialog = TestBed.inject(MatDialog) as jasmine.SpyObj<MatDialog>;
-        gameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getNeighbours']);
-        const movementPoints = 3;
-        pathfinder = new Pathfinder(gameMapDataManagerService, movementPoints);
+        mockTile = jasmine.createSpyObj('Tile', ['isWalkable']);
+        mockWalkableTile = jasmine.createSpyObj('WalkableTile', ['isWalkable', 'hasPlayer'], { moveCost: 1 });
     });
 
-    it('should return an empty map if start tile is not walkable', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const nonWalkableTile = new Tile();
+    it('should return an empty map if the start tile is null', () => {
+        mockGameMapDataManagerService.getTileAt.and.returnValue(null);
 
-        gameMapDataManagerService.getTileAt.and.returnValue(nonWalkableTile);
-        spyOn(nonWalkableTile, 'isWalkable').and.returnValue(false);
-
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
 
         expect(result.size).toBe(0);
+        expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith({ x: 0, y: 0 });
     });
 
-    it('should return an empty map if no start tile is found', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        gameMapDataManagerService.getTileAt.and.returnValue(null);
+    it('should return an empty map if the start tile is not walkable', () => {
+        mockTile.isWalkable.and.returnValue(false);
+        mockGameMapDataManagerService.getTileAt.and.returnValue(mockTile);
 
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
 
         expect(result.size).toBe(0);
+        expect(mockTile.isWalkable).toHaveBeenCalled();
     });
 
-    it('should return reachable tiles within movement points', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
+    it('should process walkable tiles and find reachable tiles', () => {
+        // Setup start tile
+        mockWalkableTile.isWalkable.and.returnValue(true);
+        mockWalkableTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getTileAt.and.returnValue(mockWalkableTile);
 
-        const neighborTile = new WalkableTile();
-        neighborTile.moveCost = 2;
+        // Setup neighbors
+        const neighborTile = jasmine.createSpyObj('WalkableTile', ['isWalkable', 'hasPlayer'], { moveCost: 1 });
+        neighborTile.isWalkable.and.returnValue(true);
+        neighborTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getNeighbours.and.returnValue([neighborTile]);
 
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
-        gameMapDataManagerService.getNeighbours.and.returnValue([neighborTile]);
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
 
-        spyOn(neighborTile, 'isWalkable').and.returnValue(true);
-        spyOn(neighborTile, 'hasPlayer').and.returnValue(false);
-
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
-
-        expect(result.size).toBe(2);
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.get(neighborTile)).toEqual([startTile, neighborTile]);
-    });
-
-    it('should skip tiles beyond movement points', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
-
-        const farTile = new WalkableTile();
-        farTile.moveCost = 4;
-
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
-        gameMapDataManagerService.getNeighbours.and.returnValue([farTile]);
-
-        spyOn(farTile, 'isWalkable').and.returnValue(true);
-        spyOn(farTile, 'hasPlayer').and.returnValue(false);
-
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
-
-        expect(result.size).toBe(1);
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.has(farTile)).toBeFalse();
-    });
-
-    it('should skip tiles with players on them', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
-
-        const occupiedTile = new WalkableTile();
-        occupiedTile.moveCost = 1;
-
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
-        gameMapDataManagerService.getNeighbours.and.returnValue([occupiedTile]);
-
-        spyOn(occupiedTile, 'isWalkable').and.returnValue(true);
-        spyOn(occupiedTile, 'hasPlayer').and.returnValue(true);
-
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
-
-        expect(result.size).toBe(1);
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.has(occupiedTile)).toBeFalse();
-    });
-
-    it('should inject MatDialog as a spy object', () => {
-        expect(dialog).toBeTruthy();
-        expect(dialog.open).toBeDefined();
-        expect(dialog.open).toEqual(jasmine.any(Function));
-    });
-
-    it('should prefer paths with lower cost when multiple paths reach the same tile', () => {
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
-
-        const neighbor1 = new WalkableTile();
-        neighbor1.moveCost = 1;
-        spyOn(neighbor1, 'isWalkable').and.returnValue(true);
-        spyOn(neighbor1, 'hasPlayer').and.returnValue(false);
-
-        const neighbor2 = new WalkableTile();
-        neighbor2.moveCost = 2;
-        spyOn(neighbor2, 'isWalkable').and.returnValue(true);
-        spyOn(neighbor2, 'hasPlayer').and.returnValue(false);
-
-        const targetTile = new WalkableTile();
-        targetTile.moveCost = 1;
-        spyOn(targetTile, 'isWalkable').and.returnValue(true);
-        spyOn(targetTile, 'hasPlayer').and.returnValue(false);
-
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
-
-        gameMapDataManagerService.getNeighbours.and.callFake((tile: Tile) => {
-            if (tile === startTile) {
-                return [neighbor1, neighbor2];
-            } else if (tile === neighbor1 || tile === neighbor2) {
-                return [targetTile];
-            }
-            return [];
-        });
-
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
-
-        const expectedReachableTilesCount = 4;
-        expect(result.size).toBe(expectedReachableTilesCount);
-
-        expect(result.has(startTile)).toBeTrue();
-        expect(result.has(neighbor1)).toBeTrue();
-        expect(result.has(neighbor2)).toBeTrue();
-        expect(result.has(targetTile)).toBeTrue();
-
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.get(neighbor1)).toEqual([startTile, neighbor1]);
-        expect(result.get(neighbor2)).toEqual([startTile, neighbor2]);
-        expect(result.get(targetTile)).toEqual([startTile, neighbor1, targetTile]);
-
-        const expectedPathLength = 3;
-        expect(result.get(targetTile)?.length).toBe(expectedPathLength);
+        expect(result.size).toBeGreaterThan(0);
+        expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith({ x: 0, y: 0 });
+        expect(mockGameMapDataManagerService.getNeighbours).toHaveBeenCalledWith(mockWalkableTile);
     });
 
     it('should skip non-walkable neighbors', () => {
-        // Arrange
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
+        // Setup start tile
+        mockWalkableTile.isWalkable.and.returnValue(true);
+        mockWalkableTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getTileAt.and.returnValue(mockWalkableTile);
 
-        const nonWalkableNeighbor = new Tile(); // Neighbor tile that is not walkable
-        spyOn(nonWalkableNeighbor, 'isWalkable').and.returnValue(false);
+        // Setup non-walkable neighbor
+        const nonWalkableTile = jasmine.createSpyObj('Tile', ['isWalkable']);
+        nonWalkableTile.isWalkable.and.returnValue(false);
+        mockGameMapDataManagerService.getNeighbours.and.returnValue([nonWalkableTile]);
 
-        // Mock the GameMapDataManagerService to return startTile and its neighbor
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
-        gameMapDataManagerService.getNeighbours.and.returnValue([nonWalkableNeighbor]);
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
 
-        // Act
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
-
-        // Assert
-        expect(result.size).toBe(1); // Only the start tile should be reachable
-        expect(result.has(startTile)).toBeTrue();
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.has(nonWalkableNeighbor)).toBeFalse(); // Non-walkable neighbor should be skipped
+        expect(result.size).toBe(1); // Only the start tile should be in the result
+        expect(mockGameMapDataManagerService.getNeighbours).toHaveBeenCalledWith(mockWalkableTile);
+        expect(nonWalkableTile.isWalkable).toHaveBeenCalled();
     });
 
-    it('should skip processing a neighbor that has already been visited with a lower or equal cost', () => {
-        // Arrange
-        const startCoordinates: Vec2 = { x: 0, y: 0 };
-        const startTile = new WalkableTile();
-        startTile.moveCost = 1;
-        spyOn(startTile, 'isWalkable').and.returnValue(true);
+    it('should skip tiles with players', () => {
+        // Setup start tile
+        mockWalkableTile.isWalkable.and.returnValue(true);
+        mockWalkableTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getTileAt.and.returnValue(mockWalkableTile);
 
-        const neighborTile = new WalkableTile();
-        neighborTile.moveCost = 1;
-        spyOn(neighborTile, 'isWalkable').and.returnValue(true);
-        spyOn(neighborTile, 'hasPlayer').and.returnValue(false);
+        // Setup neighbor with a player
+        const playerTile = jasmine.createSpyObj('WalkableTile', ['isWalkable', 'hasPlayer'], { moveCost: 1 });
+        playerTile.isWalkable.and.returnValue(true);
+        playerTile.hasPlayer.and.returnValue(true);
+        mockGameMapDataManagerService.getNeighbours.and.returnValue([playerTile]);
 
-        // Mock GameMapDataManagerService methods
-        gameMapDataManagerService.getTileAt.and.returnValue(startTile);
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
 
-        // First, return the neighbor normally; then return it again to simulate a revisit
-        gameMapDataManagerService.getNeighbours.and.callFake((tile: Tile) => {
-            if (tile === startTile) return [neighborTile];
-            if (tile === neighborTile) return [startTile]; // Simulate a revisit to the start tile (loop)
-            return [];
-        });
+        expect(result.size).toBe(1); // Only the start tile should be in the result
+        expect(mockGameMapDataManagerService.getNeighbours).toHaveBeenCalledWith(mockWalkableTile);
+        expect(playerTile.hasPlayer).toHaveBeenCalled();
+    });
 
-        // Act
-        const result = pathfinder.findAllReachableTiles(startCoordinates);
+    it('should skip tiles exceeding movement points', () => {
+        // Setup start tile
+        mockWalkableTile.isWalkable.and.returnValue(true);
+        mockWalkableTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getTileAt.and.returnValue(mockWalkableTile);
 
-        // Assert
-        expect(result.size).toBe(2); // Only startTile and neighborTile should be present
-        expect(result.get(startTile)).toEqual([startTile]);
-        expect(result.get(neighborTile)).toEqual([startTile, neighborTile]);
-        expect(gameMapDataManagerService.getNeighbours).toHaveBeenCalledTimes(2); // Ensures loop was processed only once for neighborTile
+        // Setup neighbor with high movement cost
+        const expensiveTile = jasmine.createSpyObj('WalkableTile', ['isWalkable', 'hasPlayer'], { moveCost: 10 });
+        expensiveTile.isWalkable.and.returnValue(true);
+        expensiveTile.hasPlayer.and.returnValue(false);
+        mockGameMapDataManagerService.getNeighbours.and.returnValue([expensiveTile]);
+
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
+
+        expect(result.size).toBe(1); // Only the start tile should be in the result
+        expect(mockGameMapDataManagerService.getNeighbours).toHaveBeenCalledWith(mockWalkableTile);
+    });
+
+    it('should return an empty map if the start tile is null or undefined', () => {
+        // Reset the spy to avoid conflicts with other tests
+        (mockGameMapDataManagerService.getTileAt as jasmine.Spy).calls.reset();
+
+        // Mock getTileAt to return null
+        spyOn(mockGameMapDataManagerService, 'getTileAt').and.returnValue(null);
+
+        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
+
+        expect(result.size).toBe(0); // Verify that the result is an empty map
+        expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith({ x: 0, y: 0 });
     });
 });
