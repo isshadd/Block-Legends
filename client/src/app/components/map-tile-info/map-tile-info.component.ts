@@ -15,7 +15,7 @@ export class MapTileInfoComponent {
     @Output() closePanelOutput = new EventEmitter<void>();
 
     tileTypeToImage(tileType: TileType): string {
-        return `/assets/images/tiles/blocks/${tileType}.png`;
+        return `assets/images/tiles/blocks/${tileType}.png`;
     }
 
     closePanel() {

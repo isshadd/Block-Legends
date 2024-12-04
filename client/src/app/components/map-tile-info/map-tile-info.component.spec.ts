@@ -23,7 +23,7 @@ describe('MapTileInfoComponent', () => {
 
     it('should return the correct image path for tileTypeToImage', () => {
         const tileType = TileType.Grass;
-        const expectedPath = `/assets/images/tiles/blocks/${tileType}.png`;
+        const expectedPath = `assets/images/tiles/blocks/${tileType}.png`;
 
         expect(component.tileTypeToImage(tileType)).toBe(expectedPath);
     });
