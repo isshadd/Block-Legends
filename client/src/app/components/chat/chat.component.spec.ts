@@ -101,4 +101,23 @@ describe('ClavardageComponent', () => {
         // Clean up
         subscription.unsubscribe();
     });
+
+    it('should return the correct color for the player ID', () => {
+        const playerId = 'test-player-id';
+        const expectedColor = '#123456';
+
+        // Spy on the getColor method of the ColorService
+        const colorServiceSpy = jasmine.createSpyObj('ColorService', ['getColor']);
+        colorServiceSpy.getColor.and.returnValue(expectedColor);
+
+        // Inject the mock ColorService into the component
+        component['colorService'] = colorServiceSpy;
+
+        const result = component.getPlayerClass(playerId);
+
+        // Check that getColor was called with the correct playerId
+        expect(colorServiceSpy.getColor).toHaveBeenCalledWith(playerId);
+        // Check that the returned value is the expected color
+        expect(result).toBe(expectedColor);
+    });
 });
