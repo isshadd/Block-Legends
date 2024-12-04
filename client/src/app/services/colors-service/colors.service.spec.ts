@@ -6,7 +6,7 @@ describe('ColorService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [ColorService]
+            providers: [ColorService],
         });
         service = TestBed.inject(ColorService);
     });
@@ -31,7 +31,7 @@ describe('ColorService', () => {
 
         it('should cycle through colors for different socket IDs', () => {
             const colors = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00'];
-            
+
             // Test first cycle of colors
             for (let i = 0; i < colors.length; i++) {
                 const socketId = `test-socket-${i}`;
@@ -42,7 +42,7 @@ describe('ColorService', () => {
 
         it('should wrap around to first color after all colors are used', () => {
             const colors = ['#006D77', '#4169E1', '#228B22', '#DC143C', '#5D3FD3', '#FFBF00'];
-            
+
             // Assign all colors first
             for (let i = 0; i < colors.length; i++) {
                 service.getColor(`test-socket-${i}`);

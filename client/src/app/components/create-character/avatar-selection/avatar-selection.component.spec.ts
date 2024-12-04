@@ -24,24 +24,24 @@ describe('AvatarSelectionComponent', () => {
         standing: 'standing.png',
         dogPetting: 'dogPetting.png',
         lost: 'lost.png',
-        fight: 'fight.png'
+        fight: 'fight.png',
     };
 
     beforeEach(async () => {
         takenAvatarsSubject = new BehaviorSubject<string[]>([]);
-        
+
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', [], {
-            takenAvatars$: takenAvatarsSubject.asObservable()
+            takenAvatars$: takenAvatarsSubject.asObservable(),
         });
-        
+
         gameServiceSpy = jasmine.createSpyObj('GameService', ['setSelectedAvatar']);
 
         await TestBed.configureTestingModule({
             imports: [AvatarSelectionComponent],
             providers: [
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
-                { provide: GameService, useValue: gameServiceSpy }
-            ]
+                { provide: GameService, useValue: gameServiceSpy },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AvatarSelectionComponent);
@@ -57,7 +57,7 @@ describe('AvatarSelectionComponent', () => {
     describe('setAvatars', () => {
         it('should initialize avatarList with all avatars from AvatarEnum', () => {
             component.setAvatars();
-            
+
             expect(component.avatarList.length).toBe(AMOUNT_OF_AVATARS);
             expect(component.avatarList).toContain(Object.values(AvatarEnum)[0]);
         });
@@ -67,19 +67,19 @@ describe('AvatarSelectionComponent', () => {
         it('should remove taken avatars from avatarList', () => {
             const takenAvatarName = Object.values(AvatarEnum)[0].name;
             component.takenAvatars = [takenAvatarName];
-            
+
             component.filterAvatars();
-            
+
             const filteredList = component.avatarList;
-            expect(filteredList.find(avatar => avatar.name === takenAvatarName)).toBeFalsy();
+            expect(filteredList.find((avatar) => avatar.name === takenAvatarName)).toBeFalsy();
         });
 
         it('should not filter if takenAvatars is undefined', () => {
             const initialLength = component.avatarList.length;
-            component.takenAvatars = undefined as any;
-            
+            component.takenAvatars = undefined as unknown;
+
             component.filterAvatars();
-            
+
             expect(component.avatarList.length).toBe(initialLength);
         });
 
@@ -87,9 +87,9 @@ describe('AvatarSelectionComponent', () => {
             const untakenAvatar = Object.values(AvatarEnum)[0];
             const takenAvatar = Object.values(AvatarEnum)[1];
             component.takenAvatars = [takenAvatar.name];
-            
+
             component.filterAvatars();
-            
+
             expect(component.avatarList).toContain(untakenAvatar);
         });
     });
@@ -116,10 +116,7 @@ describe('AvatarSelectionComponent', () => {
 
         it('should maintain subscription to takenAvatars$', () => {
             const initialLength = component.avatarList.length;
-            const takenAvatarNames = [
-                Object.values(AvatarEnum)[0].name,
-                Object.values(AvatarEnum)[1].name
-            ];
+            const takenAvatarNames = [Object.values(AvatarEnum)[0].name, Object.values(AvatarEnum)[1].name];
 
             takenAvatarsSubject.next(takenAvatarNames);
 

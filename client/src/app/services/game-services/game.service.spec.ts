@@ -6,6 +6,8 @@ import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject } from 'rxjs';
 
+const ACCESS_CODE = 12345;
+
 describe('GameService', () => {
     let service: GameService;
     let avatarServiceSpy: jasmine.SpyObj<AvatarService>;
@@ -18,19 +20,16 @@ describe('GameService', () => {
         standing: 'standing.png',
         dogPetting: 'dogPetting.png',
         lost: 'lost.png',
-        fight: 'fight.png'
+        fight: 'fight.png',
     };
 
     beforeEach(() => {
         avatarServiceSpy = jasmine.createSpyObj('AvatarService', [], {
-            takenAvatars$: new BehaviorSubject<string[]>([])
+            takenAvatars$: new BehaviorSubject<string[]>([]),
         });
 
         TestBed.configureTestingModule({
-            providers: [
-                GameService,
-                { provide: AvatarService, useValue: avatarServiceSpy }
-            ]
+            providers: [GameService, { provide: AvatarService, useValue: avatarServiceSpy }],
         });
 
         service = TestBed.inject(GameService);
@@ -42,11 +41,11 @@ describe('GameService', () => {
 
     describe('Basic Observable Management', () => {
         it('should initialize with default values', () => {
-            service.accessCode$.subscribe(code => {
+            service.accessCode$.subscribe((code) => {
                 expect(code).toBeNull();
             });
 
-            service.character$.subscribe(character => {
+            service.character$.subscribe((character) => {
                 expect(character).toBeTruthy();
                 expect(character?.name).toBe('');
             });
@@ -55,8 +54,8 @@ describe('GameService', () => {
         it('should set access code', () => {
             const testCode = 12345;
             service.setAccessCode(testCode);
-            
-            service.accessCode$.subscribe(code => {
+
+            service.accessCode$.subscribe((code) => {
                 expect(code).toBe(testCode);
             });
         });
@@ -64,8 +63,8 @@ describe('GameService', () => {
         it('should set character', () => {
             const testCharacter = new PlayerCharacter('TestPlayer');
             service.setCharacter(testCharacter);
-            
-            service.character$.subscribe(character => {
+
+            service.character$.subscribe((character) => {
                 expect(character).toBe(testCharacter);
             });
         });
@@ -73,8 +72,8 @@ describe('GameService', () => {
         it('should update player name', () => {
             const newName = 'UpdatedName';
             service.updatePlayerName(newName);
-            
-            service.character$.subscribe(character => {
+
+            service.character$.subscribe((character) => {
                 expect(character?.name).toBe(newName);
             });
         });
@@ -82,8 +81,8 @@ describe('GameService', () => {
         it('should set current player', () => {
             const testPlayer = new PlayerCharacter('TestPlayer');
             service.setCurrentPlayer(testPlayer);
-            
-            service.currentPlayer$.subscribe(player => {
+
+            service.currentPlayer$.subscribe((player) => {
                 expect(player).toBe(testPlayer);
             });
         });
@@ -122,30 +121,21 @@ describe('GameService', () => {
 
         it('should assign random dice bonus to virtual character', () => {
             const virtualPlayer = service.generateVirtualCharacter(0, ProfileEnum.Agressive);
-            
-            expect(
-                virtualPlayer.isAttackBonusAssigned || virtualPlayer.isDefenseBonusAssigned
-            ).toBeTrue();
-            expect(
-                virtualPlayer.isAttackBonusAssigned && virtualPlayer.isDefenseBonusAssigned
-            ).toBeTrue();
+
+            expect(virtualPlayer.isAttackBonusAssigned || virtualPlayer.isDefenseBonusAssigned).toBeTrue();
+            expect(virtualPlayer.isAttackBonusAssigned && virtualPlayer.isDefenseBonusAssigned).toBeTrue();
         });
 
         it('should assign random attribute bonus to virtual character', () => {
             const virtualPlayer = service.generateVirtualCharacter(0, ProfileEnum.Agressive);
-            
-            expect(
-                virtualPlayer.isLifeBonusAssigned || virtualPlayer.isSpeedBonusAssigned
-            ).toBeTrue();
-            expect(
-                virtualPlayer.isLifeBonusAssigned && virtualPlayer.isSpeedBonusAssigned
-            ).toBeTrue();
+
+            expect(virtualPlayer.isLifeBonusAssigned || virtualPlayer.isSpeedBonusAssigned).toBeTrue();
+            expect(virtualPlayer.isLifeBonusAssigned && virtualPlayer.isSpeedBonusAssigned).toBeTrue();
         });
 
         it('should avoid taken avatars when generating virtual character', () => {
             const takenAvatarName = Object.values(AvatarEnum)[0].name;
-            (avatarServiceSpy.takenAvatars$ as BehaviorSubject<string[]>)
-                .next([takenAvatarName]);
+            (avatarServiceSpy.takenAvatars$ as BehaviorSubject<string[]>).next([takenAvatarName]);
 
             const virtualPlayer = service.generateVirtualCharacter(0, ProfileEnum.Agressive);
 
@@ -156,17 +146,17 @@ describe('GameService', () => {
     describe('Name Management', () => {
         it('should release virtual player name', () => {
             const testName = 'TestName';
-            (service as any).usedNames.add(testName);
-            
+            (service as unknown).usedNames.add(testName);
+
             service.releaseVirtualPlayerName(testName);
-            
-            expect((service as any).usedNames.has(testName)).toBeFalse();
+
+            expect((service as unknown).usedNames.has(testName)).toBeFalse();
         });
 
         it('should handle releasing non-existent name', () => {
             const testName = 'NonExistentName';
             service.releaseVirtualPlayerName(testName);
-            expect((service as any).usedNames.has(testName)).toBeFalse();
+            expect((service as unknown).usedNames.has(testName)).toBeFalse();
         });
     });
 
@@ -174,22 +164,22 @@ describe('GameService', () => {
         it('should clear game state', () => {
             const testCharacter = new PlayerCharacter('TestPlayer');
             service.setCharacter(testCharacter);
-            service.setAccessCode(12345);
-            (service as any).usedNames.add('TestName');
+            service.setAccessCode(ACCESS_CODE);
+            (service as unknown).usedNames.add('TestName');
 
             service.clearGame();
 
-            service.accessCode$.subscribe(code => {
+            service.accessCode$.subscribe((code) => {
                 expect(code).toBeNull();
             });
-            service.character$.subscribe(character => {
+            service.character$.subscribe((character) => {
                 expect(character).toBeNull();
             });
-            expect((service as any).usedNames.size).toBe(0);
+            expect((service as unknown).usedNames.size).toBe(0);
         });
 
         it('should set selected avatar', (done) => {
-            service.signalAvatarSelected$.subscribe(avatar => {
+            service.signalAvatarSelected$.subscribe((avatar) => {
                 expect(avatar).toEqual(mockAvatar);
                 done();
             });

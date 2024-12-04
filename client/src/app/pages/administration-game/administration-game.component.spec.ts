@@ -27,7 +27,7 @@ describe('AdministrationGameComponent', () => {
         mode: GameMode.Classique,
         imageUrl: 'http://example.com/image.png',
         isVisible: true,
-        tiles: []
+        tiles: [],
     };
 
     beforeEach(async () => {
@@ -37,14 +37,7 @@ describe('AdministrationGameComponent', () => {
         gameMapDataManagerSpy = jasmine.createSpyObj('GameMapDataManagerService', ['convertJsonToGameShared', 'openErrorModal']);
 
         await TestBed.configureTestingModule({
-            imports: [
-                AdministrationGameComponent,
-                CommonModule,
-                RouterModule,
-                RouterLink,
-                ListGameComponent,
-                NoopAnimationsModule
-            ],
+            imports: [AdministrationGameComponent, CommonModule, RouterModule, RouterLink, ListGameComponent, NoopAnimationsModule],
             providers: [
                 { provide: MatDialog, useValue: dialogSpy },
                 { provide: GameServerCommunicationService, useValue: gameServerCommunicationSpy },
@@ -56,11 +49,11 @@ describe('AdministrationGameComponent', () => {
                         queryParams: of({}),
                         snapshot: {
                             params: {},
-                            queryParams: {}
-                        }
-                    }
-                }
-            ]
+                            queryParams: {},
+                        },
+                    },
+                },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AdministrationGameComponent);
@@ -106,8 +99,8 @@ describe('AdministrationGameComponent', () => {
             mockFile = new File(['content'], 'test.json', { type: 'application/json' });
             mockEvent = {
                 target: {
-                    files: [mockFile]
-                } as unknown as HTMLInputElement
+                    files: [mockFile],
+                } as unknown as HTMLInputElement,
             };
         });
 
@@ -150,15 +143,16 @@ describe('AdministrationGameComponent', () => {
             component.onFileChange(mockEvent as Event);
             tick();
 
-            expect(gameMapDataManagerSpy.openErrorModal)
-                .toHaveBeenCalledWith("Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.");
+            expect(gameMapDataManagerSpy.openErrorModal).toHaveBeenCalledWith(
+                "Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.",
+            );
         }));
 
         it('should handle empty file input', fakeAsync(() => {
             const emptyEvent = {
                 target: {
-                    files: []
-                } as unknown as HTMLInputElement
+                    files: [],
+                } as unknown as HTMLInputElement,
             };
 
             component.onFileChange(emptyEvent as unknown as Event);
