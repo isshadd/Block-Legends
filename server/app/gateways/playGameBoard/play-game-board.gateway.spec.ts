@@ -3,10 +3,16 @@ import { GameSocketRoomService } from '@app/services/gateway-services/game-socke
 import { PlayGameBoardBattleService } from '@app/services/gateway-services/play-game-board-battle-time/play-game-board-battle.service';
 import { PlayGameBoardSocketService } from '@app/services/gateway-services/play-game-board-socket/play-game-board-socket.service';
 import { PlayGameBoardTimeService } from '@app/services/gateway-services/play-game-board-time/play-game-board-time.service';
-import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
+import {
+    PlayerNumberStatisticType,
+    PlayGameStatisticsService,
+} from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MOUVEMENT_INTERVAL } from '@common/constants/game_constants';
 import { GameMode } from '@common/enums/game-mode';
 import { GameTimerState } from '@common/enums/game.timer.state';
+import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameRoom } from '@common/interfaces/game-room';
@@ -357,6 +363,159 @@ describe('PlayGameBoardGateway', () => {
         });
     });
 
+    describe('handleVirtualPlayerChoosedDestination', () => {
+        it('should emit virtualPlayerMoved to a random client in the room after a delay', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
+            playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { coordinates: { x: 1, y: 1 }, virtualPlayerId: 'virtualPlayer' };
+            jest.useFakeTimers();
+            jest.spyOn(global, 'setTimeout');
+            gateway.handleVirtualPlayerChoosedDestination(mockClient as Socket, data);
+
+            expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), MOUVEMENT_INTERVAL);
+            jest.runAllTimers();
+
+            expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+            expect(gateway.server.to('randomClientId').emit).toHaveBeenCalledWith(SocketEvents.VIRTUAL_PLAYER_MOVED, {
+                destination: data.coordinates,
+                virtualPlayerId: data.virtualPlayerId,
+            });
+        });
+
+        it('should do nothing if room is not found', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { coordinates: { x: 1, y: 1 }, virtualPlayerId: 'virtualPlayer' };
+            gateway.handleVirtualPlayerChoosedDestination(mockClient as Socket, data);
+
+            expect(gateway.server.to).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleUserGrabbedItem', () => {
+        it('should add item to player statistics and emit roomUserGrabbedItem if room exists', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { itemType: ItemType.Sword, tileCoordinates: { x: 1, y: 1 }, playerTurnId: mockClient.id };
+
+            gateway.handleUserGrabbedItem(mockClient as Socket, data);
+
+            expect(playGameStatisticsService.addPlayerDifferentItemGrabbed).toHaveBeenCalledWith(
+                mockRoom.accessCode,
+                data.playerTurnId,
+                data.itemType,
+            );
+            expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+            expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.ROOM_USER_GRABBED_ITEM, {
+                playerId: data.playerTurnId,
+                itemType: data.itemType,
+                tileCoordinate: data.tileCoordinates,
+            });
+        });
+
+        it('should do nothing if room does not exist', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { itemType: ItemType.Sword, tileCoordinates: { x: 1, y: 1 }, playerTurnId: mockClient.id };
+
+            gateway.handleUserGrabbedItem(mockClient as Socket, data);
+
+            expect(playGameStatisticsService.addPlayerDifferentItemGrabbed).not.toHaveBeenCalled();
+            expect(gateway.server.to).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleVirtualPlayerContinueTurn', () => {
+        it("should continue virtual player's turn if it is client's turn", () => {
+            jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
+            jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+            jest.useFakeTimers();
+            jest.spyOn(global, 'setTimeout');
+
+            const mockClient: Partial<Socket> = {
+                id: 'virtualPlayer',
+            };
+
+            jest.spyOn(global, 'setTimeout');
+            gateway.handleVirtualPlayerContinueTurn(mockClient as Socket, mockClient.id);
+
+            expect(gateway.isClientTurn).toHaveBeenCalledWith(mockClient.id);
+            expect(setTimeout).toHaveBeenCalled;
+            jest.runAllTimers();
+            expect(gateway.continueVirtualPlayerTurn).toHaveBeenCalledWith(mockRoom.accessCode, mockClient.id);
+        });
+
+        it("should do nothing if it is not client's turn", () => {
+            jest.spyOn(gateway, 'isClientTurn').mockReturnValue(false);
+            jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+
+            const mockClient: Partial<Socket> = {
+                id: 'virtualPlayer',
+            };
+
+            gateway.handleVirtualPlayerContinueTurn(mockClient as Socket, mockClient.id);
+
+            expect(gateway.isClientTurn).toHaveBeenCalledWith(mockClient.id);
+            expect(gateway.continueVirtualPlayerTurn).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if room is not found', () => {
+            jest.spyOn(gateway, 'isClientTurn').mockReturnValue(true);
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
+            jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+
+            const mockClient: Partial<Socket> = {
+                id: 'virtualPlayer',
+            };
+
+            gateway.handleVirtualPlayerContinueTurn(mockClient as Socket, mockClient.id);
+
+            expect(gateway.isClientTurn).toHaveBeenCalledWith(mockClient.id);
+            expect(gateway.continueVirtualPlayerTurn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleUserThrewItem', () => {
+        it('should emit roomUserThrewItem if room exists', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(mockRoom);
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { itemType: ItemType.Sword, tileCoordinates: { x: 1, y: 1 }, playerTurnId: mockClient.id };
+
+            gateway.handleUserThrewItem(mockClient as Socket, data);
+
+            expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+            expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.ROOM_USER_THREW_ITEM, {
+                playerId: data.playerTurnId,
+                itemType: data.itemType,
+                tileCoordinate: data.tileCoordinates,
+            });
+        });
+
+        it('should do nothing if room does not exist', () => {
+            gameSocketRoomService.getRoomBySocketId.mockReturnValue(undefined);
+            const mockClient: Partial<Socket> = {
+                id: 'player1',
+            };
+            const data = { itemType: ItemType.Sword, tileCoordinates: { x: 1, y: 1 }, playerTurnId: mockClient.id };
+
+            gateway.handleUserThrewItem(mockClient as Socket, data);
+
+            expect(gateway.server.to).not.toHaveBeenCalled();
+        });
+    });
+
     describe('handleUserAttacked', () => {
         it('should emit opponentAttacked and successfulAttack if attack succeeded and player not dead', () => {
             gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
@@ -679,7 +838,7 @@ describe('PlayGameBoardGateway', () => {
                 });
 
                 it('should return false if room is invalid', () => {
-                    gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    gameSocketRoomService.getRoomBySocketId.mockReturnValue(null);
                     expect(gateway.isClientTurn(mockClient.id)).toBe(false);
                 });
             });
@@ -718,24 +877,120 @@ describe('PlayGameBoardGateway', () => {
             });
 
             describe('startRoomTurn', () => {
-                it('should emit startTurn with the playerId', () => {
+                it('should emit startTurn and increase game total player turns', () => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
+
                     gateway.startRoomTurn(mockRoom.accessCode, mockRoom.currentPlayerTurn);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('startTurn', mockRoom.currentPlayerTurn);
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.START_TURN,
+                        mockRoom.currentPlayerTurn,
+                    );
+                    expect(playGameStatisticsService.increaseGameTotalPlayerTurns).toHaveBeenCalledWith(mockRoom.accessCode);
+                });
+
+                it('should start virtual player turn after a delay if player is virtual', () => {
+                    gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[2]);
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.startRoomTurn(mockRoom.accessCode, mockRoom.players[2].socketId);
+
+                    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), playGameBoardSocketService.getRandomDelay());
+                    jest.runAllTimers();
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.START_TURN,
+                        mockRoom.players[2].socketId,
+                    );
+                    expect(playGameStatisticsService.increaseGameTotalPlayerTurns).toHaveBeenCalledWith(mockRoom.accessCode);
+                });
+
+                it('should not start virtual player turn if player is not virtual', () => {
+                    gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.startRoomTurn(mockRoom.accessCode, mockRoom.players[0].socketId);
+
+                    expect(setTimeout).not.toHaveBeenCalled();
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.START_TURN,
+                        mockRoom.players[0].socketId,
+                    );
+                    expect(playGameStatisticsService.increaseGameTotalPlayerTurns).toHaveBeenCalledWith(mockRoom.accessCode);
+                });
+            });
+
+            describe('continueVirtualPlayerTurn', () => {
+                it('should emit continueVirtualPlayerTurn to a random client in the room', () => {
+                    gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
+
+                    gateway.continueVirtualPlayerTurn(mockRoom.accessCode, mockRoom.players[2].socketId);
+
+                    expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+                    expect(gateway.server.to('randomClientId').emit).toHaveBeenCalledWith(
+                        SocketEvents.CONTINUE_VIRTUAL_PLAYER_TURN,
+                        mockRoom.players[2].socketId,
+                    );
                 });
             });
 
             describe('startBattleTurn', () => {
-                it('should emit startBattleTurn with the playerId', () => {
+                it('should emit startBattleTurn and start virtual player battle turn if player is virtual', () => {
+                    const data = {
+                        playerId: 'virtualPlayer',
+                        enemyId: 'enemyPlayer',
+                        virtualPlayerRemainingHealth: 100,
+                        enemyRemainingHealth: 100,
+                        virtualPlayerRemainingEvasions: 2,
+                    };
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
-                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
-                    gateway.startBattleTurn(mockRoom.accessCode, battleRoom.firstPlayerId);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[2]);
+                    playGameBoardBattleService.getVirtualPlayerBattleData.mockReturnValue(data);
+                    playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
+                    playGameBoardSocketService.getRandomDelay.mockReturnValue(1000);
+
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.startBattleTurn(mockRoom.accessCode, mockRoom.players[2].socketId);
 
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('startBattleTurn', battleRoom.firstPlayerId);
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.START_BATTLE_TURN,
+                        mockRoom.players[2].socketId,
+                    );
+
+                    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 1000);
+                    jest.runAllTimers();
+
+                    expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+                    expect(gateway.server.to('randomClientId').emit).toHaveBeenCalledWith(SocketEvents.START_VIRTUAL_PLAYER_BATTLE_TURN, data);
+                });
+
+                it('should emit startBattleTurn and not start virtual player battle turn if player is not virtual', () => {
+                    gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
+
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.startBattleTurn(mockRoom.accessCode, mockRoom.players[0].socketId);
+
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.START_BATTLE_TURN,
+                        mockRoom.players[0].socketId,
+                    );
+
+                    expect(setTimeout).not.toHaveBeenCalled();
                 });
             });
 
@@ -796,23 +1051,50 @@ describe('PlayGameBoardGateway', () => {
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('startBattleTurn', battleRoom.firstPlayerId);
                 });
             });
+
             describe('handleBattleEndedByEscape', () => {
-                it('should end the battle and emit battleEndedByEscape with the first player ID', () => {
+                beforeEach(() => {
                     gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
                     gameSocketRoomService.gameBattleRooms.set(mockRoom.accessCode, battleRoom);
-                    gameSocketRoomService.gameTimerRooms.set(mockRoom.accessCode, mockGameTimer);
-                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
+                });
 
+                it('should emit battleEndedByEscape and continue virtual player turn if first player is virtual', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[2]);
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
 
                     gateway.handleBattleEndedByEscape(mockRoom.accessCode);
 
                     expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
                     expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
-                        'battleEndedByEscape',
+                        SocketEvents.BATTLE_ENDED_BY_ESCAPE,
                         battleRoom.firstPlayerId,
                     );
+                    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), playGameBoardSocketService.getRandomDelay());
+                    jest.runAllTimers();
+                    expect(gateway.continueVirtualPlayerTurn).toHaveBeenCalledWith(mockRoom.accessCode, battleRoom.firstPlayerId);
+                });
+
+                it('should emit battleEndedByEscape and not continue virtual player turn if first player is not virtual', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.handleBattleEndedByEscape(mockRoom.accessCode);
+
+                    expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(
+                        SocketEvents.BATTLE_ENDED_BY_ESCAPE,
+                        battleRoom.firstPlayerId,
+                    );
+                    expect(setTimeout).not.toHaveBeenCalled();
+                    expect(gateway.continueVirtualPlayerTurn).not.toHaveBeenCalled();
                 });
             });
 
@@ -822,34 +1104,132 @@ describe('PlayGameBoardGateway', () => {
                     gameSocketRoomService.gameBattleRooms.set(mockRoom.accessCode, battleRoom);
                 });
 
-                it('should emit firstPlayerWonBattle if the first player is the winner', () => {
+                it('should emit FIRST_PLAYER_WON_BATTLE and update statistics if first player wins', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[0]).mockReturnValueOnce(mockRoom.players[1]);
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
-                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[0]);
 
                     gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.firstPlayerId);
 
                     expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('firstPlayerWonBattle', {
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.FIRST_PLAYER_WON_BATTLE, {
                         firstPlayer: battleRoom.firstPlayerId,
                         loserPlayer: battleRoom.secondPlayerId,
                     });
+                    expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalledWith(
+                        mockRoom.accessCode,
+                        battleRoom.firstPlayerId,
+                        PlayerNumberStatisticType.FightWins,
+                    );
+                    expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalledWith(
+                        mockRoom.accessCode,
+                        battleRoom.secondPlayerId,
+                        PlayerNumberStatisticType.FightLoses,
+                    );
                 });
 
-                it('should emit secondPlayerWonBattle and handleTimeOut if the second player is the winner', () => {
+                it('should emit VIRTUAL_PLAYER_WON_BATTLE and continue virtual player turn if first player is virtual', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[2]).mockReturnValueOnce(mockRoom.players[1]);
+                    playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
                     jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
-                    const handleTimeOutSpy = jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
-                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValue(mockRoom.players[1]);
+                    jest.spyOn(gateway, 'continueVirtualPlayerTurn').mockImplementation(jest.fn());
+                    jest.useFakeTimers();
+                    jest.spyOn(global, 'setTimeout');
+
+                    gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.firstPlayerId);
+
+                    expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.FIRST_PLAYER_WON_BATTLE, {
+                        firstPlayer: battleRoom.firstPlayerId,
+                        loserPlayer: battleRoom.secondPlayerId,
+                    });
+                    expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+                    expect(gateway.server.to('randomClientId').emit).toHaveBeenCalledWith(
+                        SocketEvents.VIRTUAL_PLAYER_WON_BATTLE,
+                        battleRoom.firstPlayerId,
+                    );
+                    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), playGameBoardSocketService.getRandomDelay());
+                    jest.runAllTimers();
+                    expect(gateway.continueVirtualPlayerTurn).toHaveBeenCalledWith(mockRoom.accessCode, battleRoom.firstPlayerId);
+                });
+
+                it('should emit SECOND_PLAYER_WON_BATTLE and update statistics if second player wins', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[0]).mockReturnValueOnce(mockRoom.players[1]);
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
+                    gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.secondPlayerId);
+
+                    expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.SECOND_PLAYER_WON_BATTLE, {
+                        winnerPlayer: battleRoom.secondPlayerId,
+                        loserPlayer: battleRoom.firstPlayerId,
+                    });
+                    expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalledWith(
+                        mockRoom.accessCode,
+                        battleRoom.secondPlayerId,
+                        PlayerNumberStatisticType.FightWins,
+                    );
+                    expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalledWith(
+                        mockRoom.accessCode,
+                        battleRoom.firstPlayerId,
+                        PlayerNumberStatisticType.FightLoses,
+                    );
+                });
+
+                it('should emit VIRTUAL_PLAYER_WON_BATTLE if second player is virtual', () => {
+                    mockRoom.players[0].isVirtual = true;
+                    mockRoom.players[1].isVirtual = true;
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[0]).mockReturnValueOnce(mockRoom.players[1]);
+                    playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
+                    gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.secondPlayerId);
+
+                    expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.SECOND_PLAYER_WON_BATTLE, {
+                        winnerPlayer: battleRoom.secondPlayerId,
+                        loserPlayer: battleRoom.firstPlayerId,
+                    });
+                    expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+                    expect(gateway.server.to('randomClientId').emit).toHaveBeenCalled();
+                });
+
+                it('should emit VIRTUAL_PLAYER_LOST_BATTLE if first player is virtual', () => {
+                    mockRoom.players[0].isVirtual = true;
+                    mockRoom.players[1].isVirtual = true;
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[1]).mockReturnValueOnce(mockRoom.players[0]);
+                    playGameBoardSocketService.getRandomClientInRoom.mockReturnValue('randomClientId');
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
+                    gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.secondPlayerId);
+
+                    expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.SECOND_PLAYER_WON_BATTLE, {
+                        winnerPlayer: battleRoom.secondPlayerId,
+                        loserPlayer: battleRoom.firstPlayerId,
+                    });
+                    expect(gateway.server.to).toHaveBeenCalledWith('randomClientId');
+                    expect(gateway.server.to('randomClientId').emit).toHaveBeenCalled();
+                });
+
+                it('should call handleTimeOut if second player wins', () => {
+                    playGameBoardSocketService.getPlayerBySocketId.mockReturnValueOnce(mockRoom.players[0]).mockReturnValueOnce(mockRoom.players[1]);
+                    jest.spyOn(gateway, 'handleEndBattle').mockImplementation(jest.fn());
+                    jest.spyOn(gateway, 'handleTimeOut').mockImplementation(jest.fn());
 
                     gateway.handleBattleEndedByDeath(mockRoom.accessCode, battleRoom.secondPlayerId);
 
                     expect(gateway.handleEndBattle).toHaveBeenCalledWith(mockRoom.accessCode);
                     expect(gateway.server.to).toHaveBeenCalledWith(mockRoom.accessCode.toString());
-                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith('secondPlayerWonBattle', {
+                    expect(gateway.server.to(mockRoom.accessCode.toString()).emit).toHaveBeenCalledWith(SocketEvents.SECOND_PLAYER_WON_BATTLE, {
                         winnerPlayer: battleRoom.secondPlayerId,
                         loserPlayer: battleRoom.firstPlayerId,
                     });
-                    expect(handleTimeOutSpy).toHaveBeenCalledWith(mockRoom.accessCode);
+                    expect(gateway.handleTimeOut).toHaveBeenCalledWith(mockRoom.accessCode);
                 });
             });
 
