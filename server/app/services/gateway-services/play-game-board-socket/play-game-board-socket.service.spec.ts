@@ -2,8 +2,11 @@ import { Game } from '@app/model/database/game';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayGameStatisticsService } from '@app/services/gateway-services/play-game-statistics/play-game-statistics.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { MOUVEMENT_DELAY, TURN_DELAY } from '@common/constants/game_constants';
 import { GameMode } from '@common/enums/game-mode';
+import { ItemType } from '@common/enums/item-type';
 import { MapSize } from '@common/enums/map-size';
+import { TileType } from '@common/enums/tile-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameRoom } from '@common/interfaces/game-room';
 import { Logger } from '@nestjs/common';
@@ -136,6 +139,64 @@ describe('PlayGameBoardSocketService', () => {
         });
     });
 
+    describe('setupRandomItems', () => {
+        it('should replace random items with new unique types', () => {
+            const mockGameWithRandomItems: Game = {
+                ...mockGame,
+                tiles: [
+                    [
+                        { type: TileType.Grass, item: { type: ItemType.Random } },
+                        { type: TileType.Grass, item: { type: ItemType.EmptyItem } },
+                    ],
+                    [
+                        { type: TileType.Grass, item: { type: ItemType.Random } },
+                        { type: TileType.Grass, item: { type: ItemType.Sword } },
+                    ],
+                ],
+            };
+
+            jest.spyOn(Math, 'random').mockReturnValueOnce(0.1).mockReturnValueOnce(0.2);
+
+            service.setupRandomItems(mockGameWithRandomItems);
+
+            const randomItems = mockGameWithRandomItems.tiles.flat().filter((tile) => tile.item && tile.item.type !== ItemType.Random);
+            const uniqueTypes = new Set(randomItems.map((tile) => tile.item.type));
+
+            expect(randomItems.length).toBe(4);
+            expect(uniqueTypes.size).toBe(4);
+
+            (Math.random as jest.Mock).mockRestore();
+        });
+
+        it('should not replace prohibited item types', () => {
+            const mockGameWithProhibitedItems: Game = {
+                ...mockGame,
+                tiles: [
+                    [
+                        { type: TileType.Grass, item: { type: ItemType.EmptyItem } },
+                        { type: TileType.Grass, item: { type: ItemType.Spawn } },
+                    ],
+                    [
+                        { type: TileType.Grass, item: { type: ItemType.Flag } },
+                        { type: TileType.Grass, item: { type: ItemType.Random } },
+                    ],
+                ],
+            };
+
+            jest.spyOn(Math, 'random').mockReturnValueOnce(0.3);
+
+            service.setupRandomItems(mockGameWithProhibitedItems);
+
+            const prohibitedItems = mockGameWithProhibitedItems.tiles.flat().filter((tile) => tile.item && tile.item.type !== ItemType.Random);
+            const randomItems = mockGameWithProhibitedItems.tiles.flat().filter((tile) => tile.item && tile.item.type === ItemType.Random);
+
+            expect(prohibitedItems.length).toBe(4);
+            expect(randomItems.length).toBe(0);
+
+            (Math.random as jest.Mock).mockRestore();
+        });
+    });
+
     describe('setupSpawnPoints', () => {
         it('should assign unique spawn points to each player', () => {
             gameSocketRoomService.setSpawnCounter.mockReturnValue(10);
@@ -182,6 +243,124 @@ describe('PlayGameBoardSocketService', () => {
 
             expect(() => service.changeTurn(accessCode)).not.toThrow();
             expect(gameSocketRoomService.setCurrentPlayerTurn).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('getRandomClientInRoom', () => {
+        it('should return a random non-virtual player socketId', () => {
+            const accessCode = 1234;
+            const mockRoomWithNonVirtualPlayers: GameRoom = {
+                ...mockRoom,
+                players: [
+                    { ...mockRoom.players[0], isVirtual: false } as PlayerCharacter,
+                    { ...mockRoom.players[1], isVirtual: false } as PlayerCharacter,
+                ],
+            };
+
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoomWithNonVirtualPlayers);
+            jest.spyOn(Math, 'random').mockReturnValueOnce(0.5);
+
+            const result = service.getRandomClientInRoom(accessCode);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toBe('player2');
+
+            (Math.random as jest.Mock).mockRestore();
+        });
+
+        it('should return an empty string if there are no non-virtual players', () => {
+            const accessCode = 1234;
+            const mockRoomWithOnlyVirtualPlayers: GameRoom = {
+                ...mockRoom,
+                players: [
+                    { ...mockRoom.players[0], isVirtual: true } as PlayerCharacter,
+                    { ...mockRoom.players[1], isVirtual: true } as PlayerCharacter,
+                ],
+            };
+
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoomWithOnlyVirtualPlayers);
+
+            const result = service.getRandomClientInRoom(accessCode);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toBe('');
+        });
+
+        it('should return undefined if room does not exist', () => {
+            const accessCode = 5678;
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+
+            const result = service.getRandomClientInRoom(accessCode);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('getPlayerBySocketId', () => {
+        it('should return the player with the given socketId', () => {
+            const accessCode = 1234;
+            const socketId = 'player1';
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+
+            const result = service.getPlayerBySocketId(accessCode, socketId);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toEqual(mockRoom.players[0]);
+        });
+
+        it('should return undefined if the player with the given socketId does not exist', () => {
+            const accessCode = 1234;
+            const socketId = 'nonexistentPlayer';
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(mockRoom);
+
+            const result = service.getPlayerBySocketId(accessCode, socketId);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toBeUndefined();
+        });
+
+        it('should return undefined if the room does not exist', () => {
+            const accessCode = 5678;
+            const socketId = 'player1';
+            gameSocketRoomService.getRoomByAccessCode.mockReturnValue(undefined);
+
+            const result = service.getPlayerBySocketId(accessCode, socketId);
+
+            expect(gameSocketRoomService.getRoomByAccessCode).toHaveBeenCalledWith(accessCode);
+            expect(result).toBeUndefined();
+        });
+    });
+
+    describe('getRandomDelay', () => {
+        it('should return a random delay within the expected range', () => {
+            jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+
+            const result = service.getRandomDelay();
+
+            expect(result).toBe(Math.floor(0.5 * TURN_DELAY) + MOUVEMENT_DELAY);
+
+            (Math.random as jest.Mock).mockRestore();
+        });
+
+        it('should return the minimum delay when Math.random() returns 0', () => {
+            jest.spyOn(global.Math, 'random').mockReturnValue(0);
+
+            const result = service.getRandomDelay();
+
+            expect(result).toBe(MOUVEMENT_DELAY);
+
+            (Math.random as jest.Mock).mockRestore();
+        });
+
+        it('should return the maximum delay when Math.random() returns 1', () => {
+            jest.spyOn(global.Math, 'random').mockReturnValue(1);
+
+            const result = service.getRandomDelay();
+
+            expect(result).toBe(TURN_DELAY + MOUVEMENT_DELAY);
+
+            (Math.random as jest.Mock).mockRestore();
         });
     });
 });
