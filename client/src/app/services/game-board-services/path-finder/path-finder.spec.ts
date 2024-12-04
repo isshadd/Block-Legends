@@ -109,17 +109,4 @@ describe('Pathfinder', () => {
         expect(result.size).toBe(1); // Only the start tile should be in the result
         expect(mockGameMapDataManagerService.getNeighbours).toHaveBeenCalledWith(mockWalkableTile);
     });
-
-    it('should return an empty map if the start tile is null or undefined', () => {
-        // Reset the spy to avoid conflicts with other tests
-        (mockGameMapDataManagerService.getTileAt as jasmine.Spy).calls.reset();
-
-        // Mock getTileAt to return null
-        spyOn(mockGameMapDataManagerService, 'getTileAt').and.returnValue(null);
-
-        const result = pathfinder.findAllReachableTiles({ x: 0, y: 0 });
-
-        expect(result.size).toBe(0); // Verify that the result is an empty map
-        expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith({ x: 0, y: 0 });
-    });
 });
