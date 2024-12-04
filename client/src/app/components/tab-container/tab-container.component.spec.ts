@@ -1,12 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TabContainerComponent } from './tab-container.component';
-import { ClavardageComponent } from '@app/components/clavardage/clavardage.component';
-import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { CommonModule } from '@angular/common';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ChatComponent } from '@app/components/chat/chat.component';
+import { EventJournalComponent } from '@app/components/event-journal/event-journal.component';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { BehaviorSubject } from 'rxjs';
+import { TabContainerComponent } from './tab-container.component';
 
 describe('TabContainerComponent', () => {
     let component: TabContainerComponent;
@@ -32,7 +32,7 @@ describe('TabContainerComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [TabContainerComponent, ClavardageComponent, CommonModule, EventJournalComponent],
+            imports: [TabContainerComponent, ChatComponent, CommonModule, EventJournalComponent],
             providers: [
                 { provide: ChatService, useValue: chatServiceSpy },
                 { provide: EventJournalService, useValue: eventJournalServiceSpy },

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';

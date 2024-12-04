@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { GAME_CODE_MAX_VALUE } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 
