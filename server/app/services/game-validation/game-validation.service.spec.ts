@@ -493,6 +493,229 @@ describe('GameValidationService', () => {
 
                 expect(result).toBe(true);
             });
+
+            describe('validateGame', () => {
+                it('should return errors for invalid game configuration', async () => {
+                    const invalidGame = {
+                        _id: '123456789012',
+                        name: 'Test Game',
+                        description: '',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Door }],
+                            [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Grass }, { type: TileType.Door }],
+                            [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                        ],
+                        mode: GameMode.CTF,
+                        imageUrl: 'http://example.com/image.png',
+                        isVisible: true,
+                    };
+                    mockGameService.getGameByName.mockResolvedValue(invalidGame);
+
+                    const result = await service.validateGame(invalidGame);
+
+                    expect(result.isValid).toBe(false);
+                    expect(result.errors).toContain('La description du jeu ne doit pas être vide.');
+                    expect(result.errors).toContain('Aucune tuile de terrain ne doit être inaccessible à cause d’un agencement de murs.');
+                    expect(result.errors).toContain('Plus de 50 % de la carte doit être composée de tuiles de type Grass, Water ou Ice.');
+                    expect(result.errors).toContain(
+                        'Le nombre de points de spawn est incorrect. (2 pour une carte petite, 4 pour une carte moyenne et 6 pour une carte grande)',
+                    );
+                });
+
+                it('should return error for missing CTF flag', async () => {
+                    const invalidCTFGame = {
+                        _id: '123456789012',
+                        name: 'CTF Game',
+                        description: 'Test Description',
+                        size: 5,
+                        tiles: [
+                            [{ type: TileType.Grass }, { type: TileType.Grass }],
+                            [{ type: TileType.Grass }, { type: TileType.Grass }],
+                        ],
+                        mode: GameMode.CTF,
+                        imageUrl: 'http://example.com/image.png',
+                        isVisible: true,
+                    };
+                    mockGameService.getGameByName.mockResolvedValue(invalidCTFGame);
+
+                    const result = await service.validateGame(invalidCTFGame);
+
+                    expect(result.isValid).toBe(false);
+                    expect(result.errors).toContain('Un jeu en mode CTF doit nécessairement contenir un drapeau.');
+                });
+
+                it('should return error for invalid door placement', async () => {
+                    const invalidDoorGame = {
+                        _id: '123456789012',
+                        name: 'Door Game',
+                        description: 'Test Description',
+                        size: MapSize.SMALL,
+                        tiles: [
+                            [{ type: TileType.Grass }, { type: TileType.Grass }],
+                            [{ type: TileType.Grass }, { type: TileType.Door }],
+                        ],
+                        mode: GameMode.Classique,
+                        imageUrl: 'http://example.com/image.png',
+                        isVisible: true,
+                    };
+                    mockGameService.getGameByName.mockResolvedValue(invalidDoorGame);
+
+                    const result = await service.validateGame(invalidDoorGame);
+
+                    expect(result.isValid).toBe(false);
+                    expect(result.errors).toContain(
+                        'La porte doit être placée entre des tuiles de murs sur un même axe et avoir des tuiles de type terrain sur l’autre axe.',
+                    );
+                });
+
+                describe('findStartingPoint', () => {
+                    it('should return the coordinates of the first terrain tile found', () => {
+                        const map = [
+                            [1, 1, 1],
+                            [1, 0, 1],
+                            [1, 1, 1],
+                        ];
+                        const result = service.findStartingPoint(map, 3, 3);
+                        expect(result).toEqual([1, 1]);
+                    });
+
+                    it('should return [-1, -1] if no terrain tile is found', () => {
+                        const map = [
+                            [1, 1, 1],
+                            [1, 1, 1],
+                            [1, 1, 1],
+                        ];
+                        const result = service.findStartingPoint(map, 3, 3);
+                        expect(result).toEqual([-1, -1]);
+                    });
+
+                    it('should return the coordinates of the first terrain tile in a larger map', () => {
+                        const map = [
+                            [1, 1, 1, 1],
+                            [1, 1, 1, 1],
+                            [1, 1, 0, 1],
+                            [1, 1, 1, 1],
+                        ];
+                        const result = service.findStartingPoint(map, 4, 4);
+                        expect(result).toEqual([2, 2]);
+                    });
+
+                    it('should return the coordinates of the first terrain tile in a non-square map', () => {
+                        const map = [
+                            [1, 1, 1],
+                            [1, 0, 1],
+                            [1, 1, 1],
+                            [1, 1, 1],
+                        ];
+                        const result = service.findStartingPoint(map, 4, 3);
+                        expect(result).toEqual([1, 1]);
+                    });
+                });
+                describe('isHorizontalAxeDoorValid', () => {
+                    it('should return false if door is on the edge of the map', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                                [{ type: TileType.Wall }, { type: TileType.Door }, { type: TileType.Wall }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.isHorizontalAxeDoorValid(game, 0, 1);
+
+                        expect(result).toBe(false);
+                    });
+
+                    it('should return false if door is not placed between walls and terrain tiles', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                                [{ type: TileType.Wall }, { type: TileType.Door }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.isHorizontalAxeDoorValid(game, 1, 1);
+
+                        expect(result).toBe(false);
+                    });
+                });
+
+                describe('isVerticalAxeDoorValid', () => {
+                    it('should return false if door is on the edge of the map', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Door }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.isVerticalAxeDoorValid(game, 1, 0);
+
+                        expect(result).toBe(false);
+                    });
+
+                    it('should return false if door is not placed between walls and terrain tiles', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Door }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.isVerticalAxeDoorValid(game, 1, 1);
+
+                        expect(result).toBe(false);
+                    });
+                });
+                describe('mapIsValid', () => {
+                    it('should return false if no starting point is found', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                                [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                                [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                            ],
+                        } as Game;
+
+                        const result = await service.mapIsValid(game);
+
+                        expect(result).toBe(false);
+                    });
+
+                    it('should return false if not all terrain tiles are visited', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Wall }, { type: TileType.Grass }],
+                                [{ type: TileType.Wall }, { type: TileType.Wall }, { type: TileType.Wall }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.mapIsValid(game);
+
+                        expect(result).toBe(false);
+                    });
+
+                    it('should return true if all terrain tiles are visited', async () => {
+                        const game = {
+                            tiles: [
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                                [{ type: TileType.Grass }, { type: TileType.Grass }, { type: TileType.Grass }],
+                            ],
+                        } as Game;
+
+                        const result = await service.mapIsValid(game);
+
+                        expect(result).toBe(true);
+                    });
+                });
+            });
         });
     });
 });
