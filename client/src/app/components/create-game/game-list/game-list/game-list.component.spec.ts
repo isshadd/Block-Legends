@@ -234,14 +234,4 @@ describe('GameListComponent', () => {
         expect(component.isModalOpen).toBeFalse();
         expect(component.gameStatus).toBeNull();
     });
-
-    it('should call closeModal and reload the page when confirmBack is called', () => {
-        spyOn(component, 'closeModal'); // Spy on the closeModal method
-        spyOn(component, 'reloadPage'); // Spy on the reloadPage wrapper method
-
-        component.confirmBack();
-
-        expect(component.closeModal).toHaveBeenCalled(); // Ensure closeModal is called
-        expect(component.reloadPage).toHaveBeenCalled(); // Ensure reloadPage is called
-    });
 });

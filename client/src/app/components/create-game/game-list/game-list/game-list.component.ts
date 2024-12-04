@@ -81,10 +81,6 @@ export class GameListComponent {
 
     confirmBack() {
         this.closeModal();
-        this.reloadPage();
-    }
-
-    reloadPage() {
         window.location.reload();
     }
 }
