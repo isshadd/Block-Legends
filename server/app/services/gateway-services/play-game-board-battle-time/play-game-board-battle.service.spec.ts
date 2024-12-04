@@ -364,6 +364,30 @@ describe('PlayGameBoardBattleService', () => {
             expect(result).toBe(false);
         });
 
+        it('should return false if player2 has no evades left', () => {
+            const accessCode = 9;
+            const playerId = 'player2';
+            const battleRoom = {
+                time: 2,
+                firstPlayerId: 'player1',
+                secondPlayerId: 'player2',
+                isFirstPlayerTurn: false,
+                firstPlayerRemainingEvades: 0,
+                secondPlayerRemainingEvades: 0,
+                firstPlayerRemainingLife: 100,
+                secondPlayerRemainingLife: 100,
+            };
+
+            gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
+
+            const result = service.userUsedEvade(accessCode, playerId);
+            expect(battleRoom.firstPlayerRemainingEvades).toBe(0);
+            expect(result).toBe(false);
+
+            expect(battleRoom.secondPlayerRemainingEvades).toBe(0);
+            expect(result).toBe(false);
+        });
+
         it('should decrement secondPlayerRemainingEvades and return boolean based on random', () => {
             const accessCode = 10;
             const playerId = 'player2';
@@ -435,9 +459,10 @@ describe('PlayGameBoardBattleService', () => {
             playGameStatisticsService.increasePlayerStatistic.mockImplementation(jest.fn());
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSucceededAttack(accessCode, false);
+            const result = service.userSucceededAttack(accessCode, true);
             expect(playGameStatisticsService.increasePlayerStatistic).toHaveBeenCalled();
             expect(battleRoom.secondPlayerRemainingLife).toBe(0);
+            expect(battleRoom.firstPlayerRemainingLife).toBe(101);
             expect(result).toBe(true);
         });
 
@@ -456,8 +481,9 @@ describe('PlayGameBoardBattleService', () => {
 
             gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
 
-            const result = service.userSucceededAttack(accessCode, false);
+            const result = service.userSucceededAttack(accessCode, true);
             expect(battleRoom.firstPlayerRemainingLife).toBe(0);
+            expect(battleRoom.secondPlayerRemainingLife).toBe(101);
             expect(result).toBe(true);
         });
 
@@ -524,6 +550,100 @@ describe('PlayGameBoardBattleService', () => {
             jest.advanceTimersByTime(3000);
 
             expect(secondPassedSpy).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    describe('getVirtualPlayerBattleData', () => {
+        it('should return correct data for first player', () => {
+            const accessCode = 17;
+            const playerId = 'player1';
+            const battleRoom = {
+                time: 2,
+                firstPlayerId: 'player1',
+                secondPlayerId: 'player2',
+                isFirstPlayerTurn: true,
+                firstPlayerRemainingEvades: 2,
+                secondPlayerRemainingEvades: 1,
+                firstPlayerRemainingLife: 100,
+                secondPlayerRemainingLife: 50,
+            };
+
+            gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
+
+            const result = service.getVirtualPlayerBattleData(accessCode, playerId);
+            expect(result).toEqual({
+                playerId: 'player1',
+                enemyId: 'player2',
+                virtualPlayerRemainingHealth: 100,
+                enemyRemainingHealth: 50,
+                virtualPlayerRemainingEvasions: 2,
+            });
+        });
+
+        it('should return correct data for second player', () => {
+            const accessCode = 18;
+            const playerId = 'player2';
+            const battleRoom = {
+                time: 2,
+                firstPlayerId: 'player1',
+                secondPlayerId: 'player2',
+                isFirstPlayerTurn: true,
+                firstPlayerRemainingEvades: 2,
+                secondPlayerRemainingEvades: 1,
+                firstPlayerRemainingLife: 100,
+                secondPlayerRemainingLife: 50,
+            };
+
+            gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
+
+            const result = service.getVirtualPlayerBattleData(accessCode, playerId);
+            expect(result).toEqual({
+                playerId: 'player2',
+                enemyId: 'player1',
+                virtualPlayerRemainingHealth: 50,
+                enemyRemainingHealth: 100,
+                virtualPlayerRemainingEvasions: 1,
+            });
+        });
+
+        it('should return default data if battle room does not exist', () => {
+            const accessCode = 999;
+            const playerId = 'player1';
+
+            const result = service.getVirtualPlayerBattleData(accessCode, playerId);
+            expect(result).toEqual({
+                playerId: '',
+                enemyId: '',
+                virtualPlayerRemainingHealth: 0,
+                enemyRemainingHealth: 0,
+                virtualPlayerRemainingEvasions: 0,
+            });
+        });
+
+        it('should return default data if playerId does not match any player', () => {
+            const accessCode = 19;
+            const playerId = 'unknownPlayer';
+            const battleRoom = {
+                time: 2,
+                firstPlayerId: 'player1',
+                secondPlayerId: 'player2',
+                isFirstPlayerTurn: true,
+                firstPlayerRemainingEvades: 2,
+                secondPlayerRemainingEvades: 1,
+                firstPlayerRemainingLife: 100,
+                secondPlayerRemainingLife: 50,
+            };
+
+            gameSocketRoomService.gameBattleRooms.set(accessCode, battleRoom);
+
+            const result = service.getVirtualPlayerBattleData(accessCode, playerId);
+            expect(result).toEqual({
+                playerId: '',
+                enemyId: '',
+                virtualPlayerRemainingHealth: 0,
+                enemyRemainingHealth: 0,
+                virtualPlayerRemainingEvasions: 0,
+            });
         });
     });
 });
