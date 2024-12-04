@@ -1,10 +1,10 @@
+import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { DELAY_BEFORE_EMITTING_TIME } from '@common/constants/chat.gateway.constants';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { Injectable, Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { PlayerCharacter } from '@common/classes/Player/player-character';
 
 @WebSocketGateway({ cors: true })
 @Injectable()

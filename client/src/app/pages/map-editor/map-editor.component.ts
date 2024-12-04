@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
@@ -13,6 +13,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager/map-editor-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-map-editor',
@@ -21,13 +22,14 @@ import { GameShared } from '@common/interfaces/game-shared';
     templateUrl: './map-editor.component.html',
     styleUrl: './map-editor.component.scss',
 })
-export class MapEditorComponent {
+export class MapEditorComponent implements OnDestroy {
     isNewGame: boolean;
     gameToEdit: GameShared;
     isDragging: boolean = false;
     dragImage: string = '';
     mouseX = 0;
     mouseY = 0;
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         public mapEditorManagerService: MapEditorManagerService,
@@ -47,18 +49,22 @@ export class MapEditorComponent {
                 return;
             }
 
-            this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
-                this.gameMapDataManagerService.init(game);
-                this.mapEditorManagerService.init();
-                this.mapEditorManagerService.mapItemCheckup();
-            });
+            this.subscriptions.add(
+                this.gameServerCommunicationService.getGame(this.gameToEdit._id).subscribe((game) => {
+                    this.gameMapDataManagerService.init(game);
+                    this.mapEditorManagerService.init();
+                    this.mapEditorManagerService.mapItemCheckup();
+                }),
+            );
         }
     }
-
     @HostListener('document:mouseup')
     onMouseUp() {
         this.mapEditorManagerService.onMouseUp();
         this.isDragging = false;
+    }
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     onMapMouseEnter() {

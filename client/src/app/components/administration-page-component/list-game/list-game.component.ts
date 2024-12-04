@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DeleteConfirmationComponent } from '@app/components/administration-page-component/delete-conformation/delete-conformation.component';
@@ -9,6 +9,7 @@ import { GameMapDataManagerService } from '@app/services/game-board-services/gam
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { Tile } from '@common/classes/Tiles/tile';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-list-game',
@@ -17,9 +18,10 @@ import { GameShared } from '@common/interfaces/game-shared';
     imports: [CommonModule, MapComponent],
     standalone: true,
 })
-export class ListGameComponent {
+export class ListGameComponent implements OnDestroy {
     databaseGames: GameShared[] = [];
     loadedTiles: Tile[][][] = [];
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private administrationService: AdministrationPageManagerService,
@@ -28,8 +30,12 @@ export class ListGameComponent {
         private router: Router,
         private dialog: MatDialog,
     ) {
-        this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games));
+        this.subscriptions.add(this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games)));
         this.administrationService.setGames();
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     getGames(games: GameShared[]): void {

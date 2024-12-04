@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CharacterFormComponent } from '@app/components/create-character/character-form/character-form.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-avatar-selection',
@@ -13,10 +14,12 @@ import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
     templateUrl: './avatar-selection.component.html',
     styleUrl: './avatar-selection.component.scss',
 })
-export class AvatarSelectionComponent implements OnInit {
+export class AvatarSelectionComponent implements OnInit, OnDestroy {
     @Input() character: PlayerCharacter;
     avatarList: Avatar[] = [];
     takenAvatars: string[] = [];
+
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private webSocketService: WebSocketService,
@@ -26,10 +29,16 @@ export class AvatarSelectionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.webSocketService.takenAvatars$.subscribe((takenAvatars) => {
-            this.takenAvatars = takenAvatars;
-            this.filterAvatars();
-        });
+        this.subscriptions.add(
+            this.webSocketService.takenAvatars$.subscribe((takenAvatars) => {
+                this.takenAvatars = takenAvatars;
+                this.filterAvatars();
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     setAvatars() {

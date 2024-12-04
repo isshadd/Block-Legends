@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { MAX_STRING_LENGTH } from '@common/constants/game_constants';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class ChatService {
+export class ChatService implements OnDestroy {
     socket: WebSocketService | null = null;
     serverClock: Date;
     roomMessages: RoomMessageReceived[] = [];
@@ -19,15 +19,22 @@ export class ChatService {
 
     messageReceivedSubject = new Subject<void>();
     messageReceived$ = this.messageReceivedSubject.asObservable();
+    private subscriptions: Subscription = new Subscription();
 
     constructor(public socketStateService: SocketStateService) {}
 
     initialize() {
         this.socket = this.socketStateService.getActiveSocket();
 
-        this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
-            this.socket = hasSocket ? this.socketStateService.getActiveSocket() : null;
-        });
+        this.subscriptions.add(
+            this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
+                this.socket = hasSocket ? this.socketStateService.getActiveSocket() : null;
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     setCharacter(character: PlayerCharacter) {

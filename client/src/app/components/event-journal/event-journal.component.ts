@@ -1,8 +1,9 @@
-import { Component, ViewChild, ElementRef, OnInit, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
-import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { CommonModule } from '@angular/common';
-import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { EventJournalService } from '@app/services/journal-services/event-journal.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { RoomEvent } from '@common/interfaces/RoomEvent';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-event-journal',
@@ -11,7 +12,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
     templateUrl: './event-journal.component.html',
     styleUrl: './event-journal.component.scss',
 })
-export class EventJournalComponent implements AfterViewChecked, OnInit {
+export class EventJournalComponent implements AfterViewChecked, OnInit, OnDestroy {
     @ViewChild('journalEvents') eventsContainer: ElementRef;
 
     events: { event: RoomEvent; associatedPlayers: PlayerCharacter[] }[] = this.journalService.roomEvents;
@@ -19,16 +20,24 @@ export class EventJournalComponent implements AfterViewChecked, OnInit {
     shouldScroll: boolean = false;
     showMyEvents: boolean = false;
 
+    private subscriptions: Subscription = new Subscription();
+
     constructor(
         private journalService: EventJournalService,
         private cdr: ChangeDetectorRef,
     ) {}
 
     ngOnInit() {
-        this.journalService.messageReceived$.subscribe(() => {
-            this.shouldScroll = true;
-            this.cdr.detectChanges();
-        });
+        this.subscriptions.add(
+            this.journalService.messageReceived$.subscribe(() => {
+                this.shouldScroll = true;
+                this.cdr.detectChanges();
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     ngAfterViewChecked() {

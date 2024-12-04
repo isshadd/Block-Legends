@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
@@ -11,14 +11,14 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { GameRoom } from '@common/interfaces/game-room';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
 import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
-export class WebSocketService {
+export class WebSocketService implements OnDestroy {
     socket: Socket;
     playersSubject = new BehaviorSubject<PlayerCharacter[]>([]);
     players$ = this.playersSubject.asObservable();
@@ -34,6 +34,8 @@ export class WebSocketService {
     currentRoom: GameRoom;
     isGameFinished = false;
     colorCounter = 0;
+
+    private subscriptions: Subscription = new Subscription();
     // this constructor is used to inject the services that are used in the class, so it is impossible to refactor
     // eslint-disable-next-line max-params
     constructor(
@@ -51,6 +53,10 @@ export class WebSocketService {
         this.chatService.initialize();
         this.eventJournalService.initialize();
         this.isGameFinished = false;
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     createGame(gameId: string, player: PlayerCharacter) {
@@ -129,9 +135,11 @@ export class WebSocketService {
 
     getTotalPlayers(): PlayerCharacter[] {
         let players: PlayerCharacter[] = [];
-        this.players$.subscribe((data) => {
-            players = data;
-        });
+        this.subscriptions.add(
+            this.players$.subscribe((data) => {
+                players = data;
+            }),
+        );
         return players;
     }
 
