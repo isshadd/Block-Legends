@@ -50,7 +50,8 @@ describe('SideViewPlayerInfoComponent', () => {
             dice: DiceType.Attack,
         } as PlayerCharacter;
 
-        expect(component.healthArray.length).toBe(5);
+        const value = 5;
+        expect(component.healthArray.length).toBe(value);
     });
 
     it('should return correct defenseArray', () => {
@@ -59,7 +60,8 @@ describe('SideViewPlayerInfoComponent', () => {
             dice: DiceType.Attack,
         } as PlayerCharacter;
 
-        expect(component.defenseArray.length).toBe(3);
+        const value = 3;
+        expect(component.defenseArray.length).toBe(value);
     });
 
     it('should return correct speedArray', () => {
@@ -68,7 +70,9 @@ describe('SideViewPlayerInfoComponent', () => {
             dice: DiceType.Attack,
         } as PlayerCharacter;
 
-        expect(component.speedArray.length).toBe(4);
+        const value = 4;
+
+        expect(component.speedArray.length).toBe(value);
     });
 
     it('should return correct attackArray', () => {
@@ -77,6 +81,7 @@ describe('SideViewPlayerInfoComponent', () => {
             dice: DiceType.Attack,
         } as PlayerCharacter;
 
-        expect(component.attackArray.length).toBe(6);
+        const value = 6;
+        expect(component.attackArray.length).toBe(value);
     });
 });
