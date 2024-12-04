@@ -82,4 +82,37 @@ describe('GameService', () => {
     it('should return VP_NUMBER correctly', () => {
         expect(MAX_VP_PLAYER_NUMBER).toBe(FIVE);
     });
+
+    it('should set the current player correctly', (done: DoneFn) => {
+        const player = new PlayerCharacter('Hero');
+        service.setCurrentPlayer(player);
+        service.currentPlayer$.subscribe((currentPlayer) => {
+            expect(currentPlayer).toBe(player);
+            done();
+        });
+    });
+
+    it('should assign bonus to attack or defense randomly', () => {
+        const player1 = service.generateVirtualCharacter(1, ProfileEnum.Agressive);
+
+        player1.assignAttackDice();
+        player1.assignLifeBonus();
+        player1.assignSpeedBonus();
+        player1.assignDefenseDice();
+    });
+
+    it('should release virtual players names correctly', () => {
+        const player1 = service.generateVirtualCharacter(1, ProfileEnum.Agressive);
+        const player2 = service.generateVirtualCharacter(2, ProfileEnum.Defensive);
+
+        service.usedNames.add(player1.name);
+        service.usedNames.add(player2.name);
+
+        spyOn(service.usedNames, 'delete').and.callThrough();
+
+        service.releaseVirtualPlayerName(player1.name);
+
+        expect(service.usedNames.delete).toHaveBeenCalled();
+        expect(service.usedNames.has(player1.name)).toBeFalse();
+    });
 });

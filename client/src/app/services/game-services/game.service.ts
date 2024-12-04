@@ -27,7 +27,7 @@ export class GameService {
     signalAvatarSelected = new Subject<Avatar>();
     signalAvatarSelected$ = this.signalAvatarSelected.asObservable();
 
-    private usedNames: Set<string> = new Set();
+    usedNames: Set<string> = new Set();
 
     setAccessCode(code: number) {
         this.accessCodeSubject.next(code);
