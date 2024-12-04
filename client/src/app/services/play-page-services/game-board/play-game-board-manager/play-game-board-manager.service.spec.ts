@@ -1403,7 +1403,9 @@ describe('PlayGameBoardManagerService', () => {
             });
 
             service.isUserTurn = true;
-            spyOn(service, 'setupPossibleMoves').and.callThrough();
+            spyOn(service, 'setupPossibleMoves').and.callFake(() => {
+                return;
+            });
             gameMapDataManagerServiceSpy.getTileAt.and.returnValue(mockDoorTile);
 
             service.toggleDoor(tileCoordinate);
