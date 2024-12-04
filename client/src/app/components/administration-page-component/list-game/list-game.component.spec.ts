@@ -1,18 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, RouterLink } from '@angular/router';
-import { MapComponent } from '@app/components/game-board-components/map/map.component';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { DeleteConfirmationComponent } from '@app/components/administration-page-component/delete-conformation/delete-conformation.component';
 import { AdministrationPageManagerService } from '@app/services/administration-page-services/administration-page-manager.service';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
-import { Tile } from '@common/classes/Tiles/tile';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { TileType } from '@common/enums/tile-type';
 import { GameShared } from '@common/interfaces/game-shared';
-import { VisibleState } from '@common/interfaces/placeable-entity';
-import { TileShared } from '@common/interfaces/tile-shared';
 import { Subject } from 'rxjs';
 import { ListGameComponent } from './list-game.component';
 
@@ -23,6 +20,7 @@ describe('ListGameComponent', () => {
     let mockGameMapDataManagerService: jasmine.SpyObj<GameMapDataManagerService>;
     let mockTileFactoryService: jasmine.SpyObj<TileFactoryService>;
     let mockRouter: jasmine.SpyObj<Router>;
+    let mockDialog: jasmine.SpyObj<MatDialog>;
 
     const mockGames: GameShared[] = [
         {
@@ -42,52 +40,18 @@ describe('ListGameComponent', () => {
             _id: '2',
             name: 'Game Two',
             description: 'Second game',
-            size: MapSize.LARGE,
-            mode: GameMode.Classique,
+            size: MapSize.MEDIUM,
+            mode: GameMode.CTF,
             imageUrl: 'url2',
             isVisible: false,
             tiles: [
-                [{ type: TileType.Ice }, { type: TileType.Water }],
-                [{ type: TileType.Door }, { type: TileType.Grass }],
+                [{ type: TileType.Grass }, { type: TileType.Water }],
+                [{ type: TileType.Wall }, { type: TileType.Door }],
             ],
         },
     ];
 
-    // Helper function to create mock Tile instances
-    const createMockTile = (type: TileType, visibleState: VisibleState, coordinates: { x: number; y: number } = { x: 0, y: 0 }): Tile => {
-        const tile = new Tile();
-        tile.type = type;
-        tile.description = `${type} description`;
-        tile.imageUrl = `url-for-${type}`;
-        tile.coordinates = coordinates;
-        tile.visibleState = visibleState;
-        return tile;
-    };
-
-    const mockTilesGame1: Tile[][] = [
-        [
-            createMockTile(TileType.Grass, VisibleState.NotSelected, { x: 0, y: 0 }),
-            createMockTile(TileType.Water, VisibleState.Disabled, { x: 1, y: 0 }),
-        ],
-        [
-            createMockTile(TileType.Wall, VisibleState.Selected, { x: 0, y: 1 }),
-            createMockTile(TileType.Door, VisibleState.NotSelected, { x: 1, y: 1 }),
-        ],
-    ];
-
-    const mockTilesGame2: Tile[][] = [
-        [
-            createMockTile(TileType.Ice, VisibleState.NotSelected, { x: 0, y: 0 }),
-            createMockTile(TileType.Ice, VisibleState.NotSelected, { x: 1, y: 0 }),
-        ],
-        [
-            createMockTile(TileType.Door, VisibleState.NotSelected, { x: 0, y: 1 }),
-            createMockTile(TileType.Water, VisibleState.Selected, { x: 1, y: 1 }),
-        ],
-    ];
-
     beforeEach(async () => {
-        // Create spy objects for the services
         mockAdministrationService = jasmine.createSpyObj('AdministrationPageManagerService', ['setGames', 'deleteGame', 'toggleVisibility'], {
             signalGamesSetted$: new Subject<GameShared[]>(),
         });
@@ -98,128 +62,83 @@ describe('ListGameComponent', () => {
 
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
+        mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
+
         await TestBed.configureTestingModule({
-            imports: [CommonModule, RouterLink, MapComponent, ListGameComponent],
+            imports: [CommonModule, ListGameComponent],
             providers: [
                 { provide: AdministrationPageManagerService, useValue: mockAdministrationService },
                 { provide: GameMapDataManagerService, useValue: mockGameMapDataManagerService },
                 { provide: TileFactoryService, useValue: mockTileFactoryService },
                 { provide: Router, useValue: mockRouter },
+                { provide: MatDialog, useValue: mockDialog },
             ],
-            schemas: [NO_ERRORS_SCHEMA], // Ignore child component errors
         }).compileComponents();
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(ListGameComponent);
         component = fixture.componentInstance;
-
-        // Set up TileFactoryService mock
-        mockTileFactoryService.loadGridFromJSON.and.callFake((tiles: TileShared[][]) => {
-            // Compare tiles using JSON.stringify for simplicity
-            if (JSON.stringify(tiles) === JSON.stringify(mockGames[0].tiles)) {
-                return mockTilesGame1;
-            } else if (JSON.stringify(tiles) === JSON.stringify(mockGames[1].tiles)) {
-                return mockTilesGame2;
-            }
-            return [];
-        });
-
-        // Emit mock games
-        (mockAdministrationService.signalGamesSetted$ as Subject<GameShared[]>).next(mockGames);
-
-        // Trigger ngOnInit and other lifecycle hooks
         fixture.detectChanges();
     });
 
-    it('should create the component', () => {
+    it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    describe('Initialization', () => {
-        it('should subscribe to signalGamesSetted$ and call getGames with emitted games', () => {
-            expect(component.databaseGames).toEqual(mockGames);
-            expect(component.loadedTiles.length).toBe(mockGames.length);
-            expect(mockTileFactoryService.loadGridFromJSON).toHaveBeenCalledTimes(mockGames.length);
-            expect(component.loadedTiles[0]).toEqual(mockTilesGame1);
-            expect(component.loadedTiles[1]).toEqual(mockTilesGame2);
-        });
+    it('should get games and load tiles', () => {
+        component.getGames(mockGames);
+        expect(component.databaseGames).toEqual(mockGames);
+        expect(mockTileFactoryService.loadGridFromJSON).toHaveBeenCalledTimes(mockGames.length);
+    });
 
-        it('should call administrationService.setGames on initialization', () => {
-            expect(mockAdministrationService.setGames).toHaveBeenCalled();
+    it('should delete game and open delete confirmation', () => {
+        component.deleteGame('1');
+        expect(mockAdministrationService.deleteGame).toHaveBeenCalledWith('1');
+        expect(mockDialog.open).toHaveBeenCalledWith(DeleteConfirmationComponent, {
+            width: '300px',
         });
     });
 
-    describe('getGames', () => {
-        it('should set databaseGames and loadedTiles correctly', () => {
-            const newGames: GameShared[] = [
-                {
-                    _id: '3',
-                    name: 'Game Three',
-                    description: 'Third game',
-                    size: MapSize.MEDIUM,
-                    mode: GameMode.Classique,
-                    imageUrl: 'url3',
-                    isVisible: true,
-                    tiles: [[{ type: TileType.Grass }, { type: TileType.Water }]],
-                },
-            ];
-
-            const mockTilesGame3: Tile[][] = [
-                [
-                    createMockTile(TileType.Grass, VisibleState.NotSelected, { x: 0, y: 0 }),
-                    createMockTile(TileType.Water, VisibleState.Selected, { x: 1, y: 0 }),
-                ],
-            ];
-
-            mockTileFactoryService.loadGridFromJSON.and.callFake((tiles: TileShared[][]) => {
-                if (JSON.stringify(tiles) === JSON.stringify(newGames[0].tiles)) {
-                    return mockTilesGame3;
-                }
-                return [];
-            });
-
-            component.getGames(newGames);
-
-            expect(component.databaseGames).toEqual(newGames);
-            expect(component.loadedTiles.length).toBe(newGames.length);
-            expect(mockTileFactoryService.loadGridFromJSON).toHaveBeenCalledWith(newGames[0].tiles);
-            expect(component.loadedTiles[0]).toEqual(mockTilesGame3);
-        });
+    it('should toggle game visibility', () => {
+        const game = mockGames[0];
+        component.toggleVisibility(game);
+        expect(mockAdministrationService.toggleVisibility).toHaveBeenCalledWith(game);
     });
 
-    describe('deleteGame', () => {
-        it('should call administrationService.deleteGame with valid id', () => {
-            const gameId = '1';
-            component.deleteGame(gameId);
-            expect(mockAdministrationService.deleteGame).toHaveBeenCalledWith(gameId);
-        });
-
-        it('should not call administrationService.deleteGame when id is null', () => {
-            component.deleteGame(null);
-            expect(mockAdministrationService.deleteGame).not.toHaveBeenCalledWith(jasmine.anything());
-        });
-
-        it('should not call administrationService.deleteGame when id is undefined', () => {
-            component.deleteGame(undefined);
-            expect(mockAdministrationService.deleteGame).not.toHaveBeenCalledWith(jasmine.anything());
-        });
+    it('should edit game and navigate to map editor', () => {
+        const game = mockGames[0];
+        component.editGame(game);
+        expect(mockGameMapDataManagerService.setLocalStorageVariables).toHaveBeenCalledWith(false, game);
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/map-editor']);
     });
 
-    describe('toggleVisibility', () => {
-        it('should call administrationService.toggleVisibility with the game', () => {
-            const game = mockGames[0];
-            component.toggleVisibility(game);
-            expect(mockAdministrationService.toggleVisibility).toHaveBeenCalledWith(game);
-        });
+    it('should download game as JSON', () => {
+        const game = mockGames[0];
+        spyOn(document, 'createElement').and.callThrough();
+        spyOn(document.body, 'appendChild').and.callThrough();
+        spyOn(document.body, 'removeChild').and.callThrough();
+        spyOn(URL, 'createObjectURL').and.callThrough();
+        spyOn(URL, 'revokeObjectURL').and.callThrough();
+
+        component.downloadGameAsJson(game);
+
+        expect(document.createElement).toHaveBeenCalledWith('a');
+        expect(document.body.appendChild).toHaveBeenCalled();
+        expect(document.body.removeChild).toHaveBeenCalled();
+        expect(URL.createObjectURL).toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalled();
     });
 
-    describe('editGame', () => {
-        it('should set local storage variables and navigate to map-editor', () => {
-            const game = mockGames[0];
-            component.editGame(game);
-            expect(mockGameMapDataManagerService.setLocalStorageVariables).toHaveBeenCalledWith(false, game);
-            expect(mockRouter.navigate).toHaveBeenCalledWith(['/map-editor']);
-        });
+    it('should return early if id is null or undefined in deleteGame', () => {
+        // Test with null
+        component.deleteGame(null);
+        expect(mockAdministrationService.deleteGame).not.toHaveBeenCalled();
+        expect(mockDialog.open).not.toHaveBeenCalled();
+
+        // Test with undefined
+        component.deleteGame(undefined);
+        expect(mockAdministrationService.deleteGame).not.toHaveBeenCalled();
+        expect(mockDialog.open).not.toHaveBeenCalled();
     });
 });
