@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MapComponent } from '@app/components/game-board-components/map/map.component';
 import { ModalOneOptionComponent } from '@app/components/modal-one-option/modal-one-option.component';
@@ -10,6 +10,7 @@ import { GameServerCommunicationService } from '@app/services/game-server-commun
 import { Tile } from '@common/classes/Tiles/tile';
 import { GameMode } from '@common/enums/game-mode';
 import { GameShared } from '@common/interfaces/game-shared';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-game-list',
@@ -18,14 +19,14 @@ import { GameShared } from '@common/interfaces/game-shared';
     templateUrl: './game-list.component.html',
     styleUrl: './game-list.component.scss',
 })
-export class GameListComponent {
+export class GameListComponent implements OnDestroy {
     databaseGames: GameShared[] = [];
     loadedTiles: Tile[][][] = [];
     selectedGame: GameShared | null;
     gameStatus: string | null;
     selectedMode: GameMode = GameMode.Classique;
     isModalOpen = false;
-
+    private subscriptions: Subscription = new Subscription();
     constructor(
         private modeService: ModeService,
         private router: Router,
@@ -33,11 +34,19 @@ export class GameListComponent {
         private administrationService: AdministrationPageManagerService,
         private gameServerCommunicationService: GameServerCommunicationService,
     ) {
-        this.modeService.selectedMode$.subscribe((mode) => {
-            this.selectedMode = mode;
-        });
-        this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games));
+        this.subscriptions.add(
+            this.modeService.selectedMode$.subscribe((mode) => {
+                this.selectedMode = mode;
+            }),
+        );
+
+        this.subscriptions.add(this.administrationService.signalGamesSetted$.subscribe((games) => this.getGames(games)));
+
         this.administrationService.setGames();
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     getGames(games: GameShared[]): void {

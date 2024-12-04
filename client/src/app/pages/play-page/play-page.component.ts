@@ -32,7 +32,7 @@ import { SocketStateService } from '@app/services/socket-service/socket-state-se
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { TIMEOUT_DURATION } from '@common/constants/game_constants';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-play-page',
@@ -62,6 +62,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     actualPlayers: PlayerCharacter[] = [];
     actionPoints: number;
     totalLifePoints: number;
+    private subscriptions: Subscription = new Subscription();
 
     private destroy$ = new Subject<void>();
     // eslint-disable-next-line
@@ -78,20 +79,24 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private socketStateService: SocketStateService,
         private eventJournalService: EventJournalService,
     ) {
-        this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
-            this.onPlayGameBoardManagerInit();
-        });
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
+                this.onPlayGameBoardManagerInit();
+            }),
+        );
 
         this.playGameBoardSocketService.init();
-        this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
-            const abandonPlayer = this.players.find((p) => p.socketId === socketId);
-            if (!abandonPlayer) throw new Error('Player not found');
-            abandonPlayer.isAbsent = true;
-            this.players = [
-                ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
-                abandonPlayer,
-            ];
-        });
+        this.subscriptions.add(
+            this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
+                const abandonPlayer = this.players.find((p) => p.socketId === socketId);
+                if (!abandonPlayer) throw new Error('Player not found');
+                abandonPlayer.isAbsent = true;
+                this.players = [
+                    ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
+                    abandonPlayer,
+                ];
+            }),
+        );
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -116,18 +121,22 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
-        this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
-            this.actualPlayers = updatedPlayers;
-        });
+        this.subscriptions.add(
+            this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
+                this.actualPlayers = updatedPlayers;
+            }),
+        );
 
-        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
-            if (character) {
-                this.myPlayer = character;
-                if (this.myPlayer.isOrganizer) {
-                    this.totalLifePoints = this.myPlayer.attributes.life;
+        this.subscriptions.add(
+            this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+                if (character) {
+                    this.myPlayer = character;
+                    if (this.myPlayer.isOrganizer) {
+                        this.totalLifePoints = this.myPlayer.attributes.life;
+                    }
                 }
-            }
-        });
+            }),
+        );
     }
 
     ngOnDestroy(): void {

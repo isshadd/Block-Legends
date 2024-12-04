@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { GAME_CODE_MAX_VALUE } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-join-game',
@@ -13,10 +14,11 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
     templateUrl: './join-game.component.html',
     styleUrl: './join-game.component.scss',
 })
-export class JoinGameComponent implements OnInit {
+export class JoinGameComponent implements OnInit, OnDestroy {
     accessCode: number | null;
     errorMessage: string | null;
     isErrorMessageVisible: boolean = false;
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         private webSocketService: WebSocketService,
@@ -24,11 +26,17 @@ export class JoinGameComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.webSocketService.avatarTakenError$.subscribe((message) => {
-            if (message) {
-                this.errorMessage = message;
-            }
-        });
+        this.subscriptions.add(
+            this.webSocketService.avatarTakenError$.subscribe((message) => {
+                if (message) {
+                    this.errorMessage = message;
+                }
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     joinGame(): void {

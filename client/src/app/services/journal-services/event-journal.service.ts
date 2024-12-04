@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
-export class EventJournalService {
+export class EventJournalService implements OnDestroy {
     socket: WebSocketService | null = null;
     accessCode: number;
     roomID: string;
@@ -18,14 +18,22 @@ export class EventJournalService {
     messageReceivedSubject = new Subject<void>();
     messageReceived$ = this.messageReceivedSubject.asObservable();
 
+    private subscriptions: Subscription = new Subscription();
+
     constructor(private socketStateService: SocketStateService) {}
 
     initialize() {
         this.socket = this.socketStateService.getActiveSocket();
 
-        this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
-            this.socket = hasSocket ? this.socketStateService.getActiveSocket() : null;
-        });
+        this.subscriptions.add(
+            this.socketStateService.hasActiveSocket$.subscribe((hasSocket) => {
+                this.socket = hasSocket ? this.socketStateService.getActiveSocket() : null;
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     setCharacter(character: PlayerCharacter) {

@@ -1,11 +1,11 @@
 import { PlayGameBoardGateway } from '@app/gateways/playGameBoard/play-game-board.gateway';
 import { GameSocketRoomService } from '@app/services/gateway-services/game-socket-room/game-socket-room.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER, SUBSTRACT_ONE, SUBSTRACT_TWO } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { Character } from '@common/interfaces/character';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { RANDOM_NUMBER, RANDOM_SOCKET_NUMBER, SUBSTRACT_ONE, SUBSTRACT_TWO } from '@common/constants/game_constants';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -75,50 +75,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(SocketEvents.ADD_PLAYER_TO_ROOM)
     handleAddPlayerToRoom(client: Socket, payload: { accessCode: number; player: PlayerCharacter }) {
         const { accessCode, player } = payload;
-        if (!player.isVirtual) {
-            player.socketId = client.id;
-        } else {
-            player.socketId = `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_ONE, RANDOM_NUMBER)}_${Math.random()
-                .toString(RANDOM_SOCKET_NUMBER)
-                .substr(SUBSTRACT_TWO, RANDOM_NUMBER)}`;
-        }
-        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
 
-        if (!room) {
-            client.emit(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, {
-                valid: false,
-                message: "La salle n'existe plus",
-            });
+        this.setPlayerSocketId(player, client);
+
+        const roomValidationResult = this.validateRoom(accessCode, client);
+        if (!roomValidationResult.isValid) {
             return;
         }
 
-        if (room.isLocked) {
-            client.emit(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, {
-                valid: false,
-                message: 'Cette salle a été verrouillée entre temps',
-            });
-            return;
-        }
-
-        const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
-        if (added) {
-            this.updateRoomState(accessCode);
-            client.emit(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, player);
-
-            const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
-            if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {
-                const locked = this.gameSocketRoomService.lockRoom(accessCode, updatedRoom.organizer);
-                if (locked) {
-                    this.server.to(accessCode.toString()).emit(SocketEvents.ROOM_LOCKED, {
-                        message: 'La salle est verrouillée car le nombre maximal de joueurs a été atteint.',
-                        isLocked: true,
-                    });
-                }
-            }
-        } else {
-            client.emit(SocketEvents.AVATAR_TAKEN_ERROR, {
-                message: `Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`,
-            });
+        const addPlayerResult = this.addPlayerToRoom(accessCode, player, client);
+        if (addPlayerResult.success) {
+            this.handleRoomFullScenario(accessCode);
         }
     }
 
@@ -272,6 +239,71 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 players: room.players,
                 isLocked: room.isLocked,
             });
+        }
+    }
+
+    private setPlayerSocketId(player: PlayerCharacter, client: Socket): void {
+        player.socketId = player.isVirtual ? this.generateVirtualPlayerSocketId() : client.id;
+    }
+
+    private generateVirtualPlayerSocketId(): string {
+        return `${Math.random().toString(RANDOM_SOCKET_NUMBER).substr(SUBSTRACT_ONE, RANDOM_NUMBER)}_${Math.random()
+            .toString(RANDOM_SOCKET_NUMBER)
+            .substr(SUBSTRACT_TWO, RANDOM_NUMBER)}`;
+    }
+
+    private validateRoom(accessCode: number, client: Socket): { isValid: boolean } {
+        const room = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (!room) {
+            client.emit(SocketEvents.JOIN_GAME_RESPONSE_NO_MORE_EXISTING, {
+                valid: false,
+                message: "La salle n'existe plus",
+            });
+            return { isValid: false };
+        }
+
+        if (room.isLocked) {
+            client.emit(SocketEvents.JOIN_GAME_RESPONSE_LOCKED_AFTER_JOIN, {
+                valid: false,
+                message: 'Cette salle a été verrouillée entre temps',
+            });
+            return { isValid: false };
+        }
+
+        return { isValid: true };
+    }
+
+    private addPlayerToRoom(accessCode: number, player: PlayerCharacter, client: Socket): { success: boolean } {
+        const added = this.gameSocketRoomService.addPlayerToRoom(accessCode, player);
+
+        if (added) {
+            this.updateRoomState(accessCode);
+
+            client.emit(SocketEvents.JOIN_WAITING_ROOM_SUCCESS, player);
+
+            return { success: true };
+        } else {
+            client.emit(SocketEvents.AVATAR_TAKEN_ERROR, {
+                message: `Avatar ${player.avatar.name} déjà pris dans la salle ${accessCode}`,
+            });
+
+            return { success: false };
+        }
+    }
+
+    private handleRoomFullScenario(accessCode: number): void {
+        const updatedRoom = this.gameSocketRoomService.getRoomByAccessCode(accessCode);
+
+        if (updatedRoom && updatedRoom.players.length >= updatedRoom.maxPlayers) {
+            const locked = this.gameSocketRoomService.lockRoom(accessCode, updatedRoom.organizer);
+
+            if (locked) {
+                this.server.to(accessCode.toString()).emit(SocketEvents.ROOM_LOCKED, {
+                    message: 'La salle est verrouillée car le nombre maximal de joueurs a été atteint.',
+                    isLocked: true,
+                });
+            }
         }
     }
 }

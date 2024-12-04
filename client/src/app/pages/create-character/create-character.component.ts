@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
@@ -8,6 +8,7 @@ import { ImageShowcaseComponent } from '@app/components/image-showcase/image-sho
 import { ModalComponent } from '@app/components/modal/modal.component';
 import { GameService } from '@app/services/game-services/game.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-create-character',
@@ -16,14 +17,14 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
     templateUrl: './create-character.component.html',
     styleUrl: './create-character.component.scss',
 })
-export class CreateCharacterComponent implements OnInit {
+export class CreateCharacterComponent implements OnInit, OnDestroy {
     character = new PlayerCharacter('');
     gameId: string | null;
 
     isModalOpen = false;
 
     characterStatus: string | null;
-
+    private subscriptions: Subscription = new Subscription();
     constructor(
         private router: Router,
         private gameService: GameService,
@@ -31,9 +32,15 @@ export class CreateCharacterComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.route.queryParamMap.subscribe((params) => {
-            this.gameId = params.get('id');
-        });
+        this.subscriptions.add(
+            this.route.queryParamMap.subscribe((params) => {
+                this.gameId = params.get('id');
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     createCharacter() {

@@ -16,7 +16,7 @@ import { ItemType } from '@common/enums/item-type';
 import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
 
 @Injectable({
@@ -27,6 +27,7 @@ export class PlayGameBoardSocketService implements OnDestroy {
     signalPlayerLeft = new Subject<string>();
     signalPlayerLeft$ = this.signalPlayerLeft.asObservable();
     private destroy$ = new Subject<void>();
+    private subscriptions: Subscription = new Subscription();
 
     constructor(
         public webSocketService: WebSocketService,
@@ -38,58 +39,87 @@ export class PlayGameBoardSocketService implements OnDestroy {
         public virtualPlayerBattleManagerService: VirtualPlayerBattleManagerService,
         public gameStatisticsService: GameStatisticsService,
     ) {
-        this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_MOVED, data);
-        });
-        this.playGameBoardManagerService.signalUserRespawned$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_RESPAWNED, data);
-        });
-        this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
-            this.socket.emit(SocketEvents.USER_STARTED_MOVING, playerTurnId);
-        });
-        this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
-            this.socket.emit(SocketEvents.USER_FINISHED_MOVING, playerTurnId);
-        });
-        this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
-            this.endTurn(playerTurnId);
-        });
-        this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, data);
-        });
-        this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, data);
-        });
-        this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
-            this.socket.emit(SocketEvents.USER_WON, playerTurnId);
-        });
-        this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_GRABBED_ITEM, data);
-        });
-        this.playGameBoardManagerService.signalUserThrewItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_THREW_ITEM, data);
-        });
-
-        this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.USER_ATTACKED, data);
-        });
-        this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
-            this.socket.emit(SocketEvents.USER_TRIED_ESCAPE, playerTurnId);
-        });
-
-        this.virtualPlayerManagerService.signalMoveVirtualPlayer$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
-            this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION, data);
-        });
-        this.virtualPlayerManagerService.signalVirtualPlayerContinueTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
-            this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN, playerTurnId);
-        });
-        this.virtualPlayerManagerService.signalVirtualPlayerEndedTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
-            this.endTurn(playerTurnId);
-        });
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserMoved$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_MOVED, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserRespawned$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_RESPAWNED, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserStartedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+                this.socket.emit(SocketEvents.USER_STARTED_MOVING, playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserFinishedMoving$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+                this.socket.emit(SocketEvents.USER_FINISHED_MOVING, playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserGotTurnEnded$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId: string) => {
+                this.endTurn(playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserDidDoorAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_DID_DOOR_ACTION, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserDidBattleAction$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_DID_BATTLE_ACTION, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserWon$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+                this.socket.emit(SocketEvents.USER_WON, playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserGrabbedItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_GRABBED_ITEM, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.playGameBoardManagerService.signalUserThrewItem$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_THREW_ITEM, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.battleManagerService.signalUserAttacked$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.USER_ATTACKED, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.battleManagerService.signalUserTriedEscape$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+                this.socket.emit(SocketEvents.USER_TRIED_ESCAPE, playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.virtualPlayerManagerService.signalMoveVirtualPlayer$.pipe(takeUntil(this.destroy$)).subscribe((data) => {
+                this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CHOOSED_DESTINATION, data);
+            }),
+        );
+        this.subscriptions.add(
+            this.virtualPlayerManagerService.signalVirtualPlayerContinueTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+                this.socket.emit(SocketEvents.VIRTUAL_PLAYER_CONTINUE_TURN, playerTurnId);
+            }),
+        );
+        this.subscriptions.add(
+            this.virtualPlayerManagerService.signalVirtualPlayerEndedTurn$.pipe(takeUntil(this.destroy$)).subscribe((playerTurnId) => {
+                this.endTurn(playerTurnId);
+            }),
+        );
     }
 
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
+        this.subscriptions.unsubscribe();
     }
 
     init() {

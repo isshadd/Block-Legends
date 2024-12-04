@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
@@ -19,15 +19,17 @@ import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
+import { Subscription } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class GameMapDataManagerService {
+export class GameMapDataManagerService implements OnDestroy {
     currentName = '';
     currentDescription = '';
     private databaseGame: GameShared;
     private lastSavedGrid: TileShared[][];
     private currentGrid: Tile[][] = [];
+    private subscriptions: Subscription = new Subscription();
     // this line is necessary for the code to work
     // eslint-disable-next-line max-params
     constructor(
@@ -43,6 +45,10 @@ export class GameMapDataManagerService {
         this.databaseGame = game;
         this.lastSavedGrid = this.databaseGame.tiles;
         this.resetGame();
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     resetGame() {
@@ -141,27 +147,31 @@ export class GameMapDataManagerService {
     }
 
     createGameInDb() {
-        this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
-            next: () => {
-                this.router.navigate(['/administration-game']);
-            },
-            error: (errors: unknown) => {
-                this.openErrorModal(errors as string | string[]);
-            },
-        });
+        this.subscriptions.add(
+            this.gameServerCommunicationService.addGame(this.databaseGame).subscribe({
+                next: () => {
+                    this.router.navigate(['/administration-game']);
+                },
+                error: (errors: unknown) => {
+                    this.openErrorModal(errors as string | string[]);
+                },
+            }),
+        );
     }
 
     saveGameInDb() {
         if (!this.databaseGame._id) return;
 
-        this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
-            next: () => {
-                this.router.navigate(['/administration-game']);
-            },
-            error: (errors: unknown) => {
-                this.openErrorModal(errors as string | string[]);
-            },
-        });
+        this.subscriptions.add(
+            this.gameServerCommunicationService.updateGame(this.databaseGame._id, this.databaseGame).subscribe({
+                next: () => {
+                    this.router.navigate(['/administration-game']);
+                },
+                error: (errors: unknown) => {
+                    this.openErrorModal(errors as string | string[]);
+                },
+            }),
+        );
     }
 
     getCurrentGrid(): Tile[][] {

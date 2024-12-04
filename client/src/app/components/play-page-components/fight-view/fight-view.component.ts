@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
 import { MOUVEMENT_DELAY } from '@common/constants/game_constants';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-fight-view',
@@ -10,25 +11,34 @@ import { MOUVEMENT_DELAY } from '@common/constants/game_constants';
     templateUrl: './fight-view.component.html',
     styleUrls: ['./fight-view.component.scss'],
 })
-export class FightViewComponent {
+export class FightViewComponent implements OnDestroy {
     playerDiceResult = 0;
+    subscriptions: Subscription = new Subscription();
     constructor(public battleManagerService: BattleManagerService) {
-        this.battleManagerService.signalUserAttacked$.subscribe((data) => {
-            if (this.battleManagerService.isUserTurn) {
-                this.attackAnimation(data.attackResult);
-            }
-        });
-        this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
-            if (battleManagerService.isUserTurn) {
-                this.escapeAnimation();
-            }
-        });
-        this.battleManagerService.signalOpponentAttacked$.subscribe((attackResult: number) => {
-            this.opponentAttackAnimation(attackResult);
-        });
-        this.battleManagerService.signalOpponentTriedEscape$.subscribe(() => {
-            this.onOpponentEscape();
-        });
+        this.subscriptions.add(
+            this.battleManagerService.signalUserAttacked$.subscribe((data) => {
+                if (this.battleManagerService.isUserTurn) {
+                    this.attackAnimation(data.attackResult);
+                }
+            }),
+        );
+        this.subscriptions.add(
+            this.battleManagerService.signalUserTriedEscape$.subscribe(() => {
+                if (battleManagerService.isUserTurn) {
+                    this.escapeAnimation();
+                }
+            }),
+        );
+        this.subscriptions.add(
+            this.battleManagerService.signalOpponentAttacked$.subscribe((attackResult: number) => {
+                this.opponentAttackAnimation(attackResult);
+            }),
+        );
+        this.subscriptions.add(
+            this.battleManagerService.signalOpponentTriedEscape$.subscribe(() => {
+                this.onOpponentEscape();
+            }),
+        );
     }
 
     get opponentPlayerHealthArray(): unknown[] {
@@ -45,6 +55,10 @@ export class FightViewComponent {
 
     get playerDefenseArray(): unknown[] {
         return this.battleManagerService.currentPlayer ? new Array(this.battleManagerService.userDefence) : [];
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     onAttack() {
