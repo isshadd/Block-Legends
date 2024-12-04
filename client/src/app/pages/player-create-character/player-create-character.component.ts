@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AttributesComponent } from '@app/components/create-character/attributes/attributes.component';
@@ -9,6 +9,7 @@ import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-player-create-character',
@@ -17,7 +18,7 @@ import { SocketEvents } from '@common/enums/gateway-events/socket-events';
     templateUrl: './player-create-character.component.html',
     styleUrl: './player-create-character.component.scss',
 })
-export class PlayerCreateCharacterComponent {
+export class PlayerCreateCharacterComponent implements OnDestroy {
     character = new PlayerCharacter('');
     gameId: string | null;
 
@@ -30,12 +31,18 @@ export class PlayerCreateCharacterComponent {
         private route: ActivatedRoute,
         private webSocketService: WebSocketService,
         private gameService: GameService,
+        private subscriptions: Subscription = new Subscription();
     ) {}
 
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
+    }
+    
     createPlayerCharacter() {
+        this.subscriptions.add(
         this.route.queryParams.subscribe((params) => {
             this.gameId = params.roomId;
-        });
+        }));
         const missingFields: string[] = [];
         const fieldsToCheck = [
             { field: this.character.name, label: 'Nom' },

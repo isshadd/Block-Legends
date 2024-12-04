@@ -14,7 +14,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { MAX_VP_PLAYER_NUMBER } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 import { ProfileEnum } from '@common/enums/profile';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-waiting-view',
@@ -43,6 +43,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     lastVirtualPlayerSocketId: string | null = null;
     virtualPlayerRetryCount = 0;
     errorMessage: string | null = null;
+    private subscriptions: Subscription = new Subscription();
 
     private destroy$ = new Subject<void>();
 
@@ -60,41 +61,46 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
 
-        this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-            this.gameId = params.roomId;
-        });
-
-        this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
-            if (!character) return;
-            this.isOrganizer = character.isOrganizer;
-            this.chatService.setCharacter(character);
-            this.eventJournalService.setCharacter(character);
-            if (!this.gameId) return;
-            if (character.isOrganizer) {
-                this.playersCounter++;
-                this.webSocketService.init();
-                this.webSocketService.createGame(this.gameId, character);
-                this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
-                    this.accessCode = code;
-                    this.changeRoomId(this.accessCode);
-                });
-            } else {
-                this.playersCounter++;
+        this.subscriptions.add(
+            this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+                this.gameId = params.roomId;
+            }),
+        );
+        this.subscriptions.add(
+            this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
+                if (!character) return;
+                this.isOrganizer = character.isOrganizer;
                 this.chatService.setCharacter(character);
                 this.eventJournalService.setCharacter(character);
-                this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
-                    this.accessCode = code;
-                    this.changeRoomId(this.accessCode);
-                });
-            }
-            if (!character.isVirtual) {
-                this.eventJournalService.broadcastEvent(`Le joueur ${character.name} a rejoint la partie.`, []);
-            }
-        });
+                if (!this.gameId) return;
+                if (character.isOrganizer) {
+                    this.playersCounter++;
+                    this.webSocketService.init();
+                    this.webSocketService.createGame(this.gameId, character);
+                    this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
+                        this.accessCode = code;
+                        this.changeRoomId(this.accessCode);
+                    });
+                } else {
+                    this.playersCounter++;
+                    this.chatService.setCharacter(character);
+                    this.eventJournalService.setCharacter(character);
+                    this.accessCode$.pipe(takeUntil(this.destroy$)).subscribe((code) => {
+                        this.accessCode = code;
+                        this.changeRoomId(this.accessCode);
+                    });
+                }
+                if (!character.isVirtual) {
+                    this.eventJournalService.broadcastEvent(`Le joueur ${character.name} a rejoint la partie.`, []);
+                }
+            }),
+        );
 
-        this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
-            this.maxPlayers = max;
-        });
+        this.subscriptions.add(
+            this.maxPlayers$.pipe(takeUntil(this.destroy$)).subscribe((max) => {
+                this.maxPlayers = max;
+            }),
+        );
 
         this.webSocketService.socket.on(SocketEvents.ORGANIZER_LEFT, () => {
             if (!this.isOrganizer && !this.playGameBoardManagerService.winnerPlayer) {
@@ -102,15 +108,17 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.webSocketService.avatarTakenError$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-            if (this.lastVirtualPlayerProfile && this.virtualPlayerRetryCount < this.maxVirtualPlayerRetries) {
-                this.virtualPlayerRetryCount++;
-                this.addVirtualPlayer(this.lastVirtualPlayerProfile);
-            } else {
-                this.lastVirtualPlayerProfile = null;
-                this.virtualPlayerRetryCount = 0;
-            }
-        });
+        this.subscriptions.add(
+            this.webSocketService.avatarTakenError$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+                if (this.lastVirtualPlayerProfile && this.virtualPlayerRetryCount < this.maxVirtualPlayerRetries) {
+                    this.virtualPlayerRetryCount++;
+                    this.addVirtualPlayer(this.lastVirtualPlayerProfile);
+                } else {
+                    this.lastVirtualPlayerProfile = null;
+                    this.virtualPlayerRetryCount = 0;
+                }
+            }),
+        );
 
         this.webSocketService.socket.on(SocketEvents.ROOM_LOCKED, (response: { message: string }) => {
             if (this.isOrganizer) {
@@ -122,16 +130,18 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
             this.eventJournalService.broadcastEvent(response.message, []);
         });
 
-        this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
-            this.playersCounter = players.length;
-            if (this.lastVirtualPlayerProfile) {
-                const virtualPlayer = players.find((p) => p.socketId === this.lastVirtualPlayerSocketId);
-                if (virtualPlayer) {
-                    this.lastVirtualPlayerProfile = null;
-                    this.virtualPlayerRetryCount = 0;
+        this.subscriptions.add(
+            this.players$.pipe(takeUntil(this.destroy$)).subscribe((players) => {
+                this.playersCounter = players.length;
+                if (this.lastVirtualPlayerProfile) {
+                    const virtualPlayer = players.find((p) => p.socketId === this.lastVirtualPlayerSocketId);
+                    if (virtualPlayer) {
+                        this.lastVirtualPlayerProfile = null;
+                        this.virtualPlayerRetryCount = 0;
+                    }
                 }
-            }
-        });
+            }),
+        );
     }
 
     addVirtualPlayer(profile: ProfileEnum): void {
@@ -166,6 +176,7 @@ export class WaitingViewComponent implements OnInit, OnDestroy {
         this.socketStateService.clearSocket();
         this.destroy$.next();
         this.destroy$.complete();
+        this.subscriptions.unsubscribe();
     }
 
     lockRoom(): void {

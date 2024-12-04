@@ -32,7 +32,7 @@ import { SocketStateService } from '@app/services/socket-service/socket-state-se
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { Item } from '@common/classes/Items/item';
 import { TIMEOUT_DURATION } from '@common/constants/game_constants';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-play-page',
@@ -77,12 +77,15 @@ export class PlayPageComponent implements OnInit, OnDestroy {
         private gameService: GameService,
         private socketStateService: SocketStateService,
         private eventJournalService: EventJournalService,
+        private subscriptions: Subscription = new Subscription();
     ) {
+        this.subscriptions.add(
         this.playGameBoardManagerService.signalManagerFinishedInit$.subscribe(() => {
             this.onPlayGameBoardManagerInit();
-        });
+        }));
 
         this.playGameBoardSocketService.init();
+        this.subscriptions.add(
         this.playGameBoardSocketService.signalPlayerLeft$.subscribe((socketId: string) => {
             const abandonPlayer = this.players.find((p) => p.socketId === socketId);
             if (!abandonPlayer) throw new Error('Player not found');
@@ -91,7 +94,7 @@ export class PlayPageComponent implements OnInit, OnDestroy {
                 ...this.players.filter((player) => player !== abandonPlayer), // Exclude the player who clicked "Abandon"
                 abandonPlayer,
             ];
-        });
+        }));
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -116,10 +119,12 @@ export class PlayPageComponent implements OnInit, OnDestroy {
     }
     ngOnInit(): void {
         this.socketStateService.setActiveSocket(this.webSocketService);
+        this.subscriptions.add(
         this.webSocketService.players$.pipe(takeUntil(this.destroy$)).subscribe((updatedPlayers) => {
             this.actualPlayers = updatedPlayers;
-        });
+        }));
 
+        this.subscriptions.add(
         this.gameService.character$.pipe(takeUntil(this.destroy$)).subscribe((character) => {
             if (character) {
                 this.myPlayer = character;
@@ -127,12 +132,13 @@ export class PlayPageComponent implements OnInit, OnDestroy {
                     this.totalLifePoints = this.myPlayer.attributes.life;
                 }
             }
-        });
+        }));
     }
 
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
+        this.subscriptions.unsubscribe();
     }
     onMapTileMouseDown(event: MouseEvent, tile: Tile) {
         this.playPageMouseHandlerService.onMapTileMouseDown(event, tile);
