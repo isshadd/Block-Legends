@@ -273,4 +273,160 @@ describe('PlayGameStatisticsService', () => {
 
         expect(loggerSpy).toHaveBeenCalledWith(`Player pas trouve pour id: ${mockPlayer.socketId}`);
     });
+
+    it('should increase total player turns', () => {
+        const accessCode = 1;
+        const gameStatistics = { totalPlayerTurns: 0 } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.increaseGameTotalPlayerTurns(accessCode);
+
+        expect(gameStatistics.totalPlayerTurns).toBe(1);
+    });
+
+    it('should log an error if room is not found during increaseGameTotalPlayerTurns', () => {
+        const accessCode = 1;
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        service.increaseGameTotalPlayerTurns(accessCode);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+    });
+
+    it('should increase total terrain tiles visited if new terrain tile is visited', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const gameBoardRoom = { game: { tiles: [[{ type: TileType.Grass } as TileShared]] } } as GameBoardParameters;
+        const gameStatistics = { totalTerrainTilesVisited: [] } as GameStatistics;
+
+        gameSocketRoomService.gameBoardRooms.set(accessCode, gameBoardRoom);
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
+
+        expect(gameStatistics.totalTerrainTilesVisited).toContainEqual(tilePosition);
+    });
+
+    it('should not increase total terrain tiles visited if tile is already visited', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const gameBoardRoom = { game: { tiles: [[{ type: TileType.Grass } as TileShared]] } } as GameBoardParameters;
+        const gameStatistics = { totalTerrainTilesVisited: [tilePosition] } as GameStatistics;
+
+        gameSocketRoomService.gameBoardRooms.set(accessCode, gameBoardRoom);
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
+
+        expect(gameStatistics.totalTerrainTilesVisited).toHaveLength(1);
+    });
+
+    it('should log an error if room is not found during increaseGameTotalTerrainTilesVisited', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        service.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+    });
+
+    it('should log an error if gameStatisticsRoom is not found during increaseGameTotalTerrainTilesVisited', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const gameStatistics = { totalTerrainTilesVisited: [] } as GameStatistics;
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        service.increaseGameTotalTerrainTilesVisited(accessCode, tilePosition);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+    });
+
+    it('should increase total doors interacted if new door is interacted', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const gameStatistics = { totalDoorsInteracted: [] } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.increaseGameTotalDoorsInteracted(accessCode, tilePosition);
+
+        expect(gameStatistics.totalDoorsInteracted).toContainEqual(tilePosition);
+    });
+
+    it('should not increase total doors interacted if door is already interacted', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const gameStatistics = { totalDoorsInteracted: [tilePosition] } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.increaseGameTotalDoorsInteracted(accessCode, tilePosition);
+
+        expect(gameStatistics.totalDoorsInteracted).toHaveLength(1);
+    });
+
+    it('should log an error if room is not found during increaseGameTotalDoorsInteracted', () => {
+        const accessCode = 1;
+        const tilePosition = { x: 0, y: 0 };
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        service.increaseGameTotalDoorsInteracted(accessCode, tilePosition);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+    });
+
+    it('should add player that grabbed flag', () => {
+        const accessCode = 1;
+        const gameStatistics = { totalPlayersThatGrabbedFlag: [] } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.addPlayerThatGrabbedFlag(accessCode, mockPlayer.socketId);
+
+        expect(gameStatistics.totalPlayersThatGrabbedFlag).toContain(mockPlayer.socketId);
+    });
+
+    it('should not add player that grabbed flag if already added', () => {
+        const accessCode = 1;
+        const gameStatistics = { totalPlayersThatGrabbedFlag: [mockPlayer.socketId] } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        service.addPlayerThatGrabbedFlag(accessCode, mockPlayer.socketId);
+
+        expect(gameStatistics.totalPlayersThatGrabbedFlag).toHaveLength(1);
+    });
+
+    it('should log an error if room is not found during addPlayerThatGrabbedFlag', () => {
+        const accessCode = 1;
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        service.addPlayerThatGrabbedFlag(accessCode, mockPlayer.socketId);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+    });
+
+    it('should end game statistics and return game statistics room', () => {
+        const accessCode = 1;
+        const gameStatistics = { isGameOn: true } as GameStatistics;
+
+        gameSocketRoomService.gameStatisticsRooms.set(accessCode, gameStatistics);
+
+        const result = service.endGameStatistics(accessCode);
+
+        expect(result).toEqual(gameStatistics);
+        expect(gameStatistics.isGameOn).toBe(false);
+    });
+
+    it('should log an error if room is not found during endGameStatistics', () => {
+        const accessCode = 1;
+        const loggerSpy = jest.spyOn(service['logger'], 'error').mockImplementation(jest.fn());
+
+        const result = service.endGameStatistics(accessCode);
+
+        expect(loggerSpy).toHaveBeenCalledWith(`Room pas trouve pour code: ${accessCode}`);
+        expect(result).toBeUndefined();
+    });
 });
