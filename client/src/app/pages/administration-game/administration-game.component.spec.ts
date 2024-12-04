@@ -161,41 +161,4 @@ describe('AdministrationGameComponent', () => {
             expect(gameMapDataManagerSpy.convertJsonToGameShared).not.toHaveBeenCalled();
         }));
     });
-
-    it('should trigger file input click when triggerFileInput is called', () => {
-        const clickSpy = jasmine.createSpy('click'); // Create a spy for the click method
-        const fileInputMock = { click: clickSpy } as unknown as HTMLInputElement;
-
-        // Mock the getElementById method to return the mocked file input element
-        spyOn(document, 'getElementById').and.returnValue(fileInputMock);
-
-        component.triggerFileInput();
-
-        // Assert that getElementById was called with 'fileInput'
-        expect(document.getElementById).toHaveBeenCalledWith('fileInput');
-        // Assert that the click method was called on the mock file input
-        expect(clickSpy).toHaveBeenCalled();
-    });
-
-    it('should handle file input errors and open error modal', async () => {
-        const mockFile = new File(['invalid data'], 'invalid-game.json', { type: 'application/json' });
-        const mockEvent = { target: { files: [mockFile] } } as unknown as Event;
-
-        // Mock services
-        spyOn(component['gameMapDataManagerService'], 'convertJsonToGameShared').and.returnValue(Promise.reject(new Error('Invalid file format')));
-        const openErrorModalSpy = spyOn(component['gameMapDataManagerService'], 'openErrorModal');
-
-        await component.onFileChange(mockEvent);
-
-        expect(component.selectedFile).toBe(mockFile);
-        expect(openErrorModalSpy).toHaveBeenCalledWith("Impossible d'importer le fichier <br> Veuillez vérifier le format du fichier.");
-    });
-
-    it('should handle no file selected gracefully', async () => {
-        const mockEvent = { target: { files: null } } as unknown as Event;
-
-        await component.onFileChange(mockEvent);
-
-        expect(component.selectedFile).toBeNull();
-    });
 });

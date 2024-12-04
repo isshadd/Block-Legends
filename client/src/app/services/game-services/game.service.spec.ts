@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { GameService } from './game.service';
 import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
 import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject } from 'rxjs';
+import { GameService } from './game.service';
 
-const ACCESS_CODE = 12345;
+const ACCESS = 12345;
 
 describe('GameService', () => {
     let service: GameService;
@@ -52,11 +52,10 @@ describe('GameService', () => {
         });
 
         it('should set access code', () => {
-            const testCode = 12345;
-            service.setAccessCode(testCode);
+            service.setAccessCode(ACCESS);
 
             service.accessCode$.subscribe((code) => {
-                expect(code).toBe(testCode);
+                expect(code).toBe(ACCESS);
             });
         });
 
@@ -146,17 +145,17 @@ describe('GameService', () => {
     describe('Name Management', () => {
         it('should release virtual player name', () => {
             const testName = 'TestName';
-            (service as unknown).usedNames.add(testName);
+            (service as GameService).usedNames.add(testName);
 
             service.releaseVirtualPlayerName(testName);
 
-            expect((service as unknown).usedNames.has(testName)).toBeFalse();
+            expect((service as GameService).usedNames.has(testName)).toBeFalse();
         });
 
         it('should handle releasing non-existent name', () => {
             const testName = 'NonExistentName';
             service.releaseVirtualPlayerName(testName);
-            expect((service as unknown).usedNames.has(testName)).toBeFalse();
+            expect((service as GameService).usedNames.has(testName)).toBeFalse();
         });
     });
 
@@ -164,8 +163,8 @@ describe('GameService', () => {
         it('should clear game state', () => {
             const testCharacter = new PlayerCharacter('TestPlayer');
             service.setCharacter(testCharacter);
-            service.setAccessCode(ACCESS_CODE);
-            (service as unknown).usedNames.add('TestName');
+            service.setAccessCode(ACCESS);
+            (service as GameService).usedNames.add('TestName');
 
             service.clearGame();
 
@@ -175,7 +174,7 @@ describe('GameService', () => {
             service.character$.subscribe((character) => {
                 expect(character).toBeNull();
             });
-            expect((service as unknown).usedNames.size).toBe(0);
+            expect((service as GameService).usedNames.size).toBe(0);
         });
 
         it('should set selected avatar', (done) => {

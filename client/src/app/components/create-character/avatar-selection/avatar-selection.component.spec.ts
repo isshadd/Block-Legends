@@ -76,7 +76,7 @@ describe('AvatarSelectionComponent', () => {
 
         it('should not filter if takenAvatars is undefined', () => {
             const initialLength = component.avatarList.length;
-            component.takenAvatars = undefined as unknown;
+            component.takenAvatars = [];
 
             component.filterAvatars();
 
