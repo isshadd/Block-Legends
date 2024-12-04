@@ -1775,4 +1775,667 @@ describe('VirtualPlayerManagerService', () => {
             expect(result).toBe(1);
         });
     });
+    describe('areTilesEqual', () => {
+        beforeEach(() => {
+            service = TestBed.inject(VirtualPlayerManagerService);
+        });
+
+        it('should return true for tiles with same coordinates', () => {
+            const tile1 = new WalkableTile();
+            tile1.coordinates = { x: 1, y: 1 };
+
+            const tile2 = new WalkableTile();
+            tile2.coordinates = { x: 1, y: 1 };
+
+            const result = service.areTilesEqual(tile1, tile2);
+            expect(result).toBeTrue();
+        });
+
+        it('should return false for tiles with different x coordinates', () => {
+            const tile1 = new WalkableTile();
+            tile1.coordinates = { x: 1, y: 1 };
+
+            const tile2 = new WalkableTile();
+            tile2.coordinates = { x: 2, y: 1 };
+
+            const result = service.areTilesEqual(tile1, tile2);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false for tiles with different y coordinates', () => {
+            const tile1 = new WalkableTile();
+            tile1.coordinates = { x: 1, y: 1 };
+
+            const tile2 = new WalkableTile();
+            tile2.coordinates = { x: 1, y: 2 };
+
+            const result = service.areTilesEqual(tile1, tile2);
+            expect(result).toBeFalse();
+        });
+
+        it('should return false for tiles with completely different coordinates', () => {
+            const tile1 = new WalkableTile();
+            tile1.coordinates = { x: 1, y: 1 };
+
+            const tile2 = new WalkableTile();
+            tile2.coordinates = { x: 2, y: 2 };
+
+            const result = service.areTilesEqual(tile1, tile2);
+            expect(result).toBeFalse();
+        });
+    });
+
+    describe('moveVirtualPlayer', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+            mockPlayer.isVirtual = true;
+            mockPlayer.comportement = ProfileEnum.Defensive;
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'isGameModeCTF'], {
+                signalUserMoved: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj(
+                'PlayGameBoardManagerService',
+                ['findPlayerFromSocketId', 'handleTileItem', 'checkIfPLayerDidEverything', 'didPlayerTripped'],
+                {
+                    signalUserMoved: jasmine.createSpyObj('Subject', ['next']),
+                    signalUserFinishedMoving: jasmine.createSpyObj('Subject', ['next']),
+                    signalUserGotTurnEnded: jasmine.createSpyObj('Subject', ['next']),
+                },
+            );
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+            service.signalVirtualPlayerContinueTurn = jasmine.createSpyObj('Subject', ['next']);
+        });
+
+        it('should handle case when path has no next tile', () => {
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            const destination = { x: 1, y: 1 };
+
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(currentTile, [currentTile]);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            service.moveVirtualPlayer('player123', destination);
+
+            expect(mockPlayGameBoardManagerService.signalUserFinishedMoving.next).toHaveBeenCalledWith('player123');
+            expect(mockPlayGameBoardManagerService.checkIfPLayerDidEverything).toHaveBeenCalledWith(mockPlayer);
+            expect(service.signalVirtualPlayerContinueTurn.next).toHaveBeenCalledWith('player123');
+        });
+
+        it('should handle invalid path case', () => {
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            const destination = { x: 1, y: 1 };
+
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            service.moveVirtualPlayer('player123', destination);
+
+            expect(mockPlayGameBoardManagerService.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserFinishedMoving.next).not.toHaveBeenCalled();
+            expect(service.signalVirtualPlayerContinueTurn.next).not.toHaveBeenCalled();
+        });
+
+        it('should not move if player is not found', () => {
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(null);
+
+            service.moveVirtualPlayer('nonexistent', { x: 1, y: 1 });
+
+            expect(mockGameMapDataManagerService.getTileAt).not.toHaveBeenCalled();
+            expect(service.signalVirtualPlayerContinueTurn.next).not.toHaveBeenCalled();
+        });
+
+        it('should handle CTF game winning condition', () => {
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+            mockPlayerEntity.spawnCoordinates = { x: 1, y: 1 };
+
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 1, y: 1 };
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj(
+                'PlayGameBoardManagerService',
+                ['findPlayerFromSocketId', 'doesPlayerHaveItem', 'checkIfPLayerDidEverything'],
+                {
+                    signalUserMoved: jasmine.createSpyObj('Subject', ['next']),
+                    signalUserWon: jasmine.createSpyObj('Subject', ['next']),
+                },
+            );
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'isGameModeCTF']);
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(spawnTile);
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+            mockPlayGameBoardManagerService.doesPlayerHaveItem.and.returnValue(true);
+
+            const possibleMoves = new Map<Tile, Tile[]>();
+            possibleMoves.set(spawnTile, [currentTile, spawnTile]);
+            spyOn(service, 'setPossibleMoves').and.returnValue(possibleMoves);
+
+            service.moveVirtualPlayer('player123', spawnTile.coordinates);
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).toHaveBeenCalledWith('player123');
+        });
+    });
+    describe('didPlayerTripped', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', ['didPlayerTripped'], {
+                signalUserFinishedMoving: jasmine.createSpyObj('Subject', ['next']),
+                signalUserGotTurnEnded: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+        });
+
+        it('should return true and emit signals when player trips', () => {
+            const tile = new WalkableTile();
+            tile.coordinates = { x: 1, y: 1 };
+            mockPlayGameBoardManagerService.didPlayerTripped.and.returnValue(true);
+
+            const result = service.didPlayerTripped(tile, mockPlayer);
+
+            expect(result).toBeTrue();
+            expect(mockPlayGameBoardManagerService.didPlayerTripped).toHaveBeenCalledWith(tile.type, mockPlayer);
+            expect(mockPlayGameBoardManagerService.signalUserFinishedMoving.next).toHaveBeenCalledWith('player123');
+            expect(mockPlayGameBoardManagerService.signalUserGotTurnEnded.next).toHaveBeenCalledWith('player123');
+        });
+
+        it('should return false and not emit signals when player does not trip', () => {
+            const tile = new WalkableTile();
+            tile.coordinates = { x: 1, y: 1 };
+            mockPlayGameBoardManagerService.didPlayerTripped.and.returnValue(false);
+
+            const result = service.didPlayerTripped(tile, mockPlayer);
+
+            expect(result).toBeFalse();
+            expect(mockPlayGameBoardManagerService.didPlayerTripped).toHaveBeenCalledWith(tile.type, mockPlayer);
+            expect(mockPlayGameBoardManagerService.signalUserFinishedMoving.next).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserGotTurnEnded.next).not.toHaveBeenCalled();
+        });
+
+        it('should handle different tile types', () => {
+            const iceTile = new WalkableTile();
+            iceTile.type = TileType.Ice;
+            iceTile.coordinates = { x: 1, y: 1 };
+
+            const grassTile = new WalkableTile();
+            grassTile.type = TileType.Grass;
+            grassTile.coordinates = { x: 2, y: 2 };
+
+            mockPlayGameBoardManagerService.didPlayerTripped.and.returnValues(true, false);
+
+            expect(service.didPlayerTripped(iceTile, mockPlayer)).toBeTrue();
+            expect(service.didPlayerTripped(grassTile, mockPlayer)).toBeFalse();
+            expect(mockPlayGameBoardManagerService.didPlayerTripped).toHaveBeenCalledWith(iceTile.type, mockPlayer);
+            expect(mockPlayGameBoardManagerService.didPlayerTripped).toHaveBeenCalledWith(grassTile.type, mockPlayer);
+        });
+    });
+
+    describe('throwItemInListAndKeepTheRest', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+        let nextPathTile: TerrainTile;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+            mockPlayer.isVirtual = true;
+
+            nextPathTile = new TerrainTile();
+            nextPathTile.coordinates = { x: 1, y: 1 };
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+                signalUserThrewItem: jasmine.createSpyObj('Subject', ['next']),
+                signalUserGrabbedItem: jasmine.createSpyObj('Subject', ['next']),
+            });
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+        });
+
+        it('should handle case when no item to throw is found', () => {
+            mockPlayer.socketId = 'player123';
+            mockPlayer.comportement = null;
+
+            const possibleItems = [{ type: ItemType.Sword } as Item, { type: ItemType.MagicShield } as Item];
+
+            nextPathTile.coordinates = { x: 1, y: 1 };
+
+            service.throwItemInListAndKeepTheRest(mockPlayer, possibleItems, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+        });
+
+        it('should not throw item when player has no comportement', () => {
+            mockPlayer.comportement = null;
+
+            const possibleItems = [{ type: ItemType.Sword } as Item, { type: ItemType.MagicShield } as Item];
+
+            service.throwItemInListAndKeepTheRest(mockPlayer, possibleItems, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).not.toHaveBeenCalled();
+        });
+
+        it('should handle empty items list', () => {
+            const possibleItems: Item[] = [];
+
+            spyOn(Array.prototype, 'reduce').and.callThrough();
+
+            service.throwItemInListAndKeepTheRest(mockPlayer, possibleItems, nextPathTile);
+
+            expect(Array.prototype.reduce).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+        });
+
+        it('should grab tile item after throwing', () => {
+            mockPlayer.comportement = ProfileEnum.Agressive;
+
+            nextPathTile.item = { type: ItemType.Sword } as Item;
+
+            const possibleItems = [{ type: ItemType.EnchantedBook } as Item, { type: ItemType.Totem } as Item];
+
+            service.throwItemInListAndKeepTheRest(mockPlayer, possibleItems, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserGrabbedItem.next).toHaveBeenCalledWith({
+                itemType: ItemType.Sword,
+                tileCoordinates: nextPathTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+        });
+    });
+
+    describe('throwItem', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+        let nextPathTile: TerrainTile;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+
+            nextPathTile = new TerrainTile();
+            nextPathTile.coordinates = { x: 1, y: 1 };
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+                signalUserThrewItem: jasmine.createSpyObj('Subject', ['next']),
+                signalUserGrabbedItem: jasmine.createSpyObj('Subject', ['next']),
+            });
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+        });
+
+        it('should not emit signals when item is the last item in possible items', () => {
+            const item = { type: ItemType.Sword } as Item;
+            const possibleItems = [item];
+
+            service.throwItem(mockPlayer, possibleItems, item, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(possibleItems.length).toBe(0);
+        });
+
+        it('should emit throw signal when item is different from last item', () => {
+            const itemToThrow = { type: ItemType.EnchantedBook } as Item;
+            const lastItem = { type: ItemType.Sword } as Item;
+            const possibleItems = [itemToThrow, lastItem];
+
+            service.throwItem(mockPlayer, possibleItems, itemToThrow, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).toHaveBeenCalledWith({
+                itemType: ItemType.EnchantedBook,
+                tileCoordinates: nextPathTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+            expect(possibleItems.length).toBe(1);
+        });
+
+        it('should emit both throw and grab signals when tile has an item', () => {
+            const itemToThrow = { type: ItemType.EnchantedBook } as Item;
+            const lastItem = { type: ItemType.Sword } as Item;
+            const possibleItems = [itemToThrow, lastItem];
+
+            nextPathTile.item = { type: ItemType.MagicShield } as Item;
+
+            service.throwItem(mockPlayer, possibleItems, itemToThrow, nextPathTile);
+
+            expect(mockPlayGameBoardManagerService.signalUserThrewItem.next).toHaveBeenCalledWith({
+                itemType: ItemType.EnchantedBook,
+                tileCoordinates: nextPathTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+            expect(mockPlayGameBoardManagerService.signalUserGrabbedItem.next).toHaveBeenCalledWith({
+                itemType: ItemType.MagicShield,
+                tileCoordinates: nextPathTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+            expect(possibleItems.length).toBe(1);
+        });
+    });
+
+    describe('wonBattle', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+            mockPlayer.fightWins = 0;
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', ['findPlayerFromSocketId'], {
+                signalUserWon: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['isGameModeCTF']);
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+        });
+
+        it('should not do anything if player is not found', () => {
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(null);
+
+            service.wonBattle('nonexistent');
+
+            expect(mockGameMapDataManagerService.isGameModeCTF).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should check for classic game win when player is found', () => {
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+            spyOn(service, 'checkIfPlayerWonClassicGame');
+
+            service.wonBattle('player123');
+
+            expect(mockPlayGameBoardManagerService.findPlayerFromSocketId).toHaveBeenCalledWith('player123');
+            expect(service.checkIfPlayerWonClassicGame).toHaveBeenCalledWith(mockPlayer);
+        });
+
+        it('should not emit win signal in CTF mode', () => {
+            mockPlayer.fightWins = 3;
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+
+            service.wonBattle('player123');
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should emit win signal when player reaches necessary wins in classic mode', () => {
+            mockPlayer.fightWins = 3;
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+
+            service.wonBattle('player123');
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).toHaveBeenCalledWith('player123');
+        });
+    });
+
+    describe('lostBattle', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', ['findPlayerFromSocketId'], {
+                signalUserRespawned: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['getTileAt', 'getClosestWalkableTileWithoutPlayerAt']);
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+        });
+
+        it('should not do anything if player is not found', () => {
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(null);
+
+            service.lostBattle('nonexistent');
+
+            expect(mockGameMapDataManagerService.getTileAt).not.toHaveBeenCalled();
+            expect(mockGameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt).not.toHaveBeenCalled();
+            expect(mockPlayGameBoardManagerService.signalUserRespawned.next).not.toHaveBeenCalled();
+        });
+
+        it('should emit respawn signal with correct tiles', () => {
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 0, y: 0 };
+
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 5, y: 5 };
+
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockGameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt.and.returnValue(spawnTile);
+
+            service.lostBattle('player123');
+
+            expect(mockPlayGameBoardManagerService.findPlayerFromSocketId).toHaveBeenCalledWith('player123');
+            expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith(mockPlayer.mapEntity.coordinates);
+            expect(mockGameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt).toHaveBeenCalledWith(mockPlayer.mapEntity);
+            expect(mockPlayGameBoardManagerService.signalUserRespawned.next).toHaveBeenCalledWith({
+                playerTurnId: 'player123',
+                fromTile: currentTile.coordinates,
+                toTile: spawnTile.coordinates,
+            });
+        });
+
+        it('should handle different spawn locations', () => {
+            const currentTile = new WalkableTile();
+            currentTile.coordinates = { x: 3, y: 3 };
+
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 0, y: 0 };
+
+            mockPlayGameBoardManagerService.findPlayerFromSocketId.and.returnValue(mockPlayer);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(currentTile);
+            mockGameMapDataManagerService.getClosestWalkableTileWithoutPlayerAt.and.returnValue(spawnTile);
+
+            service.lostBattle('player123');
+
+            expect(mockPlayGameBoardManagerService.signalUserRespawned.next).toHaveBeenCalledWith({
+                playerTurnId: 'player123',
+                fromTile: currentTile.coordinates,
+                toTile: spawnTile.coordinates,
+            });
+        });
+    });
+
+    describe('checkIfPlayerWonClassicGame', () => {
+        let mockPlayer: PlayerCharacter;
+        const NECESSARY_WIN_NUMBER = 3;
+
+        beforeEach(() => {
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.fightWins = 0;
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', [], {
+                signalUserWon: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['isGameModeCTF']);
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+        });
+
+        it('should emit win signal when player has enough wins in classic mode', () => {
+            mockPlayer.fightWins = NECESSARY_WIN_NUMBER;
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+
+            service.checkIfPlayerWonClassicGame(mockPlayer);
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).toHaveBeenCalledWith('player123');
+        });
+
+        it('should not emit win signal when player does not have enough wins', () => {
+            mockPlayer.fightWins = NECESSARY_WIN_NUMBER - 1;
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+
+            service.checkIfPlayerWonClassicGame(mockPlayer);
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit win signal in CTF mode regardless of wins', () => {
+            mockPlayer.fightWins = NECESSARY_WIN_NUMBER + 1;
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+
+            service.checkIfPlayerWonClassicGame(mockPlayer);
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should not emit win signal when wins equals zero', () => {
+            mockPlayer.fightWins = 0;
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+
+            service.checkIfPlayerWonClassicGame(mockPlayer);
+
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('checkIfVirtualPlayerWonCTFGame', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockPlayerEntity: PlayerMapEntity;
+
+        beforeEach(() => {
+            mockPlayerEntity = new PlayerMapEntity('avatar.png');
+            mockPlayerEntity.coordinates = { x: 0, y: 0 };
+            mockPlayerEntity.spawnCoordinates = { x: 1, y: 1 };
+
+            mockPlayer = new PlayerCharacter('TestPlayer');
+            mockPlayer.socketId = 'player123';
+            mockPlayer.mapEntity = mockPlayerEntity;
+
+            mockGameMapDataManagerService = jasmine.createSpyObj('GameMapDataManagerService', ['isGameModeCTF', 'getTileAt']);
+
+            mockPlayGameBoardManagerService = jasmine.createSpyObj('PlayGameBoardManagerService', ['doesPlayerHaveItem'], {
+                signalUserWon: jasmine.createSpyObj('Subject', ['next']),
+            });
+
+            service.playGameBoardManagerService = mockPlayGameBoardManagerService;
+            service.gameMapDataManagerService = mockGameMapDataManagerService;
+        });
+
+        it('should return false if not in CTF mode', () => {
+            const newTile = new WalkableTile();
+            newTile.coordinates = { x: 1, y: 1 };
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(false);
+
+            const result = service.checkIfVirtualPlayerWonCTFGame(mockPlayer, newTile);
+
+            expect(result).toBeFalse();
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should return true and emit win signal when player with flag reaches spawn', () => {
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 1, y: 1 };
+
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(spawnTile);
+            mockPlayGameBoardManagerService.doesPlayerHaveItem.and.returnValue(true);
+
+            const result = service.checkIfVirtualPlayerWonCTFGame(mockPlayer, spawnTile);
+
+            expect(result).toBeTrue();
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).toHaveBeenCalledWith('player123');
+            expect(mockGameMapDataManagerService.getTileAt).toHaveBeenCalledWith(mockPlayerEntity.spawnCoordinates);
+            expect(mockPlayGameBoardManagerService.doesPlayerHaveItem).toHaveBeenCalledWith(mockPlayer, ItemType.Flag);
+        });
+
+        it('should return false when player without flag reaches spawn', () => {
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 1, y: 1 };
+
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(spawnTile);
+            mockPlayGameBoardManagerService.doesPlayerHaveItem.and.returnValue(false);
+
+            const result = service.checkIfVirtualPlayerWonCTFGame(mockPlayer, spawnTile);
+
+            expect(result).toBeFalse();
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+
+        it('should return false when player with flag is not at spawn', () => {
+            const nonSpawnTile = new WalkableTile();
+            nonSpawnTile.coordinates = { x: 2, y: 2 };
+
+            const spawnTile = new WalkableTile();
+            spawnTile.coordinates = { x: 1, y: 1 };
+
+            mockGameMapDataManagerService.isGameModeCTF.and.returnValue(true);
+            mockGameMapDataManagerService.getTileAt.and.returnValue(spawnTile);
+            mockPlayGameBoardManagerService.doesPlayerHaveItem.and.returnValue(true);
+
+            const result = service.checkIfVirtualPlayerWonCTFGame(mockPlayer, nonSpawnTile);
+
+            expect(result).toBeFalse();
+            expect(mockPlayGameBoardManagerService.signalUserWon.next).not.toHaveBeenCalled();
+        });
+    });
 });
