@@ -450,7 +450,6 @@ describe('PlayGameBoardGateway', () => {
             gateway.handleVirtualPlayerContinueTurn(mockClient as Socket, mockClient.id);
 
             expect(gateway.isClientTurn).toHaveBeenCalledWith(mockClient.id);
-            expect(setTimeout).toHaveBeenCalled;
             jest.runAllTimers();
             expect(gateway.continueVirtualPlayerTurn).toHaveBeenCalledWith(mockRoom.accessCode, mockClient.id);
         });
