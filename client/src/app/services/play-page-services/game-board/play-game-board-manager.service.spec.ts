@@ -506,13 +506,174 @@ describe('PlayGameBoardManagerService', () => {
             expect(service.signalUserGotTurnEnded.next).toHaveBeenCalled();
             expect(service.setupPossibleMoves).not.toHaveBeenCalled();
         });
+
+        it('should signal userFinishedMoving if possibleItems is not empty', async () => {
+            const tile1 = new GrassTile();
+            const tile2 = new GrassTile();
+            tile1.coordinates = { x: 0, y: 0 };
+            tile2.coordinates = { x: 1, y: 1 };
+            service.possibleItems = [new DiamondSword()];
+
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service, 'hidePossibleMoves');
+            spyOn(service.signalUserStartedMoving, 'next');
+            spyOn(service.signalUserMoved, 'next');
+            spyOn(service.signalUserFinishedMoving, 'next');
+            spyOn(service, 'checkIfPLayerDidEverything');
+            spyOn(service, 'setupPossibleMoves');
+            spyOn(service, 'handleTileItem').and.returnValue(true);
+
+            service.isUserTurn = true;
+            service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
+
+            await service.moveUserPlayer(tile2);
+
+            expect(service.hidePossibleMoves).toHaveBeenCalled();
+            expect(service.signalUserStartedMoving.next).toHaveBeenCalled();
+            expect(service.signalUserMoved.next).toHaveBeenCalledWith({
+                fromTile: tile1.coordinates,
+                toTile: tile2.coordinates,
+                playerTurnId: mockPlayerCharacter.socketId,
+                isTeleport: false,
+            });
+            expect(service.signalUserFinishedMoving.next).toHaveBeenCalled();
+            expect(service.checkIfPLayerDidEverything).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should not move the user if it is not the user’s turn', async () => {
+            const tile1 = new GrassTile();
+            const tile2 = new GrassTile();
+            tile1.coordinates = { x: 0, y: 0 };
+            tile2.coordinates = { x: 1, y: 1 };
+
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockPlayerCharacter);
+            spyOn(service, 'hidePossibleMoves');
+            spyOn(service.signalUserStartedMoving, 'next');
+            spyOn(service.signalUserMoved, 'next');
+            spyOn(service.signalUserFinishedMoving, 'next');
+            spyOn(service, 'checkIfPLayerDidEverything');
+            spyOn(service, 'setupPossibleMoves');
+
+            service.isUserTurn = false;
+            service.userCurrentPossibleMoves = new Map([[tile2, [tile1, tile2]]]);
+
+            await service.moveUserPlayer(tile2);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserStartedMoving.next).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.signalUserFinishedMoving.next).not.toHaveBeenCalled();
+            expect(service.checkIfPLayerDidEverything).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('teleportPlayer', () => {
+        let mockTile: WalkableTile;
+        let mockUserPlayerCharacter: PlayerCharacter;
+        let mockLastTile: WalkableTile;
+
+        beforeEach(() => {
+            mockTile = new GrassTile();
+            mockTile.coordinates = { x: 2, y: 2 } as Vec2;
+
+            mockUserPlayerCharacter = new PlayerCharacter('player1');
+            mockUserPlayerCharacter.socketId = 'player1';
+            mockUserPlayerCharacter.mapEntity = new PlayerMapEntity('avatar.png');
+            mockUserPlayerCharacter.mapEntity.coordinates = { x: 1, y: 1 } as Vec2;
+
+            mockLastTile = new WalkableTile();
+            mockLastTile.coordinates = { x: 1, y: 1 } as Vec2;
+
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(mockUserPlayerCharacter);
+            spyOn(service, 'getPlayerTile').and.returnValue(mockLastTile);
+            spyOn(service, 'hidePossibleMoves');
+            spyOn(service.signalUserMoved, 'next');
+            spyOn(service, 'waitInterval').and.returnValue(Promise.resolve());
+            spyOn(service, 'setupPossibleMoves');
+        });
+
+        it('should do nothing if userPlayerCharacter is not found', async () => {
+            (service.getCurrentPlayerCharacter as jasmine.Spy).and.returnValue(null);
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if it is not user’s turn', async () => {
+            service.isUserTurn = false;
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if lastTile is not found', async () => {
+            (service.getPlayerTile as jasmine.Spy).and.returnValue(null);
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if toTile is not walkable', async () => {
+            mockTile.isWalkable = () => false;
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if toTile has a player', async () => {
+            mockTile.hasPlayer = () => true;
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should do nothing if toTile is terrain and item is grabbable', async () => {
+            const terrainTile = new GrassTile();
+            terrainTile.coordinates = { x: 2, y: 2 } as Vec2;
+            terrainTile.item = new DiamondSword();
+
+            await service.teleportPlayer(terrainTile);
+
+            expect(service.hidePossibleMoves).not.toHaveBeenCalled();
+            expect(service.signalUserMoved.next).not.toHaveBeenCalled();
+            expect(service.setupPossibleMoves).not.toHaveBeenCalled();
+        });
+
+        it('should hide possible moves, emit signalUserMoved, wait for interval, and setup possible moves if all conditions are met', async () => {
+            service.isUserTurn = true;
+
+            await service.teleportPlayer(mockTile);
+
+            expect(service.hidePossibleMoves).toHaveBeenCalled();
+            expect(service.signalUserMoved.next).toHaveBeenCalledWith({
+                fromTile: mockLastTile.coordinates,
+                toTile: mockTile.coordinates,
+                playerTurnId: mockUserPlayerCharacter.socketId,
+                isTeleport: true,
+            });
+            expect(service.waitInterval).toHaveBeenCalledWith(service.movingTimeInterval);
+            expect(service.setupPossibleMoves).toHaveBeenCalledWith(mockUserPlayerCharacter);
+        });
     });
 
     describe('movePlayer', () => {
-        beforeEach(() => {
-            spyOn(service, 'doesPlayerHaveItem').and.returnValue(false);
-        });
-
         it('should move player from one tile to another if player is found', () => {
             const playerId = 'player1';
             const fromTileCoordinates: Vec2 = { x: 0, y: 0 };
@@ -525,6 +686,8 @@ describe('PlayGameBoardManagerService', () => {
             const fromTileInstance = new WalkableTile();
             const toTileInstance = new WalkableTile();
 
+            spyOn(service, 'doesPlayerHaveItem').and.returnValue(true);
+            spyOn(service, 'convertTileToIce').and.callThrough();
             spyOn(service, 'findPlayerFromSocketId').and.returnValue(mockPlayerCharacter);
             gameMapDataManagerServiceSpy.getTileAt.and.callFake((coordinates: Vec2) => {
                 if (coordinates === fromTileCoordinates) return fromTileInstance;
@@ -537,6 +700,7 @@ describe('PlayGameBoardManagerService', () => {
 
             service.movePlayer(playerId, fromTileCoordinates, toTileCoordinates, false);
 
+            expect(service.convertTileToIce).toHaveBeenCalledWith(fromTileInstance);
             expect(service.findPlayerFromSocketId).toHaveBeenCalledWith(playerId);
             expect(fromTileInstance.removePlayer).toHaveBeenCalled();
             expect(toTileInstance.setPlayer).toHaveBeenCalledWith(mockPlayerCharacter.mapEntity);
@@ -554,6 +718,108 @@ describe('PlayGameBoardManagerService', () => {
 
             expect(service.findPlayerFromSocketId).toHaveBeenCalledWith(playerId);
             expect(gameMapDataManagerServiceSpy.getTileAt).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('convertTileToIce', () => {
+        it('should convert a terrain tile to an ice tile and retain the item', () => {
+            const mockTerrainTile = new TerrainTile();
+            mockTerrainTile.coordinates = { x: 1, y: 1 } as Vec2;
+            const mockItem = new Item();
+            mockTerrainTile.item = mockItem;
+
+            const mockIceTile = new IceTile();
+            tileFactoryServiceSpy.createTile.and.returnValue(mockIceTile);
+
+            service.convertTileToIce(mockTerrainTile);
+
+            expect(tileFactoryServiceSpy.createTile).toHaveBeenCalledWith(TileType.Ice);
+            expect(mockIceTile.coordinates).toEqual(mockTerrainTile.coordinates);
+            expect(mockIceTile.item).toBe(mockItem);
+            expect(gameMapDataManagerServiceSpy.setTileAt).toHaveBeenCalledWith(mockTerrainTile.coordinates, mockIceTile);
+        });
+
+        it('should not convert a non-terrain tile', () => {
+            const mockNonTerrainTile = new Tile();
+            mockNonTerrainTile.coordinates = { x: 1, y: 1 } as Vec2;
+
+            service.convertTileToIce(mockNonTerrainTile);
+
+            expect(tileFactoryServiceSpy.createTile).not.toHaveBeenCalled();
+            expect(gameMapDataManagerServiceSpy.setTileAt).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('handleTileItem', () => {
+        let mockPlayer: PlayerCharacter;
+        let mockTile: TerrainTile;
+        let mockItem: Item;
+
+        beforeEach(() => {
+            mockPlayer = new PlayerCharacter('player1');
+            mockPlayer.inventory = [new EmptyItem(), new Chestplate(), new EmptyItem()];
+            mockTile = new TerrainTile();
+            mockTile.coordinates = { x: 1, y: 1 } as Vec2;
+            mockItem = new DiamondSword();
+            mockTile.item = mockItem;
+
+            spyOn(service.signalUserGrabbedItem, 'next');
+            spyOn(service.eventJournal, 'broadcastEvent');
+        });
+
+        it('should return false if tile is not terrain', () => {
+            const nonTerrainTile = new WallTile();
+
+            const result = service.handleTileItem(nonTerrainTile, mockPlayer, []);
+
+            expect(result).toBeFalse();
+        });
+
+        it('should return true and emit signalUserGrabbedItem if item is grabbable and player has empty slot', () => {
+            spyOn(mockItem, 'isGrabbable').and.returnValue(true);
+
+            const result = service.handleTileItem(mockTile, mockPlayer, []);
+
+            expect(result).toBeTrue();
+            expect(service.signalUserGrabbedItem.next).toHaveBeenCalledWith({
+                itemType: mockItem.type,
+                tileCoordinates: mockTile.coordinates,
+                playerTurnId: mockPlayer.socketId,
+            });
+            expect(service.eventJournal.broadcastEvent).toHaveBeenCalledWith(`${mockPlayer.name} a ramassé l'objet ${mockItem.type}`, [mockPlayer]);
+        });
+
+        it('should return true and add item to possibleItems if item is grabbable and player has no empty slot', () => {
+            mockPlayer.inventory = [new DiamondSword(), new Chestplate(), new Totem()];
+            spyOn(mockItem, 'isGrabbable').and.returnValue(true);
+
+            const possibleItems: Item[] = [];
+            const result = service.handleTileItem(mockTile, mockPlayer, possibleItems);
+
+            expect(result).toBeTrue();
+            expect(possibleItems).toContain(mockItem);
+            expect(service.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(service.eventJournal.broadcastEvent).not.toHaveBeenCalled();
+        });
+
+        it('should return false if item is not grabbable', () => {
+            spyOn(mockItem, 'isGrabbable').and.returnValue(false);
+
+            const result = service.handleTileItem(mockTile, mockPlayer, []);
+
+            expect(result).toBeFalse();
+            expect(service.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(service.eventJournal.broadcastEvent).not.toHaveBeenCalled();
+        });
+
+        it('should return false if there is no item on the tile', () => {
+            mockTile.item = null;
+
+            const result = service.handleTileItem(mockTile, mockPlayer, []);
+
+            expect(result).toBeFalse();
+            expect(service.signalUserGrabbedItem.next).not.toHaveBeenCalled();
+            expect(service.eventJournal.broadcastEvent).not.toHaveBeenCalled();
         });
     });
 
@@ -1199,6 +1465,14 @@ describe('PlayGameBoardManagerService', () => {
             service.startBattle(playerId, enemyPlayerId);
 
             expect(service.areOtherPlayersInBattle).toBeTrue();
+            expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
+        });
+
+        it('should return if currentPlayer is not found', () => {
+            spyOn(service, 'getCurrentPlayerCharacter').and.returnValue(null);
+
+            service.startBattle('player1', 'player2');
+
             expect(battleManagerServiceSpy.init).not.toHaveBeenCalled();
         });
     });
