@@ -1,8 +1,9 @@
 // this is a test file for the virtual player manager service, which is a service that manages the virtual players in the game, so it is a very long ts file and its test file is expected to be very long
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { EmptyItem } from '@common/classes/Items/empty-item';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
@@ -17,7 +18,6 @@ import { ProfileEnum } from '@common/enums/profile';
 import { TileType } from '@common/enums/tile-type';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject } from 'rxjs';
-import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 
 describe('VirtualPlayerManagerService', () => {
