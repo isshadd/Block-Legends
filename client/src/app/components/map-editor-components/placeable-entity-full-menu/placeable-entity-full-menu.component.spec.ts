@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 // This line is necessary for the PlaceableEntityFullMenuComponent to work and should not be refactored. We have to disable max-len
 // eslint-disable-next-line max-len
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager/map-editor-manager.service';
 import { PlaceableEntityFullMenuComponent } from './placeable-entity-full-menu.component';
 
 describe('PlaceableEntityFullMenuComponent', () => {

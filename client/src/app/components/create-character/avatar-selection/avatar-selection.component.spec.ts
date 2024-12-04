@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { AvatarEnum } from '@common/enums/avatar-enum';
 import { Subject } from 'rxjs';
@@ -104,5 +104,31 @@ describe('AvatarSelectionComponent', () => {
 
         expect(component.takenAvatars).toEqual(takenAvatars);
         expect(component.avatarList).toEqual(Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]));
+    });
+
+    it('should return early and not modify avatarList if takenAvatars is null or undefined', () => {
+        // Set up initial avatarList
+        const initialAvatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+        component.avatarList = [...initialAvatarList];
+
+        // Test with null
+        component.takenAvatars = [];
+        component.filterAvatars();
+        expect(component.avatarList).toEqual(initialAvatarList);
+    });
+
+    it('should return early and not filter avatarList if takenAvatars is null or undefined', () => {
+        const initialAvatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+        component.avatarList = [...initialAvatarList];
+
+        component.takenAvatars = [];
+        component.filterAvatars();
+
+        expect(component.avatarList).toEqual(initialAvatarList);
+
+        (component as AvatarSelectionComponent).takenAvatars = [];
+        component.filterAvatars();
+
+        expect(component.avatarList).toEqual(initialAvatarList);
     });
 });

@@ -6,7 +6,7 @@ import { AttributesComponent } from '@app/components/create-character/attributes
 import { AvatarSelectionComponent } from '@app/components/create-character/avatar-selection/avatar-selection.component';
 import { ImageShowcaseComponent } from '@app/components/image-showcase/image-showcase.component';
 import { GameService } from '@app/services/game-services/game.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
 

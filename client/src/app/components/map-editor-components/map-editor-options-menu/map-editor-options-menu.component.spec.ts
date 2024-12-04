@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MapEditorModalComponent } from '@app/components/map-editor-components/map-editor-modal/map-editor-modal.component';
-import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager.service';
-import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager.service';
+import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
+import { MapEditorManagerService } from '@app/services/map-editor-services/map-editor-manager/map-editor-manager.service';
 import { GameShared } from '@common/interfaces/game-shared';
 import { of } from 'rxjs';
 import { MapEditorOptionsMenuComponent } from './map-editor-options-menu.component';

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { GameServerCommunicationService } from '@app/services/game-server-communication.service';
+import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 import { GameMode } from '@common/enums/game-mode';
 import { MapSize } from '@common/enums/map-size';
 import { GameShared } from '@common/interfaces/game-shared';

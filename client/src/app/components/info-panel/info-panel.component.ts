@@ -5,7 +5,7 @@ import { MapTileInfoComponent } from '@app/components/map-tile-info/map-tile-inf
 /* eslint-disable max-len */
 import { ItemListContainerComponent } from '@app/components/play-page-components/item-list-container/item-list-container/item-list-container.component';
 import { SideViewPlayerInfoComponent } from '@app/components/side-view-player-info/side-view-player-info.component';
-import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { Item } from '@common/classes/Items/item';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
