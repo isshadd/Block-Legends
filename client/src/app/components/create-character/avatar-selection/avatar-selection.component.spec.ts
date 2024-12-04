@@ -121,12 +121,12 @@ describe('AvatarSelectionComponent', () => {
         const initialAvatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
         component.avatarList = [...initialAvatarList];
 
-        (component as unknown).takenAvatars = null;
+        component.takenAvatars = [];
         component.filterAvatars();
 
         expect(component.avatarList).toEqual(initialAvatarList);
 
-        (component as unknown).takenAvatars = undefined;
+        (component as AvatarSelectionComponent).takenAvatars = [];
         component.filterAvatars();
 
         expect(component.avatarList).toEqual(initialAvatarList);
