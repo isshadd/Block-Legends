@@ -12,7 +12,7 @@ import { ProfileEnum } from '@common/enums/profile';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { WaitingViewComponent } from './waiting-view.component';
 
-/*eslint-disable @typescript-eslint/no-explicit-any*/ // Disabling explicit any is necessary for the spyOn function
+/* eslint-disable @typescript-eslint/no-explicit-any*/ // Disabling explicit any is necessary for the spyOn function
 
 const ACCESS_CODE = 1234;
 const PLAYER4 = 4;
@@ -52,7 +52,7 @@ describe('WaitingViewComponent', () => {
                 players$: new BehaviorSubject<PlayerCharacter[]>([mockCharacter as PlayerCharacter]),
                 isLocked$: new BehaviorSubject<boolean>(false),
                 maxPlayers$: new BehaviorSubject<number>(PLAYER4),
-                socket: socket,
+                socket,
                 avatarTakenError$: new Subject<string>(),
             },
         );

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */ // Allow usage of undefined variables which is necessary for testing of this file
 import { TestBed } from '@angular/core/testing';
 import { AvatarService } from '@app/services/avatar-service/avatar.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
