@@ -102,4 +102,11 @@ describe('ImageShowcaseComponent', () => {
             expect(component.getRandomisedImage).toHaveBeenCalledWith(mockAvatar);
         });
     });
+
+    it('should return standing image for invalid random value (default case)', () => {
+        const invalidRandomValue = 1.0; // Simulate an invalid random value
+        spyOn(Math, 'random').and.returnValue(invalidRandomValue); // Force the invalid value
+        const result = component.getRandomisedImage(mockAvatar);
+        expect(result).toBe(mockAvatar.standing); // Ensure it falls back to the default
+    });
 });
