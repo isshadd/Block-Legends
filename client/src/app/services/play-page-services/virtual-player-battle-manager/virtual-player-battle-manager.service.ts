@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { DebugService } from '@app/services/debug-service/debug.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { POTION_DEFENSE_BONUS } from '@common/constants/game_constants';
 import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
-import { BattleManagerService } from '../game-board/battle-manager-service/battle-manager.service';
-import { PlayGameBoardManagerService } from '../game-board/play-game-board-manager/play-game-board-manager.service';
 
 @Injectable({
     providedIn: 'root',

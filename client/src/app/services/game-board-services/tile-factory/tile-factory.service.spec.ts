@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { Item } from '@common/classes/Items/item';
 import { DoorTile } from '@common/classes/Tiles/door-tile';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
@@ -11,8 +13,6 @@ import { WaterTile } from '@common/classes/Tiles/water-tile';
 import { ItemType } from '@common/enums/item-type';
 import { TileType } from '@common/enums/tile-type';
 import { TileShared } from '@common/interfaces/tile-shared';
-import { ItemFactoryService } from '../item-factory/item-factory.service';
-import { TileFactoryService } from './tile-factory.service';
 
 describe('TileFactoryService', () => {
     let service: TileFactoryService;

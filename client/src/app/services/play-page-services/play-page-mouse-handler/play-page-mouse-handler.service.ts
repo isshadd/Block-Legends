@@ -4,7 +4,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Subject, takeUntil } from 'rxjs';
-import { PlayGameBoardManagerService } from '../game-board/play-game-board-manager/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 
 enum MouseButton {
     Left = 0,

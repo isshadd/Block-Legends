@@ -3,6 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ErrorModalComponent } from '@app/components/map-editor-components/validation-modal/error-modal/error-modal.component';
+import { Pathfinder } from '@app/services/game-board-services/path-finder/path-finder';
+import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
 import { GameServerCommunicationService } from '@app/services/game-server-communication/game-server-communication.service';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Spawn } from '@common/classes/Items/spawn';
@@ -20,8 +22,6 @@ import { GameShared } from '@common/interfaces/game-shared';
 import { TileShared } from '@common/interfaces/tile-shared';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of, throwError } from 'rxjs';
-import { Pathfinder } from '../path-finder/path-finder';
-import { TileFactoryService } from '../tile-factory/tile-factory.service';
 import { GameMapDataManagerService } from './game-map-data-manager.service';
 
 describe('GameMapDataManagerService', () => {

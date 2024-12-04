@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 // this is necessary for the import of AdministrationGameComponent and it is impossible to refactor the address
 // eslint-disable-next-line
 import { RouterTestingModule } from '@angular/router/testing';
-import { CreateGameModalComponent } from '@app/components/administration-page-component/creatGameModal/createGameModal.component';
+import { CreateGameModalComponent } from '@app/components/administration-page-component/create-game-modal/create-game-modal.component';
 import { ListGameComponent } from '@app/components/administration-page-component/list-game/list-game.component';
 import { AdministrationGameComponent } from './administration-game.component';
 

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { first } from 'rxjs/operators';
 
 const MEDIUM_EMMITED = 3;

@@ -3,6 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
+import { MapEditorMouseHandlerService } from '@app/services/map-editor-services/map-editor-mouse-handler/map-editor-mouse-handler.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu/map-editor-side-menu.service';
 import { Chestplate } from '@common/classes/Items/chestplate';
 import { DiamondSword } from '@common/classes/Items/diamond-sword';
 import { Item } from '@common/classes/Items/item';
@@ -14,8 +16,6 @@ import { ItemType } from '@common/enums/item-type';
 import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { of, Subject } from 'rxjs';
-import { MapEditorMouseHandlerService } from '../map-editor-mouse-handler/map-editor-mouse-handler.service';
-import { MapEditorSideMenuService } from '../map-editor-side-menu/map-editor-side-menu.service';
 import { MapEditorManagerService } from './map-editor-manager.service';
 
 describe('MapEditorManagerService', () => {

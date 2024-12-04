@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { DebugService } from '@app/services/debug-service/debug.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+// this import's address is too long and address cannot be refactored
+// eslint-disable-next-line max-len
+import { VirtualPlayerBattleManagerService } from '@app/services/play-page-services/virtual-player-battle-manager/virtual-player-battle-manager.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ItemType } from '@common/enums/item-type';
 import { ProfileEnum } from '@common/enums/profile';
 import { Subject } from 'rxjs';
-import { BattleManagerService } from '../game-board/battle-manager-service/battle-manager.service';
-import { PlayGameBoardManagerService } from '../game-board/play-game-board-manager/play-game-board-manager.service';
-import { VirtualPlayerBattleManagerService } from './virtual-player-battle-manager.service';
 
 const REMAINING_HEALTH = 5;
 const ATTACK_DICE = 6;

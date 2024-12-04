@@ -2,6 +2,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { ItemFactoryService } from '@app/services/game-board-services/item-factory/item-factory.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
+import { MapEditorMouseHandlerService } from '@app/services/map-editor-services/map-editor-mouse-handler/map-editor-mouse-handler.service';
+import { MapEditorSideMenuService } from '@app/services/map-editor-services/map-editor-side-menu/map-editor-side-menu.service';
 import { Item } from '@common/classes/Items/item';
 import { TerrainTile } from '@common/classes/Tiles/terrain-tile';
 import { Tile } from '@common/classes/Tiles/tile';
@@ -9,8 +11,6 @@ import { ItemType } from '@common/enums/item-type';
 import { PlaceableEntity, VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
-import { MapEditorMouseHandlerService } from '../map-editor-mouse-handler/map-editor-mouse-handler.service';
-import { MapEditorSideMenuService } from '../map-editor-side-menu/map-editor-side-menu.service';
 
 @Injectable({
     providedIn: 'root',

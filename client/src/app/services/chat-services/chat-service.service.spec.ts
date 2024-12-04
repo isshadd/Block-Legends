@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { SocketStateService } from '@app/services/SocketService/socket-state.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { SocketStateService } from '@app/services/socket-service/socket-state-service/socket-state.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Subject } from 'rxjs';
 

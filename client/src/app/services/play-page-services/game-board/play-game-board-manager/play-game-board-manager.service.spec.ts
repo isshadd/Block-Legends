@@ -3,7 +3,8 @@
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
 import { TileFactoryService } from '@app/services/game-board-services/tile-factory/tile-factory.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 import { GrassTile } from '@common/classes/Tiles/grass-tile';
@@ -16,7 +17,6 @@ import { GameBoardParameters } from '@common/interfaces/game-board-parameters';
 import { GameShared } from '@common/interfaces/game-shared';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { Vec2 } from '@common/interfaces/vec2';
-import { BattleManagerService } from '../battle-manager-service/battle-manager.service';
 import { PlayGameBoardManagerService } from './play-game-board-manager.service';
 
 describe('PlayGameBoardManagerService', () => {

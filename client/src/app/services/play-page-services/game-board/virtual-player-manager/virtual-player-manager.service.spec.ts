@@ -2,14 +2,14 @@
 /* eslint-disable max-lines */
 import { TestBed } from '@angular/core/testing';
 import { GameMapDataManagerService } from '@app/services/game-board-services/game-map-data-manager/game-map-data-manager.service';
-import { WebSocketService } from '@app/services/SocketService/websocket.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 // import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { PlayerMapEntity } from '@common/classes/Player/player-map-entity';
 // import { DoorTile } from '@common/classes/Tiles/door-tile';
 // import { GrassTile } from '@common/classes/Tiles/grass-tile';
 // import { ProfileEnum } from '@common/enums/profile';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { PlayGameBoardManagerService } from '../play-game-board-manager/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { VirtualPlayerManagerService } from './virtual-player-manager.service';
 // import { mock } from 'node:test';
 import { Item } from '@common/classes/Items/item';

@@ -8,6 +8,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { GameService } from '@app/services/game-services/game.service';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { ChatEvents } from '@common/enums/gateway-events/chat-events';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
@@ -15,7 +16,6 @@ import { GameRoom } from '@common/interfaces/game-room';
 import { RoomEvent } from '@common/interfaces/RoomEvent';
 import { RoomMessage, RoomMessageReceived } from '@common/interfaces/roomMessage';
 import { Socket } from 'socket.io-client';
-import { WebSocketService } from '../websocket.service';
 
 const ACCESS_CODE = 1234;
 

@@ -1,15 +1,15 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ClavardageComponent } from './chat.component';
-import { ChatService } from '@app/services/chat-services/chat-service.service';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
 import { ChangeDetectorRef, ElementRef } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Subject } from 'rxjs';
+import { ChatComponent } from './chat.component';
 
 describe('ClavardageComponent', () => {
-    let component: ClavardageComponent;
-    let fixture: ComponentFixture<ClavardageComponent>;
+    let component: ChatComponent;
+    let fixture: ComponentFixture<ChatComponent>;
     let chatService: jasmine.SpyObj<ChatService>;
     let messageReceivedSubject: Subject<void>;
 
@@ -29,7 +29,7 @@ describe('ClavardageComponent', () => {
         });
 
         await TestBed.configureTestingModule({
-            imports: [FormsModule, CommonModule, ClavardageComponent],
+            imports: [FormsModule, CommonModule, ChatComponent],
             providers: [{ provide: ChatService, useValue: chatServiceSpy }, ChangeDetectorRef],
         }).compileComponents();
 
@@ -37,7 +37,7 @@ describe('ClavardageComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(ClavardageComponent);
+        fixture = TestBed.createComponent(ChatComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

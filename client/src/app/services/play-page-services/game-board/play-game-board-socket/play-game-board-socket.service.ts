@@ -4,8 +4,11 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { BattleManagerService } from '@app/services/play-page-services/game-board/battle-manager-service/battle-manager.service';
 import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
+import { VirtualPlayerManagerService } from '@app/services/play-page-services/game-board/virtual-player-manager/virtual-player-manager.service';
 import { GameStatisticsService } from '@app/services/play-page-services/game-statistics/game-statistics.service';
 import { PlayPageMouseHandlerService } from '@app/services/play-page-services/play-page-mouse-handler/play-page-mouse-handler.service';
+/* eslint-disable max-len */ // necessary to accommodate long import statements
+import { VirtualPlayerBattleManagerService } from '@app/services/play-page-services/virtual-player-battle-manager/virtual-player-battle-manager.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { WAIT_TIME } from '@common/constants/game_constants';
 import { SocketEvents } from '@common/enums/gateway-events/socket-events';
@@ -15,8 +18,6 @@ import { GameStatistics } from '@common/interfaces/game-statistics';
 import { Vec2 } from '@common/interfaces/vec2';
 import { Subject, takeUntil } from 'rxjs';
 import { Socket } from 'socket.io-client';
-import { VirtualPlayerBattleManagerService } from '../../virtual-player-battle-manager/virtual-player-battle-manager.service';
-import { VirtualPlayerManagerService } from '../virtual-player-manager/virtual-player-manager.service';
 
 @Injectable({
     providedIn: 'root',

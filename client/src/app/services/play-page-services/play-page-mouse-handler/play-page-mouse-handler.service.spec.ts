@@ -5,7 +5,7 @@ import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Tile } from '@common/classes/Tiles/tile';
 import { VisibleState } from '@common/interfaces/placeable-entity';
 import { of, Subject } from 'rxjs';
-import { PlayGameBoardManagerService } from '../game-board/play-game-board-manager/play-game-board-manager.service';
+import { PlayGameBoardManagerService } from '@app/services/play-page-services/game-board/play-game-board-manager/play-game-board-manager.service';
 import { PlayPageMouseHandlerService } from './play-page-mouse-handler.service';
 
 describe('PlayPageMouseHandlerService - ngOnDestroy', () => {
