@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { GameService } from '@app/services/game-services/game.service';
 import { Avatar } from '@common/enums/avatar-enum';
+import { Subscription } from 'rxjs';
 enum AvatarImages {
     MineshaftImage,
     Standing,
@@ -15,14 +16,22 @@ enum AvatarImages {
     templateUrl: './image-showcase.component.html',
     styleUrl: './image-showcase.component.scss',
 })
-export class ImageShowcaseComponent {
+export class ImageShowcaseComponent implements OnDestroy  {
     currentImage: string;
+    private subscriptions: Subscription = new Subscription();
+
     constructor(public gameService: GameService) {
-        this.gameService.signalAvatarSelected$.subscribe((avatar: Avatar) => {
-            this.setupImage(avatar);
-        });
+        this.subscriptions.add(
+            this.gameService.signalAvatarSelected$.subscribe((avatar: Avatar) => {
+                this.setupImage(avatar);
+            }),
+        );
 
         this.currentImage = 'assets/images/avatar/wallpaper.jpg';
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     setupImage(avatar: Avatar) {
