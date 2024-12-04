@@ -129,4 +129,16 @@ describe('ListGameComponent', () => {
         expect(URL.createObjectURL).toHaveBeenCalled();
         expect(URL.revokeObjectURL).toHaveBeenCalled();
     });
+
+    it('should return early if id is null or undefined in deleteGame', () => {
+        // Test with null
+        component.deleteGame(null);
+        expect(mockAdministrationService.deleteGame).not.toHaveBeenCalled();
+        expect(mockDialog.open).not.toHaveBeenCalled();
+
+        // Test with undefined
+        component.deleteGame(undefined);
+        expect(mockAdministrationService.deleteGame).not.toHaveBeenCalled();
+        expect(mockDialog.open).not.toHaveBeenCalled();
+    });
 });
