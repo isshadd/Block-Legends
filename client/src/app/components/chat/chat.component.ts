@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChatService } from '@app/services/chat-services/chat-service.service';
 import { ColorService } from '@app/services/colors-service/colors.service';
 import { RoomMessageReceived } from '@common/interfaces/roomMessage';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-chat',
@@ -18,6 +19,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     messageToSend: string = '';
     messages: RoomMessageReceived[] = this.chatService.roomMessages;
 
+    private subscriptions: Subscription = new Subscription();
+
     playerName: string = '';
     shouldScroll: boolean = false;
 
@@ -29,10 +32,16 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     ngOnInit() {
         this.playerName = this.chatService.player.name;
-        this.chatService.messageReceived$.subscribe(() => {
-            this.shouldScroll = true;
-            this.cdr.detectChanges();
-        });
+        this.subscriptions.add(
+            this.chatService.messageReceived$.subscribe(() => {
+                this.shouldScroll = true;
+                this.cdr.detectChanges();
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     ngAfterViewChecked() {

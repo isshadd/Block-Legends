@@ -5,6 +5,7 @@ import { GameService } from '@app/services/game-services/game.service';
 import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
 import { PlayerCharacter } from '@common/classes/Player/player-character';
 import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-avatar-selection',
@@ -18,6 +19,8 @@ export class AvatarSelectionComponent implements OnInit {
     avatarList: Avatar[] = [];
     takenAvatars: string[] = [];
 
+    private subscriptions: Subscription = new Subscription();
+
     constructor(
         private webSocketService: WebSocketService,
         private gameService: GameService,
@@ -26,10 +29,16 @@ export class AvatarSelectionComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.webSocketService.takenAvatars$.subscribe((takenAvatars) => {
-            this.takenAvatars = takenAvatars;
-            this.filterAvatars();
-        });
+        this.subscriptions.add(
+            this.webSocketService.takenAvatars$.subscribe((takenAvatars) => {
+                this.takenAvatars = takenAvatars;
+                this.filterAvatars();
+            }),
+        );
+    }
+
+    ngOnDestroy(): void {
+        this.subscriptions.unsubscribe();
     }
 
     setAvatars() {
