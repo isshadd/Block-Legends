@@ -1,108 +1,130 @@
-import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GameListComponent } from '@app/components/create-game/game-list/game-list/game-list.component';
-import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
-import { PlayerCharacter } from '@common/classes/Player/player-character';
-import { AvatarEnum } from '@common/enums/avatar-enum';
-import { Subject } from 'rxjs';
 import { AvatarSelectionComponent } from './avatar-selection.component';
+import { WebSocketService } from '@app/services/socket-service/websocket-service/websocket.service';
+import { GameService } from '@app/services/game-services/game.service';
+import { PlayerCharacter } from '@common/classes/Player/player-character';
+import { Avatar, AvatarEnum } from '@common/enums/avatar-enum';
+import { BehaviorSubject } from 'rxjs';
 
-class MockWebSocketService {
-    takenAvatarsSubject = new Subject<string[]>();
-    takenAvatars$ = this.takenAvatarsSubject.asObservable();
-
-    emitTakenAvatars(avatars: string[]) {
-        this.takenAvatarsSubject.next(avatars);
-    }
-}
+const AMOUNT_OF_AVATARS = 24;
 
 describe('AvatarSelectionComponent', () => {
     let component: AvatarSelectionComponent;
     let fixture: ComponentFixture<AvatarSelectionComponent>;
-    let mockWebSocketService: MockWebSocketService;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let takenAvatarsSubject: BehaviorSubject<string[]>;
+
+    const mockCharacter = new PlayerCharacter('TestPlayer');
+    const mockAvatar: Avatar = {
+        name: 'TestAvatar',
+        headImage: 'head.png',
+        fullImage: 'full.png',
+        mineshaftImage: 'mineshaft.png',
+        standing: 'standing.png',
+        dogPetting: 'dogPetting.png',
+        lost: 'lost.png',
+        fight: 'fight.png'
+    };
 
     beforeEach(async () => {
-        mockWebSocketService = new MockWebSocketService();
+        takenAvatarsSubject = new BehaviorSubject<string[]>([]);
+        
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', [], {
+            takenAvatars$: takenAvatarsSubject.asObservable()
+        });
+        
+        gameServiceSpy = jasmine.createSpyObj('GameService', ['setSelectedAvatar']);
 
         await TestBed.configureTestingModule({
-            imports: [CommonModule, AvatarSelectionComponent, GameListComponent],
-            providers: [{ provide: WebSocketService, useValue: mockWebSocketService }],
+            imports: [AvatarSelectionComponent],
+            providers: [
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: GameService, useValue: gameServiceSpy }
+            ]
         }).compileComponents();
-    });
 
-    beforeEach(() => {
         fixture = TestBed.createComponent(AvatarSelectionComponent);
         component = fixture.componentInstance;
-        component.character = { avatar: null } as unknown as PlayerCharacter;
+        component.character = mockCharacter;
         fixture.detectChanges();
     });
 
-    it('should create the component', () => {
+    it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should initialize avatarList correctly', () => {
-        const expectedAvatars = Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]);
-        expect(component.avatarList).toEqual(expectedAvatars);
+    describe('setAvatars', () => {
+        it('should initialize avatarList with all avatars from AvatarEnum', () => {
+            component.setAvatars();
+            
+            expect(component.avatarList.length).toBe(AMOUNT_OF_AVATARS);
+            expect(component.avatarList).toContain(Object.values(AvatarEnum)[0]);
+        });
     });
 
-    it('should filter out taken avatars from the avatarList', () => {
-        component.takenAvatars = [AvatarEnum.Steve.name];
-        component.avatarList = [AvatarEnum.Steve, AvatarEnum.Alex];
+    describe('filterAvatars', () => {
+        it('should remove taken avatars from avatarList', () => {
+            const takenAvatarName = Object.values(AvatarEnum)[0].name;
+            component.takenAvatars = [takenAvatarName];
+            
+            component.filterAvatars();
+            
+            const filteredList = component.avatarList;
+            expect(filteredList.find(avatar => avatar.name === takenAvatarName)).toBeFalsy();
+        });
 
-        component.filterAvatars();
+        it('should not filter if takenAvatars is undefined', () => {
+            const initialLength = component.avatarList.length;
+            component.takenAvatars = undefined as any;
+            
+            component.filterAvatars();
+            
+            expect(component.avatarList.length).toBe(initialLength);
+        });
 
-        expect(component.avatarList).not.toContain(AvatarEnum.Steve);
-        expect(component.avatarList).toContain(AvatarEnum.Alex);
+        it('should keep untaken avatars in the list', () => {
+            const untakenAvatar = Object.values(AvatarEnum)[0];
+            const takenAvatar = Object.values(AvatarEnum)[1];
+            component.takenAvatars = [takenAvatar.name];
+            
+            component.filterAvatars();
+            
+            expect(component.avatarList).toContain(untakenAvatar);
+        });
     });
 
-    it('should initialize avatarList with all avatars before any taken avatars are emitted', () => {
-        const allAvatars = Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]);
+    describe('selectAvatar', () => {
+        it('should set avatar for character and notify service', () => {
+            component.selectAvatar(mockAvatar);
 
-        expect(component.avatarList).toEqual(allAvatars);
+            expect(component.character.avatar).toBe(mockAvatar);
+            expect(gameServiceSpy.setSelectedAvatar).toHaveBeenCalledWith(mockAvatar);
+        });
     });
 
-    it('should set the selected avatar on the player character', () => {
-        const mockCharacter = { avatar: null } as unknown as PlayerCharacter;
-        component.character = mockCharacter;
-        const selectedAvatar = AvatarEnum.Steve;
+    describe('ngOnInit', () => {
+        it('should update takenAvatars and filter list when receiving new taken avatars', () => {
+            const takenAvatarName = Object.values(AvatarEnum)[0].name;
+            spyOn(component, 'filterAvatars');
 
-        component.selectAvatar(selectedAvatar);
+            takenAvatarsSubject.next([takenAvatarName]);
 
-        expect(component.character.avatar).toBe(selectedAvatar);
-    });
+            expect(component.takenAvatars).toEqual([takenAvatarName]);
+            expect(component.filterAvatars).toHaveBeenCalled();
+        });
 
-    it('should update takenAvatars and filter avatarList when takenAvatars$ emits', () => {
-        const takenAvatars = [AvatarEnum.Arlina.name];
-        const expectedFilteredAvatars = Object.keys(AvatarEnum)
-            .map((key) => AvatarEnum[key as keyof typeof AvatarEnum])
-            .filter((avatar) => avatar !== AvatarEnum.Arlina);
+        it('should maintain subscription to takenAvatars$', () => {
+            const initialLength = component.avatarList.length;
+            const takenAvatarNames = [
+                Object.values(AvatarEnum)[0].name,
+                Object.values(AvatarEnum)[1].name
+            ];
 
-        mockWebSocketService.emitTakenAvatars(takenAvatars);
-        fixture.detectChanges();
+            takenAvatarsSubject.next(takenAvatarNames);
 
-        expect(component.takenAvatars).toEqual(takenAvatars);
-        expect(component.avatarList).toEqual(expectedFilteredAvatars);
-    });
-
-    it('should not modify avatarList if takenAvatars is empty', () => {
-        const takenAvatars: string[] = [];
-        const expectedAvatars = Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]);
-
-        mockWebSocketService.emitTakenAvatars(takenAvatars);
-        fixture.detectChanges();
-
-        expect(component.takenAvatars).toEqual(takenAvatars);
-        expect(component.avatarList).toEqual(expectedAvatars);
-    });
-
-    it('should handle null or undefined takenAvatars gracefully', () => {
-        const takenAvatars: string[] = [];
-
-        mockWebSocketService.emitTakenAvatars(takenAvatars);
-        fixture.detectChanges();
-
-        expect(component.takenAvatars).toEqual(takenAvatars);
-        expect(component.avatarList).toEqual(Object.keys(AvatarEnum).map((key) => AvatarEnum[key as keyof typeof AvatarEnum]));
+            expect(component.takenAvatars).toEqual(takenAvatarNames);
+            expect(component.avatarList.length).toBeLessThan(initialLength);
+        });
     });
 });
