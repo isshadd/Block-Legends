@@ -16,7 +16,7 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
   - Créer une partie
   - Administrer les jeux
 
-![Vue Initiale](images/Vue initiale.png)
+![Vue Initiale](images/Vue-initiale.png)
 
 ### Administration des Jeux
 - Liste des jeux disponibles avec :
