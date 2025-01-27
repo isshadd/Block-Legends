@@ -60,7 +60,7 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
 
 1. Clonez ce dépôt :
    ```bash
-   git clone <URL_DU_DEPOT>
+   git clone https://github.com/isshadd/Block-Legends.git
    ```
 
 2. Assurez-vous d'avoir les dépendances nécessaires installées (Nest.js) :
