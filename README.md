@@ -23,6 +23,8 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
   - Nom, taille de la carte, mode de jeu, aperçu et date de modification.
 - Options : Éditer, supprimer, exporter (JSON), ou importer des jeux.
 
+![Vue d'administration](images/Administrer-les-jeux.png)
+
 ### Création/Édition d'un Jeu
 - Configuration initiale :
   - Mode de jeu : Classique ou Capture the Flag.
@@ -30,12 +32,24 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
 - Placement interactif de tuiles (mur, porte, eau, glace) et d'objets.
 - Validation des configurations avant l'enregistrement.
 
+![Vue d'édition](images/Creation-de-map.png)
+
 ### Création de partie
 - Choix de la map.
 - Création du personnage de l'administrateur
 - Saisie du code de la salle pour qu'un autre joueur rejoigne.
 - Ajout ou non de bots.
 - Possibilité de communiquer avec les autres joueurs via le chat de la salle d'attente.
+
+![Vue de de création](images/Creer-une-partie.png)
+![Création de perso](images/Création-de-perso.png)
+![Vue d'attente](images/Vue-attente.png)
+
+### Joindre une partie
+- Saisie du code de la salle pour qu'un autre joueur rejoigne.
+- Envoie ensuite vers la salle d'attente associée si le code est correct.
+
+![Joindre une partie](images/Joindre-une-partie.png)
 
 ### Déroulement d'une Partie
 - Création de personnages : Nom, avatar et attribution des bonus.
@@ -46,10 +60,14 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
   - **Classique** : Gagner trois combats.
   - **Capture the Flag** : Ramener le drapeau à son point de départ.
 
+![Vue de partie](images/Vue-de-partie.png)
+
 ### Combat
 - Résolution au tour par tour.
 - Calculs impliquant des attributs (attaque/défense) et des dés bonus.
 - Évasion possible (limité à 2 tentatives par combat).
+
+![Vue de combat](images/Vue-de-combat.png)
 
 ### Interface Utilisateur
 - Informations de la partie : Taille de la carte, joueurs présents, joueur actif.
