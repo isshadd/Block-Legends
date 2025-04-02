@@ -90,7 +90,7 @@ Le projet permet de jouer en ligne ou seul avec des bots, creer des maps et des 
 
 4. Lancez l'application dans les dossier client ET server :
    ```bash
-   npm start # ou python app.py
+   npm start
    ```
 
 
