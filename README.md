@@ -1,3 +1,8 @@
+[![TypeScript 91.2%](https://img.shields.io/badge/TypeScript-91.2%25-3178c6?style=flat&logo=TypeScript&logoColor=white)](#)
+[![SCSS 5.0%](https://img.shields.io/badge/SCSS-5.0%25-CC6699?style=flat&logo=Sass&logoColor=white)](#)
+[![HTML 3.7%](https://img.shields.io/badge/HTML-3.7%25-E34F26?style=flat&logo=HTML5&logoColor=white)](#)
+[![JavaScript 0.1%](https://img.shields.io/badge/JavaScript-0.1%25-F7DF1E?style=flat&logo=JavaScript&logoColor=black)](#)
+
 # Plateforme de RPG Tactique
 
 Bienvenue dans la plateforme de jeu de rôle tactique développée dans le cadre du cours-projet **LOG2990**.
